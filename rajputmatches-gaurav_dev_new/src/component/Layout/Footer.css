@@ -1,0 +1,166 @@
+.footer-top {
+  background-color: rgba(102, 37, 37, 1);
+}
+
+.footer-top .footer-design {
+  /* padding: 1.5rem; */
+  max-height: 96px;
+  height: 10vw;
+  min-height: 20px;
+  background-image: url("../../assets/images/footerLayout.png");
+}
+
+.footer-about img {
+  height: 69px;
+  margin-bottom: 3rem;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  /* width: 75%; */
+  max-width: 1400px;
+  margin: 0 auto;
+  color: white;
+  min-height: 610px;
+  height: fit-content;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+  padding-top: 3rem;
+}
+
+.footer-about {
+  width: 40%;
+}
+.footer-links,
+.footer-legal {
+  width: 50%;
+}
+
+.footer-description {
+  margin-top: 1rem;
+  font-size: 18px;
+  line-height: 1.5;
+  font-family: var(--font-body);
+  font-weight: 500;
+  max-width: 465px;
+}
+
+.footer-socials {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.footer-icon {
+  font-size: 1.5rem;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+.footer-icon:hover {
+  color: #ffdd00; /* Yellow */
+}
+
+.footer-heading {
+  font-size: 24px;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  line-height: 1.5;
+
+  margin-bottom: 2rem;
+}
+
+.footer-links ul,
+.footer-legal ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links ul li,
+.footer-legal ul li {
+  margin-bottom: 0.5rem;
+
+  font-size: 16px;
+  line-height: 2;
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+.footer-links a,
+.footer-legal a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover,
+.footer-legal a:hover {
+  color: #ffdd00;
+}
+
+/* Footer Bottom Section */
+.footer-bottom {
+  background-color: white;
+  text-align: center;
+  color: black;
+  font-size: 14px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: 5;
+  margin: 0%;
+}
+
+@media (max-width: 1040px) {
+  .footer-container {
+    width: 90%;
+    padding-top: 1rem;
+  }
+  .footer-about img {
+    margin-bottom: 2rem;
+  }
+  .footer-bottom {
+    font-size: 12px;
+    line-height: 3;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+    flex-direction: column;
+    padding-top: 1rem;
+  }
+  .footer-about,
+  .footer-links,
+  .footer-legal {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .footer-about img {
+    height: 49px;
+    margin-bottom: 1rem;
+  }
+
+  .footer-description {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .footer-heading {
+    margin-top: 1.5rem;
+    font-size: 1.3rem;
+  }
+  .footer-links ul li,
+  .footer-legal ul li {
+    font-size: 1rem;
+    line-height: 2;
+  }
+  .footer-bottom {
+    font-size: 10px;
+    line-height: 2;
+  }
+}

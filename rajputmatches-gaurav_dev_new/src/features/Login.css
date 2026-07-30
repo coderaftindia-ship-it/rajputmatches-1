@@ -1,0 +1,468 @@
+/* ==========================================================================
+   Royal Auth Theme Styles
+   ========================================================================== */
+
+.royal-auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background-image: url("../assets/images/Bannerbg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  box-sizing: border-box;
+  padding: 3rem 1.5rem;
+}
+
+.royal-auth-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(63, 12, 42, 0.5); /* Burgundy-tinted backdrop overlay */
+  backdrop-filter: blur(3px);
+  z-index: 1;
+}
+
+.royal-auth-card {
+  background: var(--royal-cream);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(63, 12, 42, 0.45);
+  border: 2px solid var(--royal-gold);
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  z-index: 2;
+  animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+/* Wider card variant for registration */
+.royal-auth-card.wide {
+  max-width: 720px;
+}
+
+.royal-auth-header {
+  background: linear-gradient(135deg, var(--royal-maroon) 0%, var(--royal-maroon-dark) 100%);
+  padding: 2.5rem 2rem 2rem 2rem;
+  text-align: center;
+  position: relative;
+  border-bottom: 3px solid var(--royal-gold);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.royal-close-btn {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.royal-close-btn:hover {
+  color: var(--royal-gold);
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
+}
+
+.royal-crown-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--royal-gold);
+  background: linear-gradient(135deg, var(--royal-maroon-dark), var(--royal-maroon));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(237, 177, 57, 0.4);
+  margin-bottom: 1rem;
+}
+
+.royal-crown-icon {
+  color: var(--royal-gold);
+  font-size: 2.2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.royal-auth-title {
+  font-family: var(--font-heading);
+  color: var(--royal-gold-light);
+  font-size: 1.95rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem 0;
+  letter-spacing: 0.5px;
+}
+
+.royal-auth-subtitle {
+  font-family: var(--font-heading);
+  font-style: italic;
+  color: var(--royal-cream);
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.95;
+  font-weight: 300;
+}
+
+/* Elegant filigree separator */
+.royal-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60%;
+  margin: 1.25rem 0 0 0;
+  position: relative;
+}
+
+.royal-divider::before,
+.royal-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--royal-gold), transparent);
+}
+
+.royal-divider-ornament {
+  color: var(--royal-gold);
+  font-size: 1rem;
+  margin: 0 8px;
+  opacity: 0.85;
+}
+
+.royal-auth-body {
+  padding: 2.25rem 2.25rem 2.5rem 2.25rem;
+  box-sizing: border-box;
+}
+
+/* Tab Selector */
+.royal-tab-toggle {
+  display: flex;
+  background: rgba(89, 18, 59, 0.06);
+  padding: 4px;
+  border-radius: 30px;
+  margin-bottom: 2rem;
+  border: 1.5px solid rgba(237, 177, 57, 0.25);
+}
+
+.royal-tab-btn {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--royal-text-light);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  text-decoration: none;
+}
+
+.royal-tab-btn:hover {
+  color: var(--royal-maroon);
+}
+
+.royal-tab-btn.active {
+  background: linear-gradient(135deg, var(--royal-maroon), var(--royal-maroon-dark));
+  color: var(--royal-gold-light);
+  box-shadow: 0 4px 12px rgba(89, 18, 59, 0.2);
+}
+
+/* Form groups */
+.royal-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.royal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.royal-input-label {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--royal-maroon);
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.royal-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.royal-input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--royal-gold-dark);
+  font-size: 1.05rem;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.royal-input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.65rem;
+  border: 1.5px solid rgba(237, 177, 57, 0.35);
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  background: #ffffff;
+  color: var(--royal-text);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* Input text adjustments for fields without left icons */
+.royal-input.no-icon {
+  padding-left: 1rem;
+}
+
+.royal-input:focus {
+  border-color: var(--royal-gold);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(237, 177, 57, 0.15);
+}
+
+.royal-input:disabled {
+  background-color: #f5eedf;
+  color: var(--royal-text-light);
+  border-color: rgba(237, 177, 57, 0.2);
+  cursor: not-allowed;
+}
+
+.royal-password-toggle {
+  position: absolute;
+  right: 1rem;
+  color: var(--royal-text-light);
+  cursor: pointer;
+  transition: color 0.2s;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+}
+
+.royal-password-toggle:hover {
+  color: var(--royal-maroon);
+}
+
+.royal-forgot-link {
+  display: block;
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--royal-maroon);
+  font-weight: 600;
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s;
+  text-decoration: none;
+}
+
+.royal-forgot-link:hover {
+  color: var(--royal-maroon-light);
+  text-decoration: underline;
+}
+
+/* Submit button */
+.royal-submit-btn {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--royal-maroon), var(--royal-maroon-dark));
+  color: white;
+  border: 1.5px solid var(--royal-gold);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(89, 18, 59, 0.22);
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.royal-submit-btn:hover {
+  background: linear-gradient(135deg, var(--royal-maroon-dark), var(--royal-maroon));
+  border-color: var(--royal-gold-light);
+  color: var(--royal-gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(89, 18, 59, 0.35);
+}
+
+.royal-submit-btn:active {
+  transform: translateY(0);
+}
+
+.royal-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.royal-submit-btn-icon {
+  font-size: 1.1rem;
+}
+
+/* Footer & other elements */
+.royal-footer-text {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--royal-text-light);
+  margin-top: 1.75rem;
+  font-weight: 500;
+}
+
+.royal-footer-link {
+  color: var(--royal-maroon);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s;
+  margin-left: 4px;
+}
+
+.royal-footer-link:hover {
+  color: var(--royal-maroon-light);
+  text-decoration: underline;
+}
+
+.royal-demo-creds {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--royal-text-light);
+  margin-top: 2rem;
+  padding: 8px 12px;
+  background: rgba(237, 177, 57, 0.1);
+  border: 1px dashed rgba(237, 177, 57, 0.4);
+  border-radius: 8px;
+  line-height: 1.4;
+}
+
+.royal-error-text {
+  color: #c92a2a;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  display: block;
+}
+
+.royal-info-text {
+  color: var(--royal-maroon);
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* OTP Inline Fields styling */
+.royal-otp-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+/* Responsive grid for registration on mobile */
+@media (max-width: 640px) {
+  .royal-form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .royal-auth-container {
+    padding: 1rem 0.75rem;
+  }
+  .royal-auth-body {
+    padding: 1.25rem 1.1rem 1.5rem;
+  }
+  .royal-auth-header {
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+  .royal-auth-title {
+    font-size: 1.35rem;
+  }
+  .royal-auth-subtitle {
+    font-size: 0.9rem;
+  }
+  .royal-crown-badge {
+    width: 54px;
+    height: 54px;
+    margin-bottom: 0.6rem;
+  }
+  .royal-crown-icon {
+    font-size: 1.6rem;
+  }
+  /* Smaller submit button on mobile */
+  .royal-submit-btn {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 9px;
+    gap: 6px;
+  }
+  .royal-submit-btn-icon {
+    font-size: 0.95rem;
+  }
+  /* Smaller tab buttons */
+  .royal-tab-btn {
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+  /* Smaller labels and inputs */
+  .royal-input-label {
+    font-size: 0.82rem;
+    margin-bottom: 0.35rem;
+  }
+  .royal-input {
+    padding: 0.65rem 0.9rem 0.65rem 2.4rem;
+    font-size: 0.85rem;
+    border-radius: 9px;
+  }
+  .royal-form-group {
+    margin-bottom: 1rem;
+  }
+  .royal-forgot-link {
+    font-size: 0.78rem;
+    margin-bottom: 1rem;
+  }
+  .royal-footer-text {
+    font-size: 0.82rem;
+    margin-top: 1.25rem;
+  }
+  .royal-demo-creds {
+    font-size: 0.72rem;
+    margin-top: 1.25rem;
+    padding: 6px 10px;
+  }
+  .royal-otp-wrapper {
+    gap: 6px;
+  }
+}

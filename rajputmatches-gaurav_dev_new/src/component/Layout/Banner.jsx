@@ -1,0 +1,415 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./Home.css";
+import Navbar from "./Navbar";
+import { LiaSearchSolid } from "react-icons/lia";
+import { FaCrown, FaCheckCircle, FaUsers, FaStar, FaRegBuilding, FaVenus, FaMars, FaRegHeart, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
+import Features from "./Features";
+import { useAuth } from "./AuthContext";
+import { motion } from "framer-motion";
+import Bannerbg from "../../assets/images/bannerbg.png";
+import { Country, State, City } from "country-state-city";
+import { Navigate } from "react-router-dom";
+
+const ageOptions = Array.from({ length: 33 }, (_, i) => 18 + i);
+
+function Banner() {
+  const { isAuthenticated, setFormData, formData, userData } = useAuth();
+  const [redirectPath, setRedirectPath] = useState(null);
+
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  // Auto-enforce opposite gender search based on user profile gender
+  useEffect(() => {
+    if (userData?.gender === "Male" && formData.gender !== "Female") {
+      setFormData((prev) => ({ ...prev, gender: "Female" }));
+    } else if (userData?.gender === "Female" && formData.gender !== "Male") {
+      setFormData((prev) => ({ ...prev, gender: "Male" }));
+    }
+  }, [userData?.gender, setFormData, formData.gender]);
+
+  // Populate countries on mount and default to India if empty
+  useEffect(() => {
+    const allCountries = Country.getAllCountries();
+    setCountries(allCountries);
+    if (!formData.country) {
+      setFormData((prev) => ({ ...prev, country: "India" }));
+    }
+  }, []);
+
+  // When country selection changes, update states
+  useEffect(() => {
+    if (formData.country) {
+      const selectedCountry = countries.find(
+        (c) => c.name === formData.country
+      );
+      if (selectedCountry) {
+        setStates(State.getStatesOfCountry(selectedCountry.isoCode));
+      }
+    } else {
+      setStates([]);
+    }
+  }, [formData.country, countries]);
+
+  // When state selection changes, update cities
+  useEffect(() => {
+    if (formData.state && formData.country) {
+      const selectedCountry = countries.find(
+        (c) => c.name === formData.country
+      );
+      if (selectedCountry) {
+        const selectedState = states.find(
+          (s) => s.name === formData.state
+        );
+        if (selectedState) {
+          setCities(City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode));
+        } else {
+          setCities([]);
+        }
+      }
+    } else {
+      setCities([]);
+    }
+  }, [formData.state, formData.country, states, countries]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    let updatedValue = value.trimStart();
+
+    const nameRegex = /^[a-zA-Z\s]{1,20}$/;
+    const locationRegex = /^[a-zA-Z\s,-]{0,50}$/;
+    const numberRegex = /^\d*$/;
+
+    switch (name) {
+      case "name":
+        if (numberRegex.test(value) || nameRegex.test(value)) {
+          updatedValue = value;
+        } else {
+          return;
+        }
+        break;
+      case "location":
+        if (locationRegex.test(value)) {
+          updatedValue = value;
+        } else {
+          return;
+        }
+        break;
+      case "minAge":
+      case "maxAge":
+        if (!numberRegex.test(value)) return;
+        break;
+      default:
+        break;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: updatedValue,
+      ...(name === "country" ? { state: "", city: "" } : {}),
+      ...(name === "state" ? { city: "" } : {}),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      setRedirectPath("/login");
+    } else {
+      setRedirectPath("/search");
+    }
+  };
+
+  if (redirectPath) {
+    return <Navigate to={redirectPath} replace />;
+  }
+
+  const particleStyles = [
+    { left: "10%", animationDelay: "0s", animationDuration: "14s" },
+    { left: "25%", animationDelay: "3s", animationDuration: "18s" },
+    { left: "40%", animationDelay: "1s", animationDuration: "16s" },
+    { left: "55%", animationDelay: "5s", animationDuration: "20s" },
+    { left: "70%", animationDelay: "2s", animationDuration: "15s" },
+    { left: "85%", animationDelay: "4s", animationDuration: "17s" },
+    { left: "95%", animationDelay: "7s", animationDuration: "19s" },
+  ];
+
+  return (
+    <>
+      <div 
+        className="position-relative overflow-hidden banner-wrapper" 
+        style={{ 
+          minHeight: "100vh", 
+          display: "flex", 
+          flexDirection: "column",
+          overflowX: "hidden"
+        }}
+      >
+        {/* Cinematic Ken Burns Background Zoom/Pan Effect */}
+        <div 
+          className="position-absolute top-0 start-0 w-100 h-100" 
+          style={{ 
+            backgroundImage: `url(${Bannerbg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            zIndex: 0,
+            animation: "kenBurns 30s ease-in-out infinite",
+            transformOrigin: "center center"
+          }}
+        ></div>
+
+        {/* Premium Dark Royal Overlay with Maroon and Dark Vignette */}
+        <div 
+          className="position-absolute top-0 start-0 w-100 h-100" 
+          style={{ 
+            background: "linear-gradient(180deg, rgba(70, 0, 0, 0.7) 0%, rgba(20, 20, 20, 0.55) 45%, rgba(20, 20, 20, 0.6) 70%, rgba(70, 0, 0, 0.8) 100%)", 
+            zIndex: 1 
+          }}
+        ></div>
+
+        {/* Floating Sparks / Gold Particles Effect */}
+        <div className="position-absolute w-100 h-100 overflow-hidden" style={{ top: 0, left: 0, zIndex: 2, pointerEvents: "none" }}>
+          {particleStyles.map((style, index) => (
+            <div 
+              key={index} 
+              className="royal-particle" 
+              style={{
+                left: style.left,
+                animationDelay: style.animationDelay,
+                animationDuration: style.animationDuration
+              }}
+            />
+          ))}
+        </div>
+
+        <div style={{ zIndex: 10 }}>
+          <Navbar />
+        </div>
+
+        <div className="container d-flex flex-column justify-content-center flex-grow-1 position-relative" style={{ zIndex: 3 }}>
+          <div className="row align-items-center min-vh-100 mt-2 pt-4 pb-4 mt-md-4 pt-md-5 pb-md-5">
+            {/* Left Column: Text & Badges */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="col-12 col-lg-6 text-white pe-lg-5 mb-5 mb-lg-0"
+            >
+              <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4" style={{ border: "1px solid rgba(237, 177, 57, 0.4)", background: "rgba(0,0,0,0.2)" }}>
+                <FaCrown color="var(--royal-gold)" size={14} />
+                <span style={{ fontSize: "0.85rem", color: "var(--royal-gold)", letterSpacing: "0.5px" }}>Trusted Since 2009</span>
+              </div>
+              
+              <h1 className="display-5 display-md-3 fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", textShadow: "0 4px 15px rgba(0,0,0,0.65)", lineHeight: "1.1", fontSize: "clamp(2rem, 7vw, 4rem)" }}>
+                Where Royalty<br/>Meets <span style={{ color: "var(--royal-gold)" }}>Destiny</span>
+              </h1>
+              
+              <div className="mb-4">
+                <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 10 Q 30 0, 60 10 T 110 10" stroke="var(--royal-gold)" strokeWidth="1.5" fill="none" />
+                  <circle cx="60" cy="10" r="3" fill="var(--royal-gold)" />
+                  <circle cx="10" cy="10" r="2" fill="var(--royal-gold)" />
+                  <circle cx="110" cy="10" r="2" fill="var(--royal-gold)" />
+                </svg>
+              </div>
+              
+              <p className="lead mb-3 mb-md-5 text-white-50" style={{ fontSize: "clamp(0.9rem, 3.5vw, 1.1rem)", maxWidth: "90%", lineHeight: "1.6", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+                India's premium royal matrimonial service. Discover verified, dignified matches from distinguished families — crafted for unions that honour tradition and celebrate love.
+              </p>
+              
+              <div className="d-flex flex-wrap gap-3 mb-3 mb-md-5">
+                <button 
+                  className="royal-button d-flex align-items-center gap-2" 
+                  style={{ padding: "12px 24px", background: "var(--royal-gold)", color: "var(--royal-dark)", border: "none", borderRadius: "8px", fontWeight: "600" }}
+                  onClick={() => setRedirectPath(isAuthenticated ? "/search" : "/signup")}
+                >
+                  <FaRegHeart /> Begin Your Journey
+                </button>
+                <button 
+                  className="royal-button-outline d-flex align-items-center gap-2" 
+                  style={{ padding: "12px 24px", background: "rgba(0,0,0,0.3)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "8px" }}
+                  onClick={() => setRedirectPath(isAuthenticated ? "/search" : "/login")}
+                >
+                  <LiaSearchSolid size={20} /> Explore Matches
+                </button>
+              </div>
+              
+              <div className="d-flex flex-wrap gap-2 gap-md-4 align-items-center" style={{ fontSize: "clamp(0.72rem, 2.5vw, 0.85rem)", opacity: 0.9 }}>
+                <div className="d-flex align-items-center gap-2"><FaCheckCircle color="var(--royal-gold)" /> 100% Verified</div>
+                <div className="d-flex align-items-center gap-2"><FaUsers color="var(--royal-gold)" /> 25,000+ Members</div>
+                <div className="d-flex align-items-center gap-2"><FaStar color="var(--royal-gold)" /> 4.9 Rating</div>
+                <div className="d-flex align-items-center gap-2"><FaRegBuilding color="var(--royal-gold)" /> All Communities</div>
+              </div>
+            </motion.div>
+
+            {/* Right Column: Search Card */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+              className="col-12 col-lg-5 offset-lg-1"
+            >
+              <form 
+                onSubmit={handleSubmit} 
+                className="p-4 p-md-5 rounded-4 d-flex flex-column"
+                style={{ 
+                  background: "rgba(252, 245, 234, 0.95)", // Glassy warm cream
+                  border: "1.5px solid rgba(212, 175, 55, 0.35)", 
+                  borderTop: "6px solid var(--royal-maroon)", // Elegant thick top border
+                  boxShadow: "0 24px 60px rgba(0, 0, 0, 0.35)",
+                  color: "var(--royal-text)",
+                  backdropFilter: "blur(12px)"
+                }}
+              >
+                <div className="text-center mb-4">
+                  <span className="d-block mb-1" style={{ color: "var(--royal-gold-dark)", fontSize: "0.8rem", letterSpacing: "3px", fontWeight: "700", textTransform: "uppercase" }}>Find Your Match</span>
+                  <h2 className="fw-bold mb-2" style={{ fontSize: "1.85rem", fontFamily: "var(--font-heading)", color: "var(--royal-maroon)" }}>
+                    Quick Partner Search
+                  </h2>
+                  <div className="mx-auto" style={{ width: "80px", height: "2px", background: "linear-gradient(90deg, transparent, var(--royal-gold), transparent)" }}></div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="mb-2 fw-bold d-flex align-items-center gap-2" style={{ fontSize: "0.85rem", color: "var(--royal-maroon-dark)", letterSpacing: "0.5px" }}>
+                    <FaRegHeart color="var(--royal-gold-dark)" /> Looking For
+                  </label>
+                  <div className="d-flex gap-3">
+                    <label 
+                      className="flex-grow-1 position-relative" 
+                      style={{ 
+                        opacity: userData?.gender === "Female" ? 0.4 : 1, 
+                        cursor: userData?.gender === "Female" ? "not-allowed" : "pointer" 
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="Female"
+                        checked={formData.gender === "Female"}
+                        onChange={handleChange}
+                        disabled={userData?.gender === "Female"}
+                        className="visually-hidden"
+                      />
+                      <div className="d-flex align-items-center justify-content-center gap-2 rounded-pill py-2" style={{
+                        background: formData.gender === "Female" ? "linear-gradient(135deg, var(--royal-maroon), var(--royal-maroon-dark))" : "#fff",
+                        color: formData.gender === "Female" ? "#fff" : "var(--royal-text-light)",
+                        border: `1.5px solid ${formData.gender === "Female" ? "var(--royal-gold)" : "rgba(89,18,59,0.15)"}`,
+                        transition: "all 0.3s ease",
+                        fontWeight: "700",
+                        fontSize: "0.95rem",
+                        boxShadow: formData.gender === "Female" ? "0 4px 12px rgba(89,18,59,0.2)" : "none"
+                      }}>
+                        <FaVenus /> Bride
+                      </div>
+                    </label>
+                    <label 
+                      className="flex-grow-1 position-relative" 
+                      style={{ 
+                        opacity: userData?.gender === "Male" ? 0.4 : 1, 
+                        cursor: userData?.gender === "Male" ? "not-allowed" : "pointer" 
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="Male"
+                        checked={formData.gender === "Male"}
+                        onChange={handleChange}
+                        disabled={userData?.gender === "Male"}
+                        className="visually-hidden"
+                      />
+                      <div className="d-flex align-items-center justify-content-center gap-2 rounded-pill py-2" style={{
+                        background: formData.gender === "Male" ? "linear-gradient(135deg, var(--royal-maroon), var(--royal-maroon-dark))" : "#fff",
+                        color: formData.gender === "Male" ? "#fff" : "var(--royal-text-light)",
+                        border: `1.5px solid ${formData.gender === "Male" ? "var(--royal-gold)" : "rgba(89,18,59,0.15)"}`,
+                        transition: "all 0.3s ease",
+                        fontWeight: "700",
+                        fontSize: "0.95rem",
+                        boxShadow: formData.gender === "Male" ? "0 4px 12px rgba(89,18,59,0.2)" : "none"
+                      }}>
+                        <FaMars /> Groom
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="row g-3 mb-4">
+                  <div className="col-12 col-sm-6">
+                    <label className="mb-2 fw-bold d-flex align-items-center gap-2" style={{ fontSize: "0.85rem", color: "var(--royal-maroon-dark)" }}>
+                      <FaRegBuilding color="var(--royal-gold-dark)" /> Age Range
+                    </label>
+                    <select
+                      name="ageRange"
+                      className="form-select rounded-3 w-100"
+                      defaultValue="22-30"
+                      style={{ height: "45px", background: "#fff", border: "1.5px solid rgba(89,18,59,0.15)", fontSize: "0.92rem", color: "var(--royal-text)" }}
+                    >
+                      <option value="18-25">18 — 25 years</option>
+                      <option value="22-30">22 — 30 years</option>
+                      <option value="25-35">25 — 35 years</option>
+                      <option value="30-40">30 — 40 years</option>
+                      <option value="40+">40+ years</option>
+                    </select>
+                  </div>
+
+                  <div className="col-12 col-sm-6">
+                    <label className="mb-2 fw-bold d-flex align-items-center gap-2" style={{ fontSize: "0.85rem", color: "var(--royal-maroon-dark)" }}>
+                      <FaMapMarkerAlt color="var(--royal-gold-dark)" /> Location
+                    </label>
+                    <div className="position-relative">
+                      <input
+                        type="text"
+                        name="location"
+                        value={formData.location || ""}
+                        onChange={handleChange}
+                        placeholder="e.g. Jaipur, Rajasthan"
+                        className="form-control rounded-3 w-100"
+                        style={{ 
+                          height: "45px", 
+                          background: "#fff", 
+                          border: "1.5px solid rgba(89,18,59,0.15)", 
+                          fontSize: "0.92rem", 
+                          color: "var(--royal-text)",
+                          paddingLeft: "35px"
+                        }}
+                      />
+                      <FaMapMarkerAlt 
+                        className="position-absolute" 
+                        style={{ 
+                          left: "12px", 
+                          top: "50%", 
+                          transform: "translateY(-50%)", 
+                          color: "rgba(89,18,59,0.4)", 
+                          fontSize: "0.9rem" 
+                        }} 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="btn w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 text-white mt-2 royal-button" 
+                  style={{ height: "48px", fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "0.95rem" }}
+                >
+                  <LiaSearchSolid size={20} /> Search Matches
+                </button>
+                <div className="text-center mt-3">
+                  <span style={{ fontSize: "0.75rem", color: "var(--royal-text-light)" }}>Free registration • No hidden charges</span>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+          
+          <div className="mt-5 pb-5 d-none d-md-block">
+            <Features />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default Banner;

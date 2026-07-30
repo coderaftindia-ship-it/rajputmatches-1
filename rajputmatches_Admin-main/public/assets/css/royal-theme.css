@@ -1,0 +1,684 @@
+/* ==========================================================================
+   Royal Wedding Admin Theme - Redesigned
+   Premium Maroon, Gold & Cream Theme with Modern Glassmorphism & Aesthetics
+   ========================================================================== */
+
+:root {
+  /* Premium Palette */
+  --royal-maroon: #59123B;
+  --royal-maroon-dark: #370823;
+  --royal-maroon-light: #7E2356;
+  --royal-gold: #D4AF37;
+  --royal-gold-light: #F3E5AB;
+  --royal-gold-dark: #AA7C11;
+  --royal-cream: #FCFAF6;
+  --royal-cream-dark: #F3EFE9;
+  --royal-white: #FFFFFF;
+  --royal-text: #2C1821;
+  --royal-text-light: #725D66;
+  --royal-border: rgba(212, 175, 55, 0.15);
+  
+  /* Modern Accents */
+  --royal-success: #2E7D32;
+  --royal-danger: #C62828;
+  --royal-warning: #EF6C00;
+  --royal-info: #1565C0;
+  
+  /* Shadow & Blur System */
+  --royal-shadow-sm: 0 2px 8px rgba(89, 18, 59, 0.04);
+  --royal-shadow-md: 0 12px 30px -10px rgba(89, 18, 59, 0.08);
+  --royal-shadow-lg: 0 22px 50px -15px rgba(89, 18, 59, 0.15);
+  --royal-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --royal-radius-sm: 8px;
+  --royal-radius-md: 16px;
+  --royal-radius-lg: 24px;
+  
+  /* Typography */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+/* ==========================================================================
+   Global Overrides & Layout
+   ========================================================================== */
+body {
+  font-family: var(--font-body) !important;
+  background-color: var(--royal-cream) !important;
+  color: var(--royal-text) !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading) !important;
+  color: var(--royal-maroon);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ==========================================================================
+   Main Navbar (Top Navigation)
+   ========================================================================== */
+.main-navbar {
+  background: var(--royal-white) !important;
+  border-bottom: 1px solid var(--royal-border) !important;
+  box-shadow: var(--royal-shadow-sm) !important;
+  backdrop-filter: blur(8px);
+}
+
+.main-navbar .nav-link-lg {
+  color: var(--royal-maroon) !important;
+  transition: var(--royal-transition);
+}
+
+.main-navbar .nav-link-lg:hover {
+  color: var(--royal-gold) !important;
+  transform: translateY(-1px);
+}
+
+.main-navbar .nav-link-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.main-navbar .user-img-radious-style {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--royal-gold);
+  object-fit: cover;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+  transition: var(--royal-transition);
+}
+
+.main-navbar .user-img-radious-style:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+/* ==========================================================================
+   Sidebar Navigation - Overhauled UI & UX
+   ========================================================================== */
+.main-sidebar {
+  background: linear-gradient(185deg, var(--royal-maroon-dark), var(--royal-maroon)) !important;
+  border-right: 1px solid var(--royal-border) !important;
+  box-shadow: 6px 0 25px rgba(55, 8, 37, 0.25) !important;
+  width: 250px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.main-sidebar .sidebar-brand {
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1) !important;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 24px 20px !important;
+  height: auto !important;
+}
+
+.main-sidebar .sidebar-brand a {
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.main-sidebar .sidebar-brand a span {
+  font-family: var(--font-heading) !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  color: var(--royal-gold) !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.main-sidebar .sidebar-menu {
+  padding: 20px 10px !important;
+}
+
+.main-sidebar .sidebar-menu li.menu-header {
+  color: rgba(243, 229, 171, 0.4) !important;
+  font-family: var(--font-body) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase;
+  margin-top: 20px !important;
+  margin-bottom: 8px !important;
+  padding-left: 15px !important;
+}
+
+.main-sidebar .sidebar-menu li a {
+  color: var(--royal-gold-light) !important;
+  border-radius: 12px;
+  margin-bottom: 4px;
+  padding: 12px 15px !important;
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent !important;
+}
+
+.main-sidebar .sidebar-menu li a i,
+.main-sidebar .sidebar-menu li a svg {
+  font-size: 16px;
+  color: var(--royal-gold) !important;
+  opacity: 0.85;
+  transition: all 0.25s ease !important;
+}
+
+.main-sidebar .sidebar-menu li a:hover {
+  background: rgba(212, 175, 55, 0.08) !important;
+  color: var(--royal-white) !important;
+  padding-left: 20px !important;
+}
+
+.main-sidebar .sidebar-menu li a:hover i,
+.main-sidebar .sidebar-menu li a:hover svg {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.main-sidebar .sidebar-menu li.active > a {
+  background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-dark)) !important;
+  color: var(--royal-maroon-dark) !important;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25) !important;
+}
+
+.main-sidebar .sidebar-menu li.active > a i,
+.main-sidebar .sidebar-menu li.active > a svg {
+  color: var(--royal-maroon-dark) !important;
+  opacity: 1;
+}
+
+.main-sidebar .sidebar-menu li.active > a:hover {
+  padding-left: 15px !important;
+  color: var(--royal-maroon-dark) !important;
+}
+
+/* Submenu Dropdowns styling */
+.main-sidebar .sidebar-menu li.dropdown .dropdown-menu {
+  background-color: rgba(55, 8, 35, 0.4) !important;
+  border-left: 2px solid var(--royal-gold) !important;
+  margin-left: 24px !important;
+  padding: 4px 0 !important;
+  border-radius: 0 0 10px 10px !important;
+}
+
+.main-sidebar .sidebar-menu li.dropdown .dropdown-menu li a {
+  padding: 10px 16px !important;
+  margin-bottom: 2px;
+  font-size: 0.85rem !important;
+  border-radius: 8px !important;
+  color: var(--royal-gold-light) !important;
+}
+
+.main-sidebar .sidebar-menu li.dropdown .dropdown-menu li a:hover {
+  background: rgba(212, 175, 55, 0.06) !important;
+  color: var(--royal-white) !important;
+  padding-left: 20px !important;
+}
+
+.main-sidebar .sidebar-menu li.dropdown .dropdown-menu li.active a {
+  background: rgba(212, 175, 55, 0.15) !important;
+  color: var(--royal-gold) !important;
+  font-weight: 600 !important;
+}
+
+/* Collapsed Mini Sidebar styles */
+body.sidebar-mini .main-sidebar {
+  width: 65px !important;
+}
+
+body.sidebar-mini .main-sidebar .sidebar-brand {
+  padding: 15px 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body.sidebar-mini .main-sidebar .sidebar-brand a span {
+  display: none !important;
+}
+
+body.sidebar-mini .main-sidebar .sidebar-menu li a {
+  padding: 12px 0 !important;
+  justify-content: center;
+  border-radius: 8px !important;
+  margin: 5px !important;
+}
+
+body.sidebar-mini .main-sidebar .sidebar-menu li a span {
+  display: none !important;
+}
+
+body.sidebar-mini .main-sidebar .sidebar-menu li.active > a {
+  background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-dark)) !important;
+}
+
+/* ==========================================================================
+   Premium Cards System
+   ========================================================================== */
+.card {
+  background: var(--royal-white) !important;
+  border: 1px solid var(--royal-border) !important;
+  border-radius: var(--royal-radius-md) !important;
+  box-shadow: var(--royal-shadow-md) !important;
+  transition: var(--royal-transition) !important;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--royal-shadow-lg) !important;
+}
+
+.card .card-header {
+  background: var(--royal-white) !important;
+  border-bottom: 1px solid var(--royal-border) !important;
+  padding: 20px 24px !important;
+  min-height: auto !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card .card-header h4 {
+  font-family: var(--font-heading) !important;
+  font-size: 1.25rem !important;
+  color: var(--royal-maroon) !important;
+  margin: 0 !important;
+  font-weight: 700;
+}
+
+.card .card-body {
+  padding: 24px !important;
+}
+
+/* ==========================================================================
+   Royal KPI Stat Cards
+   ========================================================================== */
+.royal-stat-card {
+  background: var(--royal-white) !important;
+  border: 1px solid var(--royal-border) !important;
+  border-radius: var(--royal-radius-md) !important;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--royal-shadow-md);
+  transition: var(--royal-transition);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.royal-stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.royal-stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--royal-shadow-lg);
+  border-color: var(--royal-gold);
+}
+
+.royal-stat-card .stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+  transition: var(--royal-transition);
+  background: var(--royal-cream-dark);
+}
+
+.royal-stat-card:hover .stat-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.royal-stat-card .stat-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--royal-maroon);
+  font-family: var(--font-heading);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.royal-stat-card .stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--royal-text-light);
+}
+
+/* ==========================================================================
+   Premium Table styling
+   ========================================================================== */
+.table-responsive {
+  border-radius: var(--royal-radius-md);
+  overflow: hidden;
+}
+
+.table-royal {
+  width: 100%;
+  margin-bottom: 0;
+  background: var(--royal-white);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-royal thead th {
+  background: var(--royal-cream-dark) !important;
+  color: var(--royal-maroon) !important;
+  font-family: var(--font-body) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--royal-border) !important;
+  border-top: none !important;
+}
+
+.table-royal tbody td {
+  padding: 16px 20px !important;
+  font-size: 0.875rem;
+  color: var(--royal-text);
+  border-bottom: 1px solid rgba(89, 18, 59, 0.05) !important;
+  vertical-align: middle !important;
+  transition: var(--royal-transition);
+}
+
+.table-royal tbody tr {
+  transition: var(--royal-transition);
+}
+
+.table-royal tbody tr:hover {
+  background-color: rgba(212, 175, 55, 0.04) !important;
+}
+
+.table-royal tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* ==========================================================================
+   Forms & Custom Controls
+   ========================================================================== */
+.form-control-royal {
+  width: 100%;
+  background: var(--royal-cream) !important;
+  border: 1px solid var(--royal-border) !important;
+  border-radius: var(--royal-radius-sm) !important;
+  padding: 10px 16px !important;
+  font-size: 0.9rem !important;
+  color: var(--royal-text) !important;
+  transition: var(--royal-transition) !important;
+}
+
+.form-control-royal:focus {
+  background: var(--royal-white) !important;
+  border-color: var(--royal-gold) !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2) !important;
+  outline: none;
+}
+
+.form-select-royal {
+  background: var(--royal-cream) !important;
+  border: 1px solid var(--royal-border) !important;
+  border-radius: var(--royal-radius-sm) !important;
+  padding: 10px 16px !important;
+  font-size: 0.9rem !important;
+  color: var(--royal-text) !important;
+  transition: var(--royal-transition) !important;
+  cursor: pointer;
+}
+
+.form-select-royal:focus {
+  background: var(--royal-white) !important;
+  border-color: var(--royal-gold) !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2) !important;
+  outline: none;
+}
+
+/* ==========================================================================
+   Royal Buttons
+   ========================================================================== */
+.btn-royal {
+  background: linear-gradient(135deg, var(--royal-maroon), var(--royal-maroon-dark)) !important;
+  color: var(--royal-white) !important;
+  border: 1px solid var(--royal-maroon-dark) !important;
+  border-radius: var(--royal-radius-sm) !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  transition: var(--royal-transition) !important;
+  box-shadow: 0 4px 10px rgba(89, 18, 59, 0.15) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.btn-royal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(89, 18, 59, 0.25) !important;
+  background: linear-gradient(135deg, var(--royal-maroon-light), var(--royal-maroon)) !important;
+}
+
+.btn-royal-gold {
+  background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-dark)) !important;
+  color: var(--royal-white) !important;
+  border: 1px solid var(--royal-gold-dark) !important;
+  border-radius: var(--royal-radius-sm) !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  transition: var(--royal-transition) !important;
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.2) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.btn-royal-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(212, 175, 55, 0.35) !important;
+  background: linear-gradient(135deg, var(--royal-gold-light), var(--royal-gold)) !important;
+}
+
+.btn-royal-outline {
+  background: transparent !important;
+  color: var(--royal-maroon) !important;
+  border: 1.5px solid var(--royal-maroon) !important;
+  border-radius: var(--royal-radius-sm) !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem;
+  transition: var(--royal-transition) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.btn-royal-outline:hover {
+  background: var(--royal-maroon) !important;
+  color: var(--royal-white) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(89, 18, 59, 0.15) !important;
+}
+
+/* ==========================================================================
+   Badges
+   ========================================================================== */
+.badge-royal {
+  background: rgba(89, 18, 59, 0.08) !important;
+  color: var(--royal-maroon) !important;
+  border: 1px solid rgba(89, 18, 59, 0.15) !important;
+  padding: 6px 12px !important;
+  border-radius: 30px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+.badge-royal-gold {
+  background: rgba(212, 175, 55, 0.1) !important;
+  color: var(--royal-gold-dark) !important;
+  border: 1px solid rgba(212, 175, 55, 0.2) !important;
+  padding: 6px 12px !important;
+  border-radius: 30px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+.badge-royal-success {
+  background: rgba(46, 125, 50, 0.08) !important;
+  color: var(--royal-success) !important;
+  border: 1px solid rgba(46, 125, 50, 0.15) !important;
+  padding: 6px 12px !important;
+  border-radius: 30px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+.badge-royal-danger {
+  background: rgba(198, 40, 40, 0.08) !important;
+  color: var(--royal-danger) !important;
+  border: 1px solid rgba(198, 40, 40, 0.15) !important;
+  padding: 6px 12px !important;
+  border-radius: 30px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+.badge-royal-warning {
+  background: rgba(239, 108, 0, 0.08) !important;
+  color: var(--royal-warning) !important;
+  border: 1px solid rgba(239, 108, 0, 0.15) !important;
+  padding: 6px 12px !important;
+  border-radius: 30px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ==========================================================================
+   Recharts Responsive Card Styling
+   ========================================================================== */
+.chart-container {
+  width: 100%;
+  height: 320px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--royal-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--royal-cream-dark);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--royal-gold);
+}
+
+/* ==========================================================================
+   Reports Grid Overrides
+   ========================================================================== */
+.report-grid-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.report-date-group {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .royal-stat-card {
+    padding: 20px;
+  }
+  
+  .royal-stat-card .stat-value {
+    font-size: 1.8rem;
+  }
+
+  .report-grid-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Main Content Responsive Spacing (Prevents sidebar overlap)
+   ========================================================================== */
+.main-content {
+  padding-left: 280px !important;
+  padding-top: 100px !important;
+  padding-right: 30px !important;
+  padding-bottom: 30px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+body.sidebar-mini .main-content {
+  padding-left: 95px !important;
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    padding-left: 30px !important;
+    padding-top: 100px !important;
+  }
+}

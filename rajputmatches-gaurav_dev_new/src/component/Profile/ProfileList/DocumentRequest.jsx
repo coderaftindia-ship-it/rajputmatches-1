@@ -1,0 +1,341 @@
+import React, { useState, useEffect } from "react";
+import "./ShortListedProfile.css";
+import { FaChevronLeft, FaChevronRight, FaFileAlt } from "react-icons/fa";
+import { useAuth } from "../../Layout/AuthContext";
+import styles from "./RequestCard.module.css";
+import placeholderImage from "../../../assets/images/blurimage.png";
+import { useNavigate } from "react-router-dom";
+import RequestCard from "./RequestCard";
+
+function DocumentRequest() {
+  const [activeTab, setActiveTab] = useState("requestSent");
+  const { fetchUserData, updateData } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [profiles, setProfiles] = useState([]);
+  const [data, setData] = useState({ documentReqSent: [], documentReqReceived: [] });
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const profilesPerPage = 4;
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const fetchedData = await fetchUserData("profile/documentrequests");
+      if (!fetchedData || (!fetchedData.documentReqSent && !fetchedData.documentReqReceived)) {
+        throw new Error("Invalid data format");
+      }
+      setData({
+        documentReqSent: fetchedData.documentReqSent || [],
+        documentReqReceived: fetchedData.documentReqReceived || [],
+      });
+      setProfiles(
+        activeTab === "requestSent"
+          ? fetchedData.documentReqSent || []
+          : fetchedData.documentReqReceived || []
+      );
+    } catch (err) {
+      setError("An error occurred while fetching document requests.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshData = () => setRefreshKey((prev) => prev + 1);
+
+  useEffect(() => {
+    fetchData();
+  }, [refreshKey]);
+
+  const switchTab = (tab) => {
+    setActiveTab(tab);
+    const newProfiles =
+      tab === "requestSent" ? data.documentReqSent : data.documentReqReceived;
+    setProfiles(newProfiles);
+    setCurrentPage(1);
+    setStatusFilter("all");
+  };
+
+  const filterProfiles = (status) => {
+    setStatusFilter(status);
+    const source =
+      activeTab === "requestSent" ? data.documentReqSent : data.documentReqReceived;
+    if (status === "all") {
+      setProfiles(source);
+    } else {
+      setProfiles(source.filter((p) => p.status === status));
+    }
+    setCurrentPage(1);
+  };
+
+  const getCurrentProfiles = () => {
+    const start = (currentPage - 1) * profilesPerPage;
+    return profiles.slice(start, start + profilesPerPage);
+  };
+
+  const totalPages = Math.ceil(profiles.length / profilesPerPage);
+
+  // ── Image / Action container ──────────────────────────────────
+  function DocumentImageContainer({ profile, activeButton, status }) {
+    const navigate = useNavigate();
+
+    const handleAction = async (action, profileId) => {
+      try {
+        await updateData(`profile/document/${action}`, profileId, true);
+        fetchData();
+        refreshData();
+      } catch (err) {
+        console.error(`Error on document ${action}:`, err);
+      }
+    };
+
+    const handleWithdraw = async (profileId) => {
+      try {
+        await updateData("profile/document/withdrawal", profileId, true);
+        fetchData();
+        refreshData();
+      } catch (err) {
+        console.error("Error withdrawing document request:", err);
+      }
+    };
+
+    const photos = profile?.filesId?.photos || [];
+    const avatar = photos.find((p) => p?.isAvatar) || photos[0];
+
+    const renderPlaceholderWithActions = (actionButtons = null) => (
+      <div
+        className="image-container"
+        style={{ position: "relative", width: "230px", height: "230px" }}
+      >
+        <img
+          src={avatar?.url || placeholderImage}
+          className="img-fluid m-auto"
+          alt="Profile"
+          style={{ width: "230px", height: "230px", objectFit: "cover" }}
+        />
+        {actionButtons && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              textAlign: "center",
+              padding: "1rem",
+            }}
+          >
+            {actionButtons}
+          </div>
+        )}
+      </div>
+    );
+
+    if (activeButton === "requestSent") {
+      if (status === "pending") {
+        return renderPlaceholderWithActions(
+          <button
+            className={styles.ctaButton}
+            onClick={() => handleWithdraw(profile._id)}
+          >
+            Withdraw Request
+          </button>
+        );
+      } else if (status === "rejected") {
+        return renderPlaceholderWithActions(
+          <div style={{ textAlign: "center" }}>
+            <p
+              className="m-0 mb-1 text-white fw-bold"
+              style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.8)", fontSize: "14px" }}
+            >
+              Request Rejected
+            </p>
+            <button
+              className={styles.ctaButton}
+              onClick={() => updateData("profile/documentRequest", profile._id, true).then(refreshData)}
+            >
+              Resend Request
+            </button>
+          </div>
+        );
+      } else if (status === "accepted") {
+        return renderPlaceholderWithActions(
+          <p
+            className="m-0 text-white fw-bold"
+            style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.8)", fontSize: "14px" }}
+          >
+            ✅ Access Granted
+          </p>
+        );
+      }
+      return renderPlaceholderWithActions(null);
+    }
+
+    if (activeButton === "requestReceived") {
+      if (status === "pending") {
+        return renderPlaceholderWithActions(
+          <div style={{ display: "flex", justifyContent: "center", gap: "6px" }}>
+            <button
+              className={`${styles.ctaButton} w-50`}
+              style={{ backgroundColor: "green", color: "white" }}
+              onClick={() => handleAction("accept", profile._id)}
+            >
+              Accept
+            </button>
+            <button
+              className={`${styles.ctaButton} w-50`}
+              style={{ backgroundColor: "#991c1c", color: "white" }}
+              onClick={() => handleAction("reject", profile._id)}
+            >
+              Reject
+            </button>
+          </div>
+        );
+      } else if (status === "rejected") {
+        return renderPlaceholderWithActions(
+          <p
+            className="m-0 text-white fw-bold"
+            style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.8)", fontSize: "14px" }}
+          >
+            Declined
+          </p>
+        );
+      } else if (status === "accepted") {
+        return renderPlaceholderWithActions(
+          <p
+            className="m-0 text-white fw-bold"
+            style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.8)", fontSize: "14px" }}
+          >
+            ✅ Access Granted
+          </p>
+        );
+      }
+    }
+
+    return renderPlaceholderWithActions(null);
+  }
+
+  // ── Render ────────────────────────────────────────────────────
+  return (
+    <div className="profileContainer">
+      {/* Header */}
+      <div className="profileListHeader">
+        <div className="pagetitle" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <FaFileAlt style={{ color: "#7B1A1A" }} />
+          Document Request
+        </div>
+      </div>
+
+      {/* Tabs + filter */}
+      <div className="row m-0 mb-1 p-0 bg-white">
+        <div className="col-8 col-sm-9 col-md-10 d-flex p-0">
+          {[
+            { key: "requestSent",     label: "Request Sent",     count: data.documentReqSent.length },
+            { key: "requestReceived", label: "Request Received",  count: data.documentReqReceived.length },
+          ].map(({ key, label, count }) => (
+            <div
+              key={key}
+              onClick={() => switchTab(key)}
+              style={{
+                backgroundColor: activeTab === key ? "#7B1A1A" : "transparent",
+                color: activeTab === key ? "white" : "black",
+              }}
+              className="reqbtn"
+            >
+              {label} ({count})
+            </div>
+          ))}
+        </div>
+
+        <div className="col-4 col-sm-3 col-md-2 p-2" style={{ alignContent: "center" }}>
+          <select
+            className="form-select form-select-lg m-0"
+            style={{
+              color: "rgba(97,97,97,1)",
+              borderRadius: "0%",
+              border: "1px solid rgba(97,97,97,1)",
+              padding: "0.5rem 1rem",
+              fontFamily: "Open Sans, sans-serif",
+              fontWeight: "600",
+              fontSize: "clamp(12px,2vw,14px)",
+            }}
+            value={statusFilter}
+            onChange={(e) => filterProfiles(e.target.value)}
+          >
+            <option value="all">All Request</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Profile cards */}
+      {loading ? (
+        <div className="pagetitle text-center">Loading...</div>
+      ) : error ? (
+        <div className="pagetitle text-center text-danger">{error}</div>
+      ) : (
+        <div className="row m-0 p-0">
+          {getCurrentProfiles().length === 0 ? (
+            <div className="pagetitle text-center">No Document Requests Found</div>
+          ) : (
+            getCurrentProfiles().map((entry) => (
+              <RequestCard
+                key={entry._id}
+                profile={entry?.userId}
+                status={entry?.status}
+                ProfileImagerender={DocumentImageContainer}
+                activeTab={activeTab}
+                fetchData={fetchData}
+              />
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Pagination */}
+      <div className="d-flex align-items-center justify-content-center mt-3 mb-3">
+        <div className="d-flex align-items-center gap-2">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            disabled={currentPage === 1}
+            style={{ all: "unset", cursor: currentPage === 1 ? "default" : "pointer" }}
+          >
+            <FaChevronLeft />
+          </button>
+
+          {Array.from({ length: totalPages }).map((_, idx) => (
+            <button
+              key={idx}
+              className={`btn fw-bold d-flex align-items-center justify-content-center ${
+                currentPage === idx + 1 ? "text-white" : "bg-white text-black"
+              }`}
+              style={{
+                backgroundColor: "rgba(123,26,26,1)",
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                padding: 0,
+              }}
+              onClick={() => setCurrentPage(idx + 1)}
+            >
+              {idx + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            style={{ all: "unset", cursor: currentPage === totalPages ? "default" : "pointer" }}
+          >
+            <FaChevronRight />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default DocumentRequest;

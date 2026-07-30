@@ -1,0 +1,130 @@
+/* General container styling */
+.container {
+  margin: 0 auto;
+  padding-top: 4rem;
+  padding-bottom: 2rem;
+  padding-inline: 1rem;
+  background-color: white;
+}
+
+.flexContainer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  /* width: 75%; */
+  max-width: 1400px;
+  margin-inline: auto;
+}
+
+.imageContainer {
+  flex: 1;
+  width: 100%;
+}
+
+.image {
+  width: 100%;
+}
+
+.textContainer {
+  flex: 1;
+  text-align: left;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.heading {
+  font-size: 3.125rem;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  color: #333;
+}
+
+.description {
+  margin-top: 1rem;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 1.125rem;
+  color: rgb(27, 26, 26);
+}
+
+.ctaButton {
+  margin-top: 1.5rem; /* 24px = 1.5rem */
+  background-color: rgba(153, 37, 37, 1);
+  color: white;
+  padding: 1rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.ctaButton:hover {
+  background-color: #a50e0e;
+}
+
+/* Custom Border Section */
+.customBorder {
+  margin-top: 2rem; /* 32px = 2rem */
+  border-top: 0.125rem solid #ffd700; /* 2px = 0.125rem */
+  position: relative;
+}
+
+.customBorder::after {
+  content: "";
+  position: absolute;
+  top: -1rem; /* -10px = -0.625rem */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2.5rem; /* 40px = 2.5rem */
+  height: 1.25rem; /* 20px = 1.25rem */
+  background: white;
+  border-top: 0.125rem solid #ffd700; /* 2px = 0.125rem */
+  border-left: 0.125rem solid #ffd700; /* 2px = 0.125rem */
+  border-right: 0.125rem solid #ffd700; /* 2px = 0.125rem */
+  border-radius: 0 0 0.625rem 0.625rem; /* 10px = 0.625rem */
+}
+
+@media (max-width: 995px) {
+  .heading {
+    font-size: 2.125rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile and smaller screens */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  .flexContainer {
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    margin-inline: auto;
+    padding: auto;
+  }
+
+  .textContainer {
+    padding: 0;
+    text-align: center;
+  }
+
+  .heading {
+    font-size: 1.8rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .ctaButton {
+    padding: 0.75rem 1.25rem;
+  }
+}

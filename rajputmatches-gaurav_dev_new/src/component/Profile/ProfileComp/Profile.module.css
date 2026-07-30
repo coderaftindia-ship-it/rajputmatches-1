@@ -1,0 +1,727 @@
+/* ============================================
+   PROFILE PAGE — PREMIUM UI/UX STYLES
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@300;400;500;600;700&family=Lustria&display=swap');
+
+/* ---- CSS Variables ---- */
+:root {
+  --royal-maroon: #59123B;
+  --royal-maroon-dark: #59123B;
+  --royal-maroon-light: rgba(153, 28, 28, 0.08);
+  --royal-gold: #d4af37;
+  --royal-gold-light: rgba(212, 175, 55, 0.15);
+  --royal-cream: #fdf6ec;
+  --royal-cream-dark: #f8ead6;
+  --text-primary: #1a1a2e;
+  --text-muted: #6b7280;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
+
+/* ============================================
+   PROFILE PAGE OUTER WRAPPER
+   ============================================ */
+.minhScreen {
+  background: linear-gradient(135deg, #f8ead6 0%, #fdf6ec 60%, #f3e5d0 100%);
+  min-height: 100vh;
+}
+
+/* ============================================
+   NAVBAR STYLES
+   ============================================ */
+.navHeader {
+  background: linear-gradient(135deg, #991c1c 0%, #59123B 50%, #5c0f0f 100%);
+  color: white;
+  padding-top: calc(1.5% + 0.85rem);
+  padding-bottom: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 1400px;
+  margin-inline: auto;
+  height: 100px;
+}
+
+.navHeader .title {
+  margin-left: 1rem;
+  width: 180px;
+  z-index: 10;
+}
+
+.navHeader .title img {
+  width: 100%;
+}
+
+.navLinks {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+}
+
+.navLinks li {
+  font-size: 1rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  margin-right: 1rem;
+}
+
+.navLinks li span {
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.navAvatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.avatarButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  color: white;
+  padding: 4px;
+}
+
+.avatarImg {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+}
+
+.avatarBadge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.profileDropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #fff;
+  color: #333;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  border-radius: 12px;
+  padding: 8px 0;
+  min-width: 180px;
+  z-index: 50;
+}
+
+.profileDropdownItem {
+  display: block;
+  padding: 10px 16px;
+  text-decoration: none;
+  color: #333;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.profileDropdownItem:hover {
+  background: rgba(153, 28, 28, 0.08);
+  color: #59123B;
+}
+
+.navLinks a {
+  color: white;
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.navLinks a:hover,
+.navLinkActive {
+  text-decoration: none;
+  border-bottom: 2px solid rgba(212,175,55,0.8);
+}
+
+.profileDropdown a {
+  color: #333 !important;
+  border-bottom: none !important;
+  font-family: var(--font-body);
+  font-weight: 500;
+  display: block;
+}
+
+.profileDropdown a:hover {
+  background: rgba(153, 28, 28, 0.08) !important;
+  color: #991c1c !important;
+  border-bottom: none !important;
+}
+
+.menuIcon {
+  display: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.routerpathtext {
+  margin-left: 0.5rem;
+  font-size: 16px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: 4;
+}
+
+/* ============================================
+   MAIN CONTAINER
+   ============================================ */
+.Container {
+  width: 100%;
+  padding-inline: 2%;
+  max-width: 1400px;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   PROFILE COVER BANNER
+   ============================================ */
+/* ---- Outer wrapper that holds cover + avatar + info card together ---- */
+.profileHeaderWrap {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.profileHeader {
+  background-image: url("../../../assets/images/bgHeader.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 200px;
+  border-radius: 16px 16px 0 0;
+  position: relative;
+  /* NO overflow:hidden — avatar must overflow downward */
+}
+
+.profileHeader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 40%,
+    rgba(153, 28, 28, 0.18) 100%
+  );
+  pointer-events: none;
+}
+
+/* Print button inside cover */
+.printBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: #59123B;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.printBtn:hover {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ============================================
+   AVATAR — sits between cover and info card
+   ============================================ */
+.avatarWrap {
+  position: absolute;
+  /* anchored to the bottom of the cover banner,
+     half inside banner, half in the info card */
+  bottom: -55px;
+  left: 28px;
+  z-index: 20;
+}
+
+.avatarCircle {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid white;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+}
+
+.avatarInitials {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #991c1c 0%, #59123B 100%);
+  border: 5px solid white;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2.1rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   PROFILE INFO CARD (below banner)
+   ============================================ */
+.profileInfoCard {
+  background: white;
+  border-radius: 0 0 16px 16px;
+  /* large top padding = half avatar height (58px) + inner breathing room */
+  padding: 72px 28px 24px 160px; /* left indent pushes content past the avatar */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  border-top: none;
+  position: relative;
+  min-height: 80px;
+}
+
+.profileName {
+  font-family: var(--font-heading);
+  font-size: 1.65rem;
+  font-weight: 400;
+  color: #1a1a2e;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.matriIdBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, rgba(153,28,28,0.1), rgba(212,175,55,0.12));
+  border: 1px solid rgba(153,28,28,0.18);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #59123B;
+  font-family: var(--font-body);
+  margin-bottom: 4px;
+  letter-spacing: 0.03em;
+}
+
+.ageBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 30px;
+  background: rgba(107,114,128,0.1);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #6b7280;
+  font-family: var(--font-body);
+  margin-left: 8px;
+}
+
+/* ============================================
+   CONTACT CHIPS ROW
+   ============================================ */
+.contactChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.contactChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #fdf6ec;
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 8px;
+  font-family: var(--font-body);
+}
+
+.chipIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #991c1c 0%, #59123B 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.chipLabel {
+  font-size: 0.7rem;
+  color: #6b7280;
+  font-weight: 500;
+  display: block;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.chipValue {
+  font-size: 0.85rem;
+  color: #1a1a2e;
+  font-weight: 600;
+  display: block;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* ============================================
+   SPLIT PANE LAYOUT
+   ============================================ */
+.profileLayout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+.sidebarPane {
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px;
+}
+
+.contentPane {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ============================================
+   VERTICAL SIDEBAR NAV (Desktop)
+   ============================================ */
+.verticalSidebar {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid rgba(212,175,55,0.12);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.sidebarHeader {
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #991c1c 0%, #59123B 100%);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.verticalSidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.verticalNavItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.verticalNavItem:hover {
+  background: rgba(153, 28, 28, 0.08);
+  color: #59123B;
+  border-left-color: #59123B;
+}
+
+.verticalNavItem.active {
+  background: linear-gradient(135deg, rgba(153,28,28,0.1), rgba(212,175,55,0.06));
+  color: #59123B;
+  font-weight: 600;
+  border-left: 3px solid #59123B;
+}
+
+.verticalNavItem .sidebarItemIcon {
+  display: flex;
+  align-items: center;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   CONTENT CARD WRAPPER
+   ============================================ */
+.contentCard {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid rgba(212,175,55,0.12);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+/* ============================================
+   BREADCRUMB
+   ============================================ */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  font-family: var(--font-body);
+}
+
+/* ============================================
+   CONTENT AREA / SIDEBAR (legacy compat)
+   ============================================ */
+.sidebar {
+  background-color: white;
+  margin-top: 0.3vw;
+}
+
+.content {
+  background-color: rgba(248, 235, 210, 1);
+  margin-top: 0.3vw;
+}
+
+.mainContent {
+  padding-bottom: 0;
+  background-color: rgba(248, 235, 210, 1);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.mainContent .basicDetails {
+  width: 100%;
+  padding-left: 1rem;
+}
+
+.mainContent .basicDetails .edit {
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.storycard {
+  width: 48%;
+  margin-bottom: 2rem;
+}
+
+.vipSection {
+  flex-direction: column;
+  width: 100%;
+  margin-inline: auto;
+  color: white;
+}
+
+.vipSection button {
+  background-color: #59123B;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  font-size: 15px;
+  font-family: var(--font-body);
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.vipSection button:hover {
+  background-color: #59123B;
+}
+
+.Relative {
+  position: relative;
+  text-align: left;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebarPane {
+    display: none;
+  }
+  .profileLayout {
+    flex-direction: column;
+  }
+  .contentPane {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .profileHeader {
+    height: 140px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .avatarWrap {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -50px;
+  }
+
+  .profileInfoCard {
+    padding: 66px 16px 20px;
+    text-align: center;
+    border-radius: 0 0 12px 12px;
+  }
+
+  .profileName {
+    font-size: 1.35rem;
+  }
+
+  .contactChips {
+    justify-content: center;
+  }
+
+  .content {
+    margin: 0;
+  }
+
+  .mainContent {
+    width: 100%;
+    margin-top: 0.3vw;
+  }
+
+  .mainContent .basicDetails {
+    padding-left: 0;
+  }
+
+  .storycard {
+    width: 80%;
+    margin: auto;
+    margin-bottom: 2rem;
+  }
+
+  .navHeader {
+    padding-top: calc(1.5% + 0.25rem);
+    padding-bottom: 0.25rem;
+    max-height: 60px;
+  }
+
+  .navHeader .title {
+    width: 7rem;
+    margin-left: 0.5rem;
+  }
+
+  .navLinks {
+    display: none;
+    flex-direction: column;
+    background: #922;
+    color: white;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 9rem;
+    z-index: 20;
+    border-top: 1px solid #fff;
+    gap: 0.2rem;
+  }
+
+  .navLinks.open {
+    display: flex;
+  }
+
+  .navLinks li {
+    display: flex;
+    text-align: left;
+    padding: 0.4rem;
+    transition: background-color 0.3s ease;
+    font-weight: 600;
+  }
+
+  .menuIcon {
+    display: block;
+    color: white;
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+    cursor: pointer;
+  }
+
+  .routerpathtext {
+    font-size: 12px;
+    line-height: 4;
+  }
+
+  .vipSection button {
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 995px) {
+  .Container {
+    width: 100%;
+    padding-inline: 5%;
+    margin: 0;
+  }
+  .navHeader .title {
+    width: 9rem;
+  }
+  .navHeader {
+    padding-top: calc(1.5% + 0.65rem);
+    padding-bottom: 0.65rem;
+    height: 80px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .Container {
+    width: 100%;
+    padding-inline: 5%;
+    margin: 0;
+  }
+  .navHeader {
+    width: 100%;
+  }
+}
+
+@media (max-width: 630px) {
+  .mainContent .menuIcon .textLg {
+    font-size: 0.9rem;
+  }
+  .mainContent .menuIcon .textSm {
+    font-size: 0.9rem;
+  }
+}

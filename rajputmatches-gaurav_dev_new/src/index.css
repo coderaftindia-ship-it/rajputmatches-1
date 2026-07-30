@@ -1,0 +1,610 @@
+:root {
+  /* ── Royal Wedding Theme Colors ── */
+  --royal-maroon: #59123B;
+  --royal-maroon-dark: #3f0c2a;
+  --royal-maroon-light: #821A56;
+  --royal-gold: #EDB139;
+  --royal-gold-light: #F5C870;
+  --royal-gold-dark: #CD9024;
+  --royal-cream: #FCF5EA;
+  --royal-cream-dark: #F0E5D3;
+  --royal-dark: #1A1A1A;
+  --royal-text: #3D232C;
+  --royal-text-light: #7A5C66;
+
+  /* ── Fonts ── */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Poppins', sans-serif;
+
+  /* ── Typography Scale (Desktop) ── */
+  --fs-h1: 2rem;        /* 32px */
+  --fs-h2: 1.6rem;      /* 25.6px */
+  --fs-h3: 1.3rem;      /* 20.8px */
+  --fs-h4: 1.1rem;      /* 17.6px */
+  --fs-h5: 1rem;        /* 16px */
+  --fs-h6: 0.9rem;      /* 14.4px */
+  --fs-body: 0.9rem;    /* 14.4px */
+  --fs-sm: 0.8rem;      /* 12.8px */
+  --fs-xs: 0.72rem;     /* 11.5px */
+  --fs-label: 0.78rem;  /* 12.5px */
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  background-color: var(--royal-cream);
+  color: var(--royal-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+h1 { font-family: var(--font-heading); font-size: var(--fs-h1); color: var(--royal-maroon); font-weight: 700; line-height: 1.25; margin-bottom: 0.5rem; }
+h2 { font-family: var(--font-heading); font-size: var(--fs-h2); color: var(--royal-maroon); font-weight: 600; line-height: 1.3;  margin-bottom: 0.5rem; }
+h3 { font-family: var(--font-heading); font-size: var(--fs-h3); color: var(--royal-maroon); font-weight: 600; line-height: 1.35; margin-bottom: 0.4rem; }
+h4 { font-family: var(--font-body);    font-size: var(--fs-h4); color: var(--royal-maroon); font-weight: 600; line-height: 1.4;  margin-bottom: 0.4rem; }
+h5 { font-family: var(--font-body);    font-size: var(--fs-h5); color: var(--royal-maroon); font-weight: 600; line-height: 1.4;  margin-bottom: 0.3rem; }
+h6 { font-family: var(--font-body);    font-size: var(--fs-h6); color: var(--royal-maroon); font-weight: 600; line-height: 1.4;  margin-bottom: 0.3rem; }
+
+p { font-size: var(--fs-body); line-height: 1.65; margin-bottom: 0.75rem; }
+small, .small { font-size: var(--fs-sm); }
+label { font-size: var(--fs-label); font-weight: 500; }
+
+/* ── Mobile Typography Scale ── */
+@media (max-width: 768px) {
+  :root {
+    --fs-h1: 1.5rem;      /* 24px */
+    --fs-h2: 1.25rem;     /* 20px */
+    --fs-h3: 1.1rem;      /* 17.6px */
+    --fs-h4: 0.98rem;     /* 15.7px */
+    --fs-h5: 0.92rem;     /* 14.7px */
+    --fs-h6: 0.85rem;     /* 13.6px */
+    --fs-body: 0.875rem;  /* 14px */
+    --fs-sm: 0.78rem;     /* 12.5px */
+    --fs-xs: 0.7rem;      /* 11.2px */
+    --fs-label: 0.75rem;  /* 12px */
+  }
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Bootstrap display class overrides (mobile-friendly) ── */
+.display-1 { font-size: clamp(2rem, 6vw, 3.5rem) !important; }
+.display-2 { font-size: clamp(1.8rem, 5vw, 3rem) !important; }
+.display-3 { font-size: clamp(1.6rem, 4.5vw, 2.6rem) !important; }
+.display-4 { font-size: clamp(1.4rem, 4vw, 2.2rem) !important; }
+.display-5 { font-size: clamp(1.25rem, 3.5vw, 1.8rem) !important; }
+.display-6 { font-size: clamp(1.1rem, 3vw, 1.5rem) !important; }
+
+/* ── Input, select, button font fix ── */
+input, select, textarea, button {
+  font-family: var(--font-body) !important;
+  font-size: var(--fs-body);
+}
+
+/* ── Badge font fix ── */
+.badge { font-family: var(--font-body); font-size: var(--fs-xs); }
+
+/* ── Bootstrap card/table ── */
+.card-title { font-family: var(--font-heading); }
+.table { font-size: var(--fs-body); }
+
+/* ============================================
+   Custom Scrollbar
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 0px; /* horizontal scrollbar hide karo */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--royal-cream-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--royal-maroon), var(--royal-gold-dark));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--royal-maroon);
+}
+
+/* Mobile pe scrollbar completely hide karo */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    display: none;
+  }
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+}
+
+/* ============================================
+   Glassmorphism Utilities
+   ============================================ */
+.glass-panel {
+  background: rgba(255, 253, 240, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 8px 32px rgba(128, 0, 0, 0.08);
+}
+
+/* ============================================
+   Royal Buttons
+   ============================================ */
+.royal-button {
+  background: linear-gradient(135deg, var(--royal-maroon), var(--royal-maroon-dark));
+  color: white;
+  border: 1px solid var(--royal-gold);
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(128, 0, 0, 0.2);
+}
+
+.royal-button:hover {
+  background: linear-gradient(135deg, var(--royal-maroon-dark), var(--royal-maroon));
+  box-shadow: 0 6px 15px rgba(128, 0, 0, 0.3);
+  color: var(--royal-gold-light);
+  transform: translateY(-2px);
+}
+
+.royal-button-outline {
+  background: transparent;
+  color: var(--royal-maroon);
+  border: 1px solid var(--royal-maroon);
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.royal-button-outline:hover {
+  background: var(--royal-maroon);
+  color: white;
+  border-color: var(--royal-gold);
+  box-shadow: 0 4px 15px rgba(128, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   Royal Navbar Container Styles
+   ============================================ */
+.navbar-transparent {
+  background: #FDF5E6 !important;
+  border-bottom: 2px solid var(--royal-gold) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.navbar-scrolled {
+  background: #FDF5E6 !important;
+  border-bottom: 2px solid var(--royal-gold) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.navbar-profile {
+  background: #FDF5E6 !important;
+  border-bottom: 2px solid var(--royal-gold) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ============================================
+   Royal Nav Link Styles
+   ============================================ */
+.royal-link {
+  color: var(--royal-text);
+  font-weight: 500;
+  text-decoration: none;
+  padding: 6px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.royal-link::after {
+  display: none;
+}
+
+.royal-link:hover {
+  color: var(--royal-maroon);
+}
+
+.active-royal-link {
+  color: var(--royal-maroon);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: rgba(128, 0, 0, 0.06);
+  border: 1px solid rgba(128, 0, 0, 0.1);
+}
+
+.active-royal-link::after {
+  display: none;
+}
+
+/* ============================================
+   Section Title with Gold Underline
+   ============================================ */
+.section-title-gold {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 12px;
+}
+
+.section-title-gold::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--royal-gold), transparent);
+}
+
+/* ============================================
+   Royal Radio Button Styles
+   ============================================ */
+.royal-radio {
+  display: none;
+}
+
+.royal-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--royal-dark);
+  padding: 8px 16px;
+  border-radius: 25px;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+}
+
+.royal-radio-label:hover {
+  border-color: var(--royal-gold);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.royal-radio:checked + .royal-radio-label {
+  background: linear-gradient(135deg, var(--royal-maroon), var(--royal-maroon-dark));
+  color: white;
+  border-color: var(--royal-gold);
+  box-shadow: 0 4px 12px rgba(128, 0, 0, 0.25);
+}
+
+/* ============================================
+   Royal Input Styles
+   ============================================ */
+.royal-input {
+  border: 2px solid rgba(212, 175, 55, 0.2) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  transition: all 0.3s ease !important;
+  font-family: var(--font-body);
+}
+
+.royal-input:focus {
+  border-color: var(--royal-gold) !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15) !important;
+  outline: none !important;
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+@keyframes goldShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes kenBurns {
+  0%, 100% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.15) translate(-1%, -1%);
+  }
+}
+
+@keyframes slowRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(1.1); }
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-10vh) translateX(50px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Shimmer particle – larger and softer for banner */
+@keyframes floatParticleLarge {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(1) rotate(0deg);
+    opacity: 0;
+  }
+  8% { opacity: 0.9; }
+  92% { opacity: 0.9; }
+  100% {
+    transform: translateY(-10vh) translateX(60px) scale(1.5) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+/* Gold shimmer text gradient */
+@keyframes goldTextShimmer {
+  0%   { background-position: -300% center; }
+  100% { background-position: 300% center; }
+}
+
+/* Card entry */
+@keyframes cardSlideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Heading highlight pulse */
+@keyframes highlightPulse {
+  0%,100% { text-shadow: 0 0 12px rgba(212,175,55,0.2); }
+  50%     { text-shadow: 0 0 28px rgba(212,175,55,0.5); }
+}
+
+.royal-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--royal-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--royal-gold);
+  pointer-events: none;
+  z-index: 1;
+  animation: floatParticle 18s linear infinite;
+  opacity: 0;
+}
+
+/* Premium gold shimmer text utility */
+.gold-shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--royal-gold) 0%,
+    #ffe98a 35%,
+    var(--royal-gold-dark) 50%,
+    #ffe98a 65%,
+    var(--royal-gold) 100%
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldTextShimmer 4s linear infinite;
+}
+
+/* Section heading spacing helper */
+.heading-mb {
+  margin-bottom: 2.5rem;
+}
+
+/* Premium card hover lift */
+.card-lift {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 45px rgba(128, 0, 0, 0.12) !important;
+}
+
+/* ============================================
+   Bottom Nav Padding for Mobile
+   ============================================ */
+.pb-bottom-nav {
+  padding-bottom: 70px;
+}
+
+@media (min-width: 992px) {
+  .pb-bottom-nav {
+    padding-bottom: 0;
+  }
+}
+
+/* ============================================
+   Floating Social Sidebar Responsive Styles
+   ============================================ */
+.floating-social-sidebar {
+  position: fixed;
+  left: 0;
+  bottom: 80px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+@media (max-width: 768px) {
+  .floating-social-sidebar {
+    display: none !important; /* Hide on mobile and small tablet screens to prevent overlap */
+  }
+}
+
+/* ============================================
+   Mobile Menu Drawer Styles
+   ============================================ */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1040;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.drawer-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-drawer {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 280px;
+  height: 100vh;
+  background: #FFFDF5;
+  border-left: 2px solid var(--royal-gold);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-menu-drawer.active {
+  right: 0;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid rgba(200, 151, 58, 0.2);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.drawer-header img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--royal-gold);
+}
+
+.drawer-close-btn {
+  background: none;
+  border: none;
+  color: var(--royal-maroon);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.drawer-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--royal-text) !important;
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 10px 14px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.drawer-link:hover, .drawer-link.active {
+  background: rgba(89, 18, 59, 0.06);
+  color: var(--royal-maroon) !important;
+  border-color: rgba(89, 18, 59, 0.1);
+}
+
+.drawer-footer {
+  border-top: 1.5px solid rgba(200, 151, 58, 0.2);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Document Request Button Spinner ── */
+@keyframes docSpinAnim {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+

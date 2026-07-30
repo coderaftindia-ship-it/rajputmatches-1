@@ -1,0 +1,124 @@
+/* ============================================================
+   HowItWorks.css — step-by-step matchmaking guide styles
+   ============================================================ */
+
+.how-it-works-section {
+  padding: 80px 20px;
+  background-color: #FFFDF5;
+  border-top: 1px solid rgba(200,151,58,0.15);
+  border-bottom: 1px solid rgba(200,151,58,0.15);
+  position: relative;
+}
+
+.how-eyebrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #edb139;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.how-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  color: #3f0c2a;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.how-subtitle {
+  color: #7a5c66;
+  font-size: 1rem;
+  max-width: 600px;
+  margin: 0 auto 50px;
+  line-height: 1.6;
+}
+
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.how-card {
+  background: white;
+  border-radius: 16px;
+  padding: 35px 24px;
+  text-align: center;
+  border: 1px solid rgba(200,151,58,0.15);
+  box-shadow: 0 4px 18px rgba(89, 18, 59, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.how-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(89, 18, 59, 0.08);
+  border-color: var(--royal-gold);
+}
+
+.how-card-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(200, 151, 58, 0.15);
+  color: var(--royal-maroon);
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.how-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(89, 18, 59, 0.05);
+  color: var(--royal-maroon);
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(89, 18, 59, 0.1);
+}
+
+.how-card:hover .how-icon-circle {
+  background: var(--royal-maroon);
+  color: white;
+  transform: scale(1.05);
+}
+
+.how-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  color: var(--royal-maroon-dark);
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.how-card-desc {
+  color: var(--royal-text-light);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 576px) {
+  .how-it-works-section {
+    padding: 60px 15px;
+  }
+  .how-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

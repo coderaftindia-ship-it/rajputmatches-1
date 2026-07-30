@@ -1,0 +1,240 @@
+/* Global Styles */
+
+.register-container {
+  display: flex;
+  align-items: center;
+  padding-left: 5%;
+  padding-top: 3%;
+  padding-bottom: 5%;
+  min-height: 93vh;
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  background-image: url("../assets/images/Bannerbg.jpg");
+  box-sizing: border-box;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.register-box {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 100%;
+  width: 600px;
+  box-sizing: border-box;
+}
+
+.signup-prompt {
+  margin-top: 1rem;
+  text-align: left;
+  color: rgba(0, 0, 0, 1); /* Gray 700 */
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+.register-title {
+  margin-bottom: 0.2rem;
+}
+
+.title img {
+  min-width: 200px;
+  max-width: 233px;
+  margin: 0%;
+  /* margin-left: 1rem; */
+  padding: 0%;
+}
+
+.subtitle {
+  text-align: left;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: "rgba(0, 0, 0, 1)";
+}
+
+/* Form Styles */
+.form-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+label {
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+.input-field {
+  padding: 0.7rem;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+
+  font-size: 1rem;
+  line-height: 1;
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+select .form-select {
+  background-position: right 5px center;
+  padding: 0%;
+  padding-right: 0px;
+}
+@media (min-width: 1400px) {
+  select .form-select {
+    background-position: right 15px center;
+    padding: 0%;
+    padding-right: 15px;
+  }
+}
+
+@media (max-width: 1200px) {
+  /* Adjust breakpoint as needed */
+  .background-md-visibelnone {
+    background-image: none !important; /* Hide background */
+    border: none; /* Optional: remove border */
+    padding: 0% !important;
+  }
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field .icon {
+  position: absolute;
+  top: 1.3rem;
+  right: 0.75rem;
+  color: #333231; /* Gray 500 */
+}
+
+.select-field {
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Button Styles */
+.submit-btn {
+  background-color: rgba(153, 37, 37, 1);
+  color: #fff;
+  padding: 1rem 1rem;
+  margin-top: 0.8rem;
+  font-size: 14px;
+  font-family: var(--font-body);
+  font-weight: 700;
+
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #59123B;
+}
+
+/* Link Styles */
+.link {
+  color: rgba(153, 37, 37, 1);
+  text-decoration: none;
+  margin-top: 1rem;
+
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.contact-info h5 {
+  font-size: 0.9rem;
+  font-family: var(--font-heading);
+  font-weight: 400;
+}
+
+.contact-info h2 {
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  font-family: var(--font-heading);
+  font-weight: 400;
+}
+
+.contact-info p {
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.contact-form label {
+  color: white !important;
+  font-size: 1rem;
+  line-height: 2;
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .register-container {
+    padding: 2rem;
+    justify-content: center;
+  }
+
+  .register-title {
+    font-size: 1.8rem;
+  }
+
+  .submit-btn {
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .text-left {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .register-container {
+    padding: 5%;
+    justify-content: center;
+    width: 100%;
+  }
+  .register-title {
+    font-size: 1.5rem;
+  }
+
+  .form-group {
+    grid-template-columns: 1fr;
+  }
+  .input-field,
+  .select-field {
+    font-size: 0.9rem;
+  }
+
+  .submit-btn {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .text-left p {
+    font-size: 0.9rem;
+  }
+
+  .subtitle {
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
+}

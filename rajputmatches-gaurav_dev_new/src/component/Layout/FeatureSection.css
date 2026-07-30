@@ -1,0 +1,320 @@
+/* General Styles */
+
+.feature-container {
+  margin: auto;
+  max-width: 1400px;
+  margin-top: 1rem;
+  padding: 3rem 1rem;
+  box-sizing: border-box;
+}
+
+/* Features Section */
+.features-grid {
+  display: grid;
+  /* grid-template-columns: 1fr; */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2.5rem;
+  text-align: center;
+}
+
+.features-grid .icon {
+  font-size: 60px;
+  color: rgba(153, 37, 37, 1);
+  margin-bottom: 1rem;
+}
+
+.features-grid div {
+  font-size: 1.25rem;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+
+.features-grid p {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 1);
+}
+
+@media (max-width: 1024) {
+  .feature-container {
+    width: 60%;
+    padding: 1px 2px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+/* Responsive Grid Layout */
+@media (max-width: 768px) {
+  .feature-container {
+    margin-inline: 0px;
+    width: 80%;
+    margin-inline: auto;
+    box-sizing: border-box;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* VVIP Section */
+.vip-section {
+  display: flex;
+  align-items: center;
+  max-width: 1400px;
+  box-sizing: border-box;
+  margin-inline: auto;
+  padding: 100px;
+  max-height: 328px;
+  background-repeat: no-repeat;
+  /* background-image: url("../../assets/images/vvipsectionbg.jpg"); */
+  background-color: transparent;
+
+  background-position: center;
+  background-size: contain;
+
+  position: relative;
+  bottom: 10px;
+}
+
+.box {
+  padding-inline: 10px;
+  border: 2px solid rgba(255, 210, 64, 1);
+}
+
+.vip-section img {
+  max-width: 100%;
+  height: auto;
+}
+
+.vip-section div {
+  text-align: left;
+}
+
+.vip-section h2 {
+  font-size: 3.125rem;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  padding: 0rem;
+  padding-inline: 60px;
+  margin-bottom: 1rem;
+}
+
+.vip-section p {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  text-align: start;
+}
+
+.vip-section button {
+  background-color: rgba(153, 37, 37, 1);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  margin-top: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  font-size: 14px; /* 16px */
+  font-family: "Now", sans-serif;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.vip-section button:hover {
+  background-color: #991b1b;
+}
+
+/* Add media queries for fine control */
+@media (max-width: 1200px) {
+  .box {
+    padding-inline: 8px;
+    /* bottom: 4px; */
+    border: 1px solid rgba(255, 210, 64, 1);
+  }
+  .vip-section {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    padding-inline: 40px;
+    width: 100%;
+    margin-inline: auto;
+    min-height: 280px;
+    bottom: 8px;
+  }
+  .vip-section h2 {
+    font-size: 2.75rem;
+    margin-bottom: 0%;
+    text-align: left;
+    padding-right: 50px;
+  }
+
+  .vip-section p {
+    font-size: 1rem;
+    margin-bottom: 0%;
+  }
+}
+
+@media (max-width: 992px) {
+  .vip-section h2 {
+    font-size: 2.5rem;
+  }
+  .vip-section h2 {
+    min-width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .box {
+    padding-inline: 5px;
+
+    border: 2px solid rgba(255, 210, 64, 1);
+  }
+  .vip-section {
+    padding: 15px;
+    flex-direction: column;
+    min-height: fit-content;
+    text-align: center;
+    bottom: 5px;
+  }
+  .vip-section h2 {
+    text-align: center;
+    font-size: 3vw;
+    margin-bottom: 8px;
+    padding: auto;
+  }
+
+  .vip-section p {
+    padding-inline: 5vw;
+    font-size: 1.75vw;
+    margin-bottom: 8px;
+  }
+  .vip-section div {
+    text-align: center;
+  }
+
+  .vip-section button {
+    padding: 0.5rem 1rem;
+    font-size: 1.3vw;
+  }
+}
+
+@media (max-width: 440px) {
+  .box {
+    padding-inline: 4px;
+    border: 2px solid rgba(255, 210, 64, 1);
+  }
+  .vip-section {
+    padding: 10px;
+    text-align: center;
+    bottom: 4px;
+    min-height: 180px;
+    bottom: 5px;
+  }
+  .vip-section h2 {
+    text-align: center;
+    font-size: 4.5vw;
+    margin-bottom: 8px;
+  }
+
+  .vip-section p {
+    padding-inline: 5vw;
+    font-size: 2.5vw;
+    margin-bottom: 8px;
+  }
+
+  .vip-section button {
+    padding: 0.6rem 1.2rem;
+    font-size: 2vw;
+  }
+}
+
+/* ============================================================
+   PREMIUM COMPACT FEATURES CARDS WITH MICRO-ANIMATIONS
+   ============================================================ */
+.premiumFeatureCard {
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FFFDF5 0%, #FDF6EC 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  min-height: 180px;
+  padding: 20px 14px;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.premiumFeatureCard:hover {
+  transform: translateY(-5px) scale(1.03);
+  border-color: rgba(123, 26, 26, 0.4);
+  box-shadow: 0 12px 28px rgba(123, 26, 26, 0.09);
+  background: linear-gradient(135deg, #FFFDF5 0%, #F5EDD0 100%);
+}
+
+.premiumFeatureCard::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  border-radius: 8px;
+  pointer-events: none;
+  transition: all 0.35s ease;
+}
+
+.premiumFeatureCard:hover::before {
+  border-color: rgba(123, 26, 26, 0.2);
+  inset: 4px;
+}
+
+.featureIconCircle {
+  width: 54px;
+  height: 54px;
+  background-color: white;
+  border: 1.5px solid #C8973A;
+  color: #7B1A1A;
+  font-size: 1.4rem;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.12);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  margin-bottom: 12px;
+  transition: all 0.35s ease;
+}
+
+.premiumFeatureCard:hover .featureIconCircle {
+  transform: scale(1.08);
+  background-color: #7B1A1A;
+  color: #FFFDF5;
+  border-color: #7B1A1A;
+  box-shadow: 0 6px 16px rgba(123, 26, 26, 0.25);
+}
+
+.featureTitle {
+  font-family: "Cinzel", serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1E0A0A;
+  margin-bottom: 0;
+  letter-spacing: 0.02em;
+  transition: all 0.35s ease;
+  text-transform: uppercase;
+}
+
+.premiumFeatureCard:hover .featureTitle {
+  color: #7B1A1A;
+}
+
