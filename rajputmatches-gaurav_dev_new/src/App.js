@@ -11,6 +11,7 @@ import Profile from "./component/Profile/ProfileComp/Profile";
 import Mydetails from "./component/Profile/BasicDetails/Mydetails";
 import ProtectedRoute from "./component/Layout/ProtectedRoute";
 import { AuthProvider } from "./component/Layout/AuthContext";
+import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import Profilenavbar from "./component/Profile/ProfileComp/Profilenavbar";
 import Settings from "./component/Profile/ProfileComp/Settings";
 import SearchPage from "./component/Layout/SearchPage";
@@ -122,14 +123,19 @@ function FloatingSocial() {
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
   return null;
 }
 
 function App() {
   return (
-    <AuthProvider>
+    <SiteSettingsProvider>
+      <AuthProvider>
       {/* ToastContainer for displaying toast notifications */}
       <ToastContainer
         position="bottom-left" // Position of the toast
@@ -246,6 +252,7 @@ function App() {
       </Routes>
       <BottomNav />
     </AuthProvider>
+    </SiteSettingsProvider>
   );
 }
 

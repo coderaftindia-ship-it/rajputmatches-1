@@ -42,6 +42,8 @@ import {
 
 import { useAuth } from "../../Layout/AuthContext";
 import blurImage from "../../../assets/images/blurimage.png";
+import maleDefault from "../../../assets/images/male_default.png";
+import femaleDefault from "../../../assets/images/female_default.png";
 
 // ─────────────────────────────────────────────────
 // Scroll-reveal wrapper
@@ -1347,7 +1349,7 @@ const ViewPage = () => {
                             ) : (
                               <motion.img
                                 key="placeholder"
-                                src={blurImage}
+                                src={(Data?.imageUrl && !Data.imageUrl.includes("profile.png") && !Data.imageUrl.includes("user-icon-flat-isolated") && !Data.imageUrl.includes("istockphoto.com")) ? Data.imageUrl : (Data?.gender === "Female" ? femaleDefault : maleDefault)}
                                 alt="Placeholder"
                                 className={styles.carouselImg}
                                 initial={{ opacity: 0 }}
@@ -1533,7 +1535,7 @@ const ViewPage = () => {
                 <div style={{ textAlign: "center" }}>
                   <div className={styles.photoFrame}>
                     <img
-                      src={images.length > 0 ? images[0].url : blurImage}
+                      src={images.length > 0 ? images[0].url : ((Data?.imageUrl && !Data.imageUrl.includes("profile.png") && !Data.imageUrl.includes("user-icon-flat-isolated") && !Data.imageUrl.includes("istockphoto.com")) ? Data.imageUrl : (Data?.gender === "Female" ? femaleDefault : maleDefault))}
                       alt="Printed Profile"
                       style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
@@ -1676,7 +1678,7 @@ const ViewPage = () => {
                   <FaTimes />
                 </button>
                 <img
-                  src={images.length > 0 ? images[lightboxIndex].url : blurImage}
+                  src={images.length > 0 ? images[lightboxIndex].url : ((Data?.imageUrl && !Data.imageUrl.includes("profile.png") && !Data.imageUrl.includes("user-icon-flat-isolated") && !Data.imageUrl.includes("istockphoto.com")) ? Data.imageUrl : (Data?.gender === "Female" ? femaleDefault : maleDefault))}
                   alt="Full-size Profile"
                   className={styles.lightboxImg}
                 />

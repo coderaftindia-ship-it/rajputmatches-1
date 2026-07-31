@@ -1,23 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
-import { AiOutlineRight } from "react-icons/ai";
 import { MdLocationOn, MdEmail, MdPhone } from "react-icons/md";
 import { publicApi } from "../../api";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
-import contactBg from "../../assets/images/stories/SS2.jpg";
+import contactBgFallback from "../../assets/images/stories/SS2.jpg";
+import { BASE_URL } from "../../api";
+
+const DEFAULT_CMS = {
+  heroSupertitle: "At Your Service",
+  heroTitle: "Premium Support & Concierge",
+  heroDescription:
+    "Experience personalized assistance from our dedicated team. Whether you need help with your profile or wish to learn more about our exclusive services, we are here for you.",
+  heroBgImage: "",
+  addressTitle: "Headquarters",
+  addressText: "Flat No. 203, Green Heights,\nNear Kunal Tower, Sector 47,\nGurugram, Haryana, 122018",
+  emailTitle: "Email Concierge",
+  email1: "support@rajputmatch.com",
+  email2: "parakram125@gmail.com",
+  phoneTitle: "Direct Lines",
+  phone1: "+91 123 456 7892",
+  phone2: "+1 565 2145 962",
+  formHeading: "Send a Message",
+  formSubheading: "Fill out the form below and our team will get back to you promptly.",
+};
 
 function ContactUs() {
+  const [cms, setCms] = useState(DEFAULT_CMS);
+
+  useEffect(() => {
+    publicApi.getContactCMS()
+      .then((res) => {
+        if (res?.data?.data) setCms({ ...DEFAULT_CMS, ...res.data.data });
+      })
+      .catch(() => {});
+  }, []);
+
+  const heroBg = cms.heroBgImage
+    ? (cms.heroBgImage.startsWith("/uploads/") ? `${BASE_URL}${cms.heroBgImage}` : cms.heroBgImage)
+    : contactBgFallback;
+
+  // Render address with line breaks
+  const renderAddress = (text) =>
+    text.split("\n").map((line, i) => (
+      <React.Fragment key={i}>
+        {line}
+        {i < text.split("\n").length - 1 && <br />}
+      </React.Fragment>
+    ));
+
   return (
     <div style={{ backgroundColor: "#fcfaf9", minHeight: "100vh" }} className="pb-bottom-nav">
       <Profilenavbar />
-      
+
       {/* Cinematic Hero Section */}
       <section className="position-relative overflow-hidden d-flex align-items-center justify-content-center" style={{ minHeight: "65vh", width: "100%", marginTop: 0 }}>
-        
-   
 
         {/* Background Image */}
         <motion.div
@@ -26,19 +65,18 @@ function ContactUs() {
           transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
           style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0 }}
         >
-            {/* Using a rich background image */}
-            <img src={contactBg} alt="Contact Background" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img src={heroBg} alt="Contact Background" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </motion.div>
 
         {/* Maroon/Gold Theme Overlay */}
         <div style={{
-            position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-            background: "linear-gradient(135deg, rgba(80, 0, 0, 0.7) 0%, rgba(20, 0, 0, 0.95) 100%)",
-            zIndex: 1
+          position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+          background: "linear-gradient(135deg, rgba(80, 0, 0, 0.7) 0%, rgba(20, 0, 0, 0.95) 100%)",
+          zIndex: 1
         }}></div>
 
         {/* Hero Text */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
@@ -46,30 +84,30 @@ function ContactUs() {
           style={{ zIndex: 10, position: "relative", padding: "0 20px", maxWidth: "800px" }}
         >
           <p style={{ fontSize: "clamp(14px, 16px, 18px)", fontWeight: 600, fontFamily: "var(--font-body)", color: "#e8c371", textTransform: "uppercase", letterSpacing: "4px", marginBottom: "1rem", textShadow: "1px 1px 3px rgba(0,0,0,0.8)" }}>
-            At Your Service
+            {cms.heroSupertitle}
           </p>
           <h1 style={{ fontSize: "clamp(36px, 48px, 60px)", fontWeight: 600, fontFamily: "var(--font-heading)", lineHeight: 1.2, color: "#ffffff", textShadow: "2px 2px 10px rgba(0,0,0,0.6)", marginBottom: "1.5rem" }}>
-            Premium Support & <br/> Concierge
+            {cms.heroTitle}
           </h1>
           <p style={{ fontSize: "clamp(16px, 18px, 20px)", fontFamily: "var(--font-body)", color: "rgba(255, 255, 255, 0.9)", lineHeight: 1.6, textShadow: "1px 1px 4px rgba(0,0,0,0.8)", maxWidth: "650px", margin: "0 auto" }}>
-            Experience personalized assistance from our dedicated team. Whether you need help with your profile or wish to learn more about our exclusive services, we are here for you.
+            {cms.heroDescription}
           </p>
         </motion.div>
       </section>
 
       <div className="container" style={{ position: "relative", zIndex: 10, marginTop: "-80px", paddingBottom: "5rem" }}>
-        
+
         {/* Floating Contact Info Cards */}
         <div className="row g-4 mb-5 justify-content-center">
-          
+
           <div className="col-12 col-md-4">
             <motion.div whileHover={{ y: -10 }} transition={{ type: "spring", stiffness: 300 }} className="card h-100 text-center border-0 p-4 shadow-lg" style={{ borderRadius: "20px", backgroundColor: "#fff" }}>
               <div className="mx-auto mb-3 d-flex align-items-center justify-content-center" style={{ width: "70px", height: "70px", borderRadius: "50%", backgroundColor: "rgba(128, 0, 0, 0.05)", color: "var(--royal-maroon-dark)" }}>
                 <MdLocationOn size={32} />
               </div>
-              <h5 className="fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}>Headquarters</h5>
+              <h5 className="fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}>{cms.addressTitle}</h5>
               <p className="text-secondary mb-0" style={{ fontSize: "15px", lineHeight: "1.6" }}>
-                Flat No. 203, Green Heights,<br/> Near Kunal Tower, Sector 47,<br/> Gurugram, Haryana, 122018
+                {renderAddress(cms.addressText)}
               </p>
             </motion.div>
           </div>
@@ -79,9 +117,9 @@ function ContactUs() {
               <div className="mx-auto mb-3 d-flex align-items-center justify-content-center" style={{ width: "70px", height: "70px", borderRadius: "50%", backgroundColor: "rgba(128, 0, 0, 0.05)", color: "var(--royal-maroon-dark)" }}>
                 <MdEmail size={32} />
               </div>
-              <h5 className="fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}>Email Concierge</h5>
+              <h5 className="fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}>{cms.emailTitle}</h5>
               <p className="text-secondary mb-0" style={{ fontSize: "15px", lineHeight: "1.6" }}>
-                support@rajputmatch.com<br/><br/>parakram125@gmail.com
+                {cms.email1}<br /><br />{cms.email2}
               </p>
             </motion.div>
           </div>
@@ -91,9 +129,9 @@ function ContactUs() {
               <div className="mx-auto mb-3 d-flex align-items-center justify-content-center" style={{ width: "70px", height: "70px", borderRadius: "50%", backgroundColor: "rgba(128, 0, 0, 0.05)", color: "var(--royal-maroon-dark)" }}>
                 <MdPhone size={32} />
               </div>
-              <h5 className="fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}>Direct Lines</h5>
+              <h5 className="fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}>{cms.phoneTitle}</h5>
               <p className="text-secondary mb-0" style={{ fontSize: "15px", lineHeight: "1.6" }}>
-                +91 123 456 7892<br/><br/>+1 565 2145 962
+                {cms.phone1}<br /><br />{cms.phone2}
               </p>
             </motion.div>
           </div>
@@ -101,7 +139,7 @@ function ContactUs() {
         </div>
 
         {/* Contact Form Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -111,8 +149,8 @@ function ContactUs() {
           <div className="col-12 col-lg-8">
             <div className="p-5 rounded-4 shadow-lg bg-white" style={{ borderTop: "4px solid var(--royal-gold)" }}>
               <div className="text-center mb-5">
-                <h3 className="fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}>Send a Message</h3>
-                <p className="text-secondary">Fill out the form below and our team will get back to you promptly.</p>
+                <h3 className="fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}>{cms.formHeading}</h3>
+                <p className="text-secondary">{cms.formSubheading}</p>
               </div>
               <ContactForm />
             </div>
@@ -120,7 +158,7 @@ function ContactUs() {
         </motion.div>
 
       </div>
-      
+
       <Footer />
     </div>
   );
@@ -246,13 +284,13 @@ export function ContactForm() {
 
       <div className="mb-5">
         <label className="fw-semibold mb-2" style={{ color: "#4a4a4a", fontSize: "0.9rem" }}>HOW CAN WE ASSIST YOU?</label>
-        <textarea name="additionalInfo" value={formData.additionalInfo} onChange={handleChange} placeholder="Please provide any additional details..." className="form-control rounded-3 shadow-none" rows="5" style={{...inputStyle, resize: "none"}}></textarea>
+        <textarea name="additionalInfo" value={formData.additionalInfo} onChange={handleChange} placeholder="Please provide any additional details..." className="form-control rounded-3 shadow-none" rows="5" style={{ ...inputStyle, resize: "none" }}></textarea>
       </div>
 
-      <motion.button 
+      <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        type="submit" 
+        type="submit"
         disabled={isSubmitting}
         className="btn w-100 rounded-3 text-white fw-bold shadow"
         style={{

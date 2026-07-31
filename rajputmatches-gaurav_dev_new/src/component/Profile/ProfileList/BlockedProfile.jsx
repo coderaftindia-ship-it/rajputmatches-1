@@ -4,7 +4,8 @@ import { useAuth } from "../../Layout/AuthContext";
 import { FaUnlock, FaEye } from "react-icons/fa";
 import { calculateAge, formatDate } from "../ProfileComp/ProfileInfoHeader";
 import placeholderImage from "../../../assets/images/blurimage.png";
-import profileDefault from "../../../assets/images/profile.png";
+import maleDefault from "../../../assets/images/male_default.png";
+import femaleDefault from "../../../assets/images/female_default.png";
 import "./ShortListedProfile.css";
 
 const BlockedProfile = () => {
@@ -56,7 +57,13 @@ const BlockedProfile = () => {
         return prof.filesId.photos[0].url;
       }
     }
-    return profileDefault;
+    const url = prof.imageUrl;
+    const isDefault = !url || 
+      url.includes("profile.png") || 
+      url.includes("user-icon-flat-isolated") || 
+      url.includes("istockphoto.com");
+    if (!isDefault) return url;
+    return prof.gender === "Female" ? femaleDefault : maleDefault;
   };
 
   if (loading) {
@@ -98,6 +105,12 @@ const BlockedProfile = () => {
 
       {profiles.map((profile) => {
         const imageSrc = getProfileImage(profile);
+        const isDefaultImg = (() => {
+          if (profile.filesId?.photos?.length > 0) return false;
+          if (profile.filesId?.isPrivate) return false;
+          const url = profile.imageUrl;
+          return !url || url.includes("profile.png") || url.includes("user-icon-flat-isolated") || url.includes("istockphoto.com");
+        })();
         const age = profile.dateOfBirth ? calculateAge(profile.dateOfBirth) : "N/A";
         return (
           <div key={profile._id} className="profile-card-modern">
@@ -108,6 +121,7 @@ const BlockedProfile = () => {
                   src={imageSrc}
                   alt="Profile"
                   className="profileImage"
+                  style={isDefaultImg ? { objectFit: "cover", objectPosition: "center" } : { objectFit: "cover", objectPosition: "top" }}
                 />
               </div>
               <div className="profile-card-title-section">

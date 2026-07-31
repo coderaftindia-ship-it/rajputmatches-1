@@ -203,7 +203,7 @@ const Dashboard = () => {
             </div>
             <div className={styles.heroText}>
               <p className={styles.heroGreet}>
-                <Sparkles size={16} /> Namaste,
+                <Sparkles size={16} /> Khamaghani,
               </p>
               <h1 className={styles.heroName}>{fullName || "Welcome Back"}</h1>
               <div className={styles.heroBadges}>

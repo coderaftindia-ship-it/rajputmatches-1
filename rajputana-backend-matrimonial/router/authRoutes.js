@@ -745,5 +745,80 @@ router.get("/", (req, res) => {
   res.send("Welcome! server is running");
 });
 
+const AboutUs = require("../models/AboutUs");
+const HomeCMS = require("../models/HomeCMS");
+const ContactCMS = require("../models/ContactCMS");
+const StoriesCMS = require("../models/StoriesCMS");
+const SiteSettings = require("../models/SiteSettings");
+
+// Additional alias endpoints for contact submission
+router.post("/contactus", createContactRequest);
+router.post("/contact", createContactRequest);
+router.put("/contact", createContactRequest);
+router.post("/public/contact", createContactRequest);
+router.put("/public/contact", createContactRequest);
+
+// GET /api/v1/auth/about - Public endpoint to get About Us content
+router.get("/about", async (req, res) => {
+  try {
+    let about = await AboutUs.findOne();
+    if (!about) {
+      about = await AboutUs.create({});
+    }
+    return res.status(200).json({ success: true, data: about });
+  } catch (error) {
+    console.error("Error fetching About Us content:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch About Us content" });
+  }
+});
+
+// GET /api/v1/auth/home-cms - Public endpoint to get Home page CMS
+router.get("/home-cms", async (req, res) => {
+  try {
+    let home = await HomeCMS.findOne();
+    if (!home) home = await HomeCMS.create({});
+    return res.status(200).json({ success: true, data: home });
+  } catch (error) {
+    console.error("Error fetching Home CMS:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch Home CMS" });
+  }
+});
+
+// GET /api/v1/auth/contact-cms - Public endpoint to get Contact page CMS
+router.get("/contact-cms", async (req, res) => {
+  try {
+    let contact = await ContactCMS.findOne();
+    if (!contact) contact = await ContactCMS.create({});
+    return res.status(200).json({ success: true, data: contact });
+  } catch (error) {
+    console.error("Error fetching Contact CMS:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch Contact CMS" });
+  }
+});
+
+// GET /api/v1/auth/stories-cms - Public endpoint to get Stories page CMS
+router.get("/stories-cms", async (req, res) => {
+  try {
+    let stories = await StoriesCMS.findOne();
+    if (!stories) stories = await StoriesCMS.create({});
+    return res.status(200).json({ success: true, data: stories });
+  } catch (error) {
+    console.error("Error fetching Stories CMS:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch Stories CMS" });
+  }
+});
+
+// GET /api/v1/auth/site-settings - Public endpoint to get Site Settings (Branding, Logo)
+router.get("/site-settings", async (req, res) => {
+  try {
+    let settings = await SiteSettings.findOne();
+    if (!settings) settings = await SiteSettings.create({});
+    return res.status(200).json({ success: true, data: settings });
+  } catch (error) {
+    console.error("Error fetching Site Settings:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch Site Settings" });
+  }
+});
 
 module.exports = router;
+

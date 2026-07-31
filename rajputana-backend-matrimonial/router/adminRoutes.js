@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const { generateToken } = require('../utils/utility');
 const {
   getStories,
@@ -37,6 +40,11 @@ const User = require("../models/UserProfile");
 const Notification = require("../models/NotificationSchema");
 const Stories = require("../models/StoriesSchema");
 const Reviews = require("../models/ReviewSchema");
+const AboutUs = require("../models/AboutUs");
+const HomeCMS = require("../models/HomeCMS");
+const ContactCMS = require("../models/ContactCMS");
+const StoriesCMS = require("../models/StoriesCMS");
+const SiteSettings = require("../models/SiteSettings");
 
 // Admin credentials — set via environment variables or use defaults
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin@gmail.com';
@@ -203,6 +211,36 @@ router.post('/stories', isAuth, sanitizeAdminUser, (req, res, next) => {
       });
     } catch (error) {
       console.error('Error creating story:', error);
+      return res.status(500).json({ message: 'Internal server error.', error: error.message });
+    }
+  });
+});
+
+// PUT /admin/update-story/:id — Update an existing story
+router.put('/update-story/:id', isAuth, sanitizeAdminUser, (req, res, next) => {
+  singleFileUpload(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message || 'File upload error.' });
+    }
+    try {
+      const { id } = req.params;
+      const { title, description } = req.body;
+
+      const story = await Stories.findById(id);
+      if (!story) {
+        return res.status(404).json({ message: 'Story not found.' });
+      }
+
+      if (title && title.trim()) story.title = title.trim();
+      if (description && description.trim()) story.description = description.trim();
+      if (req.file) {
+        story.image = `/uploads/avatar/${req.file.filename}`;
+      }
+
+      await story.save();
+      return res.status(200).json({ message: 'Story updated successfully!', story });
+    } catch (error) {
+      console.error('Error updating story:', error);
       return res.status(500).json({ message: 'Internal server error.', error: error.message });
     }
   });
@@ -532,7 +570,6 @@ router.get('/', (req, res) => {
 const FeedbackReport = require("../models/FeedbackReport");
 
 // Multer for feedback image (optional, max 5MB, images only)
-const multer = require("multer");
 const feedbackUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
@@ -689,5 +726,307 @@ router.delete("/feedback/:id", isAuth, async (req, res) => {
 // Dynamic Social Media Links
 router.get("/social-links", getSocialLinks);
 router.put("/social-links", isAuth, updateSocialLinks);
+
+// ── About Page Dynamic CMS Endpoints ──────────────────────────
+const aboutStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, "../uploads/avatar");
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const filename = `about-${file.fieldname}-${Date.now()}${ext}`;
+    cb(null, filename);
+  }
+});
+
+const aboutUpload = multer({ storage: aboutStorage }).fields([
+  { name: "heroImage", maxCount: 1 },
+  { name: "card1Image", maxCount: 1 },
+  { name: "card2Image", maxCount: 1 },
+  { name: "bannerImage", maxCount: 1 },
+  { name: "legacyLeftImage", maxCount: 1 },
+  { name: "legacyRightImage", maxCount: 1 },
+  { name: "whyChooseImage", maxCount: 1 }
+]);
+
+// GET /admin/about-page — Fetch About page content for admin
+router.get("/about-page", isAuth, async (req, res) => {
+  try {
+    let about = await AboutUs.findOne();
+    if (!about) {
+      about = await AboutUs.create({});
+    }
+    res.json({ success: true, data: about });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+});
+
+// POST /admin/about-page — Update About page content and uploaded images
+router.post("/about-page", isAuth, (req, res) => {
+  aboutUpload(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ success: false, message: err.message || "File upload error" });
+    }
+    try {
+      let about = await AboutUs.findOne();
+      if (!about) {
+        about = new AboutUs();
+      }
+
+      const fields = [
+        "heroSubtitle", "heroTitleLine1", "heroTitleLine2", "heroDescription",
+        "card1Text", "card2Text",
+        "legacyTitle", "legacyParagraph1", "legacyParagraph2",
+        "whyChooseHeading",
+        "vvipTitle", "vvipDescription", "vvipButtonText"
+      ];
+
+      fields.forEach((field) => {
+        if (req.body[field] !== undefined) {
+          about[field] = req.body[field];
+        }
+      });
+
+      if (req.body.whyChooseFeatures) {
+        try {
+          const parsed = typeof req.body.whyChooseFeatures === "string"
+            ? JSON.parse(req.body.whyChooseFeatures)
+            : req.body.whyChooseFeatures;
+          if (Array.isArray(parsed)) {
+            about.whyChooseFeatures = parsed;
+          }
+        } catch (e) {
+          console.error("Error parsing whyChooseFeatures:", e);
+        }
+      }
+
+      // Handle uploaded files
+      const imageFields = [
+        "heroImage", "card1Image", "card2Image", "bannerImage",
+        "legacyLeftImage", "legacyRightImage", "whyChooseImage"
+      ];
+
+      imageFields.forEach((imgField) => {
+        if (req.files && req.files[imgField] && req.files[imgField][0]) {
+          about[imgField] = `/uploads/avatar/${req.files[imgField][0].filename}`;
+        }
+      });
+
+      await about.save();
+      res.json({ success: true, message: "About page content updated successfully!", data: about });
+    } catch (error) {
+      console.error("Error updating About page:", error);
+      res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+  });
+});
+
+// ── Home Page CMS Endpoints ────────────────────────────────────
+const homeStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, "../uploads/avatar");
+    if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `home-${file.fieldname}-${Date.now()}${ext}`);
+  }
+});
+const homeUpload = multer({ storage: homeStorage }).fields([
+  { name: "bannerBgImage", maxCount: 1 },
+  { name: "matchmakingImage", maxCount: 1 }
+]);
+
+router.get("/home-cms", isAuth, async (req, res) => {
+  try {
+    let home = await HomeCMS.findOne();
+    if (!home) home = await HomeCMS.create({});
+    res.json({ success: true, data: home });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+});
+
+router.post("/home-cms", isAuth, (req, res) => {
+  homeUpload(req, res, async (err) => {
+    if (err) return res.status(400).json({ success: false, message: err.message || "File upload error" });
+    try {
+      let home = await HomeCMS.findOne();
+      if (!home) home = new HomeCMS();
+
+      const fields = [
+        "heroBadgeText", "heroTitleLine1", "heroTitleLine2", "heroDescription",
+        "heroCTA1Text", "heroCTA2Text", "heroFooterNote",
+        "stat1Value", "stat1Label", "stat2Value", "stat2Label",
+        "stat3Value", "stat3Label", "stat4Value", "stat4Label",
+        "matchBadgeText", "matchHeading", "matchDescription",
+        "matchBullet1Title", "matchBullet1Desc", "matchBullet2Title", "matchBullet2Desc", "matchCTAText",
+        "featureSectionHeading",
+        "feature1Title", "feature2Title", "feature3Title", "feature4Title", "feature5Title",
+        "statsHeading", "statsSubheading",
+        "stat_members_label", "stat_matches_label", "stat_marriages_label", "stat_satisfaction_label"
+      ];
+      const numberFields = ["stat_members_value", "stat_matches_value", "stat_marriages_value", "stat_satisfaction_value"];
+
+      fields.forEach((field) => { if (req.body[field] !== undefined) home[field] = req.body[field]; });
+      numberFields.forEach((field) => { if (req.body[field] !== undefined) home[field] = Number(req.body[field]); });
+
+      const imageFields = ["bannerBgImage", "matchmakingImage"];
+      imageFields.forEach((field) => {
+        if (req.files && req.files[field] && req.files[field][0]) {
+          home[field] = `/uploads/avatar/${req.files[field][0].filename}`;
+        }
+      });
+
+      await home.save();
+      res.json({ success: true, message: "Home page content updated!", data: home });
+    } catch (error) {
+      console.error("Error updating Home CMS:", error);
+      res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+  });
+});
+
+// ── Contact Page CMS Endpoints ─────────────────────────────────
+const contactCmsStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, "../uploads/avatar");
+    if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `contact-${file.fieldname}-${Date.now()}${ext}`);
+  }
+});
+const contactCmsUpload = multer({ storage: contactCmsStorage }).fields([
+  { name: "heroBgImage", maxCount: 1 }
+]);
+
+router.get("/contact-cms", isAuth, async (req, res) => {
+  try {
+    let contact = await ContactCMS.findOne();
+    if (!contact) contact = await ContactCMS.create({});
+    res.json({ success: true, data: contact });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+});
+
+router.post("/contact-cms", isAuth, (req, res) => {
+  contactCmsUpload(req, res, async (err) => {
+    if (err) return res.status(400).json({ success: false, message: err.message || "File upload error" });
+    try {
+      let contact = await ContactCMS.findOne();
+      if (!contact) contact = new ContactCMS();
+
+      const fields = [
+        "heroSupertitle", "heroTitle", "heroDescription",
+        "addressTitle", "addressText",
+        "emailTitle", "email1", "email2",
+        "phoneTitle", "phone1", "phone2",
+        "formHeading", "formSubheading"
+      ];
+      fields.forEach((field) => { if (req.body[field] !== undefined) contact[field] = req.body[field]; });
+
+      if (req.files && req.files["heroBgImage"] && req.files["heroBgImage"][0]) {
+        contact.heroBgImage = `/uploads/avatar/${req.files["heroBgImage"][0].filename}`;
+      }
+
+      await contact.save();
+      res.json({ success: true, message: "Contact page content updated!", data: contact });
+    } catch (error) {
+      console.error("Error updating Contact CMS:", error);
+      res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+  });
+});
+
+// ── Stories Page CMS Endpoints ─────────────────────────────────
+router.get("/stories-cms", isAuth, async (req, res) => {
+  try {
+    let stories = await StoriesCMS.findOne();
+    if (!stories) stories = await StoriesCMS.create({});
+    res.json({ success: true, data: stories });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+});
+
+router.post("/stories-cms", isAuth, async (req, res) => {
+  try {
+    let stories = await StoriesCMS.findOne();
+    if (!stories) stories = new StoriesCMS();
+
+    const fields = [
+      "heroSupertitle", "heroTitle", "heroDescription",
+      "vvipTitle", "vvipDescription", "vvipButtonText"
+    ];
+    fields.forEach((field) => { if (req.body[field] !== undefined) stories[field] = req.body[field]; });
+
+    await stories.save();
+    res.json({ success: true, message: "Stories page content updated!", data: stories });
+  } catch (error) {
+    console.error("Error updating Stories CMS:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+});
+
+// ── Site Settings & Branding Endpoints ────────────────────────
+const siteSettingsStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, "../uploads/avatar");
+    if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `logo-${Date.now()}${ext}`);
+  }
+});
+const siteSettingsUpload = multer({ storage: siteSettingsStorage }).fields([
+  { name: "logo", maxCount: 1 }
+]);
+
+router.get("/site-settings", isAuth, async (req, res) => {
+  try {
+    let settings = await SiteSettings.findOne();
+    if (!settings) settings = await SiteSettings.create({});
+    res.json({ success: true, data: settings });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+});
+
+router.post("/site-settings", isAuth, (req, res) => {
+  siteSettingsUpload(req, res, async (err) => {
+    if (err) return res.status(400).json({ success: false, message: err.message || "File upload error" });
+    try {
+      let settings = await SiteSettings.findOne();
+      if (!settings) settings = new SiteSettings();
+
+      const fields = ["companyName", "tagline", "copyrightText"];
+      fields.forEach((field) => {
+        if (req.body[field] !== undefined) settings[field] = req.body[field];
+      });
+
+      if (req.files && req.files["logo"] && req.files["logo"][0]) {
+        settings.logo = `/uploads/avatar/${req.files["logo"][0].filename}`;
+      }
+
+      await settings.save();
+      res.json({ success: true, message: "Site settings updated successfully!", data: settings });
+    } catch (error) {
+      console.error("Error updating Site settings:", error);
+      res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+  });
+});
 
 module.exports = router;

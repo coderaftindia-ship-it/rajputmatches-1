@@ -6,7 +6,13 @@
 export const calculateAge = (dob) => {
   if (!dob) return 0;
   
-  const birthDate = new Date(dob);
+  let dateStr = dob;
+  if (typeof dateStr === "string") {
+    dateStr = dateStr.replace(/-/g, "/").replace("T", " ").split(".")[0];
+  }
+  const birthDate = new Date(dateStr);
+  if (isNaN(birthDate.getTime())) return 0;
+
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -15,7 +21,7 @@ export const calculateAge = (dob) => {
     age--;
   }
   
-  return age;
+  return age > 0 ? age : 0;
 };
 
 /**

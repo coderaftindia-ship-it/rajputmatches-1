@@ -19,7 +19,8 @@ import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
 import { useAuth } from "./AuthContext";
 import pro from "../../assets/images/blurimage.png";
-import profileDefault from "../../assets/images/profile.png";
+import maleDefault from "../../assets/images/male_default.png";
+import femaleDefault from "../../assets/images/female_default.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { calculateAge } from "../Profile/ProfileComp/ProfileInfoHeader";
 import styles from "./RecentAddedPage.module.css";
@@ -40,11 +41,19 @@ export function Interestimagecontainer({ profile, status, fetchData }) {
     catch (err) { console.error(err); }
   };
 
-  if (!hasPhotos) return (
-    <div className="position-relative w-100" style={{ height: "16rem", borderBottom: "3px solid var(--royal-gold)" }}>
-      <img src={profileDefault} className="w-100 h-100 object-fit-cover" alt="Profile Default" />
-    </div>
-  );
+  if (!hasPhotos) {
+    const url = profile?.imageUrl;
+    const isDefault = !url || 
+      url.includes("profile.png") || 
+      url.includes("user-icon-flat-isolated") || 
+      url.includes("istockphoto.com");
+    const fallbackSrc = !isDefault ? url : (profile?.gender === "Female" ? femaleDefault : maleDefault);
+    return (
+      <div className="position-relative w-100" style={{ height: "16rem", borderBottom: "3px solid var(--royal-gold)" }}>
+        <img src={fallbackSrc} className="w-100 h-100 object-fit-cover" alt="Profile Default" />
+      </div>
+    );
+  }
 
   if (isPrivate && profile?.photoRequestStatus !== "accepted") {
     const isPending  = profile?.photoRequestStatus === "pending";
@@ -95,10 +104,31 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
   const getImg = () => {
     if (profile?.filesId?.isPrivate && profile?.photoRequestStatus !== "accepted") return pro;
     if (profile?.filesId?.photos?.length > 0) return profile.filesId.photos[0].url;
-    return profileDefault;
+    const url = profile?.imageUrl;
+    const isDefault = !url || 
+      url.includes("profile.png") || 
+      url.includes("user-icon-flat-isolated") || 
+      url.includes("istockphoto.com");
+    if (!isDefault) return url;
+    return profile?.gender === "Female" ? femaleDefault : maleDefault;
+  };
+
+  const isDefaultImg = () => {
+    if (profile?.filesId?.photos?.length > 0) return false;
+    if (profile?.filesId?.isPrivate && photoReqStatus !== "accepted") return false;
+    const img = getImg();
+    if (!img) return true;
+    const str = String(img).toLowerCase();
+    return (
+      str.includes("default") ||
+      str.includes("profile") ||
+      str.includes("user-icon") ||
+      str.includes("istock")
+    );
   };
 
   const imageSrc   = getImg();
+  const useDefault = isDefaultImg();
   const isPrivate  = profile?.filesId?.isPrivate;
   const totalPhotos= profile?.filesId?.totalPhotos || 0;
   const age        = profile?.dateOfBirth ? calculateAge(profile.dateOfBirth) : null;
@@ -232,7 +262,12 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
       </div>
       {/* Avatar */}
       <div className={styles.avatarWrapper}>
-        <img src={imageSrc} className={styles.avatarImage} alt="Profile"/>
+        <img 
+          src={imageSrc} 
+          className={styles.avatarImage} 
+          alt="Profile"
+          style={useDefault ? { objectFit: "cover", objectPosition: "center" } : { objectFit: "cover", objectPosition: "top" }}
+        />
         {isPrivate && photoReqStatus !== "accepted" && (
           <div className={styles.privateOverlay} style={{ flexDirection: "column", gap: "3px", padding: "4px" }}>
             <span style={{ fontSize: "0.55rem", lineHeight: "1" }}>Photo on Request</span>

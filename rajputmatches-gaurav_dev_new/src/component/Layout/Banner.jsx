@@ -10,16 +10,43 @@ import { motion } from "framer-motion";
 import Bannerbg from "../../assets/images/bannerbg.png";
 import { Country, State, City } from "country-state-city";
 import { Navigate } from "react-router-dom";
+import { publicApi } from "../../api";
+import { BASE_URL } from "../../api";
 
 const ageOptions = Array.from({ length: 33 }, (_, i) => 18 + i);
+
+const DEFAULT_CMS = {
+  heroBadgeText: "Trusted Since 2009",
+  heroTitleLine1: "Where Royalty",
+  heroTitleLine2: "Meets Destiny",
+  heroDescription:
+    "India's premium royal matrimonial service. Discover verified, dignified matches from distinguished families — crafted for unions that honour tradition and celebrate love.",
+  heroCTA1Text: "Begin Your Journey",
+  heroCTA2Text: "Explore Matches",
+  heroFooterNote: "Free registration • No hidden charges",
+  stat1Value: "100%", stat1Label: "Verified",
+  stat2Value: "25,000+", stat2Label: "Members",
+  stat3Value: "4.9", stat3Label: "Rating",
+  stat4Value: "All", stat4Label: "Communities",
+};
 
 function Banner() {
   const { isAuthenticated, setFormData, formData, userData } = useAuth();
   const [redirectPath, setRedirectPath] = useState(null);
+  const [cms, setCms] = useState(DEFAULT_CMS);
 
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+
+  // Fetch CMS data
+  useEffect(() => {
+    publicApi.getHomeCMS()
+      .then((res) => {
+        if (res?.data?.data) setCms({ ...DEFAULT_CMS, ...res.data.data });
+      })
+      .catch(() => {});
+  }, []);
 
   // Auto-enforce opposite gender search based on user profile gender
   useEffect(() => {
@@ -42,9 +69,7 @@ function Banner() {
   // When country selection changes, update states
   useEffect(() => {
     if (formData.country) {
-      const selectedCountry = countries.find(
-        (c) => c.name === formData.country
-      );
+      const selectedCountry = countries.find((c) => c.name === formData.country);
       if (selectedCountry) {
         setStates(State.getStatesOfCountry(selectedCountry.isoCode));
       }
@@ -56,13 +81,9 @@ function Banner() {
   // When state selection changes, update cities
   useEffect(() => {
     if (formData.state && formData.country) {
-      const selectedCountry = countries.find(
-        (c) => c.name === formData.country
-      );
+      const selectedCountry = countries.find((c) => c.name === formData.country);
       if (selectedCountry) {
-        const selectedState = states.find(
-          (s) => s.name === formData.state
-        );
+        const selectedState = states.find((s) => s.name === formData.state);
         if (selectedState) {
           setCities(City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode));
         } else {
@@ -126,6 +147,11 @@ function Banner() {
     return <Navigate to={redirectPath} replace />;
   }
 
+  // Resolve banner background image
+  const bannerBg = cms.bannerBgImage
+    ? (cms.bannerBgImage.startsWith("/uploads/") ? `${BASE_URL}${cms.bannerBgImage}` : cms.bannerBgImage)
+    : Bannerbg;
+
   const particleStyles = [
     { left: "10%", animationDelay: "0s", animationDuration: "14s" },
     { left: "25%", animationDelay: "3s", animationDuration: "18s" },
@@ -136,22 +162,29 @@ function Banner() {
     { left: "95%", animationDelay: "7s", animationDuration: "19s" },
   ];
 
+  const stats = [
+    { value: cms.stat1Value, label: cms.stat1Label, icon: <FaCheckCircle color="var(--royal-gold)" /> },
+    { value: cms.stat2Value, label: cms.stat2Label, icon: <FaUsers color="var(--royal-gold)" /> },
+    { value: cms.stat3Value, label: cms.stat3Label, icon: <FaStar color="var(--royal-gold)" /> },
+    { value: cms.stat4Value, label: cms.stat4Label, icon: <FaRegBuilding color="var(--royal-gold)" /> },
+  ];
+
   return (
     <>
-      <div 
-        className="position-relative overflow-hidden banner-wrapper" 
-        style={{ 
-          minHeight: "100vh", 
-          display: "flex", 
+      <div
+        className="position-relative overflow-hidden banner-wrapper"
+        style={{
+          minHeight: "100vh",
+          display: "flex",
           flexDirection: "column",
           overflowX: "hidden"
         }}
       >
         {/* Cinematic Ken Burns Background Zoom/Pan Effect */}
-        <div 
-          className="position-absolute top-0 start-0 w-100 h-100" 
-          style={{ 
-            backgroundImage: `url(${Bannerbg})`,
+        <div
+          className="position-absolute top-0 start-0 w-100 h-100"
+          style={{
+            backgroundImage: `url(${bannerBg})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             zIndex: 0,
@@ -161,20 +194,20 @@ function Banner() {
         ></div>
 
         {/* Premium Dark Royal Overlay with Maroon and Dark Vignette */}
-        <div 
-          className="position-absolute top-0 start-0 w-100 h-100" 
-          style={{ 
-            background: "linear-gradient(180deg, rgba(70, 0, 0, 0.7) 0%, rgba(20, 20, 20, 0.55) 45%, rgba(20, 20, 20, 0.6) 70%, rgba(70, 0, 0, 0.8) 100%)", 
-            zIndex: 1 
+        <div
+          className="position-absolute top-0 start-0 w-100 h-100"
+          style={{
+            background: "linear-gradient(180deg, rgba(70, 0, 0, 0.7) 0%, rgba(20, 20, 20, 0.55) 45%, rgba(20, 20, 20, 0.6) 70%, rgba(70, 0, 0, 0.8) 100%)",
+            zIndex: 1
           }}
         ></div>
 
         {/* Floating Sparks / Gold Particles Effect */}
         <div className="position-absolute w-100 h-100 overflow-hidden" style={{ top: 0, left: 0, zIndex: 2, pointerEvents: "none" }}>
           {particleStyles.map((style, index) => (
-            <div 
-              key={index} 
-              className="royal-particle" 
+            <div
+              key={index}
+              className="royal-particle"
               style={{
                 left: style.left,
                 animationDelay: style.animationDelay,
@@ -191,7 +224,7 @@ function Banner() {
         <div className="container d-flex flex-column justify-content-center flex-grow-1 position-relative" style={{ zIndex: 3 }}>
           <div className="row align-items-center min-vh-100 mt-2 pt-4 pb-4 mt-md-4 pt-md-5 pb-md-5">
             {/* Left Column: Text & Badges */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, ease: "easeOut" }}
@@ -199,13 +232,14 @@ function Banner() {
             >
               <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4" style={{ border: "1px solid rgba(237, 177, 57, 0.4)", background: "rgba(0,0,0,0.2)" }}>
                 <FaCrown color="var(--royal-gold)" size={14} />
-                <span style={{ fontSize: "0.85rem", color: "var(--royal-gold)", letterSpacing: "0.5px" }}>Trusted Since 2009</span>
+                <span style={{ fontSize: "0.85rem", color: "var(--royal-gold)", letterSpacing: "0.5px" }}>{cms.heroBadgeText}</span>
               </div>
-              
+
               <h1 className="display-5 display-md-3 fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", textShadow: "0 4px 15px rgba(0,0,0,0.65)", lineHeight: "1.1", fontSize: "clamp(2rem, 7vw, 4rem)" }}>
-                Where Royalty<br/>Meets <span style={{ color: "var(--royal-gold)" }}>Destiny</span>
+                {cms.heroTitleLine1}<br/>
+                <span style={{ color: "var(--royal-gold)" }}>{cms.heroTitleLine2}</span>
               </h1>
-              
+
               <div className="mb-4">
                 <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M10 10 Q 30 0, 60 10 T 110 10" stroke="var(--royal-gold)" strokeWidth="1.5" fill="none" />
@@ -214,33 +248,34 @@ function Banner() {
                   <circle cx="110" cy="10" r="2" fill="var(--royal-gold)" />
                 </svg>
               </div>
-              
+
               <p className="lead mb-3 mb-md-5 text-white-50" style={{ fontSize: "clamp(0.9rem, 3.5vw, 1.1rem)", maxWidth: "90%", lineHeight: "1.6", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
-                India's premium royal matrimonial service. Discover verified, dignified matches from distinguished families — crafted for unions that honour tradition and celebrate love.
+                {cms.heroDescription}
               </p>
-              
+
               <div className="d-flex flex-wrap gap-3 mb-3 mb-md-5">
-                <button 
-                  className="royal-button d-flex align-items-center gap-2" 
+                <button
+                  className="royal-button d-flex align-items-center gap-2"
                   style={{ padding: "12px 24px", background: "var(--royal-gold)", color: "var(--royal-dark)", border: "none", borderRadius: "8px", fontWeight: "600" }}
-                  onClick={() => setRedirectPath(isAuthenticated ? "/search" : "/signup")}
+                  onClick={() => setRedirectPath(isAuthenticated ? "/search" : "/login")}
                 >
-                  <FaRegHeart /> Begin Your Journey
+                  <FaRegHeart /> {cms.heroCTA1Text}
                 </button>
-                <button 
-                  className="royal-button-outline d-flex align-items-center gap-2" 
+                <button
+                  className="royal-button-outline d-flex align-items-center gap-2"
                   style={{ padding: "12px 24px", background: "rgba(0,0,0,0.3)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "8px" }}
                   onClick={() => setRedirectPath(isAuthenticated ? "/search" : "/login")}
                 >
-                  <LiaSearchSolid size={20} /> Explore Matches
+                  <LiaSearchSolid size={20} /> {cms.heroCTA2Text}
                 </button>
               </div>
-              
+
               <div className="d-flex flex-wrap gap-2 gap-md-4 align-items-center" style={{ fontSize: "clamp(0.72rem, 2.5vw, 0.85rem)", opacity: 0.9 }}>
-                <div className="d-flex align-items-center gap-2"><FaCheckCircle color="var(--royal-gold)" /> 100% Verified</div>
-                <div className="d-flex align-items-center gap-2"><FaUsers color="var(--royal-gold)" /> 25,000+ Members</div>
-                <div className="d-flex align-items-center gap-2"><FaStar color="var(--royal-gold)" /> 4.9 Rating</div>
-                <div className="d-flex align-items-center gap-2"><FaRegBuilding color="var(--royal-gold)" /> All Communities</div>
+                {stats.map((stat, i) => (
+                  <div key={i} className="d-flex align-items-center gap-2">
+                    {stat.icon} {stat.value} {stat.label}
+                  </div>
+                ))}
               </div>
             </motion.div>
 
@@ -251,13 +286,13 @@ function Banner() {
               transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
               className="col-12 col-lg-5 offset-lg-1"
             >
-              <form 
-                onSubmit={handleSubmit} 
+              <form
+                onSubmit={handleSubmit}
                 className="p-4 p-md-5 rounded-4 d-flex flex-column"
-                style={{ 
-                  background: "rgba(252, 245, 234, 0.95)", // Glassy warm cream
-                  border: "1.5px solid rgba(212, 175, 55, 0.35)", 
-                  borderTop: "6px solid var(--royal-maroon)", // Elegant thick top border
+                style={{
+                  background: "rgba(252, 245, 234, 0.95)",
+                  border: "1.5px solid rgba(212, 175, 55, 0.35)",
+                  borderTop: "6px solid var(--royal-maroon)",
                   boxShadow: "0 24px 60px rgba(0, 0, 0, 0.35)",
                   color: "var(--royal-text)",
                   backdropFilter: "blur(12px)"
@@ -276,11 +311,11 @@ function Banner() {
                     <FaRegHeart color="var(--royal-gold-dark)" /> Looking For
                   </label>
                   <div className="d-flex gap-3">
-                    <label 
-                      className="flex-grow-1 position-relative" 
-                      style={{ 
-                        opacity: userData?.gender === "Female" ? 0.4 : 1, 
-                        cursor: userData?.gender === "Female" ? "not-allowed" : "pointer" 
+                    <label
+                      className="flex-grow-1 position-relative"
+                      style={{
+                        opacity: userData?.gender === "Female" ? 0.4 : 1,
+                        cursor: userData?.gender === "Female" ? "not-allowed" : "pointer"
                       }}
                     >
                       <input
@@ -304,11 +339,11 @@ function Banner() {
                         <FaVenus /> Bride
                       </div>
                     </label>
-                    <label 
-                      className="flex-grow-1 position-relative" 
-                      style={{ 
-                        opacity: userData?.gender === "Male" ? 0.4 : 1, 
-                        cursor: userData?.gender === "Male" ? "not-allowed" : "pointer" 
+                    <label
+                      className="flex-grow-1 position-relative"
+                      style={{
+                        opacity: userData?.gender === "Male" ? 0.4 : 1,
+                        cursor: userData?.gender === "Male" ? "not-allowed" : "pointer"
                       }}
                     >
                       <input
@@ -366,43 +401,43 @@ function Banner() {
                         onChange={handleChange}
                         placeholder="e.g. Jaipur, Rajasthan"
                         className="form-control rounded-3 w-100"
-                        style={{ 
-                          height: "45px", 
-                          background: "#fff", 
-                          border: "1.5px solid rgba(89,18,59,0.15)", 
-                          fontSize: "0.92rem", 
+                        style={{
+                          height: "45px",
+                          background: "#fff",
+                          border: "1.5px solid rgba(89,18,59,0.15)",
+                          fontSize: "0.92rem",
                           color: "var(--royal-text)",
                           paddingLeft: "35px"
                         }}
                       />
-                      <FaMapMarkerAlt 
-                        className="position-absolute" 
-                        style={{ 
-                          left: "12px", 
-                          top: "50%", 
-                          transform: "translateY(-50%)", 
-                          color: "rgba(89,18,59,0.4)", 
-                          fontSize: "0.9rem" 
-                        }} 
+                      <FaMapMarkerAlt
+                        className="position-absolute"
+                        style={{
+                          left: "12px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          color: "rgba(89,18,59,0.4)",
+                          fontSize: "0.9rem"
+                        }}
                       />
                     </div>
                   </div>
                 </div>
 
-                <button 
-                  type="submit" 
-                  className="btn w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 text-white mt-2 royal-button" 
+                <button
+                  type="submit"
+                  className="btn w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 text-white mt-2 royal-button"
                   style={{ height: "48px", fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "0.95rem" }}
                 >
                   <LiaSearchSolid size={20} /> Search Matches
                 </button>
                 <div className="text-center mt-3">
-                  <span style={{ fontSize: "0.75rem", color: "var(--royal-text-light)" }}>Free registration • No hidden charges</span>
+                  <span style={{ fontSize: "0.75rem", color: "var(--royal-text-light)" }}>{cms.heroFooterNote}</span>
                 </div>
               </form>
             </motion.div>
           </div>
-          
+
           <div className="mt-5 pb-5 d-none d-md-block">
             <Features />
           </div>

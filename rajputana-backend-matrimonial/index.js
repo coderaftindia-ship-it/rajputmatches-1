@@ -95,7 +95,9 @@ const authRoutes = require("./router/authRoutes");
 const adminRoutes = require("./router/adminRoutes");
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/public", authRoutes);
 app.use("/admin", adminRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 io.on("connection", (socket) => {
   console.log("Connected:", socket.id);

@@ -127,13 +127,15 @@ function Mydetails() {
 
   const [aboutText, setAboutText] = useState("");
   const [prefText, setPrefText] = useState("");
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user && !isInitialized) {
       setAboutText(user.additionalInfo || "");
       setPrefText(user.partnerPreferences || "");
+      setIsInitialized(true);
     }
-  }, [user]);
+  }, [user, isInitialized]);
 
   const saveAboutMe = async (text) => {
     const payload = {
@@ -231,16 +233,24 @@ function Mydetails() {
   };
 
   const openEducationEdit = () => {
+    const rawOccs = professional?.occupationsList || [];
+    const normalizedOccs = rawOccs.map((o) => ({
+      occupation: o.occupation || "",
+      company: o.company || o.salary || "",
+      salary: o.salary || o.company || "",
+    }));
+
     setEducationFormData({
       qualifications: professional?.qualifications || "",
       institution: professional?.institution || "",
       professional: professional?.professional || "",
-      annualIncome: professional?.annualIncome || "",
+      company: professional?.company || professional?.annualIncome || "",
+      annualIncome: professional?.company || professional?.annualIncome || "",
       hobbies: professional?.hobbies || [],
       additionalInfo: professional?.additionalInfo || "",
       class: professional?.class || "",
       qualificationsList: professional?.qualificationsList || [],
-      occupationsList: professional?.occupationsList || [],
+      occupationsList: normalizedOccs,
     });
     setActiveModal("education");
   };
@@ -676,13 +686,13 @@ function Mydetails() {
                 professional.occupationsList.map((o, idx) => (
                   <React.Fragment key={idx}>
                     <DetailRow icon={<FaBriefcase />} label={professional.occupationsList.length > 1 ? `Current Role #${idx + 1}` : "Current Role"} value={o.occupation || "N/A"} />
-                    <DetailRow icon={<FaDollarSign />} label="Annual Income" value={o.salary || "N/A"} />
+                    <DetailRow icon={<FaBuilding />} label={professional.occupationsList.length > 1 ? `Company #${idx + 1}` : "Company / Employer"} value={o.company || o.salary || "N/A"} />
                   </React.Fragment>
                 ))
               ) : (
                 <>
                   <DetailRow icon={<FaBriefcase />} label="Current Role" value={professional?.professional || "N/A"} />
-                  <DetailRow icon={<FaDollarSign />} label="Annual Income" value={professional?.annualIncome || "N/A"} />
+                  <DetailRow icon={<FaBuilding />} label="Company / Employer" value={professional?.company || professional?.annualIncome || "N/A"} />
                 </>
               )}
             </div>

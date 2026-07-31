@@ -7,6 +7,7 @@ const ProfessionalDetailsSchema = new Schema({
   institution: { type: String, trim: true },
   professional: { type: String, trim: true },
   annualIncome: { type: String },
+  company: { type: String },
   hobbies: { type: [String] },
   additionalInfo: { type: String, trim: true, maxlength: 100 },
   class: { type: String, trim: true },
@@ -20,6 +21,7 @@ const ProfessionalDetailsSchema = new Schema({
     {
       occupation: { type: String },
       salary: { type: String },
+      company: { type: String },
     },
   ],
 });

@@ -2442,8 +2442,8 @@ exports.createStory = async (req, res) => {
 
 exports.createContactRequest = async (req, res) => {
   try {
-    const { firstName, lastName, mobile, email, additionalInfo } =
-      req.body.data;
+    const payload = req.body.data || req.body;
+    const { firstName, lastName, mobile, email, additionalInfo } = payload;
 
     const existingUser = await ContactRequest.findOne({
       $or: [{ email }, { mobile }],
@@ -2843,18 +2843,12 @@ exports.getStories = async (req, res) => {
 
 exports.storiesData = async (req, res) => {
   try {
-    const stories = await Stories.find({ status: true });
-
-    if (!stories || stories.length === 0) {
-      return res.status(404).json({
-        message: "No stories found",
-        stories: [],
-      });
-    }
+    const stories = await Stories.find({ status: true }).sort({ createdAt: -1 });
 
     return res.status(200).json({
       message: "Stories data found",
-      user: stories,
+      user: stories || [],
+      stories: stories || [],
     });
   } catch (error) {
     console.error("Error fetching stories:", error);

@@ -11,7 +11,8 @@ import RecentAddedPageCss from "./RecentAddedPage.module.css";
 import { publicApi } from "../../api";
 import { calculateAge } from "../Profile/ProfileComp/ProfileInfoHeader";
 import { useAuth } from "./AuthContext";
-import profileDefault from "../../assets/images/profile.png";
+import maleDefault from "../../assets/images/male_default.png";
+import femaleDefault from "../../assets/images/female_default.png";
 import blurImage from "../../assets/images/blurimage.png";
 import { motion } from "framer-motion";
 
@@ -126,7 +127,27 @@ function RecentAddedPage() {
       if (prof.filesId.isPrivate && prof.photoRequestStatus !== "accepted") return blurImage;
       if (prof.filesId.photos?.length > 0) return prof.filesId.photos[0].url;
     }
-    return prof.imageUrl || profileDefault;
+    const url = prof.imageUrl;
+    const isDefault = !url || 
+      url.includes("profile.png") || 
+      url.includes("user-icon-flat-isolated") || 
+      url.includes("istockphoto.com");
+    if (!isDefault) return url;
+    return prof.gender === "Female" ? femaleDefault : maleDefault;
+  };
+
+  const isDefaultAvatar = (prof) => {
+    if (prof?.filesId?.photos?.length > 0) return false;
+    if (prof?.filesId?.isPrivate && prof?.photoRequestStatus !== "accepted") return false;
+    const img = getProfileImage(prof);
+    if (!img) return true;
+    const str = String(img).toLowerCase();
+    return (
+      str.includes("default") ||
+      str.includes("profile") ||
+      str.includes("user-icon") ||
+      str.includes("istock")
+    );
   };
 
   const disabledOverlay = {
@@ -138,6 +159,7 @@ function RecentAddedPage() {
 
   const ProfileCard = ({ profile, widthStyle }) => {
     const imageSrc    = getProfileImage(profile);
+    const useDefault  = isDefaultAvatar(profile);
     const age         = profile.dateOfBirth ? calculateAge(profile.dateOfBirth) : "N/A";
     const totalPhotos = profile.filesId?.totalPhotos || 0;
     const isPrivate   = profile.filesId?.isPrivate;
@@ -167,7 +189,12 @@ function RecentAddedPage() {
           </div>
 
           <div className={RecentAddedPageCss.avatarWrapper}>
-            <img src={imageSrc} className={RecentAddedPageCss.avatarImage} alt="Profile" />
+            <img 
+              src={imageSrc} 
+              className={RecentAddedPageCss.avatarImage} 
+              alt="Profile"
+              style={useDefault ? { objectFit: "cover", objectPosition: "center" } : { objectFit: "cover", objectPosition: "top" }}
+            />
             {isPrivate && profile.photoRequestStatus !== "accepted" && <div className={RecentAddedPageCss.privateOverlay}><span>Photo on Request</span></div>}
           </div>
 

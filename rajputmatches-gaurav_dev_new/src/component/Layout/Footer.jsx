@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../../assets/images/Logo.png";
 import { useAuth } from "./AuthContext";
+import { useSiteSettings } from "../../context/SiteSettingsContext";
 import {
   FaFacebook,
   FaInstagram,
@@ -17,6 +18,7 @@ const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_UR
 
 function Footer() {
   const { logout } = useAuth();
+  const { siteSettings } = useSiteSettings();
   const [links, setLinks] = useState({});
 
   useEffect(() => {
@@ -50,8 +52,8 @@ function Footer() {
           <div className="col-12 col-lg-5">
             <Link to="/" className="d-inline-flex align-items-center gap-3 mb-4 text-decoration-none">
               <img
-                src={Logo}
-                alt="Rajput Matches Logo"
+                src={siteSettings.logo || Logo}
+                alt={siteSettings.companyName || "Logo"}
                 style={{
                   height: "72px",
                   width: "auto",
@@ -71,7 +73,7 @@ function Footer() {
                   lineHeight: "1.1",
                   textTransform: "uppercase"
                 }}>
-                  Rajput Matches
+                  {siteSettings.companyName || "Rajput Matches"}
                 </span>
                 <span style={{
                   fontSize: "0.7rem",
@@ -81,7 +83,7 @@ function Footer() {
                   textTransform: "uppercase",
                   marginTop: "2px"
                 }}>
-                  Royal Matrimonial
+                  {siteSettings.tagline || "Royal Matrimonial"}
                 </span>
               </div>
             </Link>
@@ -155,7 +157,7 @@ function Footer() {
         
         <div className="text-center pb-3">
           <p className="mb-0" style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "0.9rem" }}>
-            &copy; 2025-26 Rajputmatches Matrimony. All Rights Reserved.
+            {siteSettings.copyrightText || "© 2025-26 Rajput Matches Matrimony. All Rights Reserved."}
           </p>
         </div>
       </div>

@@ -12,6 +12,7 @@ import {
 import { useAuth } from "../component/Layout/AuthContext";
 import { authApi } from "../api/auth.api";
 import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
+import royalPlaceBg from "../assets/images/royalplacebg.jpg";
 import "./Login.css";
 
 function Register() {
@@ -60,7 +61,7 @@ function Register() {
           : ["email", "password"].includes(name)
           ? value.replace(/\s/g, "") // No spaces for email & password
           : ["firstName", "lastName"].includes(name)
-          ? value.replace(/\s/g, "") // No spaces for first & last name
+          ? value.replace(/[^A-Za-z\s]/g, "").replace(/^\s+/, "").replace(/\s{2,}/g, " ") // Allow letters & spaces for first & last name
           : value,
       ...(name === "country" ? { state: "", city: "" } : {}),
       ...(name === "state" ? { city: "" } : {}),
@@ -262,10 +263,24 @@ function Register() {
     }
   }, []);
 
+  const isVerified = otpVerified || new URLSearchParams(window.location.search).get("verified") === "true";
+
   return (
     <>
       <Profilenavbar />
-      <div className="royal-auth-container">
+      <div 
+        className="royal-auth-container"
+        style={
+          isVerified
+            ? {
+                backgroundImage: `url(${royalPlaceBg})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }
+            : {}
+        }
+      >
         <div className="royal-auth-overlay"></div>
         <div className="royal-auth-card wide">
           <button 

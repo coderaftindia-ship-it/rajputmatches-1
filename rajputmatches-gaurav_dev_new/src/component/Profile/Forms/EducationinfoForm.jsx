@@ -19,7 +19,7 @@ function EducationinfoForm({
 
   // Occupation row edit state: null = closed, -1 = adding new, index >= 0 = editing existing
   const [editingOccIndex, setEditingOccIndex] = useState(null);
-  const [occForm, setOccForm] = useState({ occupation: "", salary: "" });
+  const [occForm, setOccForm] = useState({ occupation: "", company: "" });
 
   // Initialize lists from props — only use real saved data, no dummy defaults
   useEffect(() => {
@@ -35,7 +35,7 @@ function EducationinfoForm({
     if (formData?.occupationsList && Array.isArray(formData.occupationsList) && formData.occupationsList.length > 0) {
       occs = formData.occupationsList;
     } else if (formData?.professional || formData?.annualIncome) {
-      occs = [{ occupation: formData.professional || "", salary: formData.annualIncome || "" }];
+      occs = [{ occupation: formData.professional || "", company: formData.company || formData.annualIncome || "" }];
     }
     setOccupationsList(occs);
   }, [formData]);
@@ -73,7 +73,7 @@ function EducationinfoForm({
   // ── Occupation Actions ──
   const startAddOcc = () => {
     setEditingOccIndex(-1);
-    setOccForm({ occupation: "", salary: "" });
+    setOccForm({ occupation: "", company: "" });
   };
 
   const startEditOcc = (index) => {
@@ -88,12 +88,17 @@ function EducationinfoForm({
 
   const saveOccRow = () => {
     if (!occForm.occupation.trim()) return;
+    const itemToSave = {
+      occupation: occForm.occupation,
+      company: occForm.company,
+      salary: occForm.company || occForm.salary || "",
+    };
     if (editingOccIndex === -1) {
-      setOccupationsList((prev) => [...prev, { ...occForm }]);
+      setOccupationsList((prev) => [...prev, itemToSave]);
     } else if (editingOccIndex >= 0) {
       setOccupationsList((prev) => {
         const copy = [...prev];
-        copy[editingOccIndex] = { ...occForm };
+        copy[editingOccIndex] = itemToSave;
         return copy;
       });
     }
@@ -103,31 +108,58 @@ function EducationinfoForm({
   // ── Final Form Submit ──
   const onFinalSubmit = (e) => {
     if (e) e.preventDefault();
-    const primaryQual = qualificationsList[0]?.qualification || "";
-    const primaryInst = qualificationsList[0]?.institution || "";
-    const primaryOcc = occupationsList[0]?.occupation || "";
-    const primarySal = occupationsList[0]?.salary || "";
+
+    let finalQuals = [...qualificationsList];
+    if (editingQualIndex === -1 && qualForm.qualification.trim()) {
+      finalQuals.push({ ...qualForm });
+    } else if (editingQualIndex >= 0 && qualForm.qualification.trim()) {
+      finalQuals[editingQualIndex] = { ...qualForm };
+    }
+
+    let finalOccs = [...occupationsList];
+    if (editingOccIndex === -1 && occForm.occupation.trim()) {
+      finalOccs.push({
+        occupation: occForm.occupation,
+        company: occForm.company,
+        salary: occForm.company,
+      });
+    } else if (editingOccIndex >= 0 && occForm.occupation.trim()) {
+      finalOccs[editingOccIndex] = {
+        occupation: occForm.occupation,
+        company: occForm.company,
+        salary: occForm.company,
+      };
+    }
+
+    const primaryQual = finalQuals[0]?.qualification || "";
+    const primaryInst = finalQuals[0]?.institution || "";
+    const primaryOcc = finalOccs[0]?.occupation || "";
+    const primaryCompany = finalOccs[0]?.company || finalOccs[0]?.salary || "";
+
+    const formattedOccs = finalOccs.map((o) => ({
+      occupation: o.occupation,
+      company: o.company || o.salary || "",
+      salary: o.company || o.salary || "",
+    }));
+
+    const payload = {
+      qualifications: primaryQual,
+      institution: primaryInst,
+      professional: primaryOcc,
+      company: primaryCompany,
+      annualIncome: primaryCompany,
+      qualificationsList: finalQuals,
+      occupationsList: formattedOccs,
+    };
 
     if (setEducationFormData) {
       setEducationFormData((prev) => ({
         ...prev,
-        qualifications: primaryQual,
-        institution: primaryInst,
-        professional: primaryOcc,
-        annualIncome: primarySal,
-        qualificationsList,
-        occupationsList,
+        ...payload,
       }));
     }
     if (handleSaveClick) {
-      handleSaveClick({
-        qualifications: primaryQual,
-        institution: primaryInst,
-        professional: primaryOcc,
-        annualIncome: primarySal,
-        qualificationsList,
-        occupationsList,
-      });
+      handleSaveClick(payload);
     }
   };
 
@@ -295,7 +327,7 @@ function EducationinfoForm({
             <div style={{ border: "1px solid #edf2f7", borderRadius: "8px", overflow: "hidden" }}>
               <div className="row m-0 py-2 px-3 bg-light" style={{ borderBottom: "1px solid #edf2f7", fontSize: "0.75rem", fontWeight: "700", color: "#64748b", letterSpacing: "0.05em" }}>
                 <div className="col-5">OCCUPATION</div>
-                <div className="col-5">SALARY (PER ANNUM)</div>
+                <div className="col-5">COMPANY / EMPLOYER</div>
                 <div className="col-2 text-end">ACTIONS</div>
               </div>
 
@@ -323,9 +355,9 @@ function EducationinfoForm({
                         <input
                           type="text"
                           className="form-control form-control-sm"
-                          placeholder="Salary (e.g. ₹ 12,00,000)"
-                          value={occForm.salary}
-                          onChange={(e) => setOccForm({ ...occForm, salary: e.target.value })}
+                          placeholder="e.g. Infosys, TCS, Self-employed"
+                          value={occForm.company}
+                          onChange={(e) => setOccForm({ ...occForm, company: e.target.value })}
                         />
                       </div>
                       <div className="col-2 text-end d-flex gap-2 justify-content-end">
@@ -337,7 +369,7 @@ function EducationinfoForm({
                     /* Display Row */
                     <div className="row m-0 py-3 px-3 align-items-center bg-white" style={{ borderBottom: index < occupationsList.length - 1 ? "1px solid #edf2f7" : "none" }}>
                       <div className="col-5 fw-normal text-dark" style={{ fontSize: "0.9rem" }}>{item.occupation || "—"}</div>
-                      <div className="col-5 text-secondary" style={{ fontSize: "0.9rem" }}>{item.salary || "—"}</div>
+                      <div className="col-5 text-secondary" style={{ fontSize: "0.9rem" }}>{item.company || "—"}</div>
                       <div className="col-2 text-end d-flex gap-3 justify-content-end align-items-center">
                         <FaPencilAlt size={14} style={{ color: "#7B1A1A", cursor: "pointer" }} onClick={() => startEditOcc(index)} title="Edit" />
                         <FaTrashAlt size={14} style={{ color: "#7B1A1A", cursor: "pointer" }} onClick={() => deleteOcc(index)} title="Delete" />
@@ -363,9 +395,9 @@ function EducationinfoForm({
                     <input
                       type="text"
                       className="form-control form-control-sm"
-                      placeholder="e.g. ₹ 12,00,000"
-                      value={occForm.salary}
-                      onChange={(e) => setOccForm({ ...occForm, salary: e.target.value })}
+                      placeholder="e.g. Infosys, TCS, Self-employed"
+                      value={occForm.company}
+                      onChange={(e) => setOccForm({ ...occForm, company: e.target.value })}
                     />
                   </div>
                   <div className="col-2 text-end d-flex gap-2 justify-content-end">

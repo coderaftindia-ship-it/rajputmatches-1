@@ -5,9 +5,11 @@ import style from "../Profile/ProfileComp/Profile.module.css";
 import { FaSearch, FaUserCircle, FaSignOutAlt, FaCommentDots, FaBell, FaBars, FaTimes } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { useAuth } from "./AuthContext";
+import { useSiteSettings } from "../../context/SiteSettingsContext";
 
 const Navbar = ({ forceSolid = false }) => {
   const { isAuthenticated, logout, userData, profile } = useAuth();
+  const { siteSettings } = useSiteSettings();
   const location = useLocation();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -46,71 +48,70 @@ const Navbar = ({ forceSolid = false }) => {
       className={`${forceSolid ? "sticky-top" : "fixed-top"} ${isScrolled || forceSolid ? "navbar-scrolled" : "navbar-transparent"}`}
       style={{ zIndex: 1000 }}
     >
-      <div className="container d-flex justify-content-between align-items-center">
-        <div className="logo-container">
-          <Link to="/home" className="d-flex align-items-center gap-3 text-decoration-none group">
+      <div className="container-fluid px-3 px-xl-5 d-flex justify-content-between align-items-center">
+        <div className="logo-container flex-shrink-0">
+          <Link to="/home" className="d-flex align-items-center gap-2 gap-md-3 text-decoration-none group">
             <img
-              src={Logo}
-              alt="Rajput Matches Logo"
+              src={siteSettings.logo || Logo}
+              alt={siteSettings.companyName || "Logo"}
               style={{
-                height: "62px",
+                height: "54px",
                 width: "auto",
-                maxHeight: "62px",
+                maxHeight: "54px",
                 objectFit: "contain",
                 filter: "drop-shadow(0px 2px 6px rgba(89, 18, 59, 0.25))",
                 transition: "transform 0.3s ease"
               }}
             />
-            <div className="d-flex flex-column text-start">
+            <div className="d-flex flex-column text-start" style={{ whiteSpace: "nowrap" }}>
               <span style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "1.3rem",
+                fontSize: "1.2rem",
                 fontWeight: "800",
                 color: "var(--royal-maroon, #59123B)",
-                letterSpacing: "1.5px",
+                letterSpacing: "1.2px",
                 lineHeight: "1.1",
                 textTransform: "uppercase"
               }}>
-                Rajput Matches
+                {siteSettings.companyName || "Rajput Matches"}
               </span>
               <span style={{
-                fontSize: "0.65rem",
+                fontSize: "0.6rem",
                 color: "var(--royal-gold-dark, #CD9024)",
-                letterSpacing: "3px",
+                letterSpacing: "2.5px",
                 fontWeight: "600",
                 textTransform: "uppercase",
                 marginTop: "2px"
               }}>
-                Royal Matrimonial
+                {siteSettings.tagline || "Royal Matrimonial"}
               </span>
             </div>
           </Link>
         </div>
 
         <nav className="d-none d-lg-flex align-items-center">
-          <ul className="d-flex align-items-center gap-2 m-0 p-0" style={{ listStyle: "none" }}>
-            <li>
+          <ul className="d-flex align-items-center gap-1 gap-xl-2 m-0 p-0" style={{ listStyle: "none", flexWrap: "nowrap" }}>
+            <li style={{ flexShrink: 0 }}>
               <Link to="/home" className={navLinkClass("/home", "/")}>
                 Home
               </Link>
             </li>
-            <li>
+            <li style={{ flexShrink: 0 }}>
               <Link to="/about" className={navLinkClass("/about", "/about-us")}>
                 About
               </Link>
             </li>
-           
-            <li>
+            <li style={{ flexShrink: 0 }}>
               <Link to="/how-to-use" className={navLinkClass("/how-to-use")}>
                 How to Use
               </Link>
             </li>
-            <li>
+            <li style={{ flexShrink: 0 }}>
               <Link to="/stories" className={navLinkClass("/stories")}>
                 Stories
               </Link>
             </li>
-            <li>
+            <li style={{ flexShrink: 0 }}>
               <Link to="/contact" className={navLinkClass("/contact", "/contact-us")}>
                 Contact
               </Link>
@@ -118,32 +119,33 @@ const Navbar = ({ forceSolid = false }) => {
           </ul>
         </nav>
 
-        <div className="d-none d-lg-flex align-items-center gap-4">
+        <div className="d-none d-lg-flex align-items-center gap-2 gap-xl-3" style={{ flexWrap: "nowrap", flexShrink: 0 }}>
           {isAuthenticated ? (
             <>
-              <Link to="/search" className="d-flex align-items-center gap-2" style={{ color: "var(--royal-maroon)", textDecoration: "none", fontWeight: "600", fontSize: "0.95rem" }}>
-                <FaSearch size={16} /> Search
+              <Link to="/search" className="d-flex align-items-center gap-1" style={{ color: "var(--royal-maroon)", textDecoration: "none", fontWeight: "600", fontSize: "0.9rem", whiteSpace: "nowrap", flexShrink: 0, padding: "4px 8px" }}>
+                <FaSearch size={15} /> Search
               </Link>
-              <Link to="/dashboard" className="d-flex align-items-center gap-2" style={{ color: "var(--royal-maroon)", textDecoration: "none", fontWeight: "600", fontSize: "0.95rem" }}>
-                <MdDashboard size={20} /> Dashboard
+              <Link to="/dashboard" className="d-flex align-items-center gap-1" style={{ color: "var(--royal-maroon)", textDecoration: "none", fontWeight: "600", fontSize: "0.9rem", whiteSpace: "nowrap", flexShrink: 0, padding: "4px 8px" }}>
+                <MdDashboard size={18} /> Dashboard
               </Link>
-              <Link to="/message" className="d-flex align-items-center gap-2" style={{ color: "var(--royal-maroon)", textDecoration: "none", fontWeight: "600", fontSize: "0.95rem" }}>
-                <FaCommentDots size={18} /> Messages
+              <Link to="/message" className="d-flex align-items-center gap-1" style={{ color: "var(--royal-maroon)", textDecoration: "none", fontWeight: "600", fontSize: "0.9rem", whiteSpace: "nowrap", flexShrink: 0, padding: "4px 8px" }}>
+                <FaCommentDots size={17} /> Messages
               </Link>
               
-              <div className="position-relative">
+              <div className="position-relative" style={{ flexShrink: 0 }}>
                 <div 
                   className="cursor-pointer d-flex align-items-center" 
                   onClick={toggleAvatar}
                   style={{
                     border: "1px solid rgba(237, 177, 57, 0.4)",
                     borderRadius: "30px",
-                    padding: "4px 16px 4px 4px",
+                    padding: "3px 14px 3px 3px",
                     gap: "8px",
                     background: "rgba(252, 245, 234, 0.5)",
                     color: "var(--royal-maroon)",
                     fontWeight: "600",
-                    fontSize: "0.95rem",
+                    fontSize: "0.9rem",
+                    whiteSpace: "nowrap",
                     transition: "all 0.3s ease"
                   }}
                 >
@@ -155,10 +157,10 @@ const Navbar = ({ forceSolid = false }) => {
                         src={avatarUrl}
                         alt="avatar"
                         className="rounded-circle border border-warning"
-                        style={{ width: "32px", height: "32px", objectFit: "cover" }}
+                        style={{ width: "30px", height: "30px", objectFit: "cover" }}
                       />
                     ) : (
-                      <div className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style={{ width: "32px", height: "32px", background: "var(--royal-maroon)", fontSize: "14px" }}>
+                      <div className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style={{ width: "30px", height: "30px", background: "var(--royal-maroon)", fontSize: "13px" }}>
                         {initials || "M"}
                       </div>
                     );
@@ -168,7 +170,7 @@ const Navbar = ({ forceSolid = false }) => {
 
                 {avatarOpen && (
                   <div className="position-absolute rounded-3 p-2" style={{
-                    top: "55px", right: "0", minWidth: "185px",
+                    top: "50px", right: "0", minWidth: "185px",
                     background: "rgba(252, 245, 234, 0.98)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(237, 177, 57, 0.35)",

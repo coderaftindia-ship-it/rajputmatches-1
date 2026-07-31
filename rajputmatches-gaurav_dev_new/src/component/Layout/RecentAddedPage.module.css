@@ -199,7 +199,13 @@
 .avatarWrapper {
   width: 96px;
   height: 96px;
-  border-radius: 50%;
+  min-width: 96px;
+  max-width: 96px;
+  min-height: 96px;
+  max-height: 96px;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  border-radius: 50% !important;
   border: 4px solid #ffffff;
   outline: 2px solid var(--royal-gold);
   outline-offset: 2px;
@@ -209,8 +215,11 @@
   box-shadow: 
     0 0 0 4px rgba(212, 175, 55, 0.15),
     0 8px 24px rgba(0, 0, 0, 0.18);
-  background-color: #f0e8d8;
+  background-color: #ffffff;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .avatarImage {
@@ -577,7 +586,16 @@
 @media (max-width: 480px) {
   .cardContainer { height: auto; min-height: unset; }
   .cardHeaderBlock { height: 80px; }
-  .avatarWrapper { width: 84px; height: 84px; margin: -42px auto 12px auto; }
+  .avatarWrapper { 
+    width: 84px; 
+    height: 84px; 
+    min-width: 84px;
+    max-width: 84px;
+    min-height: 84px;
+    max-height: 84px;
+    aspect-ratio: 1 / 1;
+    margin: -42px auto 12px auto; 
+  }
   .detailsGrid { grid-template-columns: repeat(2, 1fr); gap: 5px; margin-top: 8px; margin-bottom: 8px; }
   .detailItem { padding: 5px 8px; }
   .detailLabel { font-size: 0.6rem; }

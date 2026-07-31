@@ -44,6 +44,24 @@ const Header = () => {
     setOpenMenus((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const handleSidebarToggle = (e) => {
+    e.preventDefault();
+    const body = document.body;
+    if (body.classList.contains("sidebar-show")) {
+      body.classList.remove("sidebar-show");
+      body.classList.add("sidebar-gone");
+    } else if (body.classList.contains("sidebar-gone")) {
+      body.classList.remove("sidebar-gone");
+      body.classList.add("sidebar-show");
+    } else {
+      if (window.innerWidth <= 1024) {
+        body.classList.add("sidebar-show");
+      } else {
+        body.classList.toggle("sidebar-mini");
+      }
+    }
+  };
+
   const markAllAsRead = async () => {
     try {
       await updateData("notifications/mark-all-read", {});
@@ -100,7 +118,7 @@ const Header = () => {
         <div className="form-inline mr-auto">
           <ul className="navbar-nav mr-3">
             <li>
-              <Link to="#" data-toggle="sidebar" className="nav-link nav-link-lg collapse-btn" style={{ color: "#EDB139" }}>
+              <Link to="#" onClick={handleSidebarToggle} data-toggle="sidebar" className="nav-link nav-link-lg collapse-btn" style={{ color: "#EDB139" }}>
                 <FaBars />
               </Link>
             </li>
@@ -246,6 +264,41 @@ const Header = () => {
               <Link to="/Contact/Contactus" className="nav-link">
                 <i className="fa fa-envelope" />
                 <span>Contact Me</span>
+              </Link>
+            </li>
+
+            <li className={isActive("/About/ManageAboutUs") ? "active" : ""}>
+              <Link to="/About/ManageAboutUs" className="nav-link">
+                <i className="fa fa-info-circle" />
+                <span>About Us Page</span>
+              </Link>
+            </li>
+
+            <li className={isActive("/Home/ManageHomeCMS") ? "active" : ""}>
+              <Link to="/Home/ManageHomeCMS" className="nav-link">
+                <i className="fa fa-home" />
+                <span>Home Page CMS</span>
+              </Link>
+            </li>
+
+            <li className={isActive("/Contact/ManageContactCMS") ? "active" : ""}>
+              <Link to="/Contact/ManageContactCMS" className="nav-link">
+                <i className="fa fa-phone" />
+                <span>Contact Page CMS</span>
+              </Link>
+            </li>
+
+            <li className={isActive("/Success/ManageStoriesCMS") ? "active" : ""}>
+              <Link to="/Success/ManageStoriesCMS" className="nav-link">
+                <i className="fa fa-book" />
+                <span>Stories Page CMS</span>
+              </Link>
+            </li>
+
+            <li className={isActive("/Settings/ManageSiteSettings") ? "active" : ""}>
+              <Link to="/Settings/ManageSiteSettings" className="nav-link">
+                <i className="fa fa-cog" />
+                <span>Site Branding &amp; Logo</span>
               </Link>
             </li>
 

@@ -36,6 +36,11 @@ import AddStory from "./pages/Success/AddStory";
 import Contactus from "./pages/Contact/Contactus";
 import Reports from "./pages/Reports";
 import HappyFace from "./pages/HappyFace/HappyFace";
+import ManageAboutUs from "./pages/Other/ManageAboutUs";
+import ManageHomeCMS from "./pages/Other/ManageHomeCMS";
+import ManageContactCMS from "./pages/Other/ManageContactCMS";
+import ManageStoriesCMS from "./pages/Other/ManageStoriesCMS";
+import ManageSiteSettings from "./pages/Other/ManageSiteSettings";
 
 
 import { ToastContainer } from "react-toastify";
@@ -109,7 +114,11 @@ const ProtectedRoutes = () => (
     <Route path="Contact/Contactus" element={<Contactus />} />
     <Route path="Reports" element={<Reports />} />
     <Route path="HappyFace" element={<HappyFace />} />
-
+    <Route path="About/ManageAboutUs" element={<ManageAboutUs />} />
+    <Route path="Home/ManageHomeCMS" element={<ManageHomeCMS />} />
+    <Route path="Contact/ManageContactCMS" element={<ManageContactCMS />} />
+    <Route path="Success/ManageStoriesCMS" element={<ManageStoriesCMS />} />
+    <Route path="Settings/ManageSiteSettings" element={<ManageSiteSettings />} />
     <Route path="*" element={<PageNotFound />} />
   </Routes>
 );

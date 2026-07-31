@@ -27,7 +27,11 @@ $(function () {
   var sidebar_nicescroll;
   var update_sidebar_nicescroll = function () {
     let a = setInterval(function () {
-      if (sidebar_nicescroll != null) sidebar_nicescroll.resize();
+      try {
+        if (sidebar_nicescroll != null && typeof sidebar_nicescroll.resize === "function") {
+          sidebar_nicescroll.resize();
+        }
+      } catch (e) {}
     }, 10);
 
     setTimeout(function () {

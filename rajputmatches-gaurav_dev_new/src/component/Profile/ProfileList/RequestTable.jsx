@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { chatApi } from "../../../api";
 import { useAuth } from "../../Layout/AuthContext";
 import { calculateAge } from "../ProfileComp/ProfileInfoHeader";
-import profileDefault from "../../../assets/images/profile.png";
+import maleDefault from "../../../assets/images/male_default.png";
+import femaleDefault from "../../../assets/images/female_default.png";
 
 import { RiDeleteBin4Line } from "react-icons/ri";
 import { FaRegEye } from "react-icons/fa";
@@ -47,7 +48,13 @@ const RequestTable = ({ profiles, status, activeTab, fetchData, handlecheck, isS
     if (totalPhotos > 0 && !isPrivate && profile?.filesId?.photos?.length > 0) {
       return profile.filesId.photos[0].url;
     }
-    return profileDefault;
+    const url = profile?.imageUrl;
+    const isDefault = !url || 
+      url.includes("profile.png") || 
+      url.includes("user-icon-flat-isolated") || 
+      url.includes("istockphoto.com");
+    if (!isDefault) return url;
+    return profile?.gender === "Female" ? femaleDefault : maleDefault;
   };
 
   return (
@@ -69,7 +76,16 @@ const RequestTable = ({ profiles, status, activeTab, fetchData, handlecheck, isS
               <td className="py-3 px-4">
                 <div className="d-flex align-items-center gap-3">
                   <div style={{ width: "50px", height: "50px", borderRadius: "50%", overflow: "hidden", border: "2px solid var(--royal-gold)" }}>
-                    <img src={getProfileImage(profile)} alt="Profile" className="w-100 h-100 object-fit-cover" />
+                    {(() => {
+                      const imgSrc = getProfileImage(profile);
+                      const isDefaultImg = (() => {
+                        if (profile?.filesId?.photos?.length > 0) return false;
+                        if (profile?.filesId?.isPrivate && profile?.photoRequestStatus !== "accepted") return false;
+                        const url = profile?.imageUrl;
+                        return !url || url.includes("profile.png") || url.includes("user-icon-flat-isolated") || url.includes("istockphoto.com");
+                      })();
+                      return <img src={imgSrc} alt="Profile" className="w-100 h-100" style={{ objectFit: "cover", objectPosition: isDefaultImg ? "center" : "top" }} />;
+                    })()}
                   </div>
                   <div>
                     <div className="fw-bold" style={{ color: "var(--royal-maroon-dark)" }}>{profile.martrId}</div>

@@ -3,6 +3,7 @@ import { useAuth } from "./AuthContext";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { BASE_URL } from "../../api";
+import { publicApi } from "../../api/public.api";
 
 // Styles and Components
 import style from "../Profile/ProfileComp/Profile.module.css";
@@ -79,12 +80,20 @@ function Stories() {
   const [activeIndex, setActiveIndex] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [cmsData, setCmsData] = useState({
+    heroSupertitle: "Real Love Stories",
+    heroTitle: "Where Tradition Meets <br/> True Love.",
+    heroDescription: "Discover how our exclusive matchmaking has helped countless couples build a beautiful legacy together. Your forever begins right here.",
+    vvipTitle: "VVIP Services for Ultimate Discretion",
+    vvipDescription: "For those seeking an even more exclusive experience, our VVIP membership provides a personal matchmaking manager, access to non-listed profiles, and personalized introductions.",
+    vvipButtonText: "Join the Rajput Legacy"
+  });
   
   // Hero Section Slideshow State
-  const heroImages = [
-    SS1,
-    SS2,
-  ];
+  const dynamicHeroImages = storyData
+    .map((s) => getImageSrc(s.image))
+    .filter(Boolean);
+  const heroImages = dynamicHeroImages.length > 0 ? dynamicHeroImages : [SS1, SS2];
   const [currentHeroIdx, setCurrentHeroIdx] = useState(0);
 
   const { fetchUserData } = useAuth();
@@ -102,22 +111,25 @@ function Stories() {
       setLoading(true);
       const route = "profile/stories";
       const data = await fetchUserData(route);
-      if (data && data.length > 0) {
+      if (Array.isArray(data) && data.length > 0) {
         setStoryData(data);
       }
+
+      const res = await publicApi.getStoriesCMS();
+      if (res.data && res.data.success) {
+        setCmsData((prev) => ({ ...prev, ...res.data.data }));
+      }
     } catch (err) {
-      console.error("Error fetching data:", err);
-      // Fallback to dummy data gracefully
+      console.error("Error fetching stories data:", err);
     } finally {
       setLoading(false);
     }
   };
 
   const vvipData = {
-    title: "VVIP Services for Ultimate Discretion",
-    description:
-      "For those seeking an even more exclusive experience, our VVIP membership provides a personal matchmaking manager, access to non-listed profiles, and personalized introductions.",
-    buttonText: "Join the Rajput Legacy",
+    title: cmsData.vvipTitle,
+    description: cmsData.vvipDescription,
+    buttonText: cmsData.vvipButtonText,
   };
 
   useEffect(() => {
@@ -190,7 +202,7 @@ function Stories() {
                 textShadow: "1px 1px 3px rgba(0,0,0,0.8)"
               }}
             >
-              Real Love Stories
+              {cmsData.heroSupertitle}
             </p>
             <h1
               style={{
@@ -202,9 +214,8 @@ function Stories() {
                 textShadow: "2px 2px 10px rgba(0,0,0,0.6)",
                 marginBottom: "1.5rem"
               }}
-            >
-              Where Tradition Meets <br/> True Love.
-            </h1>
+              dangerouslySetInnerHTML={{ __html: cmsData.heroTitle }}
+            />
             <p
               style={{
                 fontSize: "clamp(16px, 18px, 20px)",
@@ -216,7 +227,7 @@ function Stories() {
                 margin: "0 auto"
               }}
             >
-              Discover how our exclusive matchmaking has helped countless couples build a beautiful legacy together. Your forever begins right here.
+              {cmsData.heroDescription}
             </p>
           </motion.div>
         </section>

@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "./AuthContext";
 import { AiOutlineRight, AiOutlineDown } from "react-icons/ai";
 import { FaUserPlus, FaSlidersH, FaComments, FaRing, FaShieldAlt, FaLock, FaCheckCircle, FaHeart } from "react-icons/fa";
 
 function HowToUse() {
+  const { isAuthenticated } = useAuth();
   const [activeFaq, setActiveFaq] = useState(null);
 
   const toggleFaq = (index) => {
@@ -230,10 +232,10 @@ function HowToUse() {
                 <h4 className="fw-bold mb-2" style={{ color: "var(--royal-maroon-dark)" }}>Are you ready to find your destiny?</h4>
                 <p className="text-secondary small mb-4">Join thousands of verified Rajput brides and grooms who have successfully registered their match profiles.</p>
                 <div className="d-flex flex-column gap-2">
-                  <Link to="/signup" className="btn text-white w-100 fw-bold" style={{ backgroundColor: "var(--royal-maroon)", padding: "10px" }}>
+                  <Link to={isAuthenticated ? "/search" : "/signup"} className="btn text-white w-100 fw-bold" style={{ backgroundColor: "var(--royal-maroon)", padding: "10px" }}>
                     Register for Free
                   </Link>
-                  <Link to="/login" className="btn btn-outline-secondary w-100 fw-semibold" style={{ padding: "10px" }}>
+                  <Link to={isAuthenticated ? "/search" : "/login"} className="btn btn-outline-secondary w-100 fw-semibold" style={{ padding: "10px" }}>
                     Sign In to Account
                   </Link>
                 </div>

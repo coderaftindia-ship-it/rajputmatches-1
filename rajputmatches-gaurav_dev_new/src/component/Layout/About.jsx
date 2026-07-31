@@ -1,13 +1,16 @@
 // About.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import style from "../Profile/ProfileComp/Profile.module.css";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "./AuthContext";
+import { publicApi } from "../../api";
+import { BASE_URL, extractData } from "../../api/client";
 
 import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
 import border from "../../assets/images/Aboutusborder.js.png";
-import imgSrc from "../../assets/images/sectionImg (2).png";
+import imgSrcDefault from "../../assets/images/sectionImg (2).png";
 import { AiOutlineRight } from "react-icons/ai";
 import { Features } from "./FeatureSection";
 
@@ -42,62 +45,92 @@ const imageRightVariants = {
 };
 
 function About() {
+  const { isAuthenticated } = useAuth();
+  const [aboutData, setAboutData] = useState(null);
+
+  useEffect(() => {
+    const fetchAboutContent = async () => {
+      try {
+        const response = await publicApi.getAbout();
+        const data = extractData(response);
+        if (data) {
+          setAboutData(data);
+        }
+      } catch (err) {
+        console.error("Error fetching dynamic About content:", err);
+      }
+    };
+    fetchAboutContent();
+  }, []);
+
+  const resolveImage = (imagePath, fallback) => {
+    if (!imagePath) return fallback;
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("data:")) {
+      return imagePath;
+    }
+    const cleanBase = BASE_URL.replace(/\/$/, "");
+    return `${cleanBase}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
+  };
+
   const storyData = [
     {
-      text: "Welcome to Rajput Matches, the premier matrimonial platform designed exclusively for the Rajput community. Our mission is to bring together Rajput families from across the globe and help them build meaningful connections rooted in shared values, traditions, and cultural heritage.",
-      imageSrc: imageAbout,
+      text: aboutData?.card1Text || "Welcome to Rajput Matches, the premier matrimonial platform designed exclusively for the Rajput community. Our mission is to bring together Rajput families from across the globe and help them build meaningful connections rooted in shared values, traditions, and cultural heritage.",
+      imageSrc: resolveImage(aboutData?.card1Image, imageAbout),
     },
     {
-      text: "At Rajput Matches, we understand the importance of preserving Rajput pride and customs, which is why we’ve created a trusted platform tailored specifically to your community's unique needs.",
-      imageSrc: imageAbout2,
+      text: aboutData?.card2Text || "At Rajput Matches, we understand the importance of preserving Rajput pride and customs, which is why we’ve created a trusted platform tailored specifically to your community's unique needs.",
+      imageSrc: resolveImage(aboutData?.card2Image, imageAbout2),
     },
   ];
 
   const vvipData = {
-    title: "Start Your Journey to a Royal Match Today",
-    description:
-      "Join Rajput Matches and embark on a journey to find your perfect partner within a community that respects your legacy and honors your privacy. Let us guide you in finding a partner who complements your values, lifestyle, and heritage.",
-    buttonText: "Join the Rajput Legacy",
+    title: aboutData?.vvipTitle || "Start Your Journey to a Royal Match Today",
+    description: aboutData?.vvipDescription || "Join Rajput Matches and embark on a journey to find your perfect partner within a community that respects your legacy and honors your privacy. Let us guide you in finding a partner who complements your values, lifestyle, and heritage.",
+    buttonText: aboutData?.vvipButtonText || "Join the Rajput Legacy",
   };
 
-  const leftImage = HHpratapimage;
-  const rightImage = royalimg;
-  const title = "Our Legacy of Trust and Tradition";
+  const leftImage = resolveImage(aboutData?.legacyLeftImage, HHpratapimage);
+  const rightImage = resolveImage(aboutData?.legacyRightImage, royalimg);
+  const title = aboutData?.legacyTitle || "Our Legacy of Trust and Tradition";
   const paragraphs = [
-    "The Rajput community has a long-standing legacy of honor, pride, and cultural richness. At Rajput Matches, we aim to reflect these values by fostering a trustworthy environment where families can come together to find the perfect match.",
-    "We believe that marriage is not just a union of two individuals but a bond between two families. With this philosophy, we ensure that every match we facilitate is built on shared respect and understanding.",
+    aboutData?.legacyParagraph1 || "The Rajput community has a long-standing legacy of honor, pride, and cultural richness. At Rajput Matches, we aim to reflect these values by fostering a trustworthy environment where families can come together to find the perfect match.",
+    aboutData?.legacyParagraph2 || "We believe that marriage is not just a union of two individuals but a bond between two families. With this philosophy, we ensure that every match we facilitate is built on shared respect and understanding.",
   ];
 
-  const imageSrc = royalimg2;
-  const heading = "Why Choose Rajput Matches?";
+  const imageSrc = resolveImage(aboutData?.whyChooseImage, royalimg2);
+  const heading = aboutData?.whyChooseHeading || "Why Choose Rajput Matches?";
 
-  const features = [
-    {
-      title: "Exclusively for the Rajput Community",
-      description:
-        "Our platform is tailored to the needs and preferences of Rajput families, making it easier to find matches within the community.",
-    },
-    {
-      title: "Verified Profiles",
-      description:
-        "We prioritize your safety by ensuring every profile is thoroughly verified.",
-    },
-    {
-      title: "Advanced Matchmaking",
-      description:
-        "Our platform suggests compatible matches based on your preferences, including education, profession, lifestyle, and values.",
-    },
-    {
-      title: "Respect for Traditions",
-      description:
-        "We understand the importance of Rajput customs and ensure they are honored throughout the matchmaking process.",
-    },
-    {
-      title: "Dedicated Support",
-      description:
-        "Our team is here to assist you at every step, ensuring a seamless experience.",
-    },
-  ];
+  const features = aboutData?.whyChooseFeatures?.length > 0
+    ? aboutData.whyChooseFeatures
+    : [
+        {
+          title: "Exclusively for the Rajput Community",
+          description:
+            "Our platform is tailored to the needs and preferences of Rajput families, making it easier to find matches within the community.",
+        },
+        {
+          title: "Verified Profiles",
+          description:
+            "We prioritize your safety by ensuring every profile is thoroughly verified.",
+        },
+        {
+          title: "Advanced Matchmaking",
+          description:
+            "Our platform suggests compatible matches based on your preferences, including education, profession, lifestyle, and values.",
+        },
+        {
+          title: "Respect for Traditions",
+          description:
+            "We understand the importance of Rajput customs and ensure they are honored throughout the matchmaking process.",
+        },
+        {
+          title: "Dedicated Support",
+          description:
+            "Our team is here to assist you at every step, ensuring a seamless experience.",
+        },
+      ];
+
+  const heroBgImage = resolveImage(aboutData?.heroImage, royalimg);
 
   return (
     <>
@@ -115,7 +148,7 @@ function About() {
             transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
             style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0 }}
           >
-              <img src={royalimg} alt="About Us Background" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+              <img src={heroBgImage} alt="About Us Background" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
           </motion.div>
 
           {/* Maroon/Gold Theme Overlay */}
@@ -134,14 +167,14 @@ function About() {
             style={{ zIndex: 10, position: "relative", padding: "0 20px", maxWidth: "900px" }}
           >
             <p style={{ fontSize: "clamp(13px, 14px, 16px)", fontWeight: 600, fontFamily: "var(--font-body)", color: "#e8c371", textTransform: "uppercase", letterSpacing: "3px", marginBottom: "0.75rem", textShadow: "1px 1px 3px rgba(0,0,0,0.8)" }}>
-              Who We Are
+              {aboutData?.heroSubtitle || "Who We Are"}
             </p>
             <h1 style={{ fontSize: "clamp(24px, 6vw, 48px)", fontWeight: 600, fontFamily: "var(--font-heading)", lineHeight: 1.25, color: "#ffffff", textShadow: "2px 2px 10px rgba(0,0,0,0.6)", marginBottom: "1rem" }}>
-              Celebrating Rajput Legacy, <br/>
-              <span style={{ color: "#e8c371" }}>Connecting Hearts</span>
+              {aboutData?.heroTitleLine1 || "Celebrating Rajput Legacy,"} <br/>
+              <span style={{ color: "#e8c371" }}>{aboutData?.heroTitleLine2 || "Connecting Hearts"}</span>
             </h1>
             <p style={{ fontSize: "clamp(14px, 4vw, 17px)", fontFamily: "var(--font-body)", color: "rgba(255, 255, 255, 0.9)", lineHeight: 1.6, textShadow: "1px 1px 4px rgba(0,0,0,0.8)", maxWidth: "700px", margin: "0 auto" }}>
-              Dedicated to uniting Rajput families through meaningful matches, we honor tradition while embracing modern connections.
+              {aboutData?.heroDescription || "Dedicated to uniting Rajput families through meaningful matches, we honor tradition while embracing modern connections."}
             </p>
           </motion.div>
         </section>
@@ -239,7 +272,7 @@ function About() {
               border: "1px solid rgba(212, 175, 55, 0.3)"
             }}
           >
-            <img className="w-100 rounded-3 mb-4" src={imgSrc} alt="join banner" style={{ maxHeight: "250px", objectFit: "cover" }} />
+            <img className="w-100 rounded-3 mb-4" src={resolveImage(aboutData?.bannerImage, imgSrcDefault)} alt="join banner" style={{ maxHeight: "250px", objectFit: "cover" }} />
             <div className="py-2">
               <Features />
             </div>
@@ -299,7 +332,7 @@ function About() {
                 <p className="lead mx-auto mb-4" style={{ maxWidth: "800px", color: "var(--royal-cream)", opacity: 0.9 }}>
                   {vvipData.description}
                 </p>
-                <Link to="/login">
+                <Link to={isAuthenticated ? "/search" : "/login"}>
                   <button className="btn mt-3 px-5 py-3 fs-5" style={{ background: "#ffffff", color: "var(--royal-maroon-dark)", fontWeight: "700", borderRadius: "30px", boxShadow: "0 10px 20px rgba(0,0,0,0.3)" }}>
                     {vvipData.buttonText}
                   </button>

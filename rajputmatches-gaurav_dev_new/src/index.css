@@ -227,9 +227,12 @@ input, select, textarea, button {
   color: var(--royal-text);
   font-weight: 500;
   text-decoration: none;
-  padding: 6px 16px;
+  padding: 6px 14px;
   border-radius: 20px;
   transition: all 0.3s ease;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
 }
 
 .royal-link::after {
@@ -244,10 +247,13 @@ input, select, textarea, button {
   color: var(--royal-maroon);
   font-weight: 600;
   text-decoration: none;
-  padding: 6px 16px;
+  padding: 6px 14px;
   border-radius: 20px;
   background: rgba(128, 0, 0, 0.06);
   border: 1px solid rgba(128, 0, 0, 0.1);
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
 }
 
 .active-royal-link::after {

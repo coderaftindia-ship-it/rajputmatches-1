@@ -313,9 +313,14 @@ function ContactChip({ icon, label, value }) {
 
 export function calculateAge(dateOfBirth) {
   if (!dateOfBirth) return "N/A";
-  const birthDate = new Date(dateOfBirth);
-  const today = new Date();
+  let dateStr = dateOfBirth;
+  if (typeof dateStr === "string") {
+    dateStr = dateStr.replace(/-/g, "/").replace("T", " ").split(".")[0];
+  }
+  const birthDate = new Date(dateStr);
+  if (isNaN(birthDate.getTime())) return "N/A";
 
+  const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDifference = today.getMonth() - birthDate.getMonth();
   const dayDifference = today.getDate() - birthDate.getDate();
@@ -324,13 +329,17 @@ export function calculateAge(dateOfBirth) {
     age--;
   }
 
-  return age;
+  return age > 0 ? age : "N/A";
 }
 
 export function formatDate(dateString) {
   if (!dateString) return "N/A";
-  const date = new Date(dateString);
-  if (isNaN(date)) return "Invalid Date";
+  let formattedStr = dateString;
+  if (typeof formattedStr === "string") {
+    formattedStr = formattedStr.replace(/-/g, "/").replace("T", " ").split(".")[0];
+  }
+  const date = new Date(formattedStr);
+  if (isNaN(date.getTime())) return "N/A";
   const day = date.getDate();
   const month = date.toLocaleString("default", { month: "long" });
   const year = date.getFullYear();
