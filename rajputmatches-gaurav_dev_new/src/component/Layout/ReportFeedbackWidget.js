@@ -131,7 +131,7 @@ export default function ReportFeedbackWidget() {
           position: "fixed",
           bottom: "24px",
           right: "24px",
-          zIndex: 1200,
+          zIndex: 1030,
           display: "flex",
           alignItems: "center",
           gap: "8px",
@@ -535,8 +535,22 @@ export default function ReportFeedbackWidget() {
         @keyframes rfBounceIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
         
         /* Mobile responsive */
+        @media (max-width: 991px) {
+          #report-feedback-fab {
+            bottom: 74px !important;
+            right: 14px !important;
+            padding: 8px 14px !important;
+            font-size: 0.78rem !important;
+            z-index: 1030 !important;
+          }
+        }
         @media (max-width: 480px) {
-          #report-feedback-fab span { display: none; }
+          #report-feedback-fab {
+            bottom: 74px !important;
+            right: 12px !important;
+            padding: 7px 12px !important;
+            font-size: 0.75rem !important;
+          }
         }
       `}</style>
     </>

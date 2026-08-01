@@ -511,11 +511,11 @@ input, select, textarea, button {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(4px);
-  z-index: 1040;
+  z-index: 1140;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
@@ -529,17 +529,19 @@ input, select, textarea, button {
 .mobile-menu-drawer {
   position: fixed;
   top: 0;
-  right: -300px;
-  width: 280px;
+  right: -320px;
+  width: 290px;
+  max-width: 85vw;
   height: 100vh;
   background: #FFFDF5;
   border-left: 2px solid var(--royal-gold);
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
-  z-index: 1050;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.25);
+  z-index: 1150;
   display: flex;
   flex-direction: column;
-  padding: 24px;
+  padding: 16px 18px 80px 18px;
   transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
 }
 
 .mobile-menu-drawer.active {
@@ -551,13 +553,13 @@ input, select, textarea, button {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1.5px solid rgba(200, 151, 58, 0.2);
-  padding-bottom: 16px;
-  margin-bottom: 20px;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .drawer-header img {
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--royal-gold);
@@ -574,7 +576,7 @@ input, select, textarea, button {
 .drawer-menu {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
   overflow-y: auto;
   flex-grow: 1;
 }
@@ -587,8 +589,8 @@ input, select, textarea, button {
   text-decoration: none;
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: 0.95rem;
-  padding: 10px 14px;
+  font-size: 0.9rem;
+  padding: 8px 12px;
   border-radius: 8px;
   transition: all 0.2s ease;
   border: 1px solid transparent;
@@ -602,10 +604,12 @@ input, select, textarea, button {
 
 .drawer-footer {
   border-top: 1.5px solid rgba(200, 151, 58, 0.2);
-  padding-top: 16px;
+  padding-top: 12px;
+  padding-bottom: 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  margin-top: auto;
 }
 
 /* ── Document Request Button Spinner ── */
