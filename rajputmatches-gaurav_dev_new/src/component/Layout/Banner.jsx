@@ -76,23 +76,24 @@ function Banner() {
     if (formData.country) {
       const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
       if (selectedCountry) {
-        setStates(State.getStatesOfCountry(selectedCountry.isoCode));
+        setStates(State.getStatesOfCountry(selectedCountry.isoCode) || []);
       } else {
         setStates([]);
       }
     } else {
       setStates([]);
     }
-  }, [formData.country]);
+  }, [formData.country, ALL_COUNTRIES]);
 
   // When state selection changes, update cities
   useEffect(() => {
-    if (formData.state && formData.country && states.length > 0) {
+    if (formData.state && formData.country) {
       const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
       if (selectedCountry) {
-        const selectedState = states.find((s) => s.name === formData.state);
+        const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode) || [];
+        const selectedState = fetchedStates.find((s) => s.name === formData.state);
         if (selectedState) {
-          setCities(City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode));
+          setCities(City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode) || []);
         } else {
           setCities([]);
         }
@@ -102,7 +103,7 @@ function Banner() {
     } else {
       setCities([]);
     }
-  }, [formData.state, formData.country, states]);
+  }, [formData.state, formData.country, ALL_COUNTRIES]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

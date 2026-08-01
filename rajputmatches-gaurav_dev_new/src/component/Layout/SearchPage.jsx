@@ -474,11 +474,12 @@ const SearchPage = () => {
     loadClans();
   }, [fetchUserData]);
   useEffect(() => {
-    if (formData.country) {
-      const c = countries.find(c => c.name === formData.country);
-      if (c) setStates(State.getStatesOfCountry(c.isoCode));
+    if (formData.country && countries.length > 0) {
+      const c = countries.find((item) => item.name === formData.country);
+      if (c) setStates(State.getStatesOfCountry(c.isoCode) || []);
+      else setStates([]);
     } else setStates([]);
-  }, [formData.country, countries]);
+  }, [formData.country]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
