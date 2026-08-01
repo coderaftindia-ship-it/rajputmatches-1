@@ -155,7 +155,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="home" element={<Home />} />
-        <Route path="login" element={<Login />} />
+        {/* <Route path="login" element={<Login />} />
         <Route path="signup" element={<Register />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="set-new-password" element={<NewPassword />} />
@@ -248,7 +248,7 @@ function App() {
               <ViewImages />
             </ProtectedRoute>
           }
-        /> 
+        />  */}
       </Routes>
       <BottomNav />
     </AuthProvider>

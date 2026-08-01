@@ -14,6 +14,7 @@ import { publicApi } from "../../api";
 import { BASE_URL } from "../../api";
 
 const ageOptions = Array.from({ length: 33 }, (_, i) => 18 + i);
+const ALL_COUNTRIES = Country.getAllCountries();
 
 const DEFAULT_CMS = {
   heroBadgeText: "Trusted Since 2009",
@@ -35,7 +36,6 @@ function Banner() {
   const [redirectPath, setRedirectPath] = useState(null);
   const [cms, setCms] = useState(DEFAULT_CMS);
 
-  const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
 
@@ -58,10 +58,8 @@ function Banner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData?.gender]);
 
-  // Populate countries on mount and default to India if empty
+  // Default country to India on mount if empty
   useEffect(() => {
-    const allCountries = Country.getAllCountries();
-    setCountries(allCountries);
     if (!formData.country) {
       setFormData((prev) => ({ ...prev, country: "India" }));
     }
@@ -70,19 +68,21 @@ function Banner() {
   // When country selection changes, update states
   useEffect(() => {
     if (formData.country) {
-      const selectedCountry = countries.find((c) => c.name === formData.country);
+      const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
       if (selectedCountry) {
         setStates(State.getStatesOfCountry(selectedCountry.isoCode));
+      } else {
+        setStates([]);
       }
     } else {
       setStates([]);
     }
-  }, [formData.country, countries]);
+  }, [formData.country]);
 
   // When state selection changes, update cities
   useEffect(() => {
-    if (formData.state && formData.country) {
-      const selectedCountry = countries.find((c) => c.name === formData.country);
+    if (formData.state && formData.country && states.length > 0) {
+      const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
       if (selectedCountry) {
         const selectedState = states.find((s) => s.name === formData.state);
         if (selectedState) {
@@ -90,42 +90,17 @@ function Banner() {
         } else {
           setCities([]);
         }
+      } else {
+        setCities([]);
       }
     } else {
       setCities([]);
     }
-  }, [formData.state, formData.country, states, countries]);
+  }, [formData.state, formData.country, states]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    let updatedValue = value.trimStart();
-
-    const nameRegex = /^[a-zA-Z\s]{1,20}$/;
-    const locationRegex = /^[a-zA-Z\s,-]{0,50}$/;
-    const numberRegex = /^\d*$/;
-
-    switch (name) {
-      case "name":
-        if (numberRegex.test(value) || nameRegex.test(value)) {
-          updatedValue = value;
-        } else {
-          return;
-        }
-        break;
-      case "location":
-        if (locationRegex.test(value)) {
-          updatedValue = value;
-        } else {
-          return;
-        }
-        break;
-      case "minAge":
-      case "maxAge":
-        if (!numberRegex.test(value)) return;
-        break;
-      default:
-        break;
-    }
+    const updatedValue = value.trimStart();
 
     setFormData((prev) => ({
       ...prev,
@@ -190,7 +165,9 @@ function Banner() {
             backgroundPosition: "center",
             zIndex: 0,
             animation: "kenBurns 30s ease-in-out infinite",
-            transformOrigin: "center center"
+            transformOrigin: "center center",
+            willChange: "transform",
+            WebkitTransform: "translateZ(0)"
           }}
         ></div>
 
@@ -223,7 +200,7 @@ function Banner() {
         </div>
 
         <div className="container d-flex flex-column justify-content-center flex-grow-1 position-relative" style={{ zIndex: 3 }}>
-          <div className="row align-items-center min-vh-100 mt-2 pt-4 pb-4 mt-md-4 pt-md-5 pb-md-5">
+          <div className="row align-items-center flex-grow-1 py-4 py-md-5 my-auto">
             {/* Left Column: Text & Badges */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -296,7 +273,8 @@ function Banner() {
                   borderTop: "6px solid var(--royal-maroon)",
                   boxShadow: "0 24px 60px rgba(0, 0, 0, 0.35)",
                   color: "var(--royal-text)",
-                  backdropFilter: "blur(12px)"
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)"
                 }}
               >
                 <div className="text-center mb-4">
