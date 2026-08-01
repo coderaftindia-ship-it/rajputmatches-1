@@ -31,11 +31,11 @@ function Home() {
     <>
       {/* <Banner /> */}
       {/* <MatchMakingSection /> */}
-      {/* <FeatureSection /> */}
+      <FeatureSection />
       <RecentAddedPage />
       <LandingPage />
-      {/* <Testimonial /> */}
-      {/* <JourneyPage /> */}
+      <Testimonial />
+      <JourneyPage />
       <HappyClients />
       <Footer />
     </>
