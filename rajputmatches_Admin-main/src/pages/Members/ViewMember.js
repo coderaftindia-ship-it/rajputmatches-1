@@ -12,7 +12,7 @@ import {
   FaCrown, FaCheckCircle, FaUsersCog
 } from "react-icons/fa";
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+const BASE_URL = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
 
 /* ─────────────────────────── HELPERS ─────────────────────────── */
 const getFullAddress = (addr) => {

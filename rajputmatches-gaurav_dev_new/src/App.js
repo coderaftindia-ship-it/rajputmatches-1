@@ -40,7 +40,7 @@ import { FaFacebook, FaInstagram, FaWhatsapp, FaTelegram } from "react-icons/fa"
 import "react-toastify/dist/ReactToastify.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "https://rajputana-backend-matrimonial-7tmmtqu5u-test166.vercel.app").replace(/\/$/, "");
+const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "http://localhost:5000/").replace(/\/$/, "");
 
 function FloatingSocial() {
   const [links, setLinks] = useState({
@@ -158,7 +158,7 @@ function App() {
      <Route path="login" element={<Login />} />
         <Route path="auth/emailverification" element={<Verification />} />
         <Route path="auth/otp-verify" element={<EmailOtpVerify />} />
-         <Route path="signup" element={<Register />} />
+         {/* <Route path="signup" element={<Register />} /> */}
 
         {/* <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="set-new-password" element={<NewPassword />} />
@@ -172,7 +172,7 @@ function App() {
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
         <Route path="terms-of-use" element={<TermsOfUse />} /> 
 
-{/*        
+       
         <Route path="*" element={<NotFoundPage />} />
 
       
@@ -249,7 +249,7 @@ function App() {
               <ViewImages />
             </ProtectedRoute>
           }
-        />     */}
+        />     
       </Routes>
       <BottomNav />
     </AuthProvider>

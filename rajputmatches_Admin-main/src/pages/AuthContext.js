@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  var Base_url = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+  var Base_url = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(
     JSON.parse(localStorage.getItem("isAuthenticated")) || false

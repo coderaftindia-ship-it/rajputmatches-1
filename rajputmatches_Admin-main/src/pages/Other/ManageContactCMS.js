@@ -5,7 +5,7 @@ import { FaSave, FaImage, FaPhone, FaEnvelope, FaMapMarkerAlt } from "react-icon
 import { MdContactPhone } from "react-icons/md";
 
 const ManageContactCMS = () => {
-  const Base_url = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+  const Base_url = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
   const backendOrigin = Base_url ? Base_url.replace(/\/admin.*$/, "") : "";
 
   const getImageSrc = (p) => {

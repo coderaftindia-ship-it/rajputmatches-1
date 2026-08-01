@@ -9,7 +9,7 @@ import {
   FaUserPlus, FaUsers, FaClock, FaCheckCircle, FaShieldAlt
 } from "react-icons/fa";
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+const BASE_URL = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 const getToken = () => localStorage.getItem("adminAuthToken");

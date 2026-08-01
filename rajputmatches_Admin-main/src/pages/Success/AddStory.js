@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa";
 
 const AddStory = () => {
-  const Base_url = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+  const Base_url = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 

@@ -18,7 +18,7 @@ import {
 
 const EditStory = () => {
   const { updateData, storyId } = useAuth();
-  const Base_url = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+  const Base_url = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
   const backendOrigin = Base_url ? Base_url.replace(/\/admin.*$/, "") : "";
 
   const navigate = useNavigate();

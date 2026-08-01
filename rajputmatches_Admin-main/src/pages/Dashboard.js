@@ -13,7 +13,7 @@ import {
 import { toast } from "react-toastify";
 
 const Dashboard = () => {
-  const Base_url = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+  const Base_url = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
   const token = localStorage.getItem("adminAuthToken");
 
   const [loading, setLoading] = useState(true);

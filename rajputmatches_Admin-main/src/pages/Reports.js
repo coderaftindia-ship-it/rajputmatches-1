@@ -57,7 +57,7 @@ const renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, n
 /* ════════════════════════════════════════════════════ */
 const Reports = () => {
   const { fetchUserData } = useAuth();
-  const Base_url = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+  const Base_url = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
 
   /* ── Analytics state ─────────────────────────────── */
   const [analytics, setAnalytics] = useState(null);
