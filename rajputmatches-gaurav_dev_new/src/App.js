@@ -184,7 +184,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path="profile"
           element={
             <ProtectedRoute>
@@ -193,8 +193,8 @@ function App() {
           }
         >
           <Route index element={<Mydetails />} />
-        </Route>
-       {/* <Route
+        </Route> */}
+       <Route
           path="search"
           element={
             <ProtectedRoute>
@@ -203,54 +203,54 @@ function App() {
           }
         />
         
-        <Route
+        {/* <Route
           path="message"
           element={
             <ProtectedRoute>
               <ChatApp />
             </ProtectedRoute>
           }
-        ></Route>
-        <Route
+        ></Route> */}
+        {/* <Route
           path="settings"
           element={
             <ProtectedRoute>
               <Settings />
             </ProtectedRoute>
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="profile/view/:profileId"
           element={
             <ProtectedRoute>
               <ViewPage />
             </ProtectedRoute>
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="search/view/:profileId"
           element={
             <ProtectedRoute>
               <ViewPage />
             </ProtectedRoute>
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="search/view/images/:profileId"
           element={
             <ProtectedRoute>
               <ViewImages />
             </ProtectedRoute>
           }
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="profile/view/images/:profileId"
           element={
             <ProtectedRoute>
               <ViewImages />
             </ProtectedRoute>
           }
-        />       */}
+        />        */}
       </Routes>
       <BottomNav />
     </AuthProvider>
