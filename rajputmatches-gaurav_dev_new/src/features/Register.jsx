@@ -16,48 +16,49 @@ import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import royalPlaceBg from "../assets/images/royalplacebg.jpg";
 import "./Login.css";
 
-// Safe getter for Country list to prevent top-level module evaluation crashes on WebKit/Safari
-// const getSafeCountries = () => {
-//   try {
-//     const raw = Country.getAllCountries() || [];
-//     const popularIso = ["IN", "US", "AE", "GB", "CA", "AU", "SA", "SG", "KW", "QA", "OM"];
-//     const popular = raw.filter((c) => popularIso.includes(c.isoCode));
-//     const other = raw.filter((c) => !popularIso.includes(c.isoCode));
-//     return [...popular, ...other];
-//   } catch (e) {
-//     return [];
-//   }
-// };
+// Safe getter for Country list outside component to prevent module re-evaluation call stack issues
+const getSafeCountries = () => {
+  try {
+    const raw = Country.getAllCountries() || [];
+    const popularIso = ["IN", "US", "AE", "GB", "CA", "AU", "SA", "SG", "KW", "QA", "OM"];
+    const popular = raw.filter((c) => popularIso.includes(c.isoCode));
+    const other = raw.filter((c) => !popularIso.includes(c.isoCode));
+    return [...popular, ...other];
+  } catch (e) {
+    return [];
+  }
+};
 
-// const COUNTRY_CODES = [
-//   { code: "+91", label: "+91 (India)" },
-//   { code: "+1", label: "+1 (USA/Canada)" },
-//   { code: "+971", label: "+971 (UAE)" },
-//   { code: "+44", label: "+44 (UK)" },
-//   { code: "+61", label: "+61 (Australia)" },
-//   { code: "+966", label: "+966 (Saudi Arabia)" },
-//   { code: "+65", label: "+65 (Singapore)" },
-//   { code: "+965", label: "+965 (Kuwait)" },
-//   { code: "+974", label: "+974 (Qatar)" },
-//   { code: "+968", label: "+968 (Oman)" },
-//   { code: "+49", label: "+49 (Germany)" },
-//   { code: "+33", label: "+33 (France)" },
-//   { code: "+39", label: "+39 (Italy)" },
-//   { code: "+34", label: "+34 (Spain)" },
-//   { code: "+81", label: "+81 (Japan)" },
-//   { code: "+86", label: "+86 (China)" },
-//   { code: "+92", label: "+92 (Pakistan)" },
-//   { code: "+977", label: "+977 (Nepal)" },
-//   { code: "+94", label: "+94 (Sri Lanka)" },
-//   { code: "+880", label: "+880 (Bangladesh)" }
-// ];
+const COUNTRY_CODES = [
+  { code: "+91", label: "+91 (India)" },
+  { code: "+1", label: "+1 (USA/Canada)" },
+  { code: "+971", label: "+971 (UAE)" },
+  { code: "+44", label: "+44 (UK)" },
+  { code: "+61", label: "+61 (Australia)" },
+  { code: "+966", label: "+966 (Saudi Arabia)" },
+  { code: "+65", label: "+65 (Singapore)" },
+  { code: "+965", label: "+965 (Kuwait)" },
+  { code: "+974", label: "+974 (Qatar)" },
+  { code: "+968", label: "+968 (Oman)" },
+  { code: "+49", label: "+49 (Germany)" },
+  { code: "+33", label: "+33 (France)" },
+  { code: "+39", label: "+39 (Italy)" },
+  { code: "+34", label: "+34 (Spain)" },
+  { code: "+81", label: "+81 (Japan)" },
+  { code: "+86", label: "+86 (China)" },
+  { code: "+92", label: "+92 (Pakistan)" },
+  { code: "+977", label: "+977 (Nepal)" },
+  { code: "+94", label: "+94 (Sri Lanka)" },
+  { code: "+880", label: "+880 (Bangladesh)" }
+];
 
 function Register() {
   const { register, email: authEmail } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // const ALL_COUNTRIES = useMemo(() => getSafeCountries(), []);
+  // Memoized country list prevents re-triggering render loops
+  const countries = useMemo(() => getSafeCountries(), []);
 
   const [showPassword, setShowPassword] = useState(false);
   const [states, setStates] = useState([]);
@@ -91,12 +92,11 @@ function Register() {
     setShowPassword((prev) => !prev);
   };
 
-  // Sync state options when country changes
+  // Sync state options when country changes (Decoupled effect eliminates call stack recursion)
   useEffect(() => {
     if (formData.country) {
       try {
-        const raw = Country.getAllCountries() || [];
-        const selectedCountry = raw.find((c) => c.name === formData.country);
+        const selectedCountry = countries.find((c) => c.name === formData.country);
         if (selectedCountry) {
           const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode);
           setStates(fetchedStates || []);
@@ -109,14 +109,13 @@ function Register() {
     } else {
       setStates([]);
     }
-  }, [formData.country]);
+  }, [formData.country, countries]);
 
-  // Sync city options when state changes (capped at max 150 to guarantee smooth WebKit rendering on iOS/Android)
+  // Sync city options when state changes (Decoupled effect; capped at 150 for high-performance mobile WebKit rendering)
   useEffect(() => {
     if (formData.state && formData.country) {
       try {
-        const raw = Country.getAllCountries() || [];
-        const selectedCountry = raw.find((c) => c.name === formData.country);
+        const selectedCountry = countries.find((c) => c.name === formData.country);
         if (selectedCountry) {
           const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode) || [];
           const selectedState = fetchedStates.find((s) => s.name === formData.state);
@@ -135,9 +134,9 @@ function Register() {
     } else {
       setCities([]);
     }
-  }, [formData.state, formData.country]);
+  }, [formData.state, formData.country, countries]);
 
-  // Check URL params for verification status
+  // Check URL params or localStorage for email verification status
   useEffect(() => {
     const verifiedParam = new URLSearchParams(location.search).get("verified");
     const storedEmail = localStorage.getItem("verifiedEmail");
@@ -149,7 +148,7 @@ function Register() {
     }
   }, [location.search]);
 
-  // Input change handler (clean & non-blocking for iOS/Android keyboards)
+  // Input change handler (clean & non-blocking for mobile keyboards)
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -213,11 +212,15 @@ function Register() {
       newErrors.dateOfBirth = "Date of Birth is required.";
     } else {
       const selectedDate = new Date(formData.dateOfBirth);
-      const today = new Date();
-      const minAgeDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+      if (isNaN(selectedDate.getTime())) {
+        newErrors.dateOfBirth = "Please enter a valid date of birth.";
+      } else {
+        const today = new Date();
+        const minAgeDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
 
-      if (selectedDate > minAgeDate) {
-        newErrors.dateOfBirth = "You must be at least 18 years old.";
+        if (selectedDate > minAgeDate) {
+          newErrors.dateOfBirth = "You must be at least 18 years old.";
+        }
       }
     }
 
@@ -260,7 +263,7 @@ function Register() {
     e.preventDefault();
     if (verify()) {
       if (!isVerified) {
-        setErrors((prev) => ({ ...prev, email: "Please verify your email before registering." }));
+        setErrors((prev) => ({ ...prev, email: "Please verify your email before signing up." }));
         return;
       }
       try {
@@ -323,7 +326,7 @@ function Register() {
 
   return (
     <>
-      {/* <Profilenavbar /> */}
+      <Profilenavbar />
       <div 
         className="royal-auth-container"
         style={
@@ -428,14 +431,11 @@ function Register() {
                       value={formData.countryCode}
                       onChange={handleChange}
                     >
-                      {/* {COUNTRY_CODES.map((item) => (
+                      {COUNTRY_CODES.map((item) => (
                         <option key={item.code} value={item.code}>
                           {item.label}
                         </option>
-                      ))} */}
-                      
-                      <option value="+1">+1 (USA/Canada)</option>
-                      <option value="+971">+971 (UAE)</option>
+                      ))}
                     </select>
 
                     <input
@@ -552,13 +552,11 @@ function Register() {
                       className="royal-input no-icon"
                     >
                       <option value="">Select Country</option>
-                      {/* {ALL_COUNTRIES.map((country) => (
+                      {countries.map((country) => (
                         <option key={country.isoCode || country.name} value={country.name}>
                           {country.name}
                         </option>
-                      ))} */}
-
-                      <option value="India">India</option>
+                      ))}
                     </select>
                   </div>
                   {errors.country && <span className="royal-error-text">{errors.country}</span>}
