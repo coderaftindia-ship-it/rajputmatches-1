@@ -18,13 +18,13 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      global: 'window',
       'process.env': JSON.stringify(env),
     },
     build: {
       outDir: 'build',
       emptyOutDir: true,
-      target: ['es2015', 'safari12'],
+      sourcemap: true,
+      target: ['es2020', 'safari14'],
     },
   };
 });
