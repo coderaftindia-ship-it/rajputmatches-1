@@ -136,7 +136,7 @@ function App() {
   return (
     <SiteSettingsProvider>
       <AuthProvider>
-      {/* ToastContainer for displaying toast notifications */}
+      
       <ToastContainer
         position="bottom-left" // Position of the toast
         autoClose={1000} // Auto-close after 3 seconds
@@ -154,101 +154,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
-        <Route path="home" element={<Home />} />
-        <Route path="login" element={<Login />} />
-        <Route path="signup" element={<Register />} />
-        <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="set-new-password" element={<NewPassword />} />
-        <Route path="auth/emailverification" element={<Verification />} />
-        <Route path="auth/otp-verify" element={<EmailOtpVerify />} />
-        <Route path="verify-email" element={<VerifyEmail />} />
-
-        <Route path="about" element={<About />} />
-        <Route path="stories" element={<Stories />} />
-        <Route path="contact" element={<ContactUs />} />
-        <Route path="contact-us" element={<ContactUs />} />
-        <Route path="how-to-use" element={<HowToUse />} />
-        <Route path="privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="terms-of-use" element={<TermsOfUse />} />
-
-        {/* <Route path="*" element={<Home />} /> */}
-        <Route path="*" element={<NotFoundPage />} />
-
-        {/* Protected Routes */}
-        <Route
-          path="dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="search"
-          element={
-            <ProtectedRoute>
-              <SearchPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Mydetails />} />
-        </Route>
-        <Route
-          path="message"
-          element={
-            <ProtectedRoute>
-              <ChatApp />
-            </ProtectedRoute>
-          }
-        ></Route>
-        <Route
-          path="settings"
-          element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="profile/view/:profileId"
-          element={
-            <ProtectedRoute>
-              <ViewPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="search/view/:profileId"
-          element={
-            <ProtectedRoute>
-              <ViewPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="search/view/images/:profileId"
-          element={
-            <ProtectedRoute>
-              <ViewImages />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="profile/view/images/:profileId"
-          element={
-            <ProtectedRoute>
-              <ViewImages />
-            </ProtectedRoute>
-          }
-        />
+        
       </Routes>
       <BottomNav />
     </AuthProvider>
