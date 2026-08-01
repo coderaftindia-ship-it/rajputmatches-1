@@ -20,14 +20,18 @@ import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import royalPlaceBg from "../assets/images/royalplacebg.jpg";
 import "./Login.css";
 
-// 1. Static Country Data declared outside component to prevent module re-evaluation call stack issues
-const RAW_COUNTRIES = Country.getAllCountries();
-
-// Prioritize India & popular NRI countries at top for fast mobile access
-const POPULAR_ISO = ["IN", "US", "AE", "GB", "CA", "AU", "SA", "SG", "KW", "QA", "OM"];
-const POPULAR_LIST = RAW_COUNTRIES.filter((c) => POPULAR_ISO.includes(c.isoCode));
-const OTHER_LIST = RAW_COUNTRIES.filter((c) => !POPULAR_ISO.includes(c.isoCode));
-const ALL_COUNTRIES = [...POPULAR_LIST, ...OTHER_LIST];
+// Safe getter for Country list to prevent top-level module evaluation crashes on WebKit/Safari
+const getSafeCountries = () => {
+  try {
+    const raw = Country.getAllCountries() || [];
+    const popularIso = ["IN", "US", "AE", "GB", "CA", "AU", "SA", "SG", "KW", "QA", "OM"];
+    const popular = raw.filter((c) => popularIso.includes(c.isoCode));
+    const other = raw.filter((c) => !popularIso.includes(c.isoCode));
+    return [...popular, ...other];
+  } catch (e) {
+    return [];
+  }
+};
 
 const COUNTRY_CODES = [
   { code: "+91", label: "+91 (India)" },
@@ -56,6 +60,8 @@ function Register() {
   const { register, message, email: authEmail } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const ALL_COUNTRIES = useMemo(() => getSafeCountries(), []);
 
   const [showPassword, setShowPassword] = useState(false);
   const [states, setStates] = useState([]);
@@ -92,11 +98,16 @@ function Register() {
   // Sync state options when country changes
   useEffect(() => {
     if (formData.country) {
-      const selectedCountry = RAW_COUNTRIES.find((c) => c.name === formData.country);
-      if (selectedCountry) {
-        const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode);
-        setStates(fetchedStates || []);
-      } else {
+      try {
+        const raw = Country.getAllCountries() || [];
+        const selectedCountry = raw.find((c) => c.name === formData.country);
+        if (selectedCountry) {
+          const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode);
+          setStates(fetchedStates || []);
+        } else {
+          setStates([]);
+        }
+      } catch (e) {
         setStates([]);
       }
     } else {
@@ -107,17 +118,22 @@ function Register() {
   // Sync city options when state changes (capped at max 150 to guarantee smooth WebKit rendering on iOS/Android)
   useEffect(() => {
     if (formData.state && formData.country) {
-      const selectedCountry = RAW_COUNTRIES.find((c) => c.name === formData.country);
-      if (selectedCountry) {
-        const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode);
-        const selectedState = (fetchedStates || []).find((s) => s.name === formData.state);
-        if (selectedState) {
-          const fetchedCities = City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode);
-          setCities((fetchedCities || []).slice(0, 150));
+      try {
+        const raw = Country.getAllCountries() || [];
+        const selectedCountry = raw.find((c) => c.name === formData.country);
+        if (selectedCountry) {
+          const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode) || [];
+          const selectedState = fetchedStates.find((s) => s.name === formData.state);
+          if (selectedState) {
+            const fetchedCities = City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode) || [];
+            setCities(fetchedCities.slice(0, 150));
+          } else {
+            setCities([]);
+          }
         } else {
           setCities([]);
         }
-      } else {
+      } catch (e) {
         setCities([]);
       }
     } else {

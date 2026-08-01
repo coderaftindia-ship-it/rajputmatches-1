@@ -13,7 +13,13 @@ import { publicApi } from "../../api";
 import { BASE_URL } from "../../api";
 
 const ageOptions = Array.from({ length: 33 }, (_, i) => 18 + i);
-const ALL_COUNTRIES = Country.getAllCountries();
+const getSafeCountries = () => {
+  try {
+    return Country.getAllCountries() || [];
+  } catch (e) {
+    return [];
+  }
+};
 
 const DEFAULT_CMS = {
   heroBadgeText: "Trusted Since 2009",
@@ -31,6 +37,7 @@ const DEFAULT_CMS = {
 };
 
 function Banner() {
+  const ALL_COUNTRIES = React.useMemo(() => getSafeCountries(), []);
   const { isAuthenticated, setFormData, formData, userData } = useAuth();
   const [redirectPath, setRedirectPath] = useState(null);
   const [cms, setCms] = useState(DEFAULT_CMS);

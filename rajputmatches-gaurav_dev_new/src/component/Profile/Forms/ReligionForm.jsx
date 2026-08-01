@@ -3,7 +3,9 @@ import { Country, State, City } from "country-state-city";
 import styles from "./Form.module.css";
 import { MdOutlineCancelPresentation } from "react-icons/md";
 
-const ALL_COUNTRIES = Country.getAllCountries();
+const getSafeCountries = () => {
+  try { return Country.getAllCountries() || []; } catch (e) { return []; }
+};
 
 const ReligionForm = ({
   handleCancelClick,
@@ -12,6 +14,7 @@ const ReligionForm = ({
   handleInputChange,
   setFormData,
 }) => {
+  const ALL_COUNTRIES = React.useMemo(() => getSafeCountries(), []);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
 
