@@ -164,14 +164,14 @@ function App() {
         <Route path="verify-email" element={<VerifyEmail />} />  */}
 
         <Route path="about" element={<About />} />
-        {/* <Route path="stories" element={<Stories />} />
-        <Route path="contact" element={<ContactUs />} />
+       <Route path="stories" element={<Stories />} />
+       <Route path="contact" element={<ContactUs />} />
         <Route path="contact-us" element={<ContactUs />} />
         <Route path="how-to-use" element={<HowToUse />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="terms-of-use" element={<TermsOfUse />} />
+        <Route path="terms-of-use" element={<TermsOfUse />} /> 
 
-       
+{/*        
         <Route path="*" element={<NotFoundPage />} />
 
       
@@ -248,7 +248,7 @@ function App() {
               <ViewImages />
             </ProtectedRoute>
           }
-        />    */}
+        />     */}
       </Routes>
       <BottomNav />
     </AuthProvider>
