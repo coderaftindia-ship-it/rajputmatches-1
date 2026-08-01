@@ -151,11 +151,7 @@ function App() {
       <ScrollToTop />
       <FloatingSocial />
       <ReportFeedbackWidget />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        
-      </Routes>
+      <h1>sadfghfhjfh</h1>
       <BottomNav />
     </AuthProvider>
     </SiteSettingsProvider>
