@@ -384,19 +384,7 @@ function Register() {
   return (
     <>
       {/* <Profilenavbar /> */}
-      <div 
-        className="royal-auth-container"
-        style={
-          isVerified
-            ? {
-                backgroundImage: `url(${royalPlaceBg})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }
-            : {}
-        }
-      >
+      
         <div className="royal-auth-overlay"></div>
         <div className="royal-auth-card wide">
           <button 
@@ -723,7 +711,7 @@ function Register() {
             </p>
           </div>
         </div>
-      </div>
+      
     </>
   );
 }
