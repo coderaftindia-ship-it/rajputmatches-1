@@ -40,8 +40,8 @@ const ShortlistedProfile = () => {
   // Function to sort profiles by Age
   const sortByAge = (order) => {
     let sortedProfiles = [...profiles].sort((a, b) => {
-      const dateA = new Date(a.profile.dateOfBirth);
-      const dateB = new Date(b.profile.dateOfBirth);
+      const dateA = new Date(a?.profile?.dateOfBirth || 0);
+      const dateB = new Date(b?.profile?.dateOfBirth || 0);
       return order === "asc" ? dateA - dateB : dateB - dateA;
     });
 
@@ -52,8 +52,8 @@ const ShortlistedProfile = () => {
   // Function to sort profiles by Height
   const sortByHeight = (order) => {
     let sortedProfiles = [...profiles].sort((a, b) => {
-      const heightA = a.profile.height.feet * 12 + a.profile.height.inches;
-      const heightB = b.profile.height.feet * 12 + b.profile.height.inches;
+      const heightA = (a?.profile?.height?.feet || 0) * 12 + (a?.profile?.height?.inches || 0);
+      const heightB = (b?.profile?.height?.feet || 0) * 12 + (b?.profile?.height?.inches || 0);
       return order === "asc" ? heightA - heightB : heightB - heightA;
     });
 

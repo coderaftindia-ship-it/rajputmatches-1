@@ -49,6 +49,7 @@ const BlockedProfile = () => {
   }, []);
 
   const getProfileImage = (prof) => {
+    if (!prof) return placeholderImage;
     if (prof.filesId) {
       if (prof.filesId.isPrivate) {
         return placeholderImage;
