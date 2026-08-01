@@ -30,8 +30,8 @@ function Home() {
   return (
     <>
       {/* <Banner /> */}
-      {/* <MatchMakingSection /> */}
-      {/* <FeatureSection /> */}
+   <MatchMakingSection /> 
+   <FeatureSection /> 
       <RecentAddedPage />
       <LandingPage />
     
