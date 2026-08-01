@@ -162,7 +162,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchUserData = React.useCallback(async (route) => {
-    setLoading(true);
     try {
       return await fetchByRoute(route);
     } catch (error) {
@@ -171,8 +170,6 @@ export const AuthProvider = ({ children }) => {
         throw error;
       }
       return null;
-    } finally {
-      setLoading(false);
     }
   }, []);
 
