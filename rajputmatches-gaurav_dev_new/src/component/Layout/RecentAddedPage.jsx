@@ -75,7 +75,7 @@ function RecentAddedPage() {
     if (!useSlider || isPaused || isMobile) return;
     const interval = setInterval(handleNext, 3500);
     return () => clearInterval(interval);
-  }, [useSlider, isPaused, maxIndex, isMobile, handleNext]);
+  }, [useSlider, isPaused, maxIndex, currentIndex, isMobile, handleNext]);
 
   useEffect(() => {
     if (currentIndex > maxIndex) setCurrentIndex(maxIndex);

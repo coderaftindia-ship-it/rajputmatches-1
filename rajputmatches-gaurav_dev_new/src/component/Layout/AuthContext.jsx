@@ -35,26 +35,20 @@ export const AuthProvider = ({ children }) => {
     class: "",
   });
 
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    try {
-      return typeof window !== "undefined" && !!localStorage.getItem("authToken");
-    } catch (e) {
-      return false;
-    }
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    typeof window !== "undefined" && !!localStorage.getItem("authToken")
+  );
   const [userData, setUserData] = useState();
   const [loading, setLoading] = useState(false);
 
   const setToken = (token) => {
-    try { localStorage.setItem("authToken", token); } catch (e) {}
+    localStorage.setItem("authToken", token);
   };
 
-  const getToken = () => {
-    try { return localStorage.getItem("authToken"); } catch (e) { return null; }
-  };
+  const getToken = () => localStorage.getItem("authToken");
 
   const removeToken = () => {
-    try { localStorage.removeItem("authToken"); } catch (e) {}
+    localStorage.removeItem("authToken");
   };
 
   const register = async (_route, data, navigate) => {
@@ -162,6 +156,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchUserData = React.useCallback(async (route) => {
+    setLoading(true);
     try {
       return await fetchByRoute(route);
     } catch (error) {
@@ -170,6 +165,8 @@ export const AuthProvider = ({ children }) => {
         throw error;
       }
       return null;
+    } finally {
+      setLoading(false);
     }
   }, []);
 

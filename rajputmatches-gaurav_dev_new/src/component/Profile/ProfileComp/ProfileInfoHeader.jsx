@@ -313,42 +313,37 @@ function ContactChip({ icon, label, value }) {
 
 export function calculateAge(dateOfBirth) {
   if (!dateOfBirth) return "N/A";
-  try {
-    let d = dateOfBirth;
-    if (typeof d === "string") {
-      d = d.trim().split("T")[0].replace(/\//g, "-");
-    }
-    const birthDate = new Date(d);
-    if (isNaN(birthDate.getTime())) return "N/A";
-
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age > 0 ? age : "N/A";
-  } catch (e) {
-    return "N/A";
+  let dateStr = dateOfBirth;
+  if (typeof dateStr === "string") {
+    dateStr = dateStr.replace(/-/g, "/").replace("T", " ").split(".")[0];
   }
+  const birthDate = new Date(dateStr);
+  if (isNaN(birthDate.getTime())) return "N/A";
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+  const dayDifference = today.getDate() - birthDate.getDate();
+
+  if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+    age--;
+  }
+
+  return age > 0 ? age : "N/A";
 }
 
 export function formatDate(dateString) {
   if (!dateString) return "N/A";
-  try {
-    let d = dateString;
-    if (typeof d === "string") {
-      d = d.trim().split("T")[0].replace(/\//g, "-");
-    }
-    const date = new Date(d);
-    if (isNaN(date.getTime())) return "N/A";
-    const day = date.getDate();
-    const month = date.toLocaleString("en-US", { month: "long" });
-    const year = date.getFullYear();
-    return `${day} ${month}, ${year}`;
-  } catch (e) {
-    return dateString || "N/A";
+  let formattedStr = dateString;
+  if (typeof formattedStr === "string") {
+    formattedStr = formattedStr.replace(/-/g, "/").replace("T", " ").split(".")[0];
   }
+  const date = new Date(formattedStr);
+  if (isNaN(date.getTime())) return "N/A";
+  const day = date.getDate();
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getFullYear();
+  return `${day} ${month}, ${year}`;
 }
 
 export default ProfileInfoHeader;

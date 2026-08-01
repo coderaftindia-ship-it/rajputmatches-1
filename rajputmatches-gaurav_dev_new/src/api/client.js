@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "http://localhost:5000/").replace(/\/$/, "");
+const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "https://rajputana-backend-matrimonial-7tmmtqu5u-test166.vercel.app").replace(/\/$/, "");
 const API_PREFIX = "/api/v1";
 
 export const apiClient = axios.create({
@@ -9,12 +9,10 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  try {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  } catch (e) {}
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
@@ -22,12 +20,8 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      try {
-        localStorage.removeItem("authToken");
-      } catch (e) {}
-      try {
-        window.dispatchEvent(new Event("unauthorized-logout"));
-      } catch (e) {}
+      localStorage.removeItem("authToken");
+      window.dispatchEvent(new Event("unauthorized-logout"));
     }
     return Promise.reject(error);
   }

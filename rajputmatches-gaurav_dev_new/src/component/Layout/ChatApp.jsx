@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import io from "socket.io-client";
-import { chatApi, BASE_URL } from "../../api";
+import { chatApi } from "../../api";
 import EmojiPicker from "emoji-picker-react";
 
 import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
@@ -17,12 +17,8 @@ import { toast } from "react-toastify";
 
 import "./Chat.css";
 
-const SOCKET_URL = BASE_URL || "http://localhost:5000/";
-const socket = io(SOCKET_URL, {
-  autoConnect: false,
-  reconnectionAttempts: 3,
-  timeout: 5000,
-});
+const BASE_URL = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+const socket = io(BASE_URL, { autoConnect: false });
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 const formatTime = (dateStr) => {

@@ -83,8 +83,7 @@ export function ProfileDetailsProvider({ children, enabled = true }) {
     if (enabled) {
       loadAll(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+  }, [enabled, loadAll]);
 
   return (
     <ProfileDetailsContext.Provider
