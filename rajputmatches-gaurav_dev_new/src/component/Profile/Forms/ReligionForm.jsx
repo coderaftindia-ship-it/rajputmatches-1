@@ -1,3 +1,4 @@
+import React from "react";
 import indiaStatesData from "../../../features/state";
 
 const POPULAR_COUNTRIES = [
@@ -46,24 +47,6 @@ const ReligionForm = ({
     }
     return [];
   }, [formData.birthState]);
-      const selectedCountry = ALL_COUNTRIES.find(
-        (country) => country.name === formData.birthCountry
-      );
-      const selectedState = states.find(
-        (state) => state.name === formData.birthState
-      );
-
-      if (selectedCountry && selectedState) {
-        setCities(
-          City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode)
-        );
-      } else {
-        setCities([]);
-      }
-    } else {
-      setCities([]);
-    }
-  }, [formData.birthState, formData.birthCountry, states]);
 
   return (
     <div className={styles.modalContainer}>
