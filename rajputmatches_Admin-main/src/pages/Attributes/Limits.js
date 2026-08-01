@@ -5,7 +5,7 @@ import { useAuth } from "../AuthContext";
 
 const Limits = () => {
   const { fetchUserData } = useAuth();
-  const baseUrl = (process.env.REACT_APP_BASE_URL || "").replace(/\/$/, "");
+  const baseUrl = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
 
   // Active tab state: 'role' or 'individual'
   const [activeTab, setActiveTab] = useState("role");

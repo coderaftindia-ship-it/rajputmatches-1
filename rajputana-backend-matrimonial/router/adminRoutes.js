@@ -175,9 +175,26 @@ router.put('/getReview', isAuth, sanitizeAdminUser, editreview);
 router.put('/change-review-status', isAuth, sanitizeAdminUser, changereviewstatus);
 router.put('/Edit-request', isAuth, sanitizeAdminUser, editRequestStatus);
 
+const avatarDiskStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, "../uploads/avatar");
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname) || ".jpg";
+    const filename = `avatar-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    cb(null, filename);
+  }
+});
+
+const avatarDiskUpload = multer({ storage: avatarDiskStorage }).single("avatar");
+
 // POST /admin/stories — Create a new success story (with image upload)
 router.post('/stories', isAuth, sanitizeAdminUser, (req, res, next) => {
-  singleFileUpload(req, res, async (err) => {
+  avatarDiskUpload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ message: err.message || 'File upload error.' });
     }
@@ -218,7 +235,7 @@ router.post('/stories', isAuth, sanitizeAdminUser, (req, res, next) => {
 
 // PUT /admin/update-story/:id — Update an existing story
 router.put('/update-story/:id', isAuth, sanitizeAdminUser, (req, res, next) => {
-  singleFileUpload(req, res, async (err) => {
+  avatarDiskUpload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ message: err.message || 'File upload error.' });
     }
@@ -248,7 +265,7 @@ router.put('/update-story/:id', isAuth, sanitizeAdminUser, (req, res, next) => {
 
 // POST /admin/reviews — Create a new client review (with image upload)
 router.post('/reviews', isAuth, sanitizeAdminUser, (req, res, next) => {
-  singleFileUpload(req, res, async (err) => {
+  avatarDiskUpload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ message: err.message || 'File upload error.' });
     }
@@ -299,7 +316,7 @@ router.post('/reviews', isAuth, sanitizeAdminUser, (req, res, next) => {
 
 // PUT /admin/update-review/:id — Update client review
 router.put('/update-review/:id', isAuth, sanitizeAdminUser, (req, res, next) => {
-  singleFileUpload(req, res, async (err) => {
+  avatarDiskUpload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ message: err.message || 'File upload error.' });
     }

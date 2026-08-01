@@ -10,8 +10,13 @@ const SuccessStories = () => {
 
   const getImageSrc = (image) => {
     if (!image) return "";
-    if (image.startsWith("http")) return image;
-    return `${backendOrigin}${image}`;
+    if (typeof image !== "string") return "";
+    if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) {
+      return image;
+    }
+    const cleanPath = image.replace(/\\/g, "/");
+    const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    return `${backendOrigin}${formattedPath}`;
   };
 
   const [loading, setLoading] = useState(true);

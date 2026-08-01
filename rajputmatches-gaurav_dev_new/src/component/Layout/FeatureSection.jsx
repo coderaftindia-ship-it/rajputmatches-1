@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { LiaCrownSolid, LiaChessKingSolid } from "react-icons/lia";
 import { IoShieldOutline, IoAccessibilityOutline } from "react-icons/io5";

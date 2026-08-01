@@ -447,8 +447,22 @@ const SearchPage = () => {
     return currentViews >= allowedViews;
   };
 
-  const [countries, setCountries] = useState([]);
-  const [states,    setStates]    = useState([]);
+  const [countries, setCountries] = useState([
+    { name: "India", isoCode: "IN" },
+    { name: "United States", isoCode: "US" },
+    { name: "United Arab Emirates", isoCode: "AE" },
+    { name: "United Kingdom", isoCode: "GB" },
+    { name: "Canada", isoCode: "CA" },
+    { name: "Australia", isoCode: "AU" },
+    { name: "Saudi Arabia", isoCode: "SA" },
+    { name: "Singapore", isoCode: "SG" },
+    { name: "Kuwait", isoCode: "KW" },
+    { name: "Qatar", isoCode: "QA" },
+    { name: "Oman", isoCode: "OM" },
+    { name: "Germany", isoCode: "DE" },
+    { name: "France", isoCode: "FR" }
+  ]);
+  const [states, setStates] = useState([]);
   const [clanOptions, setClanOptions] = useState({ clans: [], subclans: [], combined: [] });
   const [clanLoading, setClanLoading] = useState(false);
 
@@ -460,8 +474,6 @@ const SearchPage = () => {
   // ── Ref to always have latest formData (prevents stale-closure in callbacks) ──
   const formDataRef = useRef(formData);
   useEffect(() => { formDataRef.current = formData; }, [formData]);
-
-  useEffect(() => { setCountries(Country.getAllCountries()); }, []);
   useEffect(() => {
     const loadClans = async () => {
       setClanLoading(true);

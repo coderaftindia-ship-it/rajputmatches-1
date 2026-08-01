@@ -83,6 +83,7 @@ app.use(
     path.join(__dirname, process.env.UPLOADS_PATH || "uploads/avatar")
   )
 );
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const io = socketIo(server, {
   cors: {
@@ -98,6 +99,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/public", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/limits", adminRoutes);
+app.use("/api/v1/limits", adminRoutes);
 
 io.on("connection", (socket) => {
   console.log("Connected:", socket.id);

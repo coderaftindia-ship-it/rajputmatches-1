@@ -24,14 +24,14 @@ const STORY_DURATION = 5000; // 5 seconds per story
 function Stories() {
   const getImageSrc = (image) => {
     if (!image) return "";
-    if (typeof image === "string" && (image.startsWith("data:") || image.startsWith("http"))) {
+    if (typeof image !== "string") return image;
+    if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) {
       return image;
     }
-    // If it's a relative path (e.g., starts with /uploads/)
-    if (typeof image === "string" && image.startsWith("/")) {
-      return `${BASE_URL}${image}`;
-    }
-    return image;
+    const cleanPath = image.replace(/\\/g, "/");
+    const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    const base = (BASE_URL || "").replace(/\/$/, "");
+    return `${base}${formattedPath}`;
   };
   const [storyData, setStoryData] = useState([
     {
