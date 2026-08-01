@@ -29,9 +29,9 @@ function Home() {
 
   return (
     <>
-      <Banner />
-      <MatchMakingSection />
-      <FeatureSection />
+      {/* <Banner /> */}
+      {/* <MatchMakingSection /> */}
+      {/* <FeatureSection /> */}
       <RecentAddedPage />
       <LandingPage />
       {/* <Testimonial /> */}
