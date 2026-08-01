@@ -184,14 +184,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* <Route
-          path="search"
-          element={
-            <ProtectedRoute>
-              <SearchPage />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="profile"
           element={
@@ -202,6 +194,15 @@ function App() {
         >
           <Route index element={<Mydetails />} />
         </Route>
+       {/* <Route
+          path="search"
+          element={
+            <ProtectedRoute>
+              <SearchPage />
+            </ProtectedRoute>
+          }
+        />
+        
         <Route
           path="message"
           element={
@@ -249,7 +250,7 @@ function App() {
               <ViewImages />
             </ProtectedRoute>
           }
-        />      */}
+        />       */}
       </Routes>
       <BottomNav />
     </AuthProvider>
