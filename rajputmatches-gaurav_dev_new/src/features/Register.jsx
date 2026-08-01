@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Country, State, City } from "country-state-city";
 import { 
   FaRegEye, 
@@ -7,7 +7,12 @@ import {
   FaEnvelope, 
   FaLock, 
   FaHeart, 
-  FaCrown 
+  FaCrown,
+  FaUser,
+  FaPhoneAlt,
+  FaCalendarAlt,
+  FaMapMarkerAlt,
+  FaUsers
 } from "react-icons/fa";
 import { useAuth } from "../component/Layout/AuthContext";
 import { authApi } from "../api/auth.api";
@@ -15,29 +20,61 @@ import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import royalPlaceBg from "../assets/images/royalplacebg.jpg";
 import "./Login.css";
 
-const ALL_COUNTRIES = Country.getAllCountries();
+// 1. Static Country Data declared outside component to prevent module re-evaluation call stack issues
+const RAW_COUNTRIES = Country.getAllCountries();
+
+// Prioritize India & popular NRI countries at top for fast mobile access
+const POPULAR_ISO = ["IN", "US", "AE", "GB", "CA", "AU", "SA", "SG", "KW", "QA", "OM"];
+const POPULAR_LIST = RAW_COUNTRIES.filter((c) => POPULAR_ISO.includes(c.isoCode));
+const OTHER_LIST = RAW_COUNTRIES.filter((c) => !POPULAR_ISO.includes(c.isoCode));
+const ALL_COUNTRIES = [...POPULAR_LIST, ...OTHER_LIST];
+
+const COUNTRY_CODES = [
+  { code: "+91", label: "+91 (India)" },
+  { code: "+1", label: "+1 (USA/Canada)" },
+  { code: "+971", label: "+971 (UAE)" },
+  { code: "+44", label: "+44 (UK)" },
+  { code: "+61", label: "+61 (Australia)" },
+  { code: "+966", label: "+966 (Saudi Arabia)" },
+  { code: "+65", label: "+65 (Singapore)" },
+  { code: "+965", label: "+965 (Kuwait)" },
+  { code: "+974", label: "+974 (Qatar)" },
+  { code: "+968", label: "+968 (Oman)" },
+  { code: "+49", label: "+49 (Germany)" },
+  { code: "+33", label: "+33 (France)" },
+  { code: "+39", label: "+39 (Italy)" },
+  { code: "+34", label: "+34 (Spain)" },
+  { code: "+81", label: "+81 (Japan)" },
+  { code: "+86", label: "+86 (China)" },
+  { code: "+92", label: "+92 (Pakistan)" },
+  { code: "+977", label: "+977 (Nepal)" },
+  { code: "+94", label: "+94 (Sri Lanka)" },
+  { code: "+880", label: "+880 (Bangladesh)" }
+];
 
 function Register() {
-  const { register, message, email } = useAuth();
+  const { register, message, email: authEmail } = useAuth();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
+  const location = useLocation();
 
+  const [showPassword, setShowPassword] = useState(false);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
 
+  // Form State with all 11 required fields
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    countryCode: "+91",
     mobile: "",
-    email: email,
+    email: authEmail || "",
     dateOfBirth: "",
     gender: "",
-    country: "",
+    country: "India",
     state: "",
     city: "",
-    password: "",
-    countryCode: "",
     profilefor: "",
+    password: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -47,125 +84,174 @@ function Register() {
   const [otpMessage, setOtpMessage] = useState("");
   const [resendDisabled, setResendDisabled] = useState(false);
 
+  // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
+  // Sync state options when country changes
+  useEffect(() => {
+    if (formData.country) {
+      const selectedCountry = RAW_COUNTRIES.find((c) => c.name === formData.country);
+      if (selectedCountry) {
+        const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode);
+        setStates(fetchedStates || []);
+      } else {
+        setStates([]);
+      }
+    } else {
+      setStates([]);
+    }
+  }, [formData.country]);
+
+  // Sync city options when state changes (capped at max 150 to guarantee smooth WebKit rendering on iOS/Android)
+  useEffect(() => {
+    if (formData.state && formData.country) {
+      const selectedCountry = RAW_COUNTRIES.find((c) => c.name === formData.country);
+      if (selectedCountry) {
+        const selectedState = states.find((s) => s.name === formData.state);
+        if (selectedState) {
+          const fetchedCities = City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode);
+          setCities((fetchedCities || []).slice(0, 150));
+        } else {
+          setCities([]);
+        }
+      } else {
+        setCities([]);
+      }
+    } else {
+      setCities([]);
+    }
+  }, [formData.state, formData.country, states]);
+
+  // Check URL params for verification status
+  useEffect(() => {
+    const verifiedParam = new URLSearchParams(location.search).get("verified");
+    const storedEmail = localStorage.getItem("verifiedEmail");
+    if (verifiedParam === "true" || storedEmail) {
+      setOtpVerified(true);
+      if (storedEmail) {
+        setFormData((prev) => ({ ...prev, email: storedEmail }));
+      }
+    }
+  }, [location.search]);
+
+  // Input change handler (clean & non-blocking for iOS/Android keyboards)
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    let updatedValue = value;
+    if (name === "mobile") {
+      updatedValue = value.replace(/\D/g, "").slice(0, 12);
+    } else if (name === "email" || name === "password") {
+      updatedValue = value.trim();
+    } else if (name === "firstName" || name === "lastName") {
+      updatedValue = value.replace(/[^A-Za-z\s]/g, "");
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        name === "mobile"
-          ? value.replace(/\s/g, "").slice(0, 14) // No spaces, max 14 digits
-          : ["email", "password"].includes(name)
-          ? value.replace(/\s/g, "") // No spaces for email & password
-          : ["firstName", "lastName"].includes(name)
-          ? value.replace(/[^A-Za-z\s]/g, "").replace(/^\s+/, "").replace(/\s{2,}/g, " ") // Allow letters & spaces for first & last name
-          : value,
+      [name]: updatedValue,
       ...(name === "country" ? { state: "", city: "" } : {}),
       ...(name === "state" ? { city: "" } : {}),
     }));
+
+    // Clear field error on change
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
+  // Comprehensive Form Validation
   const verify = () => {
     const newErrors = {};
 
-    const nameRegex = /^[A-Za-z\s]+$/;
-    const stringRegex = /^[A-Za-z\s]+$/;
+    const nameRegex = /^[A-Za-z\s]{1,50}$/;
     const mobileRegex = /^\d{6,14}$/;
-    const emailRegex =
-      /^[a-zA-Z0-9._%+-]+@(gmail|yahoo|outlook|hotmail|aol|icloud)\.(com|co|in)$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    // Name Validation (allows spaces)
-    if (!formData.firstName.trim() || !nameRegex.test(formData.firstName)) {
-      newErrors.firstName = "Valid First Name is required.";
+    // 1. First Name
+    if (!formData.firstName.trim() || !nameRegex.test(formData.firstName.trim())) {
+      newErrors.firstName = "Please enter a valid First Name.";
     }
 
-    if (!formData.lastName.trim() || !nameRegex.test(formData.lastName)) {
-      newErrors.lastName = "Valid Last Name is required.";
+    // 2. Last Name
+    if (!formData.lastName.trim() || !nameRegex.test(formData.lastName.trim())) {
+      newErrors.lastName = "Please enter a valid Last Name.";
     }
 
-    if (!formData.profilefor.trim() || !stringRegex.test(formData.profilefor)) {
-      newErrors.profilefor = "Valid profile for is required.";
+    // 3. Country Code
+    if (!formData.countryCode.trim()) {
+      newErrors.countryCode = "Code required.";
     }
 
-    // Mobile Validation (no spaces allowed)
-    if (!formData.mobile.trim() || !mobileRegex.test(formData.mobile)) {
-      newErrors.mobile = "Mobile must be a valid number.";
+    // 4. Mobile Number
+    if (!formData.mobile.trim() || !mobileRegex.test(formData.mobile.trim())) {
+      newErrors.mobile = "Please enter a valid mobile number.";
     }
 
-    // Email Validation (no spaces allowed)
-    if (!formData.email.trim() || !emailRegex.test(formData.email)) {
-      newErrors.email = "Email must be valid.";
-    } else if (/\s/.test(formData.email)) {
-      newErrors.email = "Email should not contain spaces.";
+    // 5. Email
+    if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
+      newErrors.email = "Please enter a valid email address.";
     }
 
-    // Date of Birth Validation
+    // 6. Date of Birth
     if (!formData.dateOfBirth.trim()) {
       newErrors.dateOfBirth = "Date of Birth is required.";
     } else {
       const selectedDate = new Date(formData.dateOfBirth);
       const today = new Date();
-      const minDate = new Date(
-        today.getFullYear() - 18,
-        today.getMonth(),
-        today.getDate()
-      );
+      const minAgeDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
 
-      if (selectedDate > today) {
-        newErrors.dateOfBirth = "You must be at least 18 years old.";
-      } else if (selectedDate > minDate) {
+      if (selectedDate > minAgeDate) {
         newErrors.dateOfBirth = "You must be at least 18 years old.";
       }
     }
 
-    // Other Required Fields
-    if (!formData.countryCode.trim()) {
-      newErrors.countryCode = "Country Code is required.";
-    }
-
+    // 7. Gender
     if (!formData.gender.trim()) {
       newErrors.gender = "Gender is required.";
     }
 
+    // 8. Country
     if (!formData.country.trim()) {
       newErrors.country = "Country is required.";
     }
 
+    // 9. State
     if (!formData.state.trim()) {
       newErrors.state = "State is required.";
     }
 
+    // 10. City
     if (!formData.city.trim()) {
       newErrors.city = "City is required.";
     }
 
-    // Password Validation (no spaces allowed)
+    // 11. Profile For
+    if (!formData.profilefor.trim()) {
+      newErrors.profilefor = "Please select who this profile is for.";
+    }
+
+    // 12. Password
     if (!formData.password.trim() || formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters.";
-    } else if (/\s/.test(formData.password)) {
-      newErrors.password = "Password should not contain spaces.";
     }
 
     setErrors(newErrors);
-    console.log("Validation Errors:", newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // Submit Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (verify()) {
       if (!otpVerified) {
-        setErrors((prev) => ({ ...prev, email: "Please verify your email before signing up." }));
+        setErrors((prev) => ({ ...prev, email: "Please verify your email before registering." }));
         return;
       }
       try {
-        console.log("Submitting form:", formData);
         let response = await register("signup", formData, navigate);
-
         if (response && response.success) {
           navigate("/login");
         }
@@ -175,6 +261,7 @@ function Register() {
     }
   };
 
+  // OTP Handling
   const sendOtp = async () => {
     setOtpMessage("");
     if (!formData.email) {
@@ -186,11 +273,10 @@ function Register() {
       const res = await authApi.sendVerification({ email: formData.email });
       if (res && res.data && res.data.success !== false) {
         setOtpSent(true);
-        setOtpMessage(res.data.message || "OTP sent to your email.");
-        // enable resend after 30s
+        setOtpMessage(res.data.message || "OTP sent to your email address.");
         setTimeout(() => setResendDisabled(false), 30000);
       } else {
-        setOtpMessage(res.data?.message || "Failed to send OTP.");
+        setOtpMessage(res.data?.message || "Failed to send OTP. Please try again.");
         setResendDisabled(false);
       }
     } catch (err) {
@@ -203,14 +289,14 @@ function Register() {
   const verifyOtpHandler = async () => {
     setOtpMessage("");
     if (!otp) {
-      setOtpMessage("Please enter the OTP.");
+      setOtpMessage("Please enter the 6-digit OTP.");
       return;
     }
     try {
       const res = await authApi.verifyOtp({ email: formData.email, otp });
       if (res && res.data && res.data.success) {
         setOtpVerified(true);
-        setOtpMessage(res.data.message || "OTP verified successfully.");
+        setOtpMessage(res.data.message || "Email verified successfully!");
       } else {
         setOtpMessage(res.data?.message || "Invalid or expired OTP.");
       }
@@ -220,55 +306,7 @@ function Register() {
     }
   };
 
-  useEffect(() => {
-    if (formData.country) {
-      const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
-      if (selectedCountry) {
-        setStates(State.getStatesOfCountry(selectedCountry.isoCode));
-      } else {
-        setStates([]);
-        setCities([]);
-      }
-    } else {
-      setStates([]);
-      setCities([]);
-    }
-  }, [formData.country]);
-
-  useEffect(() => {
-    if (formData.state && formData.country) {
-      const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
-      if (selectedCountry) {
-        const selectedState = states.find((s) => s.name === formData.state);
-        if (selectedState) {
-          setCities(
-            City.getCitiesOfState(
-              selectedCountry.isoCode,
-              selectedState.isoCode
-            )
-          );
-        } else {
-          setCities([]);
-        }
-      } else {
-        setCities([]);
-      }
-    } else {
-      setCities([]);
-    }
-  }, [formData.state, formData.country, states]);
-
-  useEffect(() => {
-    // If email was verified via OTP page, prefill and mark as verified
-    const verified = new URLSearchParams(window.location.search).get("verified");
-    const stored = localStorage.getItem("verifiedEmail");
-    if (verified === "true" && stored) {
-      setFormData((prev) => ({ ...prev, email: stored }));
-      setOtpVerified(true);
-    }
-  }, []);
-
-  const isVerified = otpVerified || new URLSearchParams(window.location.search).get("verified") === "true";
+  const isVerified = otpVerified || new URLSearchParams(location.search).get("verified") === "true";
 
   return (
     <>
@@ -311,6 +349,7 @@ function Register() {
           </div>
 
           <div className="royal-auth-body">
+            {/* Tab Navigation */}
             <div className="royal-tab-toggle">
               <button 
                 type="button" 
@@ -322,149 +361,83 @@ function Register() {
               <button 
                 type="button" 
                 className="royal-tab-btn active"
-                onClick={() => navigate("/auth/emailverification")}
+                onClick={() => navigate("/signup")}
               >
                 Register
               </button>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
+              {/* Row 1: First Name & Last Name */}
               <div className="royal-form-grid">
                 <div className="royal-form-group">
-                  <label className="royal-input-label">First Name</label>
+                  <label className="royal-input-label">First Name *</label>
                   <div className="royal-input-wrapper">
+                    <FaUser className="royal-input-icon" />
                     <input
                       type="text"
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
                       placeholder="Enter First Name"
-                      className="royal-input no-icon"
+                      className="royal-input"
                     />
                   </div>
-                  {errors.firstName && (
-                    <span className="royal-error-text">{errors.firstName}</span>
-                  )}
+                  {errors.firstName && <span className="royal-error-text">{errors.firstName}</span>}
                 </div>
 
                 <div className="royal-form-group">
-                  <label className="royal-input-label">Last Name</label>
+                  <label className="royal-input-label">Last Name *</label>
                   <div className="royal-input-wrapper">
+                    <FaUser className="royal-input-icon" />
                     <input
                       type="text"
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
                       placeholder="Enter Last Name"
-                      className="royal-input no-icon"
+                      className="royal-input"
                     />
                   </div>
-                  {errors.lastName && (
-                    <span className="royal-error-text">{errors.lastName}</span>
-                  )}
+                  {errors.lastName && <span className="royal-error-text">{errors.lastName}</span>}
                 </div>
               </div>
 
+              {/* Row 2: Mobile & Email */}
               <div className="royal-form-grid">
                 <div className="royal-form-group">
-                  <label className="royal-input-label">Mobile</label>
+                  <label className="royal-input-label">Mobile Number *</label>
                   <div className="royal-otp-wrapper">
                     <select
                       className="royal-input no-icon"
-                      style={{ width: "110px" }}
-                      id="countryCode"
+                      style={{ width: "105px", flexShrink: 0 }}
                       name="countryCode"
                       value={formData.countryCode}
                       onChange={handleChange}
                     >
-                      <option value="">Select</option>
-                      <option value="+91">+91</option>
-                      <option value="+1">+1 (USA, Canada)</option>
-                      <option value="+7">+7 (Russia, Kazakhstan)</option>
-                      <option value="+20">+20 (Egypt)</option>
-                      <option value="+27">+27 (South Africa)</option>
-                      <option value="+30">+30 (Greece)</option>
-                      <option value="+31">+31 (Netherlands)</option>
-                      <option value="+32">+32 (Belgium)</option>
-                      <option value="+33">+33 (France)</option>
-                      <option value="+34">+34 (Spain)</option>
-                      <option value="+39">+39 (Italy)</option>
-                      <option value="+40">+40 (Romania)</option>
-                      <option value="+41">+41 (Switzerland)</option>
-                      <option value="+44">+44 (United Kingdom)</option>
-                      <option value="+49">+49 (Germany)</option>
-                      <option value="+51">+51 (Peru)</option>
-                      <option value="+52">+52 (Mexico)</option>
-                      <option value="+55">+55 (Brazil)</option>
-                      <option value="+56">+56 (Chile)</option>
-                      <option value="+60">+60 (Malaysia)</option>
-                      <option value="+61">+61 (Australia)</option>
-                      <option value="+62">+62 (Indonesia)</option>
-                      <option value="+63">+63 (Philippines)</option>
-                      <option value="+64">+64 (New Zealand)</option>
-                      <option value="+65">+65 (Singapore)</option>
-                      <option value="+66">+66 (Thailand)</option>
-                      <option value="+81">+81 (Japan)</option>
-                      <option value="+82">+82 (South Korea)</option>
-                      <option value="+84">+84 (Vietnam)</option>
-                      <option value="+86">+86 (China)</option>
-                      <option value="+90">+90 (Turkey)</option>
-                      <option value="+91">+91 (India)</option>
-                      <option value="+92">+92 (Pakistan)</option>
-                      <option value="+93">+93 (Afghanistan)</option>
-                      <option value="+94">+94 (Sri Lanka)</option>
-                      <option value="+95">+95 (Myanmar)</option>
-                      <option value="+98">+98 (Iran)</option>
-                      <option value="+212">+212 (Morocco)</option>
-                      <option value="+216">+216 (Tunisia)</option>
-                      <option value="+218">+218 (Libya)</option>
-                      <option value="+220">+220 (Gambia)</option>
-                      <option value="+221">+221 (Senegal)</option>
-                      <option value="+222">+222 (Mauritania)</option>
-                      <option value="+223">+223 (Mali)</option>
-                      <option value="+224">+224 (Guinea)</option>
-                      <option value="+225">+225 (Ivory Coast)</option>
-                      <option value="+226">+226 (Burkina Faso)</option>
-                      <option value="+227">+227 (Niger)</option>
-                      <option value="+228">+228 (Togo)</option>
-                      <option value="+229">+229 (Benin)</option>
-                      <option value="+230">+230 (Mauritius)</option>
-                      <option value="+231">+231 (Liberia)</option>
-                      <option value="+232">+232 (Sierra Leone)</option>
-                      <option value="+233">+233 (Ghana)</option>
-                      <option value="+234">+234 (Nigeria)</option>
-                      <option value="+971">+971 (UAE)</option>
-                      <option value="+972">+972 (Israel)</option>
-                      <option value="+973">+973 (Bahrain)</option>
-                      <option value="+974">+974 (Qatar)</option>
-                      <option value="+975">+975 (Bhutan)</option>
-                      <option value="+976">+976 (Mongolia)</option>
-                      <option value="+977">+977 (Nepal)</option>
-                      <option value="+992">+992 (Tajikistan)</option>
-                      <option value="+993">+993 (Turkmenistan)</option>
-                      <option value="+994">+994 (Azerbaijan)</option>
-                      <option value="+995">+995 (Georgia)</option>
-                      <option value="+996">+996 (Kyrgyzstan)</option>
-                      <option value="+998">+998 (Uzbekistan)</option>
+                      {COUNTRY_CODES.map((item) => (
+                        <option key={item.code} value={item.code}>
+                          {item.label}
+                        </option>
+                      ))}
                     </select>
 
                     <input
-                      type="text"
+                      type="tel"
                       name="mobile"
                       value={formData.mobile}
                       onChange={handleChange}
                       placeholder="Enter Mobile"
                       className="royal-input no-icon"
+                      style={{ flexGrow: 1 }}
                     />
                   </div>
                   {errors.mobile && <span className="royal-error-text">{errors.mobile}</span>}
-                  {errors.countryCode && (
-                    <span className="royal-error-text">{errors.countryCode}</span>
-                  )}
+                  {errors.countryCode && <span className="royal-error-text">{errors.countryCode}</span>}
                 </div>
 
                 <div className="royal-form-group">
-                  <label className="royal-input-label">Email</label>
+                  <label className="royal-input-label">Email Address *</label>
                   <div className="royal-input-wrapper">
                     <FaEnvelope className="royal-input-icon" />
                     <input
@@ -479,37 +452,48 @@ function Register() {
                   </div>
                   {errors.email && <span className="royal-error-text">{errors.email}</span>}
                   
-                  {/* Inline verification handler in case email changes or OTP is needed */}
                   {!otpVerified && (
-                    <div style={{ marginTop: 8, display: "flex", gap: 8, alignItems: "center" }}>
-                      <button type="button" className="royal-submit-btn" style={{ padding: "6px 12px", fontSize: "0.85rem" }} onClick={sendOtp} disabled={resendDisabled}>
-                        {otpSent ? "Resend OTP" : "Send OTP"}
+                    <div style={{ marginTop: 8, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                      <button 
+                        type="button" 
+                        className="royal-submit-btn" 
+                        style={{ padding: "6px 14px", fontSize: "0.82rem", width: "auto" }} 
+                        onClick={sendOtp} 
+                        disabled={resendDisabled}
+                      >
+                        {otpSent ? "Resend OTP" : "Verify Email OTP"}
                       </button>
                       {otpSent && (
-                        <>
+                        <div className="d-flex gap-2 align-items-center">
                           <input
                             type="text"
-                            placeholder="Enter OTP"
+                            placeholder="6-digit OTP"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0,6))}
                             className="royal-input no-icon"
-                            style={{ width: 100, padding: "6px" }}
+                            style={{ width: 110, padding: "6px 10px", fontSize: "0.85rem" }}
                           />
-                          <button type="button" className="royal-submit-btn" style={{ padding: "6px 12px", fontSize: "0.85rem" }} onClick={verifyOtpHandler}>
+                          <button 
+                            type="button" 
+                            className="royal-submit-btn" 
+                            style={{ padding: "6px 12px", fontSize: "0.82rem", width: "auto" }} 
+                            onClick={verifyOtpHandler}
+                          >
                             Verify
                           </button>
-                        </>
+                        </div>
                       )}
                     </div>
                   )}
-                  {otpVerified && <span className="royal-info-text" style={{ color: "green", display: "block", textAlign: "left" }}>✓ Email verified</span>}
-                  {otpMessage && <p className="royal-info-text" style={{ textAlign: "left" }}>{otpMessage}</p>}
+                  {otpVerified && <span className="royal-info-text" style={{ color: "#2b8a3e", display: "block", textAlign: "left", fontWeight: "600" }}>✓ Email Verified</span>}
+                  {otpMessage && <p className="royal-info-text" style={{ textAlign: "left", fontSize: "0.82rem" }}>{otpMessage}</p>}
                 </div>
               </div>
 
+              {/* Row 3: Date of Birth & Gender */}
               <div className="royal-form-grid">
                 <div className="royal-form-group">
-                  <label className="royal-input-label">Date of Birth</label>
+                  <label className="royal-input-label">Date of Birth *</label>
                   <div className="royal-input-wrapper">
                     <input
                       type="date"
@@ -519,13 +503,11 @@ function Register() {
                       className="royal-input no-icon"
                     />
                   </div>
-                  {errors.dateOfBirth && (
-                    <span className="royal-error-text">{errors.dateOfBirth}</span>
-                  )}
+                  {errors.dateOfBirth && <span className="royal-error-text">{errors.dateOfBirth}</span>}
                 </div>
 
                 <div className="royal-form-group">
-                  <label className="royal-input-label">Gender</label>
+                  <label className="royal-input-label">Gender *</label>
                   <div className="royal-input-wrapper">
                     <select
                       name="gender"
@@ -534,17 +516,18 @@ function Register() {
                       className="royal-input no-icon"
                     >
                       <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
+                      <option value="Male">Male (Groom)</option>
+                      <option value="Female">Female (Bride)</option>
                     </select>
                   </div>
                   {errors.gender && <span className="royal-error-text">{errors.gender}</span>}
                 </div>
               </div>
 
+              {/* Row 4: Country & State */}
               <div className="royal-form-grid">
                 <div className="royal-form-group">
-                  <label className="royal-input-label">Country</label>
+                  <label className="royal-input-label">Country *</label>
                   <div className="royal-input-wrapper">
                     <select
                       name="country"
@@ -560,19 +543,18 @@ function Register() {
                       ))}
                     </select>
                   </div>
-                  {errors.country && (
-                    <span className="royal-error-text">{errors.country}</span>
-                  )}
+                  {errors.country && <span className="royal-error-text">{errors.country}</span>}
                 </div>
 
                 <div className="royal-form-group">
-                  <label className="royal-input-label">State</label>
+                  <label className="royal-input-label">State *</label>
                   <div className="royal-input-wrapper">
                     <select
                       name="state"
                       value={formData.state}
                       onChange={handleChange}
                       className="royal-input no-icon"
+                      disabled={!formData.country}
                     >
                       <option value="">Select State</option>
                       {states.map((state) => (
@@ -586,15 +568,17 @@ function Register() {
                 </div>
               </div>
 
+              {/* Row 5: City & Profile For */}
               <div className="royal-form-grid">
                 <div className="royal-form-group">
-                  <label className="royal-input-label">City</label>
+                  <label className="royal-input-label">City *</label>
                   <div className="royal-input-wrapper">
                     <select
                       name="city"
                       value={formData.city}
                       onChange={handleChange}
                       className="royal-input no-icon"
+                      disabled={!formData.state}
                     >
                       <option value="">Select City</option>
                       {cities.map((city) => (
@@ -608,7 +592,7 @@ function Register() {
                 </div>
 
                 <div className="royal-form-group">
-                  <label className="royal-input-label">Profile is for whom?</label>
+                  <label className="royal-input-label">Profile is for whom? *</label>
                   <div className="royal-input-wrapper">
                     <select
                       name="profilefor"
@@ -626,14 +610,13 @@ function Register() {
                       <option value="My Relative">My Relative</option>
                     </select>
                   </div>
-                  {errors.profilefor && (
-                    <span className="royal-error-text">{errors.profilefor}</span>
-                  )}
+                  {errors.profilefor && <span className="royal-error-text">{errors.profilefor}</span>}
                 </div>
               </div>
 
-              <div className="royal-form-group">
-                <label className="royal-input-label">Password</label>
+              {/* Row 6: Password */}
+              <div className="royal-form-group mb-4">
+                <label className="royal-input-label">Password *</label>
                 <div className="royal-input-wrapper">
                   <FaLock className="royal-input-icon" />
                   <input
@@ -641,7 +624,7 @@ function Register() {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Enter your password"
+                    placeholder="Enter at least 6 characters"
                     className="royal-input"
                     autoComplete="new-password"
                   />
@@ -649,19 +632,18 @@ function Register() {
                     {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
                   </div>
                 </div>
-                {errors.password && (
-                  <span className="royal-error-text">{errors.password}</span>
-                )}
+                {errors.password && <span className="royal-error-text">{errors.password}</span>}
               </div>
 
-              <button type="submit" className="royal-submit-btn" style={{ marginTop: "1rem" }} onClick={handleSubmit}>
+              {/* Register Button */}
+              <button type="submit" className="royal-submit-btn">
                 <FaHeart className="royal-submit-btn-icon" />
-                Register to Your Account
+                Register Account
               </button>
             </form>
 
-            <p className="royal-footer-text">
-              Already have an account? 
+            <p className="royal-footer-text mt-4">
+              Already have an account?{" "}
               <Link to="/login" className="royal-footer-link">
                 Login Now
               </Link>
