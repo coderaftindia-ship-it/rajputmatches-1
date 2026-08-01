@@ -184,16 +184,16 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* <Route
+        <Route
           path="profile"
-          // element={
-          //   <ProtectedRoute>
-          //     <Profile />
-          //   </ProtectedRoute>
-          // }
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
         >
-          <Route index element={<Mydetails />} />
-        </Route> */}
+          {/* <Route index element={<Mydetails />} /> */}
+        </Route>
        <Route
           path="search"
           element={

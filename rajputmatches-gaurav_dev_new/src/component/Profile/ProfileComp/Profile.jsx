@@ -8,8 +8,6 @@ import Profilenavbar from "./Profilenavbar";
 import styles from "./Profile.module.css";
 
 import Mydetails from "../BasicDetails/Mydetails";
-import BasicDetails from "../BasicDetails/BasicDetails";
-
 import MyInterest from "../ProfileList/MyInterest";
 import PeopleVisited from "../ProfileList/PeopleVisited";
 import PhotoRequest from "../ProfileList/PhotoRequest";
@@ -88,12 +86,14 @@ const Profile = () => {
           </span>
         </nav>
 
-        {/* Profile Header (cover + avatar + info card) */}
-        <ProfileDetailsProvider enabled={activeContent === "myDetails"}>
+        {/* Profile Header & Tab Context Provider */}
+        <ProfileDetailsProvider enabled={true}>
+          {/* Profile Banner & Info Header */}
+          <ProfileInfoHeader />
 
-          {/* ---- Desktop: Split-pane layout ---- */}
+          {/* Desktop & Mobile Split Layout */}
           <div className={styles.profileLayout}>
-            {/* Left: Vertical Sidebar (hidden on tablet/mobile via CSS) */}
+            {/* Left: Vertical Sidebar (hidden on mobile via CSS) */}
             <div className={styles.sidebarPane}>
               <VerticalSidebar activeContent={activeContent} setActiveContent={setActiveContent} />
             </div>
