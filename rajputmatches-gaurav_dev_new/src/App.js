@@ -211,14 +211,14 @@ function App() {
             </ProtectedRoute>
           }
         ></Route> */}
-        {/* <Route
+        <Route
           path="settings"
           element={
             <ProtectedRoute>
               <Settings />
             </ProtectedRoute>
           }
-        /> */}
+        /> 
         {/* <Route
           path="profile/view/:profileId"
           element={
