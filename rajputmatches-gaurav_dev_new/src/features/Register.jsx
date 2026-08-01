@@ -17,47 +17,47 @@ import royalPlaceBg from "../assets/images/royalplacebg.jpg";
 import "./Login.css";
 
 // Safe getter for Country list to prevent top-level module evaluation crashes on WebKit/Safari
-const getSafeCountries = () => {
-  try {
-    const raw = Country.getAllCountries() || [];
-    const popularIso = ["IN", "US", "AE", "GB", "CA", "AU", "SA", "SG", "KW", "QA", "OM"];
-    const popular = raw.filter((c) => popularIso.includes(c.isoCode));
-    const other = raw.filter((c) => !popularIso.includes(c.isoCode));
-    return [...popular, ...other];
-  } catch (e) {
-    return [];
-  }
-};
+// const getSafeCountries = () => {
+//   try {
+//     const raw = Country.getAllCountries() || [];
+//     const popularIso = ["IN", "US", "AE", "GB", "CA", "AU", "SA", "SG", "KW", "QA", "OM"];
+//     const popular = raw.filter((c) => popularIso.includes(c.isoCode));
+//     const other = raw.filter((c) => !popularIso.includes(c.isoCode));
+//     return [...popular, ...other];
+//   } catch (e) {
+//     return [];
+//   }
+// };
 
-const COUNTRY_CODES = [
-  { code: "+91", label: "+91 (India)" },
-  { code: "+1", label: "+1 (USA/Canada)" },
-  { code: "+971", label: "+971 (UAE)" },
-  { code: "+44", label: "+44 (UK)" },
-  { code: "+61", label: "+61 (Australia)" },
-  { code: "+966", label: "+966 (Saudi Arabia)" },
-  { code: "+65", label: "+65 (Singapore)" },
-  { code: "+965", label: "+965 (Kuwait)" },
-  { code: "+974", label: "+974 (Qatar)" },
-  { code: "+968", label: "+968 (Oman)" },
-  { code: "+49", label: "+49 (Germany)" },
-  { code: "+33", label: "+33 (France)" },
-  { code: "+39", label: "+39 (Italy)" },
-  { code: "+34", label: "+34 (Spain)" },
-  { code: "+81", label: "+81 (Japan)" },
-  { code: "+86", label: "+86 (China)" },
-  { code: "+92", label: "+92 (Pakistan)" },
-  { code: "+977", label: "+977 (Nepal)" },
-  { code: "+94", label: "+94 (Sri Lanka)" },
-  { code: "+880", label: "+880 (Bangladesh)" }
-];
+// const COUNTRY_CODES = [
+//   { code: "+91", label: "+91 (India)" },
+//   { code: "+1", label: "+1 (USA/Canada)" },
+//   { code: "+971", label: "+971 (UAE)" },
+//   { code: "+44", label: "+44 (UK)" },
+//   { code: "+61", label: "+61 (Australia)" },
+//   { code: "+966", label: "+966 (Saudi Arabia)" },
+//   { code: "+65", label: "+65 (Singapore)" },
+//   { code: "+965", label: "+965 (Kuwait)" },
+//   { code: "+974", label: "+974 (Qatar)" },
+//   { code: "+968", label: "+968 (Oman)" },
+//   { code: "+49", label: "+49 (Germany)" },
+//   { code: "+33", label: "+33 (France)" },
+//   { code: "+39", label: "+39 (Italy)" },
+//   { code: "+34", label: "+34 (Spain)" },
+//   { code: "+81", label: "+81 (Japan)" },
+//   { code: "+86", label: "+86 (China)" },
+//   { code: "+92", label: "+92 (Pakistan)" },
+//   { code: "+977", label: "+977 (Nepal)" },
+//   { code: "+94", label: "+94 (Sri Lanka)" },
+//   { code: "+880", label: "+880 (Bangladesh)" }
+// ];
 
 function Register() {
   const { register, email: authEmail } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const ALL_COUNTRIES = useMemo(() => getSafeCountries(), []);
+  // const ALL_COUNTRIES = useMemo(() => getSafeCountries(), []);
 
   const [showPassword, setShowPassword] = useState(false);
   const [states, setStates] = useState([]);
@@ -428,11 +428,14 @@ function Register() {
                       value={formData.countryCode}
                       onChange={handleChange}
                     >
-                      {COUNTRY_CODES.map((item) => (
+                      {/* {COUNTRY_CODES.map((item) => (
                         <option key={item.code} value={item.code}>
                           {item.label}
                         </option>
-                      ))}
+                      ))} */}
+                      
+                      <option value="+1">+1 (USA/Canada)</option>
+                      <option value="+971">+971 (UAE)</option>
                     </select>
 
                     <input
@@ -549,11 +552,13 @@ function Register() {
                       className="royal-input no-icon"
                     >
                       <option value="">Select Country</option>
-                      {ALL_COUNTRIES.map((country) => (
+                      {/* {ALL_COUNTRIES.map((country) => (
                         <option key={country.isoCode || country.name} value={country.name}>
                           {country.name}
                         </option>
-                      ))}
+                      ))} */}
+
+                      <option value="India">India</option>
                     </select>
                   </div>
                   {errors.country && <span className="royal-error-text">{errors.country}</span>}
