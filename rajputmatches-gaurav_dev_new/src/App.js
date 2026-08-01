@@ -160,9 +160,9 @@ function App() {
         <Route path="auth/otp-verify" element={<EmailOtpVerify />} />
          {/* <Route path="signup" element={<Register />} /> */}
 
-        {/* <Route path="forgot-password" element={<ForgotPassword />} />
+         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="set-new-password" element={<NewPassword />} />
-        <Route path="verify-email" element={<VerifyEmail />} />   */}
+        <Route path="verify-email" element={<VerifyEmail />} />   
 
         <Route path="about" element={<About />} />
        <Route path="stories" element={<Stories />} />
