@@ -80,6 +80,12 @@ export function ProfileDetailsProvider({ children, enabled = true }) {
   );
 
   useEffect(() => {
+    if (authUserData) {
+      setData((prev) => ({ ...prev, user: authUserData }));
+    }
+  }, [authUserData]);
+
+  useEffect(() => {
     if (enabled) {
       loadAll(false);
     }

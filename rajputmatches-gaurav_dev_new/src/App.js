@@ -184,7 +184,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* <Route
+        <Route
           path="profile"
           element={
             <ProtectedRoute>
@@ -193,7 +193,7 @@ function App() {
           }
         >
           <Route index element={<Mydetails />} />
-        </Route> */}
+        </Route>
        <Route
           path="search"
           element={

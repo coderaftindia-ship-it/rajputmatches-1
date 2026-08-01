@@ -95,13 +95,13 @@ const Profile = () => {
           <div className={styles.profileLayout}>
             {/* Left: Vertical Sidebar (hidden on tablet/mobile via CSS) */}
             <div className={styles.sidebarPane}>
-              <VerticalSidebar setActiveContent={setActiveContent} />
+              <VerticalSidebar activeContent={activeContent} setActiveContent={setActiveContent} />
             </div>
 
             {/* Right: Content area */}
             <div className={styles.contentPane}>
               {/* Mobile/Tablet: Horizontal pill tabs */}
-              <Sidebar setActiveContent={setActiveContent} />
+              <Sidebar activeContent={activeContent} setActiveContent={setActiveContent} />
 
               {/* Content Card */}
               <div className={styles.contentCard}>

@@ -827,7 +827,10 @@ function Mydetails() {
         </div>
 
         {/* ── All Siblings Information ── */}
-        {(family?.elderBrother?.some(b => b.name) || family?.elderSister?.some(s => s.name) || family?.youngerBrother?.some(b => b.name) || family?.youngerSister?.some(s => s.name)) && (
+        {((Array.isArray(family?.elderBrother) && family.elderBrother.some(b => b?.name)) ||
+          (Array.isArray(family?.elderSister) && family.elderSister.some(s => s?.name)) ||
+          (Array.isArray(family?.youngerBrother) && family.youngerBrother.some(b => b?.name)) ||
+          (Array.isArray(family?.youngerSister) && family.youngerSister.some(s => s?.name))) && (
           <div className={styles.fullWidthSection}>
             <SectionRibbon onEditClick={openFamilyEdit} editTitle="Edit Siblings Details">
               Siblings Information
@@ -840,8 +843,8 @@ function Mydetails() {
                 { key: "youngerBrother", title: "Younger Brother" },
                 { key: "youngerSister", title: "Younger Sister" },
               ].map(({ key, title }) =>
-                family?.[key]?.map((person, idx) => {
-                  if (!person.name) return null;
+                Array.isArray(family?.[key]) && family[key].map((person, idx) => {
+                  if (!person?.name) return null;
                   return (
                     <div className={styles.relCard} key={`sib-${key}-${idx}`}>
                       <span className={styles.relRelation}>{title}</span>
@@ -895,7 +898,7 @@ function Mydetails() {
         </div>
 
         {/* Relatives Information if updated */}
-        {["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"].some(k => extendedFamily?.[k]?.length > 0 && extendedFamily[k][0]?.name) && (
+        {["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"].some(k => Array.isArray(extendedFamily?.[k]) && extendedFamily[k].length > 0 && extendedFamily[k][0]?.name) && (
           <div className={styles.fullWidthSection}>
             <SectionRibbon onEditClick={openPaternalEdit} editTitle="Edit Relatives">
               Family Relatives &amp; Connections
@@ -903,8 +906,8 @@ function Mydetails() {
 
             <div className={styles.relGrid}>
               {["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"].map((rk) =>
-                extendedFamily?.[rk]?.map((person, idx) => {
-                  if (!person.name) return null;
+                Array.isArray(extendedFamily?.[rk]) && extendedFamily[rk].map((person, idx) => {
+                  if (!person?.name) return null;
                   return (
                     <div className={styles.relCard} key={`${rk}-${idx}`}>
                       <span className={styles.relRelation}>{rk.replace(/([A-Z])/g, " $1")}</span>

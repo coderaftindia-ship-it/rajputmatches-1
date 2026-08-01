@@ -29,8 +29,7 @@ const menuItems = [
 /* ------------------------------------------------------------------ */
 /* Vertical sidebar — rendered inside the desktop split-pane layout   */
 /* ------------------------------------------------------------------ */
-export const VerticalSidebar = ({ setActiveContent }) => {
-  const [activeItem, setActiveItem] = useState("myDetails");
+export const VerticalSidebar = ({ activeContent = "myDetails", setActiveContent }) => {
   const navigate = useNavigate();
 
   const handleItemClick = (item) => {
@@ -38,7 +37,6 @@ export const VerticalSidebar = ({ setActiveContent }) => {
       navigate("/message");
       return;
     }
-    setActiveItem(item);
     setActiveContent(item);
   };
 
@@ -50,7 +48,7 @@ export const VerticalSidebar = ({ setActiveContent }) => {
           <li
             key={item.value}
             className={`${styles.verticalNavItem} ${
-              activeItem === item.value ? styles.active : ""
+              activeContent === item.value ? styles.active : ""
             }`}
             onClick={() => handleItemClick(item.value)}
           >
@@ -66,8 +64,7 @@ export const VerticalSidebar = ({ setActiveContent }) => {
 /* ------------------------------------------------------------------ */
 /* Horizontal pill sidebar — rendered for mobile/tablet               */
 /* ------------------------------------------------------------------ */
-const Sidebar = ({ setActiveContent }) => {
-  const [activeItem, setActiveItem] = useState("myDetails");
+const Sidebar = ({ activeContent = "myDetails", setActiveContent }) => {
   const navigate = useNavigate();
 
   const handleItemClick = (item) => {
@@ -75,7 +72,6 @@ const Sidebar = ({ setActiveContent }) => {
       navigate("/message");
       return;
     }
-    setActiveItem(item);
     setActiveContent(item);
   };
 
@@ -85,7 +81,7 @@ const Sidebar = ({ setActiveContent }) => {
         {menuItems.map((item) => (
           <li
             key={item.value}
-            className={`sidebar-menu-item ${activeItem === item.value ? "active" : ""}`}
+            className={`sidebar-menu-item ${activeContent === item.value ? "active" : ""}`}
             onClick={() => handleItemClick(item.value)}
           >
             <span className="sidebar-icon">{item.icon}</span>
