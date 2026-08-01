@@ -156,7 +156,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="home" element={<Home />} />
      <Route path="login" element={<Login />} />
-         {/* <Route path="signup" element={<Register />} /> */}
+         <Route path="signup" element={<Register />} />
         {/* <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="set-new-password" element={<NewPassword />} />
         <Route path="auth/emailverification" element={<Verification />} />
