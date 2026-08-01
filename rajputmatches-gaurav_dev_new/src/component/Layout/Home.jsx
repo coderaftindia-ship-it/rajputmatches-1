@@ -29,7 +29,7 @@ function Home() {
 
   return (
     <>
-      <Banner />
+      {/* <Banner /> */}
    <MatchMakingSection /> 
    <FeatureSection /> 
       <RecentAddedPage />
