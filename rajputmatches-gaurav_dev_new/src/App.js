@@ -40,7 +40,7 @@ import { FaFacebook, FaInstagram, FaWhatsapp, FaTelegram } from "react-icons/fa"
 import "react-toastify/dist/ReactToastify.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "").replace(/\/$/, "");
+const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "https://rajputana-backend-matrimonial-7tmmtqu5u-test166.vercel.app").replace(/\/$/, "");
 
 function FloatingSocial() {
   const [links, setLinks] = useState({
@@ -155,7 +155,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="home" element={<Home />} />
-        <Route path="login" element={<Login />} />
+        {/* <Route path="login" element={<Login />} />
         <Route path="signup" element={<Register />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="set-new-password" element={<NewPassword />} />
@@ -171,10 +171,10 @@ function App() {
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
         <Route path="terms-of-use" element={<TermsOfUse />} />
 
-        {/* <Route path="*" element={<Home />} /> */}
+       
         <Route path="*" element={<NotFoundPage />} />
 
-        {/* Protected Routes */}
+      
         <Route
           path="dashboard"
           element={
@@ -248,7 +248,7 @@ function App() {
               <ViewImages />
             </ProtectedRoute>
           }
-        />
+        /> */}
       </Routes>
       <BottomNav />
     </AuthProvider>

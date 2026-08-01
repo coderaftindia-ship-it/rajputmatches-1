@@ -30,11 +30,11 @@ function Home() {
   return (
     <>
       {/* <Banner /> */}
-      <MatchMakingSection />
+      {/* <MatchMakingSection /> */}
       <FeatureSection />
       <RecentAddedPage />
       <LandingPage />
-
+    
       <HappyClients />
       <Footer />
     </>

@@ -1,15 +1,4 @@
-import axios from "axios";
-import { BASE_URL, extractData, apiClient } from "./client";
-// meApi replaced by direct /auth/* calls in this adapter
-import { mediaApi } from "./media.api";
-import { profileApi } from "./profile.api";
-import { publicApi } from "./public.api";
-import { chatApi } from "./chat.api";
-
-function getAuthHeaders() {
-  const token = localStorage.getItem("authToken");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+import { extractData, apiClient } from "./client";
 
 /**
  * Maps old route strings to v1 GET handlers.
@@ -21,10 +10,9 @@ const GET_ROUTE_HANDLERS = {
     return response.data?.user ?? extractData(response);
   },
 
-  // helper used where backend may return 404 when a section hasn't been created yet
   profile: async () => {
     try {
-      const res = await mediaApi.getAvatar();
+      const res = await apiClient.get("/auth/profile");
       return extractData(res) ?? res.data?.user ?? null;
     } catch (err) {
       if (err.response?.status === 404) return null;
@@ -34,7 +22,7 @@ const GET_ROUTE_HANDLERS = {
 
   files: async () => {
     try {
-      const res = await mediaApi.getAlbum();
+      const res = await apiClient.get("/auth/files");
       return res.data?.user ?? extractData(res) ?? null;
     } catch (err) {
       if (err.response?.status === 404) return null;
@@ -63,7 +51,7 @@ const GET_ROUTE_HANDLERS = {
   },
 
   "profile/show-shortlisted": async () => {
-    const response = await profileApi.getShortlists();
+    const response = await apiClient.get("/auth/profile/show-shortlisted");
     return response.data?.user;
   },
 
@@ -73,12 +61,12 @@ const GET_ROUTE_HANDLERS = {
   },
 
   "profile/viewed": async () => {
-    const response = await profileApi.getVisited();
+    const response = await apiClient.get("/auth/profile/viewed");
     return response.data?.user;
   },
 
   "profile/visited": async () => {
-    const response = await profileApi.getVisitors();
+    const response = await apiClient.get("/auth/profile/visited");
     return response.data?.user;
   },
 
@@ -115,7 +103,10 @@ const GET_ROUTE_HANDLERS = {
     return response.data?.user ?? response.data;
   },
 
-  "chat/status": async () => chatApi.listPending(),
+  "chat/status": async () => {
+    const response = await apiClient.get("/chat/status");
+    return response.data;
+  },
 
   "profile/clans": async () => {
     const response = await apiClient.get("/auth/profile/clans");
@@ -142,23 +133,29 @@ const WRITE_ROUTE_HANDLERS = {
   "updatepaternal-details": (data) =>
     apiClient.put(`/auth/updatepaternal-details`, { data }),
 
-  "update-privacy": (data) => mediaApi.updatePrivacy(data),
+  "update-privacy": (data) =>
+    apiClient.put("/auth/update-privacy", { data }),
 
-  "set-profile-image": (data) => mediaApi.setAvatar(data),
+  "set-profile-image": (data) =>
+    apiClient.put("/auth/set-profile-image", { data }),
 
-  "delete-image": (data) => mediaApi.deleteFile(data),
+  "delete-image": (data) =>
+    apiClient.put("/auth/delete-image", { data }),
 
-  getprofiles: (data) => profileApi.search(data),
+  getprofiles: (data) =>
+    apiClient.put("/auth/getprofiles", { data }),
 
-  "profile/shortlist": (profileId) => profileApi.addShortlist(profileId),
+  "profile/shortlist": (profileId) =>
+    apiClient.put("/auth/profile/shortlist", { data: profileId }),
 
   "profile/shortlisted/delete": (profileId) =>
-    profileApi.removeShortlist(profileId),
+    apiClient.put("/auth/profile/shortlisted/delete", { data: profileId }),
 
   "profile/shortlisted/edit": (profileId) =>
-    profileApi.toggleBookmark(profileId),
+    apiClient.put("/auth/profile/shortlisted/edit", { data: profileId }),
 
-  "profile/view": (profileId) => profileApi.recordView(profileId),
+  "profile/view": (profileId) =>
+    apiClient.put("/auth/profile/view", { data: profileId }),
 
   "profile/block-toggle": (profileId) =>
     apiClient.put("/auth/profile/block-toggle", { data: profileId }),
@@ -215,21 +212,22 @@ const WRITE_ROUTE_HANDLERS = {
     apiClient.put("/auth/profile/message", { data }),
 
   "chat/status/update": ({ chatId, action }) =>
-    chatApi.updateStatus(chatId, action),
+    apiClient.put("/chat/status", { chatId, action }),
 
-  contactus: (data) => publicApi.submitContact(data),
+  contactus: (data) =>
+    apiClient.post("/public/contact", { data }),
 };
 
 export async function fetchByRoute(route) {
   if (route.startsWith("profile/view/images/")) {
     const profileId = route.split("/").pop();
-    const response = await profileApi.getPhotos(profileId);
+    const response = await apiClient.get(`/auth/profile/view/images/${profileId}`);
     return response.data?.user ?? extractData(response);
   }
 
   if (route.startsWith("profile/view/")) {
     const profileId = route.replace("profile/view/", "");
-    const response = await profileApi.getDetails(profileId);
+    const response = await apiClient.get(`/auth/profile/view/${profileId}`);
     return response.data?.user ?? extractData(response);
   }
 

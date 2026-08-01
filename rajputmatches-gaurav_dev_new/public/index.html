@@ -2,6 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <script>
+      if (typeof window !== "undefined" && !window.global) {
+        Object.defineProperty(window, "global", {
+          value: window,
+          enumerable: false,
+          configurable: true,
+          writable: true,
+        });
+      }
+    </script>
     <link rel="icon" href="%PUBLIC_URL%/logoWhite.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
@@ -32,8 +42,6 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-      integrity="sha384-oC2tJrG5e4ScbSJoen1S0uXQGQeS4d03nN5IYJ5jR+zF+Zq5p5F5o5x5p5F5o5x5"
-      crossorigin="anonymous"
     />
     <title>Rajputmatches</title>
   </head>
