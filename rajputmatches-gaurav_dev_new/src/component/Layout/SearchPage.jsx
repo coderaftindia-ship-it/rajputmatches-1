@@ -6,7 +6,7 @@ import {
   FaMapMarkerAlt, FaCalendarAlt, FaShieldAlt,
   FaRegHeart, FaHeart, FaSlidersH
 } from "react-icons/fa";
-import { Country, State } from "country-state-city";
+
 import { AiOutlineRight } from "react-icons/ai";
 import { IoImageSharp, IoEyeOutline } from "react-icons/io5";
 import { GiSwordClash } from "react-icons/gi";
@@ -474,11 +474,18 @@ const SearchPage = () => {
     loadClans();
   }, [fetchUserData]);
   useEffect(() => {
-    if (formData.country) {
-      const c = countries.find(c => c.name === formData.country);
-      if (c) setStates(State.getStatesOfCountry(c.isoCode));
-    } else setStates([]);
-  }, [formData.country, countries]);
+    if (formData.country === "India" || !formData.country) {
+      setStates([
+        "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa",
+        "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
+        "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
+        "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana",
+        "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Chandigarh"
+      ]);
+    } else {
+      setStates([]);
+    }
+  }, [formData.country]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

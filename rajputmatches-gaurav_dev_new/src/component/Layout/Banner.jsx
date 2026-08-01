@@ -1,25 +1,13 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "./Home.css";
 import Navbar from "./Navbar";
 import { LiaSearchSolid } from "react-icons/lia";
-import { FaCrown, FaCheckCircle, FaUsers, FaStar, FaRegBuilding, FaVenus, FaMars, FaRegHeart, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
+import { FaCrown, FaCheckCircle, FaUsers, FaStar, FaRegBuilding, FaVenus, FaMars, FaRegHeart, FaMapMarkerAlt } from "react-icons/fa";
 import Features from "./Features";
 import { useAuth } from "./AuthContext";
 import Bannerbg from "../../assets/images/bannerbg.png";
-import { Country, State, City } from "country-state-city";
 import { Navigate } from "react-router-dom";
-import { publicApi } from "../../api";
-import { BASE_URL } from "../../api";
-
-const ageOptions = Array.from({ length: 33 }, (_, i) => 18 + i);
-const getSafeCountries = () => {
-  try {
-    return Country.getAllCountries() || [];
-  } catch (e) {
-    return [];
-  }
-};
+import { publicApi, BASE_URL } from "../../api";
 
 const DEFAULT_CMS = {
   heroBadgeText: "Trusted Since 2009",
@@ -37,13 +25,9 @@ const DEFAULT_CMS = {
 };
 
 function Banner() {
-  const ALL_COUNTRIES = React.useMemo(() => getSafeCountries(), []);
   const { isAuthenticated, setFormData, formData, userData } = useAuth();
   const [redirectPath, setRedirectPath] = useState(null);
   const [cms, setCms] = useState(DEFAULT_CMS);
-
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
 
   // Fetch CMS data
   useEffect(() => {
@@ -61,48 +45,7 @@ function Banner() {
     } else if (userData?.gender === "Female" && formData.gender !== "Male") {
       setFormData((prev) => ({ ...prev, gender: "Male" }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData?.gender]);
-
-  // Default country to India on mount if empty
-  useEffect(() => {
-    if (!formData.country) {
-      setFormData((prev) => ({ ...prev, country: "India" }));
-    }
-  }, []);
-
-  // When country selection changes, update states
-  useEffect(() => {
-    if (formData.country) {
-      const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
-      if (selectedCountry) {
-        setStates(State.getStatesOfCountry(selectedCountry.isoCode));
-      } else {
-        setStates([]);
-      }
-    } else {
-      setStates([]);
-    }
-  }, [formData.country]);
-
-  // When state selection changes, update cities
-  useEffect(() => {
-    if (formData.state && formData.country && states.length > 0) {
-      const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
-      if (selectedCountry) {
-        const selectedState = states.find((s) => s.name === formData.state);
-        if (selectedState) {
-          setCities(City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode));
-        } else {
-          setCities([]);
-        }
-      } else {
-        setCities([]);
-      }
-    } else {
-      setCities([]);
-    }
-  }, [formData.state, formData.country, states]);
+  }, [userData?.gender, formData.gender, setFormData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -111,8 +54,6 @@ function Banner() {
     setFormData((prev) => ({
       ...prev,
       [name]: updatedValue,
-      ...(name === "country" ? { state: "", city: "" } : {}),
-      ...(name === "state" ? { city: "" } : {}),
     }));
   };
 

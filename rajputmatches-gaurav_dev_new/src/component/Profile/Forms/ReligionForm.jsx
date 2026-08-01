@@ -1,11 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { Country, State, City } from "country-state-city";
-import styles from "./Form.module.css";
-import { MdOutlineCancelPresentation } from "react-icons/md";
+import indiaStatesData from "../../../features/state";
 
-const getSafeCountries = () => {
-  try { return Country.getAllCountries() || []; } catch (e) { return []; }
-};
+const POPULAR_COUNTRIES = [
+  "India", "United States", "United Arab Emirates", "United Kingdom", "Canada", "Australia",
+  "Saudi Arabia", "Singapore", "Kuwait", "Qatar", "Oman", "Germany", "France"
+];
+
+const formattedStateMap = (() => {
+  const map = {};
+  if (indiaStatesData && typeof indiaStatesData === "object") {
+    Object.keys(indiaStatesData).forEach((key) => {
+      const readableName = key.replace(/([A-Z])/g, " $1").trim();
+      map[readableName] = indiaStatesData[key] || [];
+      map[key] = indiaStatesData[key] || [];
+    });
+  }
+  map["Uttar Pradesh"] = map["UttarPradesh"] || map["Uttar Pradesh"] || [];
+  map["Madhya Pradesh"] = map["MadhyaPradesh"] || map["Madhya Pradesh"] || [];
+  map["West Bengal"] = map["WestBengal"] || map["West Bengal"] || [];
+  map["Tamil Nadu"] = map["TamilNadu"] || map["Tamil Nadu"] || [];
+  map["Andhra Pradesh"] = map["AndhraPradesh"] || map["Andhra Pradesh"] || [];
+  return map;
+})();
+
+const INDIAN_STATES_LIST = Object.keys(formattedStateMap).filter(
+  (s) => !s.match(/^[a-z]/) && !["UttarPradesh", "MadhyaPradesh", "WestBengal", "TamilNadu", "AndhraPradesh"].includes(s)
+).sort();
 
 const ReligionForm = ({
   handleCancelClick,
@@ -14,30 +33,19 @@ const ReligionForm = ({
   handleInputChange,
   setFormData,
 }) => {
-  const ALL_COUNTRIES = React.useMemo(() => getSafeCountries(), []);
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
-
-  // Fetch states when a country is selected
-  useEffect(() => {
-    if (formData.birthCountry) {
-      const selectedCountry = ALL_COUNTRIES.find(
-        (country) => country.name === formData.birthCountry
-      );
-
-      if (selectedCountry) {
-        setStates(State.getStatesOfCountry(selectedCountry.isoCode));
-      } else {
-        setStates([]);
-      }
-    } else {
-      setStates([]);
+  const states = React.useMemo(() => {
+    if (formData.birthCountry === "India" || !formData.birthCountry) {
+      return INDIAN_STATES_LIST;
     }
+    return [];
   }, [formData.birthCountry]);
 
-  // Fetch cities when a state is selected
-  useEffect(() => {
+  const cities = React.useMemo(() => {
     if (formData.birthState) {
+      return formattedStateMap[formData.birthState] || [];
+    }
+    return [];
+  }, [formData.birthState]);
       const selectedCountry = ALL_COUNTRIES.find(
         (country) => country.name === formData.birthCountry
       );
