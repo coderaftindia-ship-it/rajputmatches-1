@@ -61,7 +61,7 @@ export default function EmailOtpVerify() {
         toast.success(res.data.message || "OTP verified", { position: "top-center" });
         // Persist any needed flag in localStorage so signup page can read it
         localStorage.setItem("verifiedEmail", localEmail);
-        navigate("/signup?verified=true");
+        navigate("/signup");
       } else {
         toast.error(res?.data?.message || "Invalid or expired OTP", { position: "top-center" });
       }
