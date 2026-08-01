@@ -323,7 +323,7 @@ function Register() {
 
   return (
     <>
-      <Profilenavbar />
+      {/* <Profilenavbar /> */}
       <div 
         className="royal-auth-container"
         style={
