@@ -219,22 +219,22 @@ function App() {
             </ProtectedRoute>
           }
         /> 
-        {/* <Route
+        <Route
           path="profile/view/:profileId"
           element={
             <ProtectedRoute>
               <ViewPage />
             </ProtectedRoute>
           }
-        /> */}
-        {/* <Route
+        />
+        <Route
           path="search/view/:profileId"
           element={
             <ProtectedRoute>
               <ViewPage />
             </ProtectedRoute>
           }
-        /> */}
+        />
         {/* <Route
           path="search/view/images/:profileId"
           element={
