@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Country, State, City } from "country-state-city";
 import { 
   FaRegEye, 
   FaRegEyeSlash, 
@@ -14,6 +13,7 @@ import { useAuth } from "../component/Layout/AuthContext";
 import { authApi } from "../api/auth.api";
 import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import royalPlaceBg from "../assets/images/royalplacebg.jpg";
+import indiaStatesData from "./state";
 import "./Login.css";
 
 /* ─── 1. Storage Wrapper (iOS Safari Private Browsing Guard) ───── */
@@ -34,19 +34,40 @@ const safeStorage = {
   },
 };
 
-/* ─── 2. Static Country Data Loader ────────────────────────────── */
-const getSafeCountries = () => {
-  try {
-    if (!Country || typeof Country.getAllCountries !== "function") return [];
-    const raw = Country.getAllCountries() || [];
-    const popularIso = ["IN", "US", "AE", "GB", "CA", "AU", "SA", "SG", "KW", "QA", "OM"];
-    const popular = raw.filter((c) => c && c.isoCode && popularIso.includes(c.isoCode));
-    const other = raw.filter((c) => c && c.isoCode && !popularIso.includes(c.isoCode));
-    return [...popular, ...other];
-  } catch (e) {
-    return [];
-  }
-};
+/* ─── 2. High-Performance Static Country List (Webkit Call Stack Safe) ─── */
+const POPULAR_COUNTRIES = [
+  "India",
+  "United States",
+  "United Arab Emirates",
+  "United Kingdom",
+  "Canada",
+  "Australia",
+  "Saudi Arabia",
+  "Singapore",
+  "Kuwait",
+  "Qatar",
+  "Oman",
+  "Germany",
+  "France",
+  "Italy",
+  "Spain",
+  "Japan",
+  "China",
+  "Pakistan",
+  "Nepal",
+  "Sri Lanka",
+  "Bangladesh",
+  "Malaysia",
+  "New Zealand",
+  "South Africa",
+  "Netherlands",
+  "Sweden",
+  "Switzerland",
+  "Norway",
+  "Denmark",
+  "Ireland",
+  "Bahrain"
+];
 
 /* ─── 3. Static Country Dial Codes ─────────────────────────────── */
 const COUNTRY_CODES = [
@@ -72,18 +93,38 @@ const COUNTRY_CODES = [
   { code: "+880", label: "+880 (Bangladesh)" }
 ];
 
-/* ─── 4. Main Register Component ───────────────────────────────── */
+/* ─── 4. Normalize Indian State Map for Fast Lookups ───────────── */
+const formattedStateMap = (() => {
+  const map = {};
+  if (indiaStatesData && typeof indiaStatesData === "object") {
+    Object.keys(indiaStatesData).forEach((key) => {
+      // Convert camel/pascal case keys to human readable labels (e.g. UttarPradesh -> Uttar Pradesh)
+      const readableName = key.replace(/([A-Z])/g, " $1").trim();
+      map[readableName] = indiaStatesData[key] || [];
+      // Also map exact key
+      map[key] = indiaStatesData[key] || [];
+    });
+  }
+  // Ensure default common state aliases
+  map["Uttar Pradesh"] = map["UttarPradesh"] || map["Uttar Pradesh"] || [];
+  map["Madhya Pradesh"] = map["MadhyaPradesh"] || map["Madhya Pradesh"] || [];
+  map["West Bengal"] = map["WestBengal"] || map["West Bengal"] || [];
+  map["Tamil Nadu"] = map["TamilNadu"] || map["Tamil Nadu"] || [];
+  map["Andhra Pradesh"] = map["AndhraPradesh"] || map["Andhra Pradesh"] || [];
+  return map;
+})();
+
+const INDIAN_STATES_LIST = Object.keys(formattedStateMap).filter(
+  (s) => !s.match(/^[a-z]/) && !["UttarPradesh", "MadhyaPradesh", "WestBengal", "TamilNadu", "AndhraPradesh"].includes(s)
+).sort();
+
+/* ─── 5. Main Register Component ───────────────────────────────── */
 function Register() {
   const { register, email: authEmail } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Static country list memoized once
-  const countries = useMemo(() => getSafeCountries(), []);
-
   const [showPassword, setShowPassword] = useState(false);
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
 
   // Form State with all 11 required fields
   const [formData, setFormData] = useState({
@@ -108,76 +149,26 @@ function Register() {
   const [otpMessage, setOtpMessage] = useState("");
   const [resendDisabled, setResendDisabled] = useState(false);
 
-  // References to prevent re-fetching dropdown options on keypress events
-  const prevCountryRef = useRef(formData.country);
-  const prevStateRef = useRef(formData.state);
-
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
   }, []);
 
-  // Sync initial state list for default country ("India") once on mount
-  useEffect(() => {
-    if (formData.country && states.length === 0) {
-      try {
-        const selectedCountry = (countries || []).find((c) => c?.name === formData.country);
-        if (selectedCountry?.isoCode) {
-          const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode) || [];
-          setStates(fetchedStates);
-        }
-      } catch (e) {}
+  // Compute available states based on selected country (Zero call stack overhead)
+  const availableStates = useMemo(() => {
+    if (formData.country === "India") {
+      return INDIAN_STATES_LIST;
     }
-  }, [formData.country, countries, states.length]);
+    return [];
+  }, [formData.country]);
 
-  // Update states ONLY when the selected country actually changes
-  useEffect(() => {
-    if (prevCountryRef.current !== formData.country) {
-      prevCountryRef.current = formData.country;
-      if (formData.country) {
-        try {
-          const selectedCountry = (countries || []).find((c) => c?.name === formData.country);
-          if (selectedCountry?.isoCode) {
-            const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode);
-            setStates(fetchedStates || []);
-          } else {
-            setStates([]);
-          }
-        } catch (e) {
-          setStates([]);
-        }
-      } else {
-        setStates([]);
-      }
+  // Compute available cities based on selected state (Zero call stack overhead)
+  const availableCities = useMemo(() => {
+    if (formData.country === "India" && formData.state) {
+      const cityList = formattedStateMap[formData.state] || [];
+      return cityList;
     }
-  }, [formData.country, countries]);
-
-  // Update cities ONLY when selected state actually changes (capped at 150 for high performance)
-  useEffect(() => {
-    if (prevStateRef.current !== formData.state) {
-      prevStateRef.current = formData.state;
-      if (formData.state && formData.country) {
-        try {
-          const selectedCountry = (countries || []).find((c) => c?.name === formData.country);
-          if (selectedCountry?.isoCode) {
-            const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode) || [];
-            const selectedState = fetchedStates.find((s) => s?.name === formData.state);
-            if (selectedState?.isoCode) {
-              const fetchedCities = City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode) || [];
-              setCities(fetchedCities.slice(0, 150));
-            } else {
-              setCities([]);
-            }
-          } else {
-            setCities([]);
-          }
-        } catch (e) {
-          setCities([]);
-        }
-      } else {
-        setCities([]);
-      }
-    }
-  }, [formData.state, formData.country, countries]);
+    return [];
+  }, [formData.country, formData.state]);
 
   // Safe check for URL search params or localStorage verification status
   useEffect(() => {
@@ -194,7 +185,7 @@ function Register() {
     } catch (e) {}
   }, [location?.search]);
 
-  // Optimized Input Change Handler
+  // Non-blocking Input Change Handler
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
 
@@ -214,7 +205,6 @@ function Register() {
       ...(name === "state" ? { city: "" } : {}),
     }));
 
-    // Clear field error on change
     setErrors((prev) => (prev[name] ? { ...prev, [name]: "" } : prev));
   }, []);
 
@@ -609,9 +599,9 @@ function Register() {
                       className="royal-input no-icon"
                     >
                       <option value="">Select Country</option>
-                      {countries.map((country) => (
-                        <option key={country.isoCode || country.name} value={country.name}>
-                          {country.name}
+                      {POPULAR_COUNTRIES.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
                         </option>
                       ))}
                     </select>
@@ -622,20 +612,30 @@ function Register() {
                 <div className="royal-form-group">
                   <label className="royal-input-label">State *</label>
                   <div className="royal-input-wrapper">
-                    <select
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
-                      className="royal-input no-icon"
-                      disabled={!formData.country}
-                    >
-                      <option value="">Select State</option>
-                      {states.map((state) => (
-                        <option key={state.isoCode || state.name} value={state.name}>
-                          {state.name}
-                        </option>
-                      ))}
-                    </select>
+                    {availableStates.length > 0 ? (
+                      <select
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
+                        className="royal-input no-icon"
+                      >
+                        <option value="">Select State</option>
+                        {availableStates.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
+                        placeholder="Enter State"
+                        className="royal-input no-icon"
+                      />
+                    )}
                   </div>
                   {errors.state && <span className="royal-error-text">{errors.state}</span>}
                 </div>
@@ -646,20 +646,30 @@ function Register() {
                 <div className="royal-form-group">
                   <label className="royal-input-label">City *</label>
                   <div className="royal-input-wrapper">
-                    <select
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                      className="royal-input no-icon"
-                      disabled={!formData.state}
-                    >
-                      <option value="">Select City</option>
-                      {cities.map((city) => (
-                        <option key={city.name} value={city.name}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </select>
+                    {availableCities.length > 0 ? (
+                      <select
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        className="royal-input no-icon"
+                      >
+                        <option value="">Select City</option>
+                        {availableCities.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        placeholder="Enter City"
+                        className="royal-input no-icon"
+                      />
+                    )}
                   </div>
                   {errors.city && <span className="royal-error-text">{errors.city}</span>}
                 </div>

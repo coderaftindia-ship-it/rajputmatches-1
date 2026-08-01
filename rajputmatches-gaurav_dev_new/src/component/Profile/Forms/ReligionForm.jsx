@@ -37,30 +37,25 @@ const ReligionForm = ({
 
   // Fetch cities when a state is selected
   useEffect(() => {
-    if (formData.birthState && formData.birthCountry) {
+    if (formData.birthState) {
       const selectedCountry = ALL_COUNTRIES.find(
         (country) => country.name === formData.birthCountry
       );
-      if (selectedCountry) {
-        const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode) || [];
-        const selectedState = fetchedStates.find(
-          (state) => state.name === formData.birthState
-        );
+      const selectedState = states.find(
+        (state) => state.name === formData.birthState
+      );
 
-        if (selectedState) {
-          setCities(
-            City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode) || []
-          );
-        } else {
-          setCities([]);
-        }
+      if (selectedCountry && selectedState) {
+        setCities(
+          City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode)
+        );
       } else {
         setCities([]);
       }
     } else {
       setCities([]);
     }
-  }, [formData.birthState, formData.birthCountry, ALL_COUNTRIES]);
+  }, [formData.birthState, formData.birthCountry, states]);
 
   return (
     <div className={styles.modalContainer}>
