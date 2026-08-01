@@ -151,7 +151,14 @@ function App() {
       <ScrollToTop />
       <FloatingSocial />
       <ReportFeedbackWidget />
-      <h1>sadfghfhjfh</h1>
+      <Routes>
+        {/* Public Routes */}
+        {/* <Route path="/" element={<Home />} />
+        <Route path="home" element={<Home />} /> */}
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Register />} />
+        {/*  */}
+      </Routes>
       <BottomNav />
     </AuthProvider>
     </SiteSettingsProvider>
