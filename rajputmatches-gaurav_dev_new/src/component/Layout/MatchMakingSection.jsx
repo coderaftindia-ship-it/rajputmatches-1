@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import herobg from "../../assets/images/matchmakingbg.jpeg";
 import border from "../../assets/images/border.png";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { FaCrown, FaCheckCircle, FaStar, FaShieldAlt } from "react-icons/fa";
 import { useAuth } from "./AuthContext";
 import { publicApi } from "../../api";
@@ -71,13 +70,7 @@ const MatchmakingSection = () => {
       <div className="container py-4 position-relative" style={{ zIndex: 2 }}>
         <div className="row align-items-center g-5">
           {/* Left Column: Premium Jharokha Framed Image */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="col-12 col-lg-6 mb-5 mb-lg-0 d-flex justify-content-center"
-          >
+          <div className="col-12 col-lg-6 mb-5 mb-lg-0 d-flex justify-content-center">
             {/* The Royal Jharokha Palace Frame */}
             <div
               className="position-relative"
@@ -149,16 +142,10 @@ const MatchmakingSection = () => {
                 <span className="d-flex align-items-center gap-1.5"><FaShieldAlt color="var(--royal-gold-dark)" /> 100% Secure</span>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Column: Heritage Text & Luxury UX Content */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="col-12 col-lg-6 text-center text-lg-start px-lg-5"
-          >
+          <div className="col-12 col-lg-6 text-center text-lg-start px-lg-5">
             {/* Heritage Badge */}
             <div className="mb-4">
               <span
@@ -236,23 +223,17 @@ const MatchmakingSection = () => {
                 {cms.matchCTAText}
               </button>
             </Link>
-          </motion.div>
+          </div>
         </div>
 
         {/* Decorative Traditional Border Underneath */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 0.9 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2 }}
-          className="text-center mt-5 pt-4"
-        >
+        <div className="text-center mt-5 pt-4">
           <img
             style={{ width: "100%", maxWidth: "900px", height: "auto", opacity: 0.8 }}
             src={border}
             alt="Decorative border"
           />
-        </motion.div>
+        </div>
       </div>
     </div>
   );

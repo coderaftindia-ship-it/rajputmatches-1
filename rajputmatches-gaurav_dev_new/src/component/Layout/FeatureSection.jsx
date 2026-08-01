@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { LiaCrownSolid, LiaChessKingSolid } from "react-icons/lia";
 import { IoShieldOutline, IoAccessibilityOutline } from "react-icons/io5";
-import { motion } from "framer-motion";
 import { useAuth } from "./AuthContext";
 import "./FeatureSection.css";
 import { publicApi } from "../../api";
@@ -59,13 +58,7 @@ function FeatureSection() {
   return (
     <section className="bg-white pb-5">
       <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="text-center pt-0"
-        >
+        <div className="text-center pt-0">
           <h2
             className="display-6 fw-bold mb-2"
             style={{
@@ -78,7 +71,7 @@ function FeatureSection() {
           >
             {cms.featureSectionHeading}
           </h2>
-        </motion.div>
+        </div>
         <Features featureTitles={featureTitles} />
       </div>
     </section>
@@ -94,25 +87,19 @@ export const Features = ({ featureTitles }) => {
   }));
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
+    <div
       className="d-flex flex-wrap justify-content-center gap-4 pt-3"
       style={{ rowGap: "1.25rem", columnGap: "1.75rem" }}
     >
       {featuresData.map((feature, index) => (
-        <motion.div
-          variants={itemVariants}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+        <div
           key={index}
           style={{ flex: "1 1 170px", maxWidth: "190px", minWidth: "160px" }}
         >
           <FeatureCard iconClass={feature.icon} title={feature.title} description={feature.description} />
-        </motion.div>
+        </div>
       ))}
-    </motion.div>
+    </div>
   );
 };
 

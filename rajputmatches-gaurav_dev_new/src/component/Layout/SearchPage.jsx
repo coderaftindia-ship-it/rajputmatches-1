@@ -252,7 +252,7 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
   };
 
   return (
-    <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.35 }} className={styles.cardContainer}>
+    <div className={styles.cardContainer}>
       {/* Dark maroon header */}
       <div className={styles.cardHeaderBlock}>
         <span className={styles.genderTag}>{profile?.gender==="Female"?"Bride":"Groom"}</span>
@@ -364,7 +364,7 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
           <ConnBtn/>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

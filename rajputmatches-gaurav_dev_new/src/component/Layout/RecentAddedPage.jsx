@@ -14,7 +14,6 @@ import { useAuth } from "./AuthContext";
 import maleDefault from "../../assets/images/male_default.png";
 import femaleDefault from "../../assets/images/female_default.png";
 import blurImage from "../../assets/images/blurimage.png";
-import { motion } from "framer-motion";
 
 function RecentAddedPage() {
   const { isAuthenticated, updateData } = useAuth();
@@ -387,11 +386,14 @@ function RecentAddedPage() {
           >
             <div className="position-relative overflow-hidden px-2 px-md-4">
               {useSlider ? (
-                <motion.div
+                <div
                   className="d-flex flex-nowrap"
-                  animate={{ x: `-${currentIndex * (100 / visibleCards)}%` }}
-                  transition={{ type: "tween", ease: "easeInOut", duration: 0.5 }}
-                  style={{ width: `${(profiles.length / visibleCards) * 100}%` }}
+                  style={{
+                    width: `${(profiles.length / visibleCards) * 100}%`,
+                    transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
+                    transition: "transform 0.5s ease-in-out",
+                    willChange: "transform"
+                  }}
                 >
                   {profiles.map(profile => (
                     <ProfileCard
@@ -400,7 +402,7 @@ function RecentAddedPage() {
                       widthStyle={{ width: `${100 / profiles.length}%`, padding: "0 12px", flexShrink: 0 }}
                     />
                   ))}
-                </motion.div>
+                </div>
               ) : (
                 <div className="d-flex gap-3 justify-content-center flex-wrap">
                   {profiles.map(profile => (

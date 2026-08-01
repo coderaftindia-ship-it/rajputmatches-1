@@ -6,7 +6,6 @@ import { LiaSearchSolid } from "react-icons/lia";
 import { FaCrown, FaCheckCircle, FaUsers, FaStar, FaRegBuilding, FaVenus, FaMars, FaRegHeart, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
 import Features from "./Features";
 import { useAuth } from "./AuthContext";
-import { motion } from "framer-motion";
 import Bannerbg from "../../assets/images/bannerbg.png";
 import { Country, State, City } from "country-state-city";
 import { Navigate } from "react-router-dom";
@@ -202,12 +201,7 @@ function Banner() {
         <div className="container d-flex flex-column justify-content-center flex-grow-1 position-relative" style={{ zIndex: 3 }}>
           <div className="row align-items-center flex-grow-1 py-4 py-md-5 my-auto">
             {/* Left Column: Text & Badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="col-12 col-lg-6 text-white pe-lg-5 mb-5 mb-lg-0"
-            >
+            <div className="col-12 col-lg-6 text-white pe-lg-5 mb-5 mb-lg-0">
               <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4" style={{ border: "1px solid rgba(237, 177, 57, 0.4)", background: "rgba(0,0,0,0.2)" }}>
                 <FaCrown color="var(--royal-gold)" size={14} />
                 <span style={{ fontSize: "0.85rem", color: "var(--royal-gold)", letterSpacing: "0.5px" }}>{cms.heroBadgeText}</span>
@@ -255,15 +249,10 @@ function Banner() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
             {/* Right Column: Search Card */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-              className="col-12 col-lg-5 offset-lg-1"
-            >
+            <div className="col-12 col-lg-5 offset-lg-1">
               <form
                 onSubmit={handleSubmit}
                 className="p-4 p-md-5 rounded-4 d-flex flex-column"
@@ -414,7 +403,7 @@ function Banner() {
                   <span style={{ fontSize: "0.75rem", color: "var(--royal-text-light)" }}>{cms.heroFooterNote}</span>
                 </div>
               </form>
-            </motion.div>
+            </div>
           </div>
 
           <div className="mt-5 pb-5 d-none d-md-block">
