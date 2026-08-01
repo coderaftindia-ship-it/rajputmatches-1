@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import io from "socket.io-client";
 import { chatApi, BASE_URL } from "../../api";
@@ -28,6 +28,7 @@ const socket = io(SOCKET_URL, {
 const formatTime = (dateStr) => {
   if (!dateStr) return "";
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
   let h = d.getHours(), m = d.getMinutes().toString().padStart(2, "0");
   const ampm = h >= 12 ? "PM" : "AM";
   h = h % 12 || 12;
@@ -37,21 +38,29 @@ const formatTime = (dateStr) => {
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
   const options = { day: "2-digit", month: "short", year: "numeric" };
   return `${d.toLocaleDateString("en-GB", options)}  ${formatTime(dateStr)}`;
 };
 
 const getInitials = (first = "", last = "") =>
-  `${first.charAt(0)}${last.charAt(0)}`.toUpperCase() || "U";
+  `${(first || "").charAt(0)}${(last || "").charAt(0)}`.toUpperCase() || "U";
 
 /* ─── Sub-Components ──────────────────────────────────────── */
-const Avatar = ({ photo, first, last, size = 48, border = false }) =>
-  photo ? (
+const Avatar = ({ photo, first, last, size = 48, border = false }) => {
+  const resolvedPhoto = photo
+    ? photo.startsWith("http")
+      ? photo
+      : `${BASE_URL || ""}${photo.startsWith("/") ? "" : "/"}${photo}`
+    : null;
+
+  return resolvedPhoto ? (
     <img
-      src={photo}
+      src={resolvedPhoto}
       alt="avatar"
       className="chat-avatar"
       style={{ width: size, height: size, ...(border ? { border: "2px solid rgba(201,168,76,0.6)" } : {}) }}
+      onError={(e) => { e.currentTarget.style.display = "none"; }}
     />
   ) : (
     <div
@@ -61,6 +70,7 @@ const Avatar = ({ photo, first, last, size = 48, border = false }) =>
       {getInitials(first, last)}
     </div>
   );
+};
 
 /* ════════════════════════════════════════════════════════════ */
 const ChatApp = () => {
@@ -85,6 +95,7 @@ const ChatApp = () => {
   const fileInputRef = useRef(null);
   const activeChatRef = useRef(activeChat);
   const inputRef = useRef(null);
+  const emojiPickerRef = useRef(null);
 
   /* ── Resize listener ── */
   useEffect(() => {
@@ -93,16 +104,81 @@ const ChatApp = () => {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  /* ── Close Emoji Picker on Click Outside ── */
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   /* ── Sync activeChatRef ── */
   useEffect(() => { activeChatRef.current = activeChat; }, [activeChat]);
 
   /* ── Auto-scroll ── */
   useEffect(() => {
-    if (chatContainerRef.current)
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    if (chatContainerRef.current) {
+      requestAnimationFrame(() => {
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+      });
+    }
   }, [messages]);
 
-  /* ── Socket ── */
+  /* ── Data Loaders (useCallback to prevent infinite re-render loops) ── */
+  const loadMessages = useCallback(async (chatId) => {
+    if (!chatId) return;
+    setActiveChat(chatId);
+    try {
+      const msgs = await chatApi.getMessages(chatId);
+      setMessages(Array.isArray(msgs) ? msgs : []);
+    } catch { 
+      setMessages([]); 
+    }
+  }, []);
+
+  const loadChats = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
+      const list = await chatApi.listChats();
+      setChats(list || []);
+      // Only set initial active chat if none is currently selected (using ref check)
+      if (list?.length > 0 && !activeChatRef.current) {
+        const first = list[0];
+        if (first?._id) {
+          await loadMessages(first._id);
+        }
+      }
+    } catch { 
+      setError("Unable to load chats"); 
+    }
+  }, [loadMessages]);
+
+  const loadRequest = useCallback(async () => {
+    try {
+      const res = await fetchUserData("chat/status");
+      if (res?.length > 0) {
+        const pending = res.filter((c) => c.status === "other");
+        if (pending.length > 0) {
+          setRequestingId(pending[0]._id);
+          setRequestingMatrId(pending[0].participants?.find((p) => p._id !== userId)?.martrId || "");
+          setStatus("other");
+        } else { 
+          setStatus(""); 
+          setRequestingId(""); 
+        }
+      }
+    } catch (e) { 
+      console.error(e); 
+    }
+  }, [fetchUserData, userId]);
+
+  /* ── Socket Connection & Handlers ── */
   useEffect(() => {
     socket.connect();
     socket.on("newMessage", (msg) => {
@@ -115,59 +191,31 @@ const ChatApp = () => {
       }
       loadChats();
     });
-    return () => { socket.off("newMessage"); socket.disconnect(); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    return () => { 
+      socket.off("newMessage"); 
+      socket.disconnect(); 
+    };
+  }, [loadChats, loadMessages]);
 
   /* ── Polling (fallback) ── */
   useEffect(() => {
     if (!activeChat) return;
-    const id = setInterval(() => loadMessages(activeChat), 5000);
+    const id = setInterval(() => {
+      if (activeChatRef.current) {
+        loadMessages(activeChatRef.current);
+      }
+    }, 8000);
     return () => clearInterval(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeChat]);
+  }, [activeChat, loadMessages]);
 
-  /* ── Data loaders ── */
-  const loadChats = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) return;
-      const list = await chatApi.listChats();
-      setChats(list || []);
-      if (list?.length > 0 && !activeChat) {
-        const first = list[0];
-        await loadMessages(first?._id);
-      }
-    } catch { setError("Unable to load chats"); }
-  };
-
-  const loadRequest = async () => {
-    try {
-      const res = await fetchUserData("chat/status");
-      if (res?.length > 0) {
-        const pending = res.filter((c) => c.status === "other");
-        if (pending.length > 0) {
-          setRequestingId(pending[0]._id);
-          setRequestingMatrId(pending[0].participants.find((p) => p._id !== userId)?.martrId || "");
-          setStatus("other");
-        } else { setStatus(""); setRequestingId(""); }
-      }
-    } catch (e) { console.error(e); }
-  };
-
-  const loadMessages = async (chatId) => {
-    if (!chatId) return;
-    setActiveChat(chatId);
-    try {
-      const msgs = await chatApi.getMessages(chatId);
-      setMessages(Array.isArray(msgs) ? msgs : []);
-    } catch { setMessages([]); }
-  };
-
+  /* ── Initial Load ── */
   useEffect(() => {
-    if (userId) { loadChats(); loadRequest(); }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, Status]);
+    if (userId) { 
+      loadChats(); 
+      loadRequest(); 
+    }
+  }, [userId, loadChats, loadRequest]);
 
   /* ── Actions ── */
   const sendMessage = async () => {
@@ -175,6 +223,8 @@ const ChatApp = () => {
     try {
       const sentText = message;
       setMessage("");
+      setShowEmojiPicker(false);
+
       const res = await chatApi.sendMessage(activeChat, sentText);
       const newMsg = res?.data?.populatedMessage || res?.data;
       if (newMsg && newMsg._id) {
@@ -192,25 +242,35 @@ const ChatApp = () => {
   };
 
   const handleFileSelect = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file || !activeChat) return;
     try {
       const res = await chatApi.sendFileMessage(activeChat, file, message);
       socket.emit("sendMessage", { chatId: activeChat, message: message || "Sent an attachment" });
       setMessage("");
-      if (res?.data) setMessages((prev) => [...prev, res.data]);
-      else await loadMessages(activeChat);
-    } catch { toast.error("Failed to upload file"); }
+      if (res?.data) {
+        setMessages((prev) => [...prev, res.data]);
+      } else {
+        await loadMessages(activeChat);
+      }
+    } catch { 
+      toast.error("Failed to upload file"); 
+    }
     e.target.value = null;
   };
 
   const deleteSingle = async (deleteForAll) => {
+    if (!messageToDelete?._id) return;
     try {
       await chatApi.deleteSingleMessage(messageToDelete._id, deleteForAll);
-      await loadMessages(activeChat);
+      if (activeChatRef.current) {
+        await loadMessages(activeChatRef.current);
+      }
       setShowDeleteModal(false);
       setMessageToDelete(null);
-    } catch (err) { toast.error(err.response?.data?.error || "Failed to delete message"); }
+    } catch (err) { 
+      toast.error(err.response?.data?.error || "Failed to delete message"); 
+    }
   };
 
   const handleResponse = async (action, chatId) => {
@@ -218,10 +278,12 @@ const ChatApp = () => {
       await updateData("chat/status/update", { action, chatId }, true);
       await loadChats();
       await loadRequest();
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error(e); 
+    }
   };
 
-  /* ── Derived state ── */
+  /* ── Derived State ── */
   const activeChatObj = chats.find((c) => c._id === activeChat);
   const activePartner = activeChatObj?.participants?.find((p) => p?._id?.toString() !== userId?.toString());
 
@@ -236,7 +298,7 @@ const ChatApp = () => {
         ) || chat?.lastMessage?.message?.toLowerCase().includes(q)
       );
     })
-    .sort((a, b) => (a.updatedAt > b.updatedAt ? -1 : 1));
+    .sort((a, b) => (new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)));
 
   /* ════════════════════════════════════════════════════════════
      RENDER
@@ -307,7 +369,7 @@ const ChatApp = () => {
                     const partner = chat?.participants?.find(
                       (p) => p?._id?.toString() !== userId?.toString()
                     );
-                    const name = partner ? `${partner.firstName} ${partner.lastName}` : "Chat User";
+                    const name = partner ? `${partner.firstName || ""} ${partner.lastName || ""}` : "Chat User";
                     const photo = partner?.filesId?.photos?.[0]?.url;
                     const hasUnread =
                       chat?.lastMessage &&
@@ -364,7 +426,7 @@ const ChatApp = () => {
                       />
                       <div>
                         <p className="chat-header-name">
-                          {activePartner.firstName} {activePartner.lastName}
+                          {activePartner.firstName || ""} {activePartner.lastName || ""}
                         </p>
                         <p className="chat-header-sub">Matri ID: {activePartner?.martrId || "—"}</p>
                       </div>
@@ -424,7 +486,7 @@ const ChatApp = () => {
                     const imgSrc = msg.attachmentUrl
                       ? msg.attachmentUrl.startsWith("http")
                         ? msg.attachmentUrl
-                        : `${BASE_URL}${msg.attachmentUrl}`
+                        : `${BASE_URL || ""}${msg.attachmentUrl.startsWith("/") ? "" : "/"}${msg.attachmentUrl}`
                       : null;
 
                     return (
@@ -467,19 +529,39 @@ const ChatApp = () => {
 
               {/* Input Bar */}
               {activeChat && (
-                <div className="chat-input-bar">
-                  {/* Emoji */}
+                <div className="chat-input-bar position-relative">
+                  {/* Hidden File Input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileSelect}
+                  />
+
+                  {/* Image Attachment Button */}
+                  <button
+                    className="chat-input-icon-btn"
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Send Image"
+                    type="button"
+                  >
+                    <IoImageOutline size={24} />
+                  </button>
+
+                  {/* Emoji Button */}
                   <button
                     className="chat-input-icon-btn"
                     onClick={() => setShowEmojiPicker((p) => !p)}
                     title="Emoji"
+                    type="button"
                   >
                     <IoHappyOutline size={26} />
                   </button>
 
-                  {/* Emoji Picker */}
+                  {/* Emoji Picker Popup */}
                   {showEmojiPicker && (
-                    <div className="chat-emoji-popup">
+                    <div className="chat-emoji-popup" ref={emojiPickerRef}>
                       <EmojiPicker
                         onEmojiClick={(emojiData) => {
                           setMessage((prev) => prev + emojiData.emoji);
@@ -489,8 +571,6 @@ const ChatApp = () => {
                       />
                     </div>
                   )}
-
-
 
                   {/* Text Input */}
                   <input
@@ -504,12 +584,13 @@ const ChatApp = () => {
                     onKeyDown={(e) => { if (e.key === "Enter") sendMessage(); }}
                   />
 
-                  {/* Send */}
+                  {/* Send Button */}
                   <button
                     className="chat-send-btn"
                     onClick={sendMessage}
                     disabled={!message.trim()}
                     title="Send"
+                    type="button"
                   >
                     <IoSendSharp size={18} />
                   </button>
@@ -544,7 +625,7 @@ const ChatApp = () => {
               This action cannot be undone. How would you like to delete this message?
             </div>
             <div className="chat-modal-footer">
-              {messageToDelete?.sender?._id === userId && (
+              {(messageToDelete?.sender?._id || messageToDelete?.sender)?.toString() === userId?.toString() && (
                 <button className="chat-modal-btn-danger" onClick={() => deleteSingle(true)}>
                   🗑️ Delete for Everyone
                 </button>

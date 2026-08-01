@@ -203,14 +203,14 @@ function App() {
           }
         />
         
-        {/* <Route
+        <Route
           path="message"
           element={
             <ProtectedRoute>
               <ChatApp />
             </ProtectedRoute>
           }
-        ></Route> */}
+        ></Route>
         <Route
           path="settings"
           element={
