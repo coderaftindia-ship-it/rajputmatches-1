@@ -109,7 +109,8 @@ function Register() {
     if (formData.state && formData.country) {
       const selectedCountry = RAW_COUNTRIES.find((c) => c.name === formData.country);
       if (selectedCountry) {
-        const selectedState = states.find((s) => s.name === formData.state);
+        const fetchedStates = State.getStatesOfCountry(selectedCountry.isoCode);
+        const selectedState = (fetchedStates || []).find((s) => s.name === formData.state);
         if (selectedState) {
           const fetchedCities = City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode);
           setCities((fetchedCities || []).slice(0, 150));
@@ -122,7 +123,7 @@ function Register() {
     } else {
       setCities([]);
     }
-  }, [formData.state, formData.country, states]);
+  }, [formData.state, formData.country]);
 
   // Check URL params for verification status
   useEffect(() => {
@@ -131,7 +132,7 @@ function Register() {
     if (verifiedParam === "true" || storedEmail) {
       setOtpVerified(true);
       if (storedEmail) {
-        setFormData((prev) => ({ ...prev, email: storedEmail }));
+        setFormData((prev) => (prev.email === storedEmail ? prev : { ...prev, email: storedEmail }));
       }
     }
   }, [location.search]);
