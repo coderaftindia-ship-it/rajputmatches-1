@@ -5,16 +5,29 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
     plugins: [react()],
+    server: {
+      host: true,
+      port: 5173,
+      hmr: {
+        overlay: false,
+      },
+    },
+    preview: {
+      host: true,
+      port: 5173,
+    },
     esbuild: {
       loader: 'jsx',
       include: /src\/.*\.jsx?$/,
       exclude: [],
+      target: 'es2015',
     },
     optimizeDeps: {
       esbuildOptions: {
         loader: {
           '.js': 'jsx',
         },
+        target: 'es2015',
       },
     },
     define: {
@@ -24,7 +37,7 @@ export default defineConfig(({ mode }) => {
       outDir: 'build',
       emptyOutDir: true,
       sourcemap: true,
-      target: ['es2020', 'safari14'],
+      target: ['es2015', 'safari12'],
       chunkSizeWarningLimit: 1500,
       rollupOptions: {
         output: {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "https://rajputana-backend-matrimonial-7tmmtqu5u-test166.vercel.app").replace(/\/$/, "");
+const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "http://localhost:5000/").replace(/\/$/, "");
 const API_PREFIX = "/api/v1";
 
 export const apiClient = axios.create({

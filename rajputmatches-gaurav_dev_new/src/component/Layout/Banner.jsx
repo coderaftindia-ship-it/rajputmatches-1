@@ -55,7 +55,8 @@ function Banner() {
     } else if (userData?.gender === "Female" && formData.gender !== "Male") {
       setFormData((prev) => ({ ...prev, gender: "Male" }));
     }
-  }, [userData?.gender, setFormData, formData.gender]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userData?.gender]);
 
   // Populate countries on mount and default to India if empty
   useEffect(() => {

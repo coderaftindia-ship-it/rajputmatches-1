@@ -544,7 +544,8 @@ const SearchPage = () => {
     } else if (userData?.gender === "Female" && formData.gender !== "Male") {
       setFormData(prev => ({ ...prev, gender: "Male" }));
     }
-  }, [userData?.gender, setFormData, formData.gender]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userData?.gender]);
 
   /* ── Count active filters ── */
   const filterKeys = ["gender","minAge","maxAge","maritalStatus","clan","manglik","class","country","state","HeightFeetfrom","HeightFeetto"];

@@ -164,7 +164,7 @@ const HappyClients = () => {
     if (total === 0) return;
     const timer = setInterval(next, 4500);
     return () => clearInterval(timer);
-  }, [active, total]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [total]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Show 3 visible cards (center + sides)
   const getVisible = () => {

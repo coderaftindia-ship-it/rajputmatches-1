@@ -40,7 +40,7 @@ import { FaFacebook, FaInstagram, FaWhatsapp, FaTelegram } from "react-icons/fa"
 import "react-toastify/dist/ReactToastify.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "").replace(/\/$/, "");
+const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "http://localhost:5000/").replace(/\/$/, "");
 
 function FloatingSocial() {
   const [links, setLinks] = useState({

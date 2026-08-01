@@ -14,7 +14,7 @@ import {
   FaLinkedin,
 } from "react-icons/fa";
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "").replace(/\/$/, "");
+const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "http://localhost:5000/").replace(/\/$/, "");
 
 function Footer() {
   const { logout } = useAuth();
