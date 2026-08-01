@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { publicApi } from "../api/public.api";
-import { BASE_URL } from "../api";
+import { BASE_URL } from "../api/client";
 
 const SiteSettingsContext = createContext();
 
@@ -24,8 +24,9 @@ export const SiteSettingsProvider = ({ children }) => {
 
   const fetchSettings = async () => {
     try {
+      if (!publicApi || typeof publicApi.getSiteSettings !== "function") return;
       const res = await publicApi.getSiteSettings();
-      if (res.data && res.data.success && res.data.data) {
+      if (res?.data?.success && res?.data?.data) {
         const d = res.data.data;
         setSiteSettings({
           companyName: d.companyName || "Rajput Matches",

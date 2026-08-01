@@ -35,20 +35,26 @@ export const AuthProvider = ({ children }) => {
     class: "",
   });
 
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    typeof window !== "undefined" && !!localStorage.getItem("authToken")
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    try {
+      return typeof window !== "undefined" && !!localStorage.getItem("authToken");
+    } catch (e) {
+      return false;
+    }
+  });
   const [userData, setUserData] = useState();
   const [loading, setLoading] = useState(false);
 
   const setToken = (token) => {
-    localStorage.setItem("authToken", token);
+    try { localStorage.setItem("authToken", token); } catch (e) {}
   };
 
-  const getToken = () => localStorage.getItem("authToken");
+  const getToken = () => {
+    try { return localStorage.getItem("authToken"); } catch (e) { return null; }
+  };
 
   const removeToken = () => {
-    localStorage.removeItem("authToken");
+    try { localStorage.removeItem("authToken"); } catch (e) {}
   };
 
   const register = async (_route, data, navigate) => {
