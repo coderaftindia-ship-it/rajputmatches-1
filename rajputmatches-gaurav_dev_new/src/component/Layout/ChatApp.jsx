@@ -143,7 +143,8 @@ const ChatApp = () => {
 
   const loadChats = useCallback(async () => {
     try {
-      const token = localStorage.getItem("authToken");
+      let token = null;
+      try { token = localStorage.getItem("authToken"); } catch (e) {}
       if (!token) return;
       const list = await chatApi.listChats();
       setChats(list || []);

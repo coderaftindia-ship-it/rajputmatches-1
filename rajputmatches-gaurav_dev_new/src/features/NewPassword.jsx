@@ -62,7 +62,7 @@ function NewPassword() {
         return;
       }
 
-      localStorage.setItem("authToken", token);
+      try { localStorage.setItem("authToken", token); } catch (e) {}
 
       const response = await authApi.resetPassword({
         password: formData.password,
