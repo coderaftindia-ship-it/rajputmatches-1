@@ -235,22 +235,22 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* <Route
+         <Route
           path="search/view/images/:profileId"
           element={
             <ProtectedRoute>
               <ViewImages />
             </ProtectedRoute>
           }
-        /> */}
-        {/* <Route
+        /> 
+        <Route
           path="profile/view/images/:profileId"
           element={
             <ProtectedRoute>
               <ViewImages />
             </ProtectedRoute>
           }
-        />        */}
+        />        
       </Routes>
       <BottomNav />
     </AuthProvider>
