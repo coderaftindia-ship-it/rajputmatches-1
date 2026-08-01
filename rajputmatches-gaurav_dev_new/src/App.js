@@ -156,12 +156,13 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="home" element={<Home />} />
      <Route path="login" element={<Login />} />
-         <Route path="signup" element={<Register />} />
+         {/* <Route path="signup" element={<Register />} /> */}
+        <Route path="auth/emailverification" element={<Verification />} />
+
         {/* <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="set-new-password" element={<NewPassword />} />
-        <Route path="auth/emailverification" element={<Verification />} />
         <Route path="auth/otp-verify" element={<EmailOtpVerify />} />
-        <Route path="verify-email" element={<VerifyEmail />} />  */}
+        <Route path="verify-email" element={<VerifyEmail />} />   */}
 
         <Route path="about" element={<About />} />
        <Route path="stories" element={<Stories />} />
