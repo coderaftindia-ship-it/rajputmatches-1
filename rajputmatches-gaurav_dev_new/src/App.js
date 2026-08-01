@@ -184,7 +184,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path="search"
           element={
             <ProtectedRoute>
@@ -249,7 +249,7 @@ function App() {
               <ViewImages />
             </ProtectedRoute>
           }
-        />     
+        />      */}
       </Routes>
       <BottomNav />
     </AuthProvider>
