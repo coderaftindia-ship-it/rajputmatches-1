@@ -3,6 +3,8 @@ import { Country, State, City } from "country-state-city";
 import styles from "./Form.module.css";
 import { MdOutlineCancelPresentation } from "react-icons/md";
 
+const ALL_COUNTRIES = Country.getAllCountries();
+
 const ReligionForm = ({
   handleCancelClick,
   handleSaveClick,
@@ -10,20 +12,13 @@ const ReligionForm = ({
   handleInputChange,
   setFormData,
 }) => {
-  const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
-
-  // Fetch all countries on mount
-  useEffect(() => {
-    const allCountries = Country.getAllCountries();
-    setCountries(allCountries);
-  }, []);
 
   // Fetch states when a country is selected
   useEffect(() => {
     if (formData.birthCountry) {
-      const selectedCountry = countries.find(
+      const selectedCountry = ALL_COUNTRIES.find(
         (country) => country.name === formData.birthCountry
       );
 
@@ -35,12 +30,12 @@ const ReligionForm = ({
     } else {
       setStates([]);
     }
-  }, [formData.birthCountry, countries]);
+  }, [formData.birthCountry]);
 
   // Fetch cities when a state is selected
   useEffect(() => {
     if (formData.birthState) {
-      const selectedCountry = countries.find(
+      const selectedCountry = ALL_COUNTRIES.find(
         (country) => country.name === formData.birthCountry
       );
       const selectedState = states.find(
@@ -57,7 +52,7 @@ const ReligionForm = ({
     } else {
       setCities([]);
     }
-  }, [formData.birthState, countries, states]);
+  }, [formData.birthState, formData.birthCountry, states]);
 
   return (
     <div className={styles.modalContainer}>
@@ -166,18 +161,12 @@ const ReligionForm = ({
                   id="birthCountry"
                   name="birthCountry"
                   value={formData.birthCountry || ""}
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      birthCountry: e.target.value, // Store country name
-                      birthState: "",
-                      birthCity: "",
-                    });
-                  }}
+                  onChange={handleInputChange}
+                  required
                 >
-                  <option value="">Enter Country</option>
-                  {countries.map((country) => (
-                    <option key={country.isoCode} value={country.name}>
+                  <option value="">Select Country</option>
+                  {ALL_COUNTRIES.map((country) => (
+                    <option key={country.name} value={country.name}>
                       {country.name}
                     </option>
                   ))}

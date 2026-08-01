@@ -15,12 +15,13 @@ import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import royalPlaceBg from "../assets/images/royalplacebg.jpg";
 import "./Login.css";
 
+const ALL_COUNTRIES = Country.getAllCountries();
+
 function Register() {
   const { register, message, email } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
 
@@ -220,38 +221,42 @@ function Register() {
   };
 
   useEffect(() => {
-    setCountries(Country.getAllCountries());
-  }, []);
-
-  useEffect(() => {
     if (formData.country) {
-      const selectedCountry = countries.find(
-        (c) => c.name === formData.country
-      );
+      const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
       if (selectedCountry) {
         setStates(State.getStatesOfCountry(selectedCountry.isoCode));
+      } else {
+        setStates([]);
+        setCities([]);
       }
     } else {
       setStates([]);
       setCities([]);
     }
-  }, [formData.country, countries]);
+  }, [formData.country]);
 
   useEffect(() => {
-    if (formData.state) {
-      const selectedState = states.find((s) => s.name === formData.state);
-      if (selectedState) {
-        setCities(
-          City.getCitiesOfState(
-            selectedState.countryCode,
-            selectedState.isoCode
-          )
-        );
+    if (formData.state && formData.country) {
+      const selectedCountry = ALL_COUNTRIES.find((c) => c.name === formData.country);
+      if (selectedCountry) {
+        const selectedState = states.find((s) => s.name === formData.state);
+        if (selectedState) {
+          setCities(
+            City.getCitiesOfState(
+              selectedCountry.isoCode,
+              selectedState.isoCode
+            )
+          );
+        } else {
+          setCities([]);
+        }
+      } else {
+        setCities([]);
       }
     } else {
       setCities([]);
     }
-  }, [formData.state, states]);
+  }, [formData.state, formData.country, states]);
 
   useEffect(() => {
     // If email was verified via OTP page, prefill and mark as verified
@@ -548,7 +553,7 @@ function Register() {
                       className="royal-input no-icon"
                     >
                       <option value="">Select Country</option>
-                      {countries.map((country) => (
+                      {ALL_COUNTRIES.map((country) => (
                         <option key={country.name} value={country.name}>
                           {country.name}
                         </option>
