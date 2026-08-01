@@ -16,7 +16,7 @@ import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import royalPlaceBg from "../assets/images/royalplacebg.jpg";
 import "./Login.css";
 
-// Safe LocalStorage helper for iOS Safari Private Browsing mode
+// 1. Storage Wrapper - Guarantees 100% safety on iOS Safari Private Browsing mode
 const safeStorage = {
   getItem: (key) => {
     try {
@@ -34,7 +34,7 @@ const safeStorage = {
   },
 };
 
-// Safe getter for Country list outside component to prevent module re-evaluation call stack issues
+// 2. Safe Static Getter for Country Data outside component execution scope
 const getSafeCountries = () => {
   try {
     if (!Country || typeof Country.getAllCountries !== "function") return [];
@@ -76,7 +76,7 @@ function Register() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Memoized country list prevents re-triggering render loops
+  // Static country array memoized once
   const countries = useMemo(() => getSafeCountries(), []);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -106,16 +106,15 @@ function Register() {
   const [otpMessage, setOtpMessage] = useState("");
   const [resendDisabled, setResendDisabled] = useState(false);
 
-  // Track previous country and state to PREVENT re-fetching on every single keypress
+  // Refs prevent re-fetching location data on every single input keypress
   const prevCountryRef = useRef(formData.country);
   const prevStateRef = useRef(formData.state);
 
-  // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
-  // Sync initial state options for default country (e.g. India) once
+  // Populate initial state dropdown options once for default country ("India")
   useEffect(() => {
     if (formData.country && states.length === 0) {
       try {
@@ -128,7 +127,7 @@ function Register() {
     }
   }, [formData.country, countries, states.length]);
 
-  // Sync state options ONLY when country value actually changes
+  // Update states ONLY when selected country changes
   useEffect(() => {
     if (prevCountryRef.current !== formData.country) {
       prevCountryRef.current = formData.country;
@@ -150,7 +149,7 @@ function Register() {
     }
   }, [formData.country, countries]);
 
-  // Sync city options ONLY when state value actually changes (capped at 150 for mobile rendering)
+  // Update cities ONLY when selected state changes (capped at 150 for mobile WebKit rendering)
   useEffect(() => {
     if (prevStateRef.current !== formData.state) {
       prevStateRef.current = formData.state;
@@ -193,7 +192,7 @@ function Register() {
     } catch (e) {}
   }, [location?.search]);
 
-  // Input change handler (clean & non-blocking for mobile keyboards)
+  // Non-blocking input change handler
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -213,7 +212,6 @@ function Register() {
       ...(name === "state" ? { city: "" } : {}),
     }));
 
-    // Clear field error on change
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -303,7 +301,7 @@ function Register() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Submit Handler
+  // Form Submit Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (verify()) {
@@ -322,7 +320,7 @@ function Register() {
     }
   };
 
-  // OTP Handling
+  // OTP Request Handler
   const sendOtp = async () => {
     setOtpMessage("");
     if (!formData.email) {
@@ -352,6 +350,7 @@ function Register() {
     }
   };
 
+  // OTP Verification Handler
   const verifyOtpHandler = async () => {
     setOtpMessage("");
     if (!otp || otp.length !== 6) {
@@ -383,8 +382,20 @@ function Register() {
 
   return (
     <>
-      {/* <Profilenavbar /> */}
-      
+      <Profilenavbar />
+      <div 
+        className="royal-auth-container"
+        style={
+          isVerified
+            ? {
+                backgroundImage: `url(${royalPlaceBg})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }
+            : {}
+        }
+      >
         <div className="royal-auth-overlay"></div>
         <div className="royal-auth-card wide">
           <button 
@@ -711,7 +722,7 @@ function Register() {
             </p>
           </div>
         </div>
-      
+      </div>
     </>
   );
 }
