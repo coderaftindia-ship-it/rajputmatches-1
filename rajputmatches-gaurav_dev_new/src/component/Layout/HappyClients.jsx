@@ -129,12 +129,14 @@ const HappyClients = () => {
 
     if (typeof window !== "undefined" && window.location) {
       const origin = window.location.origin;
-      if (origin && !origin.includes("localhost") && (base.includes("localhost") || !base)) {
+      if (origin.includes("localhost") || origin.includes("127.0.0.1") || /^http:\/\/\d+\.\d+\.\d+\.\d+/.test(origin)) {
         base = origin.replace(/:\d+$/, ":5000");
+      } else if (origin.startsWith("http://") || origin.startsWith("https://")) {
+        base = origin;
       }
     }
 
-    return `${base || "http://localhost:5000"}${formattedPath}`;
+    return `${base || ""}${formattedPath}`;
   };
 
   useEffect(() => {

@@ -20,8 +20,16 @@ export const SiteSettingsProvider = ({ children }) => {
     }
     const cleanPath = logoPath.replace(/\\/g, "/");
     const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
-    const cleanBase = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
-    return `${cleanBase}${formattedPath}`;
+    let base = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
+    if (typeof window !== "undefined" && window.location) {
+      const origin = window.location.origin;
+      if (origin.includes("localhost") || origin.includes("127.0.0.1") || /^http:\/\/\d+\.\d+\.\d+\.\d+/.test(origin)) {
+        base = origin.replace(/:\d+$/, ":5000");
+      } else if (origin.startsWith("http://") || origin.startsWith("https://")) {
+        base = origin;
+      }
+    }
+    return `${base || ""}${formattedPath}`;
   };
 
   useEffect(() => {
