@@ -214,8 +214,6 @@ function RecentAddedPage() {
               ))}
             </div>
 
-            {profile.additionalInfo && <p className={RecentAddedPageCss.quoteText}>"{profile.additionalInfo}"</p>}
-
             {/* Action Buttons */}
             <div className={RecentAddedPageCss.actionsRow}>
               {isHomePage ? (

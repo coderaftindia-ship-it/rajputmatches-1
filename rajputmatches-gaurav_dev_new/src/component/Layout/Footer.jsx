@@ -74,7 +74,7 @@ function Footer() {
                   lineHeight: "1.1",
                   textTransform: "uppercase"
                 }}>
-                  {siteSettings.companyName || "Rajput Matches"}
+                  {siteSettings.companyName || "Rajput Alliances"}
                 </span>
                 <span style={{
                   fontSize: "0.7rem",
@@ -89,7 +89,7 @@ function Footer() {
               </div>
             </Link>
             <p className="mb-4" style={{ color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.8" }}>
-              Rajput Matches is your gateway to a premier, privacy-focused
+              Rajput Alliances is your gateway to a premier, privacy-focused
               matrimonial network for Rajputs seeking serious and secure
               connections. With an exclusive selection of elite profiles, we
               offer a tailored experience for those who value heritage,
@@ -134,9 +134,9 @@ function Footer() {
               <li>
                 <Link to="/login" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Login</Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/signup" onClick={logout} className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Signup</Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -158,7 +158,7 @@ function Footer() {
         
         <div className="text-center pb-3">
           <p className="mb-0" style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "0.9rem" }}>
-            {siteSettings.copyrightText || "© 2025-26 Rajput Matches Matrimony. All Rights Reserved."}
+            {siteSettings.copyrightText || "© 2025-26 Rajput Alliances Matrimony. All Rights Reserved."}
           </p>
         </div>
       </div>

@@ -504,6 +504,7 @@ router.post("/signup", signup);
 router.post("/register", signup);
 router.post("/login", login);
 router.post("/forgot-password", forgotPassword);
+router.post("/password/forgot", forgotPassword);
 router.post("/send-verification-otp", sendVerification);
 router.post("/email/send-verification", sendVerification);
 router.post("/email/verify-otp", emailVerifyOtp);
@@ -511,6 +512,7 @@ router.post("/verify-otp", verifyOtp);
 // verify-otp
 
 router.post("/reset-password", isAuth, resetPassword);
+router.post("/password/reset", isAuth, resetPassword);
 router.get("/user", isAuth, getuserData);
 router.put("/update-profile", isAuth, updateBasicdetails);
 

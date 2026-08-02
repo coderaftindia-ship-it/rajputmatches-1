@@ -32,7 +32,7 @@ const aboutUsSchema = new mongoose.Schema(
     // Story Cards Section
     card1Text: {
       type: String,
-      default: "Welcome to Rajput Matches, the premier matrimonial platform designed exclusively for the Rajput community. Our mission is to bring together Rajput families from across the globe and help them build meaningful connections rooted in shared values, traditions, and cultural heritage."
+      default: "Welcome to Rajput Alliances, the premier matrimonial platform designed exclusively for the Rajput community. Our mission is to bring together Rajput families from across the globe and help them build meaningful connections rooted in shared values, traditions, and cultural heritage."
     },
     card1Image: {
       type: String,
@@ -40,7 +40,7 @@ const aboutUsSchema = new mongoose.Schema(
     },
     card2Text: {
       type: String,
-      default: "At Rajput Matches, we understand the importance of preserving Rajput pride and customs, which is why we’ve created a trusted platform tailored specifically to your community's unique needs."
+      default: "At Rajput Alliances, we understand the importance of preserving Rajput pride and customs, which is why we’ve created a trusted platform tailored specifically to your community's unique needs."
     },
     card2Image: {
       type: String,
@@ -60,7 +60,7 @@ const aboutUsSchema = new mongoose.Schema(
     },
     legacyParagraph1: {
       type: String,
-      default: "The Rajput community has a long-standing legacy of honor, pride, and cultural richness. At Rajput Matches, we aim to reflect these values by fostering a trustworthy environment where families can come together to find the perfect match."
+      default: "The Rajput community has a long-standing legacy of honor, pride, and cultural richness. At Rajput Alliances, we aim to reflect these values by fostering a trustworthy environment where families can come together to find the perfect match."
     },
     legacyParagraph2: {
       type: String,
@@ -78,7 +78,7 @@ const aboutUsSchema = new mongoose.Schema(
     // Why Choose Section
     whyChooseHeading: {
       type: String,
-      default: "Why Choose Rajput Matches?"
+      default: "Why Choose Rajput Alliances?"
     },
     whyChooseImage: {
       type: String,
@@ -117,7 +117,7 @@ const aboutUsSchema = new mongoose.Schema(
     },
     vvipDescription: {
       type: String,
-      default: "Join Rajput Matches and embark on a journey to find your perfect partner within a community that respects your legacy and honors your privacy. Let us guide you in finding a partner who complements your values, lifestyle, and heritage."
+      default: "Join Rajput Alliances and embark on a journey to find your perfect partner within a community that respects your legacy and honors your privacy. Let us guide you in finding a partner who complements your values, lifestyle, and heritage."
     },
     vvipButtonText: {
       type: String,

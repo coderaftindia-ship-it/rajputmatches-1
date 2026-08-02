@@ -31,7 +31,7 @@ const LandingPage = () => {
 
           <p className={styles.paragraph}>
             Our platform is designed with privacy and tradition in mind. At
-            Rajput Matches, we go beyond typical matchmaking providing a secure
+            Rajput Alliances, we go beyond typical matchmaking providing a secure
             and curated space for you to find a partner who respects and values
             your heritage. Join a trusted network where each profile is
             verified, each connection meaningful, and each match has the

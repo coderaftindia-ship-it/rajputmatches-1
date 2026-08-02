@@ -1645,7 +1645,7 @@ const ViewPage = () => {
                 {Data?.isVerified && (
                   <span className={styles.footerBadge}>Profile Verification: Verified Member</span>
                 )}
-                <span className={styles.footerBadge}>Rajput matches platform</span>
+                <span className={styles.footerBadge}>Rajput Alliances platform</span>
               </div>
             </div>
           </div>

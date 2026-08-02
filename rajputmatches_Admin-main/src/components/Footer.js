@@ -10,7 +10,7 @@ const Footer = () => (
         fontFamily: 'Playfair Display, serif'
     }}>
         <p style={{ margin: 0, fontSize: '0.9rem' }}>
-            © 2024 Rajput Matches. All Rights Reserved.
+            © 2024 Rajput Alliances. All Rights Reserved.
         </p>
         <p style={{ margin: '5px 0 0 0', fontSize: '0.8rem', opacity: 0.8 }}>
             Admin Panel - Royal Wedding Theme

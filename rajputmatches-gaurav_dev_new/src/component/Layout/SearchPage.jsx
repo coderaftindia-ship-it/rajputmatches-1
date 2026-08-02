@@ -101,8 +101,20 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
   const { updateData } = useAuth();
   const navigate = useNavigate();
 
+  // ── Local optimistic connection status ──
+  const [connStatus, setConnStatus] = useState(profile?.connectionStatus || null);
+  useEffect(() => { setConnStatus(profile?.connectionStatus || null); }, [profile?._id, profile?.connectionStatus]);
+
+  // ── Local optimistic photo request status ──
+  const [photoReqStatus, setPhotoReqStatus] = useState(profile?.photoRequestStatus || null);
+  useEffect(() => { setPhotoReqStatus(profile?.photoRequestStatus || null); }, [profile?._id, profile?.photoRequestStatus]);
+
+  // ── Local optimistic shortlist state ──
+  const [isShortlisted, setIsShortlisted] = useState(!!profile?.isShortlisted);
+  useEffect(() => { setIsShortlisted(!!profile?.isShortlisted); }, [profile?._id, profile?.isShortlisted]);
+
   const getImg = () => {
-    if (profile?.filesId?.isPrivate && profile?.photoRequestStatus !== "accepted") return pro;
+    if (profile?.filesId?.isPrivate && photoReqStatus !== "accepted") return pro;
     if (profile?.filesId?.photos?.length > 0) return profile.filesId.photos[0].url;
     const url = profile?.imageUrl;
     const isDefault = !url || 
@@ -151,18 +163,6 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
     { label:"Occupation",      icon:<FaBriefcase />,       value: profile?.familydetailsId?.occupation || profile?.profdetailsId?.occupation },
     { label:"Class",           icon:<FaUserTie />,         value: profile?.profdetailsId?.class },
   ];
-
-  // ── Local optimistic connection status ──
-  const [connStatus, setConnStatus] = useState(profile?.connectionStatus || null);
-  useEffect(() => { setConnStatus(profile?.connectionStatus || null); }, [profile?._id, profile?.connectionStatus]);
-
-  // ── Local optimistic photo request status ──
-  const [photoReqStatus, setPhotoReqStatus] = useState(profile?.photoRequestStatus || null);
-  useEffect(() => { setPhotoReqStatus(profile?.photoRequestStatus || null); }, [profile?._id, profile?.photoRequestStatus]);
-
-  // ── Local optimistic shortlist state ──
-  const [isShortlisted, setIsShortlisted] = useState(!!profile?.isShortlisted);
-  useEffect(() => { setIsShortlisted(!!profile?.isShortlisted); }, [profile?._id, profile?.isShortlisted]);
 
   const handleShortlist = async (id) => {
     setIsShortlisted(prev => !prev);   // instant toggle
@@ -332,7 +332,6 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
             </div>
           ))}
         </div>
-        {profile?.additionalInfo && <p className={styles.quoteText}>"{profile.additionalInfo}"</p>}
         <div className={styles.actionsRow}>
           <button
             className={styles.viewButton}

@@ -6,10 +6,10 @@ const SiteSettingsContext = createContext();
 
 export const SiteSettingsProvider = ({ children }) => {
   const [siteSettings, setSiteSettings] = useState({
-    companyName: "Rajput Matches",
+    companyName: "Rajput Alliances",
     tagline: "Royal Matrimonial",
     logo: "",
-    copyrightText: "© 2025-26 Rajput Matches Matrimony. All Rights Reserved.",
+    copyrightText: "© 2025-26 Rajput Alliances Matrimony. All Rights Reserved.",
   });
 
   const getLogoUrl = (logoPath) => {
@@ -34,10 +34,10 @@ export const SiteSettingsProvider = ({ children }) => {
       if (res?.data?.success && res?.data?.data) {
         const d = res.data.data;
         setSiteSettings({
-          companyName: d.companyName || "Rajput Matches",
+          companyName: d.companyName || "Rajput Alliances",
           tagline: d.tagline || "Royal Matrimonial",
           logo: d.logo ? getLogoUrl(d.logo) : "",
-          copyrightText: d.copyrightText || "© 2025-26 Rajput Matches Matrimony. All Rights Reserved.",
+          copyrightText: d.copyrightText || "© 2025-26 Rajput Alliances Matrimony. All Rights Reserved.",
         });
       }
     } catch (err) {
@@ -57,10 +57,10 @@ export const useSiteSettings = () => {
   if (!context) {
     return {
       siteSettings: {
-        companyName: "Rajput Matches",
+        companyName: "Rajput Alliances",
         tagline: "Royal Matrimonial",
         logo: "",
-        copyrightText: "© 2025-26 Rajput Matches Matrimony. All Rights Reserved.",
+        copyrightText: "© 2025-26 Rajput Alliances Matrimony. All Rights Reserved.",
       },
       fetchSettings: () => {},
     };

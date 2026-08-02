@@ -76,18 +76,18 @@ function About() {
 
   const storyData = [
     {
-      text: aboutData?.card1Text || "Welcome to Rajput Matches, the premier matrimonial platform designed exclusively for the Rajput community. Our mission is to bring together Rajput families from across the globe and help them build meaningful connections rooted in shared values, traditions, and cultural heritage.",
+      text: aboutData?.card1Text || "Welcome to Rajput Alliances, the premier matrimonial platform designed exclusively for the Rajput community. Our mission is to bring together Rajput families from across the globe and help them build meaningful connections rooted in shared values, traditions, and cultural heritage.",
       imageSrc: resolveImage(aboutData?.card1Image, imageAbout),
     },
     {
-      text: aboutData?.card2Text || "At Rajput Matches, we understand the importance of preserving Rajput pride and customs, which is why we’ve created a trusted platform tailored specifically to your community's unique needs.",
+      text: aboutData?.card2Text || "At Rajput Alliances, we understand the importance of preserving Rajput pride and customs, which is why we’ve created a trusted platform tailored specifically to your community's unique needs.",
       imageSrc: resolveImage(aboutData?.card2Image, imageAbout2),
     },
   ];
 
   const vvipData = {
     title: aboutData?.vvipTitle || "Start Your Journey to a Royal Match Today",
-    description: aboutData?.vvipDescription || "Join Rajput Matches and embark on a journey to find your perfect partner within a community that respects your legacy and honors your privacy. Let us guide you in finding a partner who complements your values, lifestyle, and heritage.",
+    description: aboutData?.vvipDescription || "Join Rajput Alliances and embark on a journey to find your perfect partner within a community that respects your legacy and honors your privacy. Let us guide you in finding a partner who complements your values, lifestyle, and heritage.",
     buttonText: aboutData?.vvipButtonText || "Join the Rajput Legacy",
   };
 
@@ -95,12 +95,12 @@ function About() {
   const rightImage = resolveImage(aboutData?.legacyRightImage, royalimg);
   const title = aboutData?.legacyTitle || "Our Legacy of Trust and Tradition";
   const paragraphs = [
-    aboutData?.legacyParagraph1 || "The Rajput community has a long-standing legacy of honor, pride, and cultural richness. At Rajput Matches, we aim to reflect these values by fostering a trustworthy environment where families can come together to find the perfect match.",
+    aboutData?.legacyParagraph1 || "The Rajput community has a long-standing legacy of honor, pride, and cultural richness. At Rajput Alliances, we aim to reflect these values by fostering a trustworthy environment where families can come together to find the perfect match.",
     aboutData?.legacyParagraph2 || "We believe that marriage is not just a union of two individuals but a bond between two families. With this philosophy, we ensure that every match we facilitate is built on shared respect and understanding.",
   ];
 
   const imageSrc = resolveImage(aboutData?.whyChooseImage, royalimg2);
-  const heading = aboutData?.whyChooseHeading || "Why Choose Rajput Matches?";
+  const heading = aboutData?.whyChooseHeading || "Why Choose Rajput Alliances?";
 
   const features = aboutData?.whyChooseFeatures?.length > 0
     ? aboutData.whyChooseFeatures

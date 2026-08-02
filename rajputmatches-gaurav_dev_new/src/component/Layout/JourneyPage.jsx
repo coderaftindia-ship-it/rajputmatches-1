@@ -61,7 +61,7 @@ const JourneyPage = () => {
               Start Your Journey to a Royal Match Today
             </h2>
             <p className="lead mb-4" style={{ color: "#444" }}>
-              Join Rajput Matches and embark on a journey to find your perfect partner within a community that respects your legacy and honors your privacy.
+              Join Rajput Alliances and embark on a journey to find your perfect partner within a community that respects your legacy and honors your privacy.
             </p>
             <Link to="/login">
               <button className="royal-button px-5 py-3 fs-5 shadow-lg">

@@ -124,7 +124,7 @@ function Settings() {
                 <h3>Profile Visibility</h3>
               </div>
               <p className={styles.cardDesc}>
-                Control who can view your profile on Rajput Matches. When hidden, you will not appear in searches.
+                Control who can view your profile on Rajput Alliances. When hidden, you will not appear in searches.
               </p>
               <div className={styles.switchWrapper}>
                 <span className={styles.statusLabel}>

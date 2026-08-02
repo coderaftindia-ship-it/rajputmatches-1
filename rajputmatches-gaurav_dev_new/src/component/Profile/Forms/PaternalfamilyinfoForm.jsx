@@ -131,285 +131,316 @@ function PaternalfamilyinfoForm({
 
             <label className="mt-3">All BadePapa</label>
             <div className="mt-2 p-3" style={{ backgroundColor: "wheat" }}>
-              {formData.badePapa?.map((item, index) => (
-                <div key={index} className="row">
-                  <div className="col-md-4">
-                    <label htmlFor={`name-${index}`}>BadePapa</label>
-                    <input
-                      type="text"
-                      id={`name-${index}`}
-                      name="name"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="name"
-                      value={item.name || ""}
-                      onChange={(e) => handleInputChange(e, index, "badePapa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`marriedto-${index}`}>Married To</label>
-                    <input
-                      type="text"
-                      id={`marriedto-${index}`}
-                      name="marriedto"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="marriedto"
-                      value={item.marriedto || ""}
-                      onChange={(e) => handleInputChange(e, index, "badePapa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`daughterof-${index}`}>Daughter Of</label>
-                    <input
-                      type="text"
-                      id={`daughterof-${index}`}
-                      name="daughterof"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="daughterof"
-                      value={item.daughterof || ""}
-                      onChange={(e) => handleInputChange(e, index, "badePapa")}
-                    />
-                  </div>
-                  <div className="col-md-4 mb-2">
-                    <label htmlFor={`thikana-${index}`}>Thikana</label>
-                    <input
-                      type="text"
-                      id={`thikana-${index}`}
-                      name="thikana"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="thikana"
-                      value={item.thikana || ""}
-                      onChange={(e) => handleInputChange(e, index, "badePapa")}
-                    />
-                  </div>
-                  <hr />
-
+              {!formData.badePapa || formData.badePapa.length === 0 ? (
+                <div className="row">
                   <div className="col-12 text-end">
-                    {/* Show Add button only for the last row */}
-                    {index === formData.badePapa.length - 1 && (
-                      <span
-                        className="custom-add text-danger"
-                        onClick={() => handleAddRow("badePapa")}
-                        style={{
-                          cursor: "pointer",
-                          marginRight: "10px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        + ADD
-                      </span>
-                    )}
-
-                    {/* Show Remove button for all rows except the first one */}
-                    {index > 0 && (
-                      <span
-                        className="custom-remove text-danger"
-                        onClick={() => handleRemoveRow(index, "badePapa")}
-                        style={{ cursor: "pointer", fontWeight: "600" }}
-                      >
-                        - REMOVE
-                      </span>
-                    )}
+                    <span
+                      className="custom-add text-danger"
+                      onClick={() => handleAddRow("badePapa")}
+                      style={{ cursor: "pointer", fontWeight: "600" }}
+                    >
+                      + ADD
+                    </span>
                   </div>
                 </div>
-              ))}
+              ) : (
+                formData.badePapa?.map((item, index) => (
+                  <div key={index} className="row">
+                    <div className="col-md-4">
+                      <label htmlFor={`name-${index}`}>BadePapa</label>
+                      <input
+                        type="text"
+                        id={`name-${index}`}
+                        name="name"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="name"
+                        value={item.name || ""}
+                        onChange={(e) => handleInputChange(e, index, "badePapa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`marriedto-${index}`}>Married To</label>
+                      <input
+                        type="text"
+                        id={`marriedto-${index}`}
+                        name="marriedto"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="marriedto"
+                        value={item.marriedto || ""}
+                        onChange={(e) => handleInputChange(e, index, "badePapa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`daughterof-${index}`}>Daughter Of</label>
+                      <input
+                        type="text"
+                        id={`daughterof-${index}`}
+                        name="daughterof"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="daughterof"
+                        value={item.daughterof || ""}
+                        onChange={(e) => handleInputChange(e, index, "badePapa")}
+                      />
+                    </div>
+                    <div className="col-md-4 mb-2">
+                      <label htmlFor={`thikana-${index}`}>Thikana</label>
+                      <input
+                        type="text"
+                        id={`thikana-${index}`}
+                        name="thikana"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="thikana"
+                        value={item.thikana || ""}
+                        onChange={(e) => handleInputChange(e, index, "badePapa")}
+                      />
+                    </div>
+                    <hr />
+
+                    <div className="col-12 text-end">
+                      {/* Show Add button only for the last row */}
+                      {index === formData.badePapa.length - 1 && (
+                        <span
+                          className="custom-add text-danger"
+                          onClick={() => handleAddRow("badePapa")}
+                          style={{
+                            cursor: "pointer",
+                            marginRight: "10px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          + ADD
+                        </span>
+                      )}
+
+                      {/* Show Remove button for all rows except the first one */}
+                      {index > 0 && (
+                        <span
+                          className="custom-remove text-danger"
+                          onClick={() => handleRemoveRow(index, "badePapa")}
+                          style={{ cursor: "pointer", fontWeight: "600" }}
+                        >
+                          - REMOVE
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             <label>All Kakosa</label>
             <div className="mt-2 p-3" style={{ backgroundColor: "wheat" }}>
-              {formData.kakosa?.map((item, index) => (
-                <div key={index} className="row">
-                  <div className="col-md-4">
-                    <label htmlFor={`kakosa-name-${index}`}>Kakosa</label>
-                    <input
-                      type="text"
-                      id={`kakosa-name-${index}`}
-                      name="name"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="name"
-                      value={item.name || ""}
-                      onChange={(e) => handleInputChange(e, index, "kakosa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`kakosa-marriedto-${index}`}>
-                      Married To
-                    </label>
-                    <input
-                      type="text"
-                      id={`kakosa-marriedto-${index}`}
-                      name="marriedto"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="marriedto"
-                      value={item.marriedto || ""}
-                      onChange={(e) => handleInputChange(e, index, "kakosa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`kakosa-daughterof-${index}`}>
-                      Daughter Of
-                    </label>
-                    <input
-                      type="text"
-                      id={`kakosa-daughterof-${index}`}
-                      name="daughterof"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="daughterof"
-                      value={item.daughterof || ""}
-                      onChange={(e) => handleInputChange(e, index, "kakosa")}
-                    />
-                  </div>
-                  <div className="col-md-4 mb-2">
-                    <label htmlFor={`kakosa-thikana-${index}`}>Thikana</label>
-                    <input
-                      type="text"
-                      id={`kakosa-thikana-${index}`}
-                      name="thikana"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="thikana"
-                      value={item.thikana || ""}
-                      onChange={(e) => handleInputChange(e, index, "kakosa")}
-                    />
-                  </div>
-                  <hr />
+              {!formData.kakosa || formData.kakosa.length === 0 ? (
+                <div className="row">
                   <div className="col-12 text-end">
-                    {/* Show Add button only for the last row */}
-                    {index === formData.kakosa.length - 1 && (
-                      <span
-                        className="custom-add text-danger"
-                        onClick={() => handleAddRow("kakosa")}
-                        style={{
-                          cursor: "pointer",
-                          marginRight: "10px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        + ADD
-                      </span>
-                    )}
-
-                    {/* Show Remove button for all rows except the first one */}
-                    {index > 0 && (
-                      <span
-                        className="custom-remove text-danger"
-                        onClick={() => handleRemoveRow(index, "kakosa")}
-                        style={{ cursor: "pointer", fontWeight: "600" }}
-                      >
-                        - REMOVE
-                      </span>
-                    )}
+                    <span
+                      className="custom-add text-danger"
+                      onClick={() => handleAddRow("kakosa")}
+                      style={{ cursor: "pointer", fontWeight: "600" }}
+                    >
+                      + ADD
+                    </span>
                   </div>
                 </div>
-              ))}
-              {/* <div className="row">
-                <div className="col-12 text-end text-danger">
-                  <span
-                    className="custom-add"
-                    onClick={() => handleAddRow("kakosa")}
-                    style={{ cursor: "pointer" }}
-                  >
-                    + ADD
-                  </span>
-                </div>
-              </div> */}
+              ) : (
+                formData.kakosa?.map((item, index) => (
+                  <div key={index} className="row">
+                    <div className="col-md-4">
+                      <label htmlFor={`kakosa-name-${index}`}>Kakosa</label>
+                      <input
+                        type="text"
+                        id={`kakosa-name-${index}`}
+                        name="name"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="name"
+                        value={item.name || ""}
+                        onChange={(e) => handleInputChange(e, index, "kakosa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`kakosa-marriedto-${index}`}>
+                        Married To
+                      </label>
+                      <input
+                        type="text"
+                        id={`kakosa-marriedto-${index}`}
+                        name="marriedto"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="marriedto"
+                        value={item.marriedto || ""}
+                        onChange={(e) => handleInputChange(e, index, "kakosa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`kakosa-daughterof-${index}`}>
+                        Daughter Of
+                      </label>
+                      <input
+                        type="text"
+                        id={`kakosa-daughterof-${index}`}
+                        name="daughterof"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="daughterof"
+                        value={item.daughterof || ""}
+                        onChange={(e) => handleInputChange(e, index, "kakosa")}
+                      />
+                    </div>
+                    <div className="col-md-4 mb-2">
+                      <label htmlFor={`kakosa-thikana-${index}`}>Thikana</label>
+                      <input
+                        type="text"
+                        id={`kakosa-thikana-${index}`}
+                        name="thikana"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="thikana"
+                        value={item.thikana || ""}
+                        onChange={(e) => handleInputChange(e, index, "kakosa")}
+                      />
+                    </div>
+                    <hr />
+                    <div className="col-12 text-end">
+                      {/* Show Add button only for the last row */}
+                      {index === formData.kakosa.length - 1 && (
+                        <span
+                          className="custom-add text-danger"
+                          onClick={() => handleAddRow("kakosa")}
+                          style={{
+                            cursor: "pointer",
+                            marginRight: "10px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          + ADD
+                        </span>
+                      )}
+
+                      {/* Show Remove button for all rows except the first one */}
+                      {index > 0 && (
+                        <span
+                          className="custom-remove text-danger"
+                          onClick={() => handleRemoveRow(index, "kakosa")}
+                          style={{ cursor: "pointer", fontWeight: "600" }}
+                        >
+                          - REMOVE
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             <label>All Bhuasa</label>
             <div className="mt-2 p-3" style={{ backgroundColor: "wheat" }}>
-              {formData.bhuasa?.map((item, index) => (
-                <div key={index} className="row">
-                  <div className="col-md-4">
-                    <label htmlFor={`bhuasa-name-${index}`}>Bhuasa</label>
-                    <input
-                      type="text"
-                      id={`bhuasa-name-${index}`}
-                      name="name"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="name"
-                      value={item.name || ""}
-                      onChange={(e) => handleInputChange(e, index, "bhuasa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`kakosa-marriedto-${index}`}>
-                      Married To
-                    </label>
-                    <input
-                      type="text"
-                      id={`bhuasa-marriedto-${index}`}
-                      name="marriedto"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="marriedto"
-                      value={item.marriedto || ""}
-                      onChange={(e) => handleInputChange(e, index, "bhuasa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`bhuasa-daughterof-${index}`}>son of</label>
-                    <input
-                      type="text"
-                      id={`bhuasa-sonof-${index}`}
-                      name="sonof"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="sonof"
-                      value={item.sonof || ""}
-                      onChange={(e) => handleInputChange(e, index, "bhuasa")}
-                    />
-                  </div>
-                  <div className="col-md-4 mb-2">
-                    <label htmlFor={`bhuasa-thikana-${index}`}>Thikana</label>
-                    <input
-                      type="text"
-                      id={`bhuasa-thikana-${index}`}
-                      name="thikana"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="thikana"
-                      value={item.thikana || ""}
-                      onChange={(e) => handleInputChange(e, index, "bhuasa")}
-                    />
-                  </div>
-                  <hr />
-
+              {!formData.bhuasa || formData.bhuasa.length === 0 ? (
+                <div className="row">
                   <div className="col-12 text-end">
-                    {/* Show Add button only for the last row */}
-                    {index === formData.bhuasa.length - 1 && (
-                      <span
-                        className="custom-add text-danger"
-                        onClick={() => handleAddRow("bhuasa")}
-                        style={{
-                          cursor: "pointer",
-                          marginRight: "10px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        + ADD
-                      </span>
-                    )}
-
-                    {/* Show Remove button for all rows except the first one */}
-                    {index > 0 && (
-                      <span
-                        className="custom-remove text-danger"
-                        onClick={() => handleRemoveRow(index, "bhuasa")}
-                        style={{ cursor: "pointer", fontWeight: "600" }}
-                      >
-                        - REMOVE
-                      </span>
-                    )}
+                    <span
+                      className="custom-add text-danger"
+                      onClick={() => handleAddRow("bhuasa")}
+                      style={{ cursor: "pointer", fontWeight: "600" }}
+                    >
+                      + ADD
+                    </span>
                   </div>
                 </div>
-              ))}
+              ) : (
+                formData.bhuasa?.map((item, index) => (
+                  <div key={index} className="row">
+                    <div className="col-md-4">
+                      <label htmlFor={`bhuasa-name-${index}`}>Bhuasa</label>
+                      <input
+                        type="text"
+                        id={`bhuasa-name-${index}`}
+                        name="name"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="name"
+                        value={item.name || ""}
+                        onChange={(e) => handleInputChange(e, index, "bhuasa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`kakosa-marriedto-${index}`}>
+                        Married To
+                      </label>
+                      <input
+                        type="text"
+                        id={`bhuasa-marriedto-${index}`}
+                        name="marriedto"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="marriedto"
+                        value={item.marriedto || ""}
+                        onChange={(e) => handleInputChange(e, index, "bhuasa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`bhuasa-daughterof-${index}`}>son of</label>
+                      <input
+                        type="text"
+                        id={`bhuasa-sonof-${index}`}
+                        name="sonof"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="sonof"
+                        value={item.sonof || ""}
+                        onChange={(e) => handleInputChange(e, index, "bhuasa")}
+                      />
+                    </div>
+                    <div className="col-md-4 mb-2">
+                      <label htmlFor={`bhuasa-thikana-${index}`}>Thikana</label>
+                      <input
+                        type="text"
+                        id={`bhuasa-thikana-${index}`}
+                        name="thikana"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="thikana"
+                        value={item.thikana || ""}
+                        onChange={(e) => handleInputChange(e, index, "bhuasa")}
+                      />
+                    </div>
+                    <hr />
+
+                    <div className="col-12 text-end">
+                      {/* Show Add button only for the last row */}
+                      {index === formData.bhuasa.length - 1 && (
+                        <span
+                          className="custom-add text-danger"
+                          onClick={() => handleAddRow("bhuasa")}
+                          style={{
+                            cursor: "pointer",
+                            marginRight: "10px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          + ADD
+                        </span>
+                      )}
+
+                      {/* Show Remove button for all rows except the first one */}
+                      {index > 0 && (
+                        <span
+                          className="custom-remove text-danger"
+                          onClick={() => handleRemoveRow(index, "bhuasa")}
+                          style={{ cursor: "pointer", fontWeight: "600" }}
+                        >
+                          - REMOVE
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             <div className="row mb-3">
@@ -539,184 +570,212 @@ function PaternalfamilyinfoForm({
 
             <label>All Mamosa</label>
             <div className="mt-2 p-3" style={{ backgroundColor: "wheat" }}>
-              {formData.mamosa?.map((item, index) => (
-                <div key={index} className="row">
-                  <div className="col-md-4">
-                    <label htmlFor={`mamosa-name-${index}`}>Mamosa</label>
-                    <input
-                      type="text"
-                      id={`mamosa-name-${index}`}
-                      name="name"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="name"
-                      value={item.name || ""}
-                      onChange={(e) => handleInputChange(e, index, "mamosa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`mamosa-marriedto-${index}`}>
-                      Married To
-                    </label>
-                    <input
-                      type="text"
-                      id={`mamosa-marriedto-${index}`}
-                      name="marriedto"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="marriedto"
-                      value={item.marriedto || ""}
-                      onChange={(e) => handleInputChange(e, index, "mamosa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`mamosa-daughterof-${index}`}>
-                      Daughter Of
-                    </label>
-                    <input
-                      type="text"
-                      id={`mamosa-daughterof-${index}`}
-                      name="daughterof"
-                      className="form-control rounded-0"
-                      placeholder="Mj. Thakur"
-                      aria-label="daughterof"
-                      value={item.daughterof || ""}
-                      onChange={(e) => handleInputChange(e, index, "mamosa")}
-                    />
-                  </div>
-                  <div className="col-md-4 mb-2">
-                    <label htmlFor={`mamosa-thikana-${index}`}>Thikana</label>
-                    <input
-                      type="text"
-                      id={`mamosa-thikana-${index}`}
-                      name="thikana"
-                      className="form-control rounded-0"
-                      placeholder="City"
-                      aria-label="thikana"
-                      value={item.thikana || ""}
-                      onChange={(e) => handleInputChange(e, index, "mamosa")}
-                    />
-                  </div>
-                  <hr />
+              {!formData.mamosa || formData.mamosa.length === 0 ? (
+                <div className="row">
                   <div className="col-12 text-end">
-                    {/* Show Add button only for the last row */}
-                    {index === formData.mamosa.length - 1 && (
-                      <span
-                        className="custom-add text-danger"
-                        onClick={() => handleAddRow("mamosa")}
-                        style={{
-                          cursor: "pointer",
-                          marginRight: "10px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        + ADD
-                      </span>
-                    )}
-
-                    {/* Show Remove button for all rows except the first one */}
-                    {index > 0 && (
-                      <span
-                        className="custom-remove text-danger"
-                        onClick={() => handleRemoveRow(index, "mamosa")}
-                        style={{ cursor: "pointer", fontWeight: "600" }}
-                      >
-                        - REMOVE
-                      </span>
-                    )}
+                    <span
+                      className="custom-add text-danger"
+                      onClick={() => handleAddRow("mamosa")}
+                      style={{ cursor: "pointer", fontWeight: "600" }}
+                    >
+                      + ADD
+                    </span>
                   </div>
                 </div>
-              ))}
+              ) : (
+                formData.mamosa?.map((item, index) => (
+                  <div key={index} className="row">
+                    <div className="col-md-4">
+                      <label htmlFor={`mamosa-name-${index}`}>Mamosa</label>
+                      <input
+                        type="text"
+                        id={`mamosa-name-${index}`}
+                        name="name"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="name"
+                        value={item.name || ""}
+                        onChange={(e) => handleInputChange(e, index, "mamosa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`mamosa-marriedto-${index}`}>
+                        Married To
+                      </label>
+                      <input
+                        type="text"
+                        id={`mamosa-marriedto-${index}`}
+                        name="marriedto"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="marriedto"
+                        value={item.marriedto || ""}
+                        onChange={(e) => handleInputChange(e, index, "mamosa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`mamosa-daughterof-${index}`}>
+                        Daughter Of
+                      </label>
+                      <input
+                        type="text"
+                        id={`mamosa-daughterof-${index}`}
+                        name="daughterof"
+                        className="form-control rounded-0"
+                        placeholder="Mj. Thakur"
+                        aria-label="daughterof"
+                        value={item.daughterof || ""}
+                        onChange={(e) => handleInputChange(e, index, "mamosa")}
+                      />
+                    </div>
+                    <div className="col-md-4 mb-2">
+                      <label htmlFor={`mamosa-thikana-${index}`}>Thikana</label>
+                      <input
+                        type="text"
+                        id={`mamosa-thikana-${index}`}
+                        name="thikana"
+                        className="form-control rounded-0"
+                        placeholder="City"
+                        aria-label="thikana"
+                        value={item.thikana || ""}
+                        onChange={(e) => handleInputChange(e, index, "mamosa")}
+                      />
+                    </div>
+                    <hr />
+                    <div className="col-12 text-end">
+                      {/* Show Add button only for the last row */}
+                      {index === formData.mamosa.length - 1 && (
+                        <span
+                          className="custom-add text-danger"
+                          onClick={() => handleAddRow("mamosa")}
+                          style={{
+                            cursor: "pointer",
+                            marginRight: "10px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          + ADD
+                        </span>
+                      )}
+
+                      {/* Show Remove button for all rows except the first one */}
+                      {index > 0 && (
+                        <span
+                          className="custom-remove text-danger"
+                          onClick={() => handleRemoveRow(index, "mamosa")}
+                          style={{ cursor: "pointer", fontWeight: "600" }}
+                        >
+                          - REMOVE
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             <label>All Masisa</label>
             <div className="mt-2 p-3" style={{ backgroundColor: "wheat" }}>
-              {formData.masisa.map((item, index) => (
-                <div key={index} className="row">
-                  <div className="col-md-4">
-                    <label htmlFor={`masisa-name-${index}`}>Masisa</label>
-                    <input
-                      type="text"
-                      id={`masisa-name-${index}`}
-                      name="name"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="name"
-                      value={item.name || ""}
-                      onChange={(e) => handleInputChange(e, index, "masisa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`masisa-marriedto-${index}`}>
-                      Married To
-                    </label>
-                    <input
-                      type="text"
-                      id={`masisa-marriedto-${index}`}
-                      name="marriedto"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="marriedto"
-                      value={item.marriedto || ""}
-                      onChange={(e) => handleInputChange(e, index, "masisa")}
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label htmlFor={`masisa-daughterof-${index}`}>Son Of</label>
-                    <input
-                      type="text"
-                      id={`masisa-sonof-${index}`}
-                      name="sonof"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="sonof"
-                      value={item.sonof || ""}
-                      onChange={(e) => handleInputChange(e, index, "masisa")}
-                    />
-                  </div>
-                  <div className="col-md-4 mb-2">
-                    <label htmlFor={`masisa-thikana-${index}`}>Thikana</label>
-                    <input
-                      type="text"
-                      id={`masisa-thikana-${index}`}
-                      name="thikana"
-                      className="form-control rounded-0"
-                      placeholder=""
-                      aria-label="thikana"
-                      value={item.thikana || ""}
-                      onChange={(e) => handleInputChange(e, index, "masisa")}
-                    />
-                  </div>
-                  <hr />
+              {!formData.masisa || formData.masisa.length === 0 ? (
+                <div className="row">
                   <div className="col-12 text-end">
-                    {/* Show Add button only for the last row */}
-                    {index === formData.masisa.length - 1 && (
-                      <span
-                        className="custom-add text-danger"
-                        onClick={() => handleAddRow("masisa")}
-                        style={{
-                          cursor: "pointer",
-                          marginRight: "10px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        + ADD
-                      </span>
-                    )}
-
-                    {/* Show Remove button for all rows except the first one */}
-                    {index > 0 && (
-                      <span
-                        className="custom-remove text-danger"
-                        onClick={() => handleRemoveRow(index, "masisa")}
-                        style={{ cursor: "pointer", fontWeight: "600" }}
-                      >
-                        - REMOVE
-                      </span>
-                    )}
+                    <span
+                      className="custom-add text-danger"
+                      onClick={() => handleAddRow("masisa")}
+                      style={{ cursor: "pointer", fontWeight: "600" }}
+                    >
+                      + ADD
+                    </span>
                   </div>
                 </div>
-              ))}
+              ) : (
+                formData.masisa?.map((item, index) => (
+                  <div key={index} className="row">
+                    <div className="col-md-4">
+                      <label htmlFor={`masisa-name-${index}`}>Masisa</label>
+                      <input
+                        type="text"
+                        id={`masisa-name-${index}`}
+                        name="name"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="name"
+                        value={item.name || ""}
+                        onChange={(e) => handleInputChange(e, index, "masisa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`masisa-marriedto-${index}`}>
+                        Married To
+                      </label>
+                      <input
+                        type="text"
+                        id={`masisa-marriedto-${index}`}
+                        name="marriedto"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="marriedto"
+                        value={item.marriedto || ""}
+                        onChange={(e) => handleInputChange(e, index, "masisa")}
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label htmlFor={`masisa-daughterof-${index}`}>Son Of</label>
+                      <input
+                        type="text"
+                        id={`masisa-sonof-${index}`}
+                        name="sonof"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="sonof"
+                        value={item.sonof || ""}
+                        onChange={(e) => handleInputChange(e, index, "masisa")}
+                      />
+                    </div>
+                    <div className="col-md-4 mb-2">
+                      <label htmlFor={`masisa-thikana-${index}`}>Thikana</label>
+                      <input
+                        type="text"
+                        id={`masisa-thikana-${index}`}
+                        name="thikana"
+                        className="form-control rounded-0"
+                        placeholder=""
+                        aria-label="thikana"
+                        value={item.thikana || ""}
+                        onChange={(e) => handleInputChange(e, index, "masisa")}
+                      />
+                    </div>
+                    <hr />
+                    <div className="col-12 text-end">
+                      {/* Show Add button only for the last row */}
+                      {index === formData.masisa.length - 1 && (
+                        <span
+                          className="custom-add text-danger"
+                          onClick={() => handleAddRow("masisa")}
+                          style={{
+                            cursor: "pointer",
+                            marginRight: "10px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          + ADD
+                        </span>
+                      )}
+
+                      {/* Show Remove button for all rows except the first one */}
+                      {index > 0 && (
+                        <span
+                          className="custom-remove text-danger"
+                          onClick={() => handleRemoveRow(index, "masisa")}
+                          style={{ cursor: "pointer", fontWeight: "600" }}
+                        >
+                          - REMOVE
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             {error && <p className="error-text">{error}</p>}

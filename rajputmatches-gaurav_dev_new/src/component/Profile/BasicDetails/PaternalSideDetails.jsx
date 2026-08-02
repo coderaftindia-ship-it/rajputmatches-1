@@ -62,6 +62,23 @@ function PaternalSideDetails() {
 
     const normalized = userData.user ?? userData;
     const { createdAt, updatedAt, _id, userId, ...filteredUserData } = normalized;
+
+    const relativeArrays = ["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"];
+    relativeArrays.forEach((arrKey) => {
+      if (!Array.isArray(filteredUserData[arrKey]) || filteredUserData[arrKey].length === 0) {
+        filteredUserData[arrKey] = [
+          {
+            name: "",
+            marriedto: "",
+            ...(arrKey === "masisa" || arrKey === "bhuasa"
+              ? { sonof: "" }
+              : { daughterof: "" }),
+            thikana: "",
+          },
+        ];
+      }
+    });
+
     const mergedDetails = { ...details, ...filteredUserData };
     setDetails(mergedDetails);
     setFormData(mergedDetails);
@@ -111,7 +128,7 @@ function PaternalSideDetails() {
     if (!nameRegex.test(value) && !placeRegex.test(value)) return;
 
     if (arrayName) {
-      const updatedArray = [...formData[arrayName]];
+      const updatedArray = [...(formData[arrayName] || [])];
       updatedArray[index] = { ...updatedArray[index], [name]: value };
       setFormData({ ...formData, [arrayName]: updatedArray });
     } else {
@@ -123,17 +140,30 @@ function PaternalSideDetails() {
     const newRow = {
       name: "",
       marriedto: "",
-      ...(arrayName === "masisa" && "bhuasa"
+      ...(arrayName === "masisa" || arrayName === "bhuasa"
         ? { sonof: "" }
         : { daughterof: "" }),
       thikana: "",
     };
-    setFormData({ ...formData, [arrayName]: [...formData[arrayName], newRow] });
+    const currentList = Array.isArray(formData[arrayName]) ? formData[arrayName] : [];
+    setFormData({ ...formData, [arrayName]: [...currentList, newRow] });
   };
 
   const handleRemoveRow = (index, arrayName) => {
-    if (formData[arrayName].length === 1) return;
-    const updatedArray = formData[arrayName].filter((_, i) => i !== index);
+    const currentList = Array.isArray(formData[arrayName]) ? formData[arrayName] : [];
+    if (currentList.length <= 1) {
+      const clearedRow = {
+        name: "",
+        marriedto: "",
+        ...(arrayName === "masisa" || arrayName === "bhuasa"
+          ? { sonof: "" }
+          : { daughterof: "" }),
+        thikana: "",
+      };
+      setFormData({ ...formData, [arrayName]: [clearedRow] });
+      return;
+    }
+    const updatedArray = currentList.filter((_, i) => i !== index);
     setFormData({ ...formData, [arrayName]: updatedArray });
   };
 

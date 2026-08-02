@@ -162,6 +162,7 @@ function App() {
 
          <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="set-new-password" element={<NewPassword />} />
+        <Route path="reset-password" element={<NewPassword />} />
         <Route path="verify-email" element={<VerifyEmail />} />   
 
         <Route path="about" element={<About />} />

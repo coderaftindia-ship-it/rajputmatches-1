@@ -196,7 +196,7 @@ const Header = () => {
           <div className="sidebar-brand">
             <Link to="/dashboard">
               <FaCrown style={{ color: "#EDB139", fontSize: "1.4rem" }} />
-              <span>Rajput Matches</span>
+              <span>Rajput Alliances</span>
             </Link>
           </div>
 

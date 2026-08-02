@@ -28,6 +28,7 @@ const {
 } = require("../middlewares/middleware.js");
 
 const { generateToken, getNextMatrimonyId } = require("../utils/utility.js");
+const { sendEmail } = require("../utils/email.js");
 const express = require("express");
 const mongoose = require("mongoose");
 
@@ -173,32 +174,57 @@ exports.login = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const { username } = req.body;
+    if (!username) {
+      return res.status(400).json({ message: "Email or Mobile is required." });
+    }
+
     const user = await User.findOne({
       $or: [{ email: username }, { mobile: username }],
-    }).select("email mobile");
+    }).select("name email mobile");
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found with this Email or Mobile." });
+    }
 
-    // const resetToken = generateToken(user._id);
-    // user.resetToken = resetToken;
-    // user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
-    // await user.save();
+    if (!user.email) {
+      return res.status(400).json({ message: "No registered email address found for this user." });
+    }
 
-    // const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-    // await sendEmail(
-    //   user.email,
-    //   "Password Reset Request",
-    //   `<p>Click the link below to reset your password:</p>
-    //   <a href="${resetLink}">Reset Password</a>`
-    // );
+    const resetToken = generateToken(user._id);
+    let frontendUrl = process.env.FRONTEND_URL;
+    if (!frontendUrl || frontendUrl.includes("localhost:3000")) {
+      frontendUrl = process.env.NODE_ENV === "production" ? "https://rajputmatches.com" : "http://localhost:5173";
+    }
+    frontendUrl = frontendUrl.replace(/\/$/, "");
+    const resetLink = `${frontendUrl}/set-new-password?token=${resetToken}&userid=${user._id}`;
 
-    let resp = await generateOTP(username);
-    console.log(resp);
-    if (!resp) return res.status(200).json({ message: "somthing went wrong" });
-    res.status(200).json({ message: "Otp sent successfully to your Email" });
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; padding: 25px; background-color: #fff8f0; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e0c8b0; border-radius: 8px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #6b0f24; font-family: Georgia, serif; margin-bottom: 5px;">Rajput Alliances</h2>
+          <p style="color: #b8860b; font-style: italic; margin-top: 0;">Connecting Rajputs Worldwide</p>
+        </div>
+        <hr style="border: none; border-top: 1px solid #d4af37; margin: 20px 0;" />
+        <p style="font-size: 16px;">Hello <strong>${user.name || "Member"}</strong>,</p>
+        <p style="font-size: 15px; line-height: 1.5;">We received a request to reset your password. Click the button below to set up a new password for your account:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetLink}" style="background-color: #6b0f24; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 4px 10px rgba(107,15,36,0.25);">
+            Reset Password
+          </a>
+        </div>
+        <p style="font-size: 13px; color: #666;">If the button above does not work, copy and paste this link into your browser:</p>
+        <p style="font-size: 13px; word-break: break-all;"><a href="${resetLink}" style="color: #6b0f24;">${resetLink}</a></p>
+        <hr style="border: none; border-top: 1px solid #e0c8b0; margin: 25px 0 15px 0;" />
+        <p style="font-size: 12px; color: #888; text-align: center;">If you did not request a password reset, please ignore this email.</p>
+      </div>
+    `;
+
+    await sendEmail(user.email, "Reset Your Password - Rajput Alliances", htmlContent);
+
+    return res.status(200).json({ message: "Password reset link sent successfully to your email." });
   } catch (error) {
     console.error("Error during forgot password:", error);
-    res.status(500).json({ message: "Server error", error });
+    return res.status(500).json({ message: "Failed to send password reset email.", error: error.message });
   }
 };
 

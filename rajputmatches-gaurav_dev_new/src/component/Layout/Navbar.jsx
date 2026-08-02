@@ -74,7 +74,7 @@ const Navbar = ({ forceSolid = false }) => {
                 lineHeight: "1.1",
                 textTransform: "uppercase"
               }}>
-                {siteSettings.companyName || "Rajput Matches"}
+                {siteSettings.companyName || "Rajput Alliances"}
               </span>
               <span style={{
                 fontSize: "0.6rem",

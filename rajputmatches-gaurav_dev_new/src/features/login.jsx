@@ -17,6 +17,7 @@ import { validateLoginUsername } from "../utils/authValidation";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -51,6 +52,10 @@ function Login() {
       newErrors.password = "Password is required.";
     } else if (formData.password.length < 6) {
       newErrors.password = "Password length is not sufficient.";
+    }
+
+    if (!agreeTerms) {
+      newErrors.agreeTerms = "Please agree to the Terms of Use & Privacy Policy.";
     }
 
     setErrors(newErrors);
@@ -94,7 +99,7 @@ function Login() {
               <FaCrown className="royal-crown-icon" />
             </div>
             <h2 className="royal-auth-title">Begin Your Royal Journey</h2>
-            <p className="royal-auth-subtitle">Where Royalty Meets Destiny</p>
+            <p className="royal-auth-subtitle">Connecting Rajputs Worldwide</p>
             <div className="royal-divider">
               <span className="royal-divider-ornament">
                 <FaCrown style={{ fontSize: "0.8rem", verticalAlign: "middle" }} />
@@ -171,15 +176,27 @@ function Login() {
                 Forgot Password?
               </Link>
 
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginTop: "14px", marginBottom: "12px", fontSize: "0.85rem", color: "#4a3b32", textAlign: "left" }}>
+                <input
+                  type="checkbox"
+                  id="loginAgreeTerms"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  style={{ accentColor: "var(--royal-maroon)", width: "16px", height: "16px", marginTop: "2px", cursor: "pointer" }}
+                />
+                <label htmlFor="loginAgreeTerms" style={{ cursor: "pointer", margin: 0, lineHeight: "1.4" }}>
+                  I agree to the <Link to="/terms-of-use" target="_blank" style={{ color: "var(--royal-maroon)", fontWeight: "600", textDecoration: "underline" }}>Terms of Use</Link> & <Link to="/privacy-policy" target="_blank" style={{ color: "var(--royal-maroon)", fontWeight: "600", textDecoration: "underline" }}>Privacy Policy</Link> *
+                </label>
+              </div>
+              {errors.agreeTerms && (
+                <span className="royal-error-text" style={{ display: "block", marginTop: "-6px", marginBottom: "14px", textAlign: "left" }}>{errors.agreeTerms}</span>
+              )}
+
               <button type="submit" className="royal-submit-btn">
                 <FaHeart className="royal-submit-btn-icon" />
                 Login to Your Account
               </button>
             </form>
-
-            <div className="royal-demo-creds">
-              Demo admin: admin@shahivivaah.com / admin123
-            </div>
           </div>
         </div>
       </div>

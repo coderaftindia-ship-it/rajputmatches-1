@@ -232,7 +232,7 @@ const Dashboard = () => {
           <h2 style={{ fontFamily: 'Playfair Display, serif', color: '#59123B', marginBottom: '8px' }}>
             System Dashboard
           </h2>
-          <p style={{ color: '#7A5C66', margin: 0 }}>Overview of Rajput Matches system telemetry and analytics.</p>
+          <p style={{ color: '#7A5C66', margin: 0 }}>Overview of Rajput Alliances system telemetry and analytics.</p>
         </div>
       </div>
 

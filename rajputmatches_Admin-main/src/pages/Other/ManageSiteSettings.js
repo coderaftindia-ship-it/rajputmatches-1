@@ -13,10 +13,10 @@ const ManageSiteSettings = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
-    companyName: "Rajput Matches",
+    companyName: "Rajput Alliances",
     tagline: "Royal Matrimonial",
     logo: "",
-    copyrightText: "© 2025-26 Rajput Matches Matrimony. All Rights Reserved.",
+    copyrightText: "© 2025-26 Rajput Alliances Matrimony. All Rights Reserved.",
   });
 
   const [logoFile, setLogoFile] = useState(null);
@@ -241,7 +241,7 @@ const ManageSiteSettings = () => {
                       name="companyName"
                       value={form.companyName}
                       onChange={handleChange}
-                      placeholder="e.g. Rajput Matches"
+                      placeholder="e.g. Rajput Alliances"
                     />
                   </div>
 
@@ -267,7 +267,7 @@ const ManageSiteSettings = () => {
                       name="copyrightText"
                       value={form.copyrightText}
                       onChange={handleChange}
-                      placeholder="e.g. © 2025-26 Rajput Matches Matrimony. All Rights Reserved."
+                      placeholder="e.g. © 2025-26 Rajput Alliances Matrimony. All Rights Reserved."
                     />
                   </div>
                 </div>

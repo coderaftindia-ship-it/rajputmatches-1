@@ -48,8 +48,8 @@ function HowToUse() {
 
   const faqs = [
     {
-      question: "How do you verify the profiles on Rajput Matches?",
-      answer: "Every profile registered on Rajput Matches goes through a manual screening process. We require mandatory mobile verification, email checks, and optionally invite users to provide government-issued IDs to receive a verified badge, ensuring safety and trust."
+      question: "How do you verify the profiles on Rajput Alliances?",
+      answer: "Every profile registered on Rajput Alliances goes through a manual screening process. We require mandatory mobile verification, email checks, and optionally invite users to provide government-issued IDs to receive a verified badge, ensuring safety and trust."
     },
     {
       question: "Is my personal data and photo secure?",
@@ -60,7 +60,7 @@ function HowToUse() {
       answer: "Gothra is crucial in traditional Rajput alliances. Our system allows you to specify your self, maternal, and paternal Gothras, and set exclusions to prevent matching within the same Gothra or specific forbidden branches according to traditional customs."
     },
     {
-      question: "Is Rajput Matches completely free to use?",
+      question: "Is Rajput Alliances completely free to use?",
       answer: "Registration, creating a profile, searching, and showing interest are 100% free. We offer premium membership packages that unlock advanced benefits like direct messaging, counselor assistance, and higher profile visibility."
     },
     {
@@ -112,7 +112,7 @@ function HowToUse() {
           </h1>
           <div className="mx-auto mb-3" style={{ width: "80px", height: "2px", background: "var(--royal-gold)" }}></div>
           <p style={{ fontSize: "clamp(14px, 4vw, 17px)", color: "rgba(255, 255, 255, 0.9)", lineHeight: 1.6, maxWidth: "650px", margin: "0 auto" }}>
-            Discover how Rajput Matches combines age-old family values with modern technology to help you find your ideal partner seamlessly and securely.
+            Discover how Rajput Alliances combines age-old family values with modern technology to help you find your ideal partner seamlessly and securely.
           </p>
         </motion.div>
       </section>
@@ -190,7 +190,7 @@ function HowToUse() {
                 Our Privacy & Security Core
               </h3>
               <p className="mb-4 text-white-50" style={{ fontSize: "1.05rem" }}>
-                We understand that matchmaking involves sensitive personal data. That's why we've built top-tier security controls right into the heart of Rajput Matches.
+                We understand that matchmaking involves sensitive personal data. That's why we've built top-tier security controls right into the heart of Rajput Alliances.
               </p>
               
               <div className="d-flex flex-column gap-3">

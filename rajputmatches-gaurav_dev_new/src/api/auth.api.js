@@ -7,9 +7,9 @@ export const authApi = {
 
   logout: () => apiClient.post("/auth/logout"),
 
-  forgotPassword: (body) => apiClient.post("/auth/password/forgot", body),
+  forgotPassword: (body) => apiClient.post("/auth/forgot-password", body),
 
-  resetPassword: (body) => apiClient.post("/auth/password/reset", body),
+  resetPassword: (body) => apiClient.post("/auth/reset-password", body),
 
   sendVerification: (body) => apiClient.post("/auth/email/send-verification", body),
 

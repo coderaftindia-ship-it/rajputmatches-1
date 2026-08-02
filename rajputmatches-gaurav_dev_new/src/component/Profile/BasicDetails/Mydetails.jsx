@@ -934,13 +934,13 @@ function Mydetails() {
         </div>
 
         <p className={styles.footerSubtext}>
-          Trusted by Millions. Delivered by Rajput Matches.
+          Trusted by Millions. Delivered by Rajput Alliances.
         </p>
 
         {/* Footer Brand Logo Block */}
         <div className={styles.footerLogoBlock}>
           <div className={styles.footerLogoLeft}>
-            <span className={styles.footerLogoTitle}>THE RAJPUT MATCHES</span>
+            <span className={styles.footerLogoTitle}>THE Rajput Alliances</span>
             <span>Matrimony for Rajput Clans</span>
           </div>
           <div className={styles.footerLogoRight}>
