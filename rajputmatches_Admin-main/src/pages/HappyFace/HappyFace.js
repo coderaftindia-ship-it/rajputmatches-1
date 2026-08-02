@@ -25,8 +25,10 @@ const HappyFace = () => {
 
   const getImageSrc = (image) => {
     if (!image) return "";
-    if (typeof image !== "string") return "";
-    if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) return image;
+    if (typeof image !== "string") return image;
+    if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) {
+      return image;
+    }
     const cleanPath = image.replace(/\\/g, "/");
     const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
     return `${backendOrigin}${formattedPath}`;
