@@ -24,8 +24,11 @@ const ManageSiteSettings = () => {
 
   const getLogoSrc = (p) => {
     if (!p) return "";
-    if (p.startsWith("http") || p.startsWith("data:")) return p;
-    return `${backendOrigin}${p}`;
+    if (typeof p !== "string") return "";
+    if (p.startsWith("data:") || p.startsWith("http://") || p.startsWith("https://")) return p;
+    const cleanPath = p.replace(/\\/g, "/");
+    const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    return `${backendOrigin}${formattedPath}`;
   };
 
   useEffect(() => {

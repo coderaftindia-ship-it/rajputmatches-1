@@ -130,22 +130,26 @@ router.put('/notifications/mark-all-read', isAuth, sanitizeAdminUser, async (req
 // GET /admin/dashboard/user-counts
 router.get('/dashboard/user-counts', async (req, res) => {
   try {
-    // Total members
-    const totalMembers = await User.countDocuments();
+    // Total members (active, not deleted)
+    const totalMembers = await User.countDocuments({ isEnable: { $ne: false } });
 
-    // Free members: These will be users whose `isSubscribed` is false
+    // Free members: active, non-subscribed, non-blocked
     const freeMembers = await User.countDocuments({
       isSubscribed: false,
+      isEnable: { $ne: false },
+      isbloacked: { $ne: true }
     });
 
-    // Blocked members: These are users with `isBlocked` set to true
+    // Blocked members: These are users with isbloacked set to true
     const blockedMembers = await User.countDocuments({
       isbloacked: true,
     });
 
-    // Premium members: These will be users whose `isSubscribed` is true
+    // Premium members: active, subscribed, non-blocked
     const premiumMembers = await User.countDocuments({
       isSubscribed: true,
+      isEnable: { $ne: false },
+      isbloacked: { $ne: true }
     });
 
     return res.status(200).json({
@@ -754,7 +758,7 @@ const aboutStorage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
+    const ext = path.extname(file.originalname) || ".jpg";
     const filename = `about-${file.fieldname}-${Date.now()}${ext}`;
     cb(null, filename);
   }

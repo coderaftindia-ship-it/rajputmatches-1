@@ -2623,7 +2623,10 @@ exports.updateLimits = async (req, res) => {
 exports.getusersData = async (req, res) => {
   try {
     const userId = req.user.id;
-    const user = await User.find().select(
+    const user = await User.find({
+      isEnable: { $ne: false },
+      isbloacked: { $ne: true }
+    }).select(
       "gender firstName middleName lastName dateOfBirth martrId view isVisible isbloacked isApproved isVerified avatar isEnable mobile email isSubscribed"
     );
     // console.log(user);

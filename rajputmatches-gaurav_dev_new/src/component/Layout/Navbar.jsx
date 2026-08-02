@@ -54,6 +54,7 @@ const Navbar = ({ forceSolid = false }) => {
             <img
               src={siteSettings.logo || Logo}
               alt={siteSettings.companyName || "Logo"}
+              onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
               style={{
                 height: "54px",
                 width: "auto",

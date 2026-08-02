@@ -20,8 +20,13 @@ const ManageAboutUs = () => {
 
   const getImageSrc = (imagePath) => {
     if (!imagePath) return "";
-    if (imagePath.startsWith("http")) return imagePath;
-    return `${backendOrigin}${imagePath}`;
+    if (typeof imagePath !== "string") return "";
+    if (imagePath.startsWith("data:") || imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+      return imagePath;
+    }
+    const cleanPath = imagePath.replace(/\\/g, "/");
+    const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    return `${backendOrigin}${formattedPath}`;
   };
 
   const { fetchUserData } = useAuth();

@@ -122,6 +122,7 @@ const Dashboard = () => {
   const [shortlisted, setShortlisted] = useState([]);
   const [interests, setInterests]   = useState({ sent: [], received: [] });
   const [photoReqs, setPhotoReqs]   = useState({ sent: [], received: [] });
+  const [mediaFiles, setMediaFiles] = useState(null);
   const [loading, setLoading]       = useState(true);
 
   const goProfile = (section) => navigate("/profile", { state: { section } });
@@ -134,13 +135,14 @@ const Dashboard = () => {
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [user, reqs, viewed, visited, sl, photoR] = await Promise.allSettled([
+      const [user, reqs, viewed, visited, sl, photoR, mediaRes] = await Promise.allSettled([
         fetchByRoute("user"),
         fetchByRoute("profile/myrequests"),
         fetchByRoute("profile/viewed"),
         fetchByRoute("profile/visited"),
         fetchByRoute("profile/show-shortlisted"),
         fetchByRoute("profile/photorequests"),
+        fetchByRoute("files"),
       ]);
       if (user.status === "fulfilled")     setUserData(user.value);
       if (reqs.status === "fulfilled" && reqs.value) {
@@ -155,6 +157,9 @@ const Dashboard = () => {
           received: photoR.value?.photoReqReceived || [],
         });
       }
+      if (mediaRes.status === "fulfilled" && mediaRes.value) {
+        setMediaFiles(mediaRes.value);
+      }
     } finally {
       setLoading(false);
     }
@@ -163,7 +168,12 @@ const Dashboard = () => {
   /* derived */
   const fullName   = [userData?.firstName, userData?.middleName, userData?.lastName].filter(Boolean).join(" ");
   const age        = calculateAge(userData?.dateOfBirth);
-  const avatarUrl  = authUser?.avatar || (profile && !profile.includes("user-icon-flat-isolated") ? profile : null);
+  const avatarUrl  =
+    authUser?.avatar ||
+    (profile && !profile.includes("user-icon-flat-isolated") ? profile : null) ||
+    mediaFiles?.photos?.find((img) => img.isAvatar)?.url ||
+    mediaFiles?.photos?.[0]?.url ||
+    userData?.avatar;
   const initials   = `${(userData?.firstName || "").charAt(0)}${(userData?.lastName || "").charAt(0)}`.toUpperCase();
 
   const contactSent     = requests?.reqSent     || [];
@@ -176,13 +186,29 @@ const Dashboard = () => {
   const recentViewed   = viewedList.slice(0,  3);
 
   /* profile completion score */
+  const hasPhoto = !!(
+    avatarUrl ||
+    userData?.avatar ||
+    (mediaFiles?.photos && mediaFiles.photos.length > 0) ||
+    (userData?.photos && userData.photos.length > 0) ||
+    (userData?.filesId?.photos && userData.filesId.photos.length > 0) ||
+    (userData?.filesId?.totalPhotos && userData.filesId.totalPhotos > 0)
+  );
+
+  const hasCity = !!(
+    userData?.city ||
+    userData?.address?.city ||
+    userData?.location?.city ||
+    userData?.state
+  );
+
   const completionItems = [
-    { done: !!(userData?.firstName),         label: "Name" },
-    { done: !!(userData?.dateOfBirth),        label: "Date of Birth" },
-    { done: !!(userData?.mobile),             label: "Mobile" },
-    { done: !!(userData?.email),              label: "Email" },
-    { done: !!(avatarUrl),                    label: "Profile Photo" },
-    { done: !!(userData?.address?.city),      label: "City" },
+    { done: !!(userData?.firstName),                             label: "Name" },
+    { done: !!(userData?.dateOfBirth),                            label: "Date of Birth" },
+    { done: !!(userData?.mobile),                                 label: "Mobile" },
+    { done: !!(userData?.email),                                  label: "Email" },
+    { done: hasPhoto,                                             label: "Profile Photo" },
+    { done: hasCity,                                              label: "City" },
   ];
   const completionPct = Math.round((completionItems.filter(i => i.done).length / completionItems.length) * 100);
 

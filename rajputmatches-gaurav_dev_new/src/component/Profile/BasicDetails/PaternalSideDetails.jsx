@@ -74,40 +74,31 @@ function PaternalSideDetails() {
   }, [extendedFamily, isEditing]);
 
   const handleSaveClick = async () => {
-    // Check if all fields in the nested arrays are filled (except index 0)
-    for (const arrayName of [
-      "badePapa",
-      "kakosa",
-      "bhuasa",
-      "mamosa",
-      "masisa",
-    ]) {
-      if (formData[arrayName]) {
-        for (let index = 0; index < formData[arrayName].length; index++) {
-          const item = formData[arrayName][index];
+    setError("");
 
-          // Skip validation for index 0
-          if (index === 0) continue;
+    const cleanedPayload = { ...formData };
+    const relativeArrays = ["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"];
 
-          for (const key in item) {
-            if (!item[key]?.trim()) {
-              setError(
-                `Please fill all fields in ${arrayName}, row ${index + 1}`
-              );
-              return;
-            }
-          }
-        }
+    relativeArrays.forEach((arrayName) => {
+      if (Array.isArray(cleanedPayload[arrayName])) {
+        cleanedPayload[arrayName] = cleanedPayload[arrayName].filter((item) => {
+          if (!item || typeof item !== "object") return false;
+          return Object.keys(item).some((key) => {
+            if (key === "_id" || key === "id") return false;
+            return typeof item[key] === "string" && item[key].trim().length > 0;
+          });
+        });
       }
-    }
+    });
 
     try {
       const route = "updatepaternal-details";
-      await updateData(route, formData, true);
+      await updateData(route, cleanedPayload, true);
       setIsEditing(false);
       await refreshSection("extendedFamily");
     } catch (error) {
       console.error("Error updating data:", error.message);
+      setError("Failed to save paternal details. Please try again.");
     }
   };
 

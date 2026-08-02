@@ -100,8 +100,8 @@ const FreeMembers = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const raw = response?.data?.user || [];
-      // Only free (non-subscribed) members
-      const free = raw.filter((m) => !m.isSubscribed);
+      // Only active free (non-subscribed, not deleted, not blocked) members
+      const free = raw.filter((m) => !m.isSubscribed && m.isEnable !== false && m.isbloacked !== true);
       setMembers(free);
     } catch (err) {
       console.error("Error fetching members:", err);

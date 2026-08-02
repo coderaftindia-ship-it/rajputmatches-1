@@ -14,8 +14,14 @@ export const SiteSettingsProvider = ({ children }) => {
 
   const getLogoUrl = (logoPath) => {
     if (!logoPath) return "";
-    if (logoPath.startsWith("http") || logoPath.startsWith("data:")) return logoPath;
-    return `${BASE_URL}${logoPath}`;
+    if (typeof logoPath !== "string") return "";
+    if (logoPath.startsWith("data:") || logoPath.startsWith("http://") || logoPath.startsWith("https://")) {
+      return logoPath;
+    }
+    const cleanPath = logoPath.replace(/\\/g, "/");
+    const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    const cleanBase = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
+    return `${cleanBase}${formattedPath}`;
   };
 
   useEffect(() => {

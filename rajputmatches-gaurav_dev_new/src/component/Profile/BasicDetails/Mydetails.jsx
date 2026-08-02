@@ -554,30 +554,31 @@ function Mydetails() {
   };
 
   const handlePaternalSave = async () => {
-    for (const arrayName of ["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"]) {
-      if (paternalFormData[arrayName]) {
-        for (let index = 0; index < paternalFormData[arrayName].length; index++) {
-          const item = paternalFormData[arrayName][index];
-          if (index === 0) continue; // first row is optional
-          for (const key in item) {
-            if (key === "_id") continue; // skip Mongoose subdoc _id
-            if (typeof item[key] === "string" && !item[key]?.trim()) {
-              setPaternalError(`Please fill all fields in ${arrayName}, row ${index + 1}`);
-              return;
-            }
-          }
-        }
+    setPaternalError("");
+
+    const cleanedPayload = { ...paternalFormData };
+    const relativeArrays = ["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"];
+
+    relativeArrays.forEach((arrayName) => {
+      if (Array.isArray(cleanedPayload[arrayName])) {
+        cleanedPayload[arrayName] = cleanedPayload[arrayName].filter((item) => {
+          if (!item || typeof item !== "object") return false;
+          return Object.keys(item).some((key) => {
+            if (key === "_id" || key === "id") return false;
+            return typeof item[key] === "string" && item[key].trim().length > 0;
+          });
+        });
       }
-    }
+    });
 
     try {
-      await updateData("updatepaternal-details", paternalFormData, true);
+      await updateData("updatepaternal-details", cleanedPayload, true);
       setActiveModal(null);
       await refreshSection("extendedFamily");
     } catch (err) {
       console.error(err);
+      setPaternalError("Failed to save paternal details. Please try again.");
     }
-
   };
 
   const handleMediaSave = async () => {
