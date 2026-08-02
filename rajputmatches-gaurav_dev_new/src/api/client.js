@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const getDynamicBaseUrl = () => {
   const envUrl = process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL;
   if (envUrl && !envUrl.includes("localhost")) {
