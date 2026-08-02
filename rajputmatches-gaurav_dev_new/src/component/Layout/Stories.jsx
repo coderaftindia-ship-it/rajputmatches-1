@@ -30,17 +30,10 @@ function Stories() {
     }
     const cleanPath = image.replace(/\\/g, "/");
     const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
-    let base = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
-    if (typeof window !== "undefined" && window.location) {
-      const origin = window.location.origin;
-      if (origin.includes("localhost") || origin.includes("127.0.0.1") || /^http:\/\/\d+\.\d+\.\d+\.\d+/.test(origin)) {
-        base = origin.replace(/:\d+$/, ":5000");
-      } else if (origin.startsWith("http://") || origin.startsWith("https://")) {
-        base = origin;
-      }
-    }
-    return `${base || ""}${formattedPath}`;
+    return `${BASE_URL}${formattedPath}`;
   };
+
+
   const [storyData, setStoryData] = useState([
     {
       id: 1,
@@ -118,14 +111,17 @@ function Stories() {
     try {
       setLoading(true);
       const route = "profile/stories";
-      const data = await fetchUserData(route);
-      if (Array.isArray(data) && data.length > 0) {
-        setStoryData(data);
+      const res = await fetchUserData(route);
+      const list = Array.isArray(res)
+        ? res
+        : (res?.stories || res?.user || res?.data || []);
+      if (list && list.length > 0) {
+        setStoryData(list);
       }
 
-      const res = await publicApi.getStoriesCMS();
-      if (res.data && res.data.success) {
-        setCmsData((prev) => ({ ...prev, ...res.data.data }));
+      const cmsRes = await publicApi.getStoriesCMS();
+      if (cmsRes?.data?.success && cmsRes?.data?.data) {
+        setCmsData((prev) => ({ ...prev, ...cmsRes.data.data }));
       }
     } catch (err) {
       console.error("Error fetching stories data:", err);
