@@ -124,8 +124,17 @@ const HappyClients = () => {
     }
     const cleanPath = image.replace(/\\/g, "/");
     const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
-    const cleanBase = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
-    return `${cleanBase}${formattedPath}`;
+
+    let base = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
+
+    if (typeof window !== "undefined" && window.location) {
+      const origin = window.location.origin;
+      if (origin && !origin.includes("localhost") && (base.includes("localhost") || !base)) {
+        base = origin.replace(/:\d+$/, ":5000");
+      }
+    }
+
+    return `${base || "http://localhost:5000"}${formattedPath}`;
   };
 
   useEffect(() => {
@@ -226,11 +235,27 @@ const HappyClients = () => {
                       src={getImageSrc(t.image)} 
                       alt={t.name} 
                       className="hc-avatar" 
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.style.display = "none";
+                        if (e.target.nextSibling) {
+                          e.target.nextSibling.style.display = "flex";
+                        }
+                      }}
                       style={{ objectFit: "cover", width: "50px", height: "50px", borderRadius: "50%" }}
                     />
-                  ) : (
-                    <div className="hc-avatar" style={{ background: t.color }}>{t.avatar}</div>
-                  )}
+                  ) : null}
+                  <div 
+                    className="hc-avatar" 
+                    style={{ 
+                      background: t.color, 
+                      display: t.image ? "none" : "flex",
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}
+                  >
+                    {t.avatar}
+                  </div>
                   <div>
                     <p className="hc-name">{t.name}</p>
                     <p className="hc-meta">{t.location} · {t.date}</p>
