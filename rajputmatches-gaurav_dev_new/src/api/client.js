@@ -1,6 +1,19 @@
-import axios from "axios";
+const getDynamicBaseUrl = () => {
+  const envUrl = process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL;
+  if (envUrl && !envUrl.includes("localhost")) {
+    return envUrl.replace(/\/$/, "");
+  }
+  if (typeof window !== "undefined" && window.location) {
+    const { protocol, hostname } = window.location;
+    if (hostname === "localhost" || hostname === "127.0.0.1" || /^\d+\.\d+\.\d+\.\d+$/.test(hostname)) {
+      return `${protocol}//${hostname}:5000`;
+    }
+    return `${protocol}//${hostname}`;
+  }
+  return "http://localhost:5000";
+};
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "http://localhost:5000/").replace(/\/$/, "");
+const BASE_URL = getDynamicBaseUrl();
 const API_PREFIX = "/api/v1";
 
 export const apiClient = axios.create({
