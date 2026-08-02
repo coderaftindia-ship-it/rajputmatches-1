@@ -38,9 +38,19 @@ function ContactUs() {
       .catch(() => {});
   }, []);
 
-  const heroBg = cms.heroBgImage
-    ? (cms.heroBgImage.startsWith("/uploads/") ? `${BASE_URL}${cms.heroBgImage}` : cms.heroBgImage)
-    : contactBgFallback;
+  const resolveImage = (imagePath, fallback) => {
+    if (!imagePath) return fallback;
+    if (typeof imagePath !== "string") return fallback;
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("data:")) {
+      return imagePath;
+    }
+    const cleanPath = imagePath.replace(/\\/g, "/");
+    const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    const cleanBase = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
+    return `${cleanBase}${formattedPath}`;
+  };
+
+  const heroBg = resolveImage(cms.heroBgImage, contactBgFallback);
 
   // Render address with line breaks
   const renderAddress = (text) =>

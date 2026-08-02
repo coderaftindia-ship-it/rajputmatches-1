@@ -70,10 +70,19 @@ function Banner() {
     return <Navigate to={redirectPath} replace />;
   }
 
-  // Resolve banner background image
-  const bannerBg = cms.bannerBgImage
-    ? (cms.bannerBgImage.startsWith("/uploads/") ? `${BASE_URL}${cms.bannerBgImage}` : cms.bannerBgImage)
-    : Bannerbg;
+  const resolveImage = (imagePath, fallback) => {
+    if (!imagePath) return fallback;
+    if (typeof imagePath !== "string") return fallback;
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("data:")) {
+      return imagePath;
+    }
+    const cleanPath = imagePath.replace(/\\/g, "/");
+    const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    const cleanBase = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
+    return `${cleanBase}${formattedPath}`;
+  };
+
+  const bannerBg = resolveImage(cms.bannerBgImage, Bannerbg);
 
   const particleStyles = [
     { left: "10%", animationDelay: "0s", animationDuration: "14s" },

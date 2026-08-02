@@ -118,13 +118,14 @@ const HappyClients = () => {
 
   const getImageSrc = (image) => {
     if (!image) return "";
-    if (typeof image === "string" && (image.startsWith("data:") || image.startsWith("http"))) {
+    if (typeof image !== "string") return image;
+    if (image.startsWith("data:") || image.startsWith("http://") || image.startsWith("https://")) {
       return image;
     }
-    if (typeof image === "string" && image.startsWith("/")) {
-      return `${BASE_URL}${image}`;
-    }
-    return image;
+    const cleanPath = image.replace(/\\/g, "/");
+    const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    const cleanBase = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
+    return `${cleanBase}${formattedPath}`;
   };
 
   useEffect(() => {
