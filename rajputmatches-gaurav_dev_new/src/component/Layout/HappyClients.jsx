@@ -131,10 +131,13 @@ const HappyClients = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const data = await fetchUserData("profile/reviews");
-        if (data && data.length > 0) {
+        const response = await fetchUserData("profile/reviews");
+        const list = Array.isArray(response)
+          ? response
+          : (response?.user || response?.reviews || response?.data || []);
+        if (list && list.length > 0) {
           // Normalize DB reviews to match the rendering shape
-          const normalized = data.map((item) => ({
+          const normalized = list.map((item) => ({
             id: item._id || item.id,
             name: item.name,
             text: item.review,
