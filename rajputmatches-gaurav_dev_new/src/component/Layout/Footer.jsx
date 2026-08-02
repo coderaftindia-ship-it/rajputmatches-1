@@ -54,6 +54,7 @@ function Footer() {
               <img
                 src={siteSettings.logo || Logo}
                 alt={siteSettings.companyName || "Logo"}
+                onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
                 style={{
                   height: "72px",
                   width: "auto",
