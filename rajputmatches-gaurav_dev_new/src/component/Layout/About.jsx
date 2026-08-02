@@ -71,8 +71,7 @@ function About() {
     }
     const cleanPath = imagePath.replace(/\\/g, "/");
     const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
-    const cleanBase = (BASE_URL || "").replace(/\/api.*$/, "").replace(/\/admin.*$/, "").replace(/\/$/, "");
-    return `${cleanBase}${formattedPath}`;
+    return `${BASE_URL}${formattedPath}`;
   };
 
   const storyData = [
