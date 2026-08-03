@@ -68,26 +68,32 @@ const DocumentForm = ({
 
   const handleImageUpload = async (event) => {
     const files = Array.from(event.target.files) || [];
-    console.log("Selected Files:", files); // Debugging line
+    const maxSizeBytes = 2 * 1024 * 1024; // 2 MB limit
+    const oversized = files.find((file) => file.size > maxSizeBytes);
+
+    if (oversized) {
+      alert("File size exceeds 2 MB limit. Please select an image under 2 MB.");
+      event.target.value = "";
+      return;
+    }
+
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
     const validFiles = files.filter((file) => allowedTypes.includes(file.type));
 
     if (validFiles.length === 0) {
       alert("Invalid file type. Only JPEG, PNG, and JPG are allowed.");
+      event.target.value = "";
       return;
     }
 
     const formData = new FormData();
     validFiles.forEach((file) => formData.append("avatars", file));
 
-    console.log(validFiles);
-
     try {
       const response = await mediaApi.uploadPhotos(formData);
       const uploadedPhotos = extractData(response)?.photos || [];
       setImages((prev) => [...uploadedPhotos]);
     } catch (error) {
-      // Improved error handling with more descriptive logs
       console.error(
         "Error uploading files:",
         error.response?.data?.message || error.message
@@ -97,7 +103,15 @@ const DocumentForm = ({
 
   const handleDocumentUpload = async (event) => {
     const files = Array.from(event.target.files) || [];
-    console.log("Selected Files:", files); // Debugging line
+    const maxSizeBytes = 2 * 1024 * 1024; // 2 MB limit
+    const oversized = files.find((file) => file.size > maxSizeBytes);
+
+    if (oversized) {
+      alert("File size exceeds 2 MB limit. Please select a document under 2 MB.");
+      event.target.value = "";
+      return;
+    }
+
     const allowedTypes = [
       "image/jpeg",
       "image/png",
@@ -110,13 +124,12 @@ const DocumentForm = ({
 
     if (validFiles.length === 0) {
       alert("Invalid file type. Only JPEG, PNG, JPG, PDF, DOC, and DOCX are allowed.");
+      event.target.value = "";
       return;
     }
 
     const formData = new FormData();
     validFiles.forEach((file) => formData.append("avatars", file));
-
-    console.log(validFiles);
 
     try {
       const response = await mediaApi.uploadDocuments(formData);

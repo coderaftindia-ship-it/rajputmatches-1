@@ -85,7 +85,7 @@ const SocialLinks = () => {
     { name: "twitter",   label: "Twitter / X URL", icon: <FaTwitter size={18} color="#1DA1F2" />, placeholder: "https://x.com/yourhandle" },
     { name: "linkedin",  label: "LinkedIn URL",  icon: <FaLinkedin size={18} color="#0A66C2" />, placeholder: "https://linkedin.com/in/profile" },
     { name: "phone",     label: "Support Phone", icon: <FaPhone size={16} color="#EDB139" />, placeholder: "+91 9999999999" },
-    { name: "email",     label: "Support Email", icon: <FaEnvelope size={16} color="#EDB139" />, placeholder: "support@rajputmatches.com" },
+    { name: "email",     label: "Support Email", icon: <FaEnvelope size={16} color="#EDB139" />, placeholder: "support@Rajput Alliances.com" },
   ];
 
   return (

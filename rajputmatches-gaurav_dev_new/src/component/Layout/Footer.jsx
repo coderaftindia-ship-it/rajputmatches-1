@@ -42,7 +42,25 @@ function Footer() {
     { icon: <FaLinkedin size={18} color="var(--royal-gold)" />, label: "LinkedIn", key: "linkedin" },
   ];
 
-  const activeSocials = socialConfig.filter((s) => links[s.key] && links[s.key] !== "");
+  const getSocialUrl = (linksObj, key) => {
+    if (!linksObj) return null;
+    const val =
+      linksObj[key] ??
+      linksObj[`${key}Url`] ??
+      linksObj[`${key}_url`] ??
+      linksObj[`${key}Channel`];
+    if (val === undefined || val === null) return null;
+    const str = String(val).trim();
+    if (str === "") return null;
+    return str;
+  };
+
+  const activeSocials = socialConfig
+    .map((s) => {
+      const href = getSocialUrl(links, s.key);
+      return href ? { ...s, href } : null;
+    })
+    .filter(Boolean);
 
   return (
     <footer className="pb-bottom-nav pt-5" style={{ backgroundColor: "var(--royal-maroon-dark)", color: "var(--royal-cream)" }}>
@@ -99,7 +117,7 @@ function Footer() {
               {activeSocials.map((s) => (
                 <a
                   key={s.label}
-                  href={links[s.key]}
+                  href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center"

@@ -58,23 +58,10 @@ export function Interestimagecontainer({ profile, status, fetchData }) {
   if (isPrivate && profile?.photoRequestStatus !== "accepted") {
     const isPending  = profile?.photoRequestStatus === "pending";
     const isRejected = profile?.photoRequestStatus === "rejected";
+    const defaultAvatar = profile?.gender === "Female" ? femaleDefault : maleDefault;
     return (
       <div className="position-relative w-100" style={{ height: "16rem", borderBottom: "3px solid var(--royal-gold)" }}>
-        <img src={pro} className="w-100 h-100 object-fit-cover" alt="Private" />
-        <div className="position-absolute bottom-0 end-0 m-2 cursor-pointer" onClick={() => handleViewimage(profile._id)}>
-          <span className="badge bg-dark rounded-pill d-flex align-items-center p-2 shadow" style={{ border: "1px solid var(--royal-gold)" }}>
-            <IoImageSharp size={16} className="me-1" color="var(--royal-gold)" />
-            <span>{totalPhotos < 10 ? `0${totalPhotos}` : totalPhotos}</span>
-          </span>
-        </div>
-        <div className="position-absolute top-50 start-50 translate-middle text-center w-100 px-3 z-10">
-          {isPending  && <p className="mb-0 text-white fw-bold bg-dark bg-opacity-75 rounded px-2 py-1 mx-auto" style={{ width:"fit-content" }}>Request Pending</p>}
-          {isRejected && <>
-            <p className="mb-2 text-white fw-bold bg-danger bg-opacity-75 rounded px-2 py-1 mx-auto" style={{ width:"fit-content" }}>Request Rejected</p>
-            <button className="royal-button-outline bg-white text-dark w-auto px-3 py-1" style={{ fontSize:"0.85rem" }} onClick={() => HandlePhotoReq(profile?._id)}>Resend Request</button>
-          </>}
-          {!isPending && !isRejected && <button className="royal-button px-3 py-2 shadow" style={{ fontSize:"0.9rem" }} onClick={() => HandlePhotoReq(profile?._id)}>Request Photo</button>}
-        </div>
+        <img src={defaultAvatar} className="w-100 h-100 object-fit-cover" alt="Default Avatar" />
       </div>
     );
   }
@@ -114,14 +101,16 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
   useEffect(() => { setIsShortlisted(!!profile?.isShortlisted); }, [profile?._id, profile?.isShortlisted]);
 
   const getImg = () => {
-    if (profile?.filesId?.isPrivate && photoReqStatus !== "accepted") return pro;
-    if (profile?.filesId?.photos?.length > 0) return profile.filesId.photos[0].url;
+    if (profile?.filesId?.photos?.length > 0 && (!profile?.filesId?.isPrivate || photoReqStatus === "accepted")) {
+      return profile.filesId.photos[0].url;
+    }
     const url = profile?.imageUrl;
     const isDefault = !url || 
       url.includes("profile.png") || 
       url.includes("user-icon-flat-isolated") || 
-      url.includes("istockphoto.com");
-    if (!isDefault) return url;
+      url.includes("istockphoto.com") ||
+      url.includes("blurimage");
+    if (!isDefault && (!profile?.filesId?.isPrivate || photoReqStatus === "accepted")) return url;
     return profile?.gender === "Female" ? femaleDefault : maleDefault;
   };
 
@@ -508,16 +497,28 @@ const SearchPage = () => {
     }));
   };
 
+  const getEnforcedTargetGender = () => {
+    if (userData?.gender === "Male") return "Female";
+    if (userData?.gender === "Female") return "Male";
+    return formDataRef.current?.gender || "";
+  };
+
   // ── Full search: resets to page 1 (used when user clicks "Search Profiles") ──
   const handleSearch = async (showToast=false) => {
     try {
       setLoading(true);
-      const res = await updateData("getprofiles", formDataRef.current, showToast);
+      const targetGender = getEnforcedTargetGender();
+      const payload = {
+        ...(formDataRef.current || {}),
+        gender: targetGender
+      };
+      const res = await updateData("getprofiles", payload, showToast);
       const rawList = res?.data || [];
       const filteredList = rawList.filter(p => {
         const isSelf = p._id === userData?._id || p.userId === userData?._id;
         const isAdmin = p.role === "admin";
-        return !isSelf && !isAdmin;
+        const matchesTarget = !targetGender || p.gender === targetGender;
+        return !isSelf && !isAdmin && matchesTarget;
       });
       setProfiles(filteredList);
       setCurrentPage(1);
@@ -528,12 +529,18 @@ const SearchPage = () => {
   // ── Refresh: keeps current page & filters — used after card actions ──
   const refreshData = useCallback(async () => {
     try {
-      const res = await updateData("getprofiles", formDataRef.current, false);
+      const targetGender = userData?.gender === "Male" ? "Female" : (userData?.gender === "Female" ? "Male" : (formDataRef.current?.gender || ""));
+      const payload = {
+        ...(formDataRef.current || {}),
+        gender: targetGender
+      };
+      const res = await updateData("getprofiles", payload, false);
       const rawList = res?.data || [];
       const filteredList = rawList.filter(p => {
         const isSelf = p._id === userData?._id || p.userId === userData?._id;
         const isAdmin = p.role === "admin";
-        return !isSelf && !isAdmin;
+        const matchesTarget = !targetGender || p.gender === targetGender;
+        return !isSelf && !isAdmin && matchesTarget;
       });
       setProfiles(filteredList);
       // currentPage intentionally NOT reset — stay on same page
@@ -554,13 +561,15 @@ const SearchPage = () => {
   useEffect(() => { 
     // On mount: load profiles with whatever filters are already in context (do NOT clear them)
     handleSearch(false); 
-  }, []);
+  }, [userData?.gender]);
 
   useEffect(() => {
-    if (userData?.gender === "Male" && formData.gender !== "Female") {
-      setFormData(prev => ({ ...prev, gender: "Female" }));
-    } else if (userData?.gender === "Female" && formData.gender !== "Male") {
-      setFormData(prev => ({ ...prev, gender: "Male" }));
+    const targetGender = getEnforcedTargetGender();
+    if (targetGender && formData.gender !== targetGender) {
+      const updated = { ...formData, gender: targetGender };
+      setFormData(updated);
+      formDataRef.current = updated;
+      handleSearch(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData?.gender]);
@@ -605,10 +614,14 @@ const SearchPage = () => {
       {/* Looking For */}
       <div style={{ marginBottom:"18px" }}>
          <FilterLabel>Looking For</FilterLabel>
-         <FilterSelect name="gender" value={formData.gender||""} onChange={handleChange}>
-           <option value="" disabled={userData?.gender === "Male" || userData?.gender === "Female"}>Any</option>
-           <option value="Male" disabled={userData?.gender === "Male"}>Groom</option>
-           <option value="Female" disabled={userData?.gender === "Female"}>Bride</option>
+         <FilterSelect 
+           name="gender" 
+           value={userData?.gender === "Male" ? "Female" : (userData?.gender === "Female" ? "Male" : (formData.gender||""))} 
+           onChange={handleChange}
+           disabled={!!userData?.gender}
+         >
+           <option value="Female">Bride (Female)</option>
+           <option value="Male">Groom (Male)</option>
          </FilterSelect>
       </div>
 
@@ -651,7 +664,7 @@ const SearchPage = () => {
         <FilterSelect name="clan" value={formData.clan||""} onChange={handleChange} disabled={clanLoading}>
           <option value="">{clanLoading ? "Loading…" : "Any Clan / Subclan"}</option>
           {clanOptions.clans.length > 0 && (
-            <optgroup label="── Clans ──">
+            <optgroup label="── Clans / Last Names ──">
               {clanOptions.clans.map(c => (
                 <option key={`clan-${c}`} value={c}>{c}</option>
               ))}

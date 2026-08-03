@@ -10,7 +10,7 @@ import { useAuth } from "./AuthContext";
 
 import { AiOutlineRight, AiOutlineClose } from "react-icons/ai";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { IoChevronBackOutline, IoSendSharp, IoHappyOutline, IoImageOutline } from "react-icons/io5";
+import { IoChevronBackOutline, IoSendSharp, IoHappyOutline } from "react-icons/io5";
 import { FaCheck, FaCommentDots } from "react-icons/fa";
 import { GiCancel } from "react-icons/gi";
 import { toast } from "react-toastify";
@@ -90,6 +90,8 @@ const ChatApp = () => {
   const [RequestingMatrId, setRequestingMatrId] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
   const [error, setError] = useState(null);
+  const [chatsLoading, setChatsLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(false);
 
   const chatContainerRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -130,19 +132,23 @@ const ChatApp = () => {
   }, [messages]);
 
   /* ── Data Loaders (useCallback to prevent infinite re-render loops) ── */
-  const loadMessages = useCallback(async (chatId) => {
+  const loadMessages = useCallback(async (chatId, showLoading = false) => {
     if (!chatId) return;
     setActiveChat(chatId);
+    if (showLoading) setMessagesLoading(true);
     try {
       const msgs = await chatApi.getMessages(chatId);
       setMessages(Array.isArray(msgs) ? msgs : []);
     } catch { 
       setMessages([]); 
+    } finally {
+      if (showLoading) setMessagesLoading(false);
     }
   }, []);
 
-  const loadChats = useCallback(async () => {
+  const loadChats = useCallback(async (showLoading = false) => {
     try {
+      if (showLoading) setChatsLoading(true);
       let token = null;
       try { token = localStorage.getItem("authToken"); } catch (e) {}
       if (!token) return;
@@ -152,11 +158,13 @@ const ChatApp = () => {
       if (list?.length > 0 && !activeChatRef.current) {
         const first = list[0];
         if (first?._id) {
-          await loadMessages(first._id);
+          await loadMessages(first._id, showLoading);
         }
       }
     } catch { 
       setError("Unable to load chats"); 
+    } finally {
+      if (showLoading) setChatsLoading(false);
     }
   }, [loadMessages]);
 
@@ -187,10 +195,10 @@ const ChatApp = () => {
         if (msg._id) {
           setMessages((prev) => (prev.some((m) => m._id === msg._id) ? prev : [...prev, msg]));
         } else {
-          loadMessages(activeChatRef.current);
+          loadMessages(activeChatRef.current, false);
         }
       }
-      loadChats();
+      loadChats(false);
     });
 
     return () => { 
@@ -204,7 +212,7 @@ const ChatApp = () => {
     if (!activeChat) return;
     const id = setInterval(() => {
       if (activeChatRef.current) {
-        loadMessages(activeChatRef.current);
+        loadMessages(activeChatRef.current, false);
       }
     }, 8000);
     return () => clearInterval(id);
@@ -213,7 +221,7 @@ const ChatApp = () => {
   /* ── Initial Load ── */
   useEffect(() => {
     if (userId) { 
-      loadChats(); 
+      loadChats(true); 
       loadRequest(); 
     }
   }, [userId, loadChats, loadRequest]);
@@ -358,7 +366,16 @@ const ChatApp = () => {
 
               {/* List */}
               <div className="chat-list">
-                {filteredChats.length === 0 ? (
+                {chatsLoading ? (
+                  <div style={{ padding: "40px 20px", textAlign: "center", color: "#888" }}>
+                    <div className="spinner-border mb-2" role="status" style={{ width: "1.8rem", height: "1.8rem", color: "#7B1A1A" }}>
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p style={{ fontSize: 13, fontFamily: "var(--font-body)", margin: 0, fontWeight: "600", color: "#7B1A1A" }}>
+                      Loading Conversations...
+                    </p>
+                  </div>
+                ) : filteredChats.length === 0 ? (
                   <div style={{ padding: "40px 20px", textAlign: "center", color: "#bbb" }}>
                     <FaCommentDots size={36} style={{ marginBottom: 12, opacity: 0.3 }} />
                     <p style={{ fontSize: 14, fontFamily: "var(--font-body)", margin: 0 }}>
@@ -382,7 +399,7 @@ const ChatApp = () => {
                         key={chat._id}
                         className={`chat-list-item ${chat._id === activeChat ? "active" : ""}`}
                         onClick={() => {
-                          loadMessages(chat._id);
+                          loadMessages(chat._id, true);
                         }}
                       >
                         <Avatar photo={photo} first={partner?.firstName} last={partner?.lastName} size={48} />
@@ -461,7 +478,16 @@ const ChatApp = () => {
 
               {/* Messages */}
               <div className="chat-messages-area" ref={chatContainerRef}>
-                {!activeChat ? (
+                {messagesLoading ? (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", padding: "40px 20px" }}>
+                    <div className="spinner-border mb-3" role="status" style={{ width: "2.5rem", height: "2.5rem", color: "#EDB139" }}>
+                      <span className="visually-hidden">Loading messages...</span>
+                    </div>
+                    <p style={{ fontSize: 14, fontFamily: "var(--font-body)", margin: 0, fontWeight: "600", color: "#7B1A1A" }}>
+                      Loading Messages...
+                    </p>
+                  </div>
+                ) : !activeChat ? (
                   <div className="chat-empty-state">
                     <div className="chat-empty-icon">
                       <FaCommentDots size={36} color="var(--chat-maroon, #6b0f1a)" />
@@ -531,24 +557,6 @@ const ChatApp = () => {
               {/* Input Bar */}
               {activeChat && (
                 <div className="chat-input-bar position-relative">
-                  {/* Hidden File Input */}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={handleFileSelect}
-                  />
-
-                  {/* Image Attachment Button */}
-                  <button
-                    className="chat-input-icon-btn"
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Send Image"
-                    type="button"
-                  >
-                    <IoImageOutline size={24} />
-                  </button>
 
                   {/* Emoji Button */}
                   <button

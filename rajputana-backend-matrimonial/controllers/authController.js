@@ -193,7 +193,7 @@ exports.forgotPassword = async (req, res) => {
     const resetToken = generateToken(user._id);
     let frontendUrl = process.env.FRONTEND_URL;
     if (!frontendUrl || frontendUrl.includes("localhost:3000")) {
-      frontendUrl = process.env.NODE_ENV === "production" ? "https://rajputmatches.com" : "http://localhost:5173";
+      frontendUrl = process.env.NODE_ENV === "production" ? "https://Rajput Alliances.com" : "http://localhost:5173";
     }
     frontendUrl = frontendUrl.replace(/\/$/, "");
     const resetLink = `${frontendUrl}/set-new-password?token=${resetToken}&userid=${user._id}`;
@@ -1068,14 +1068,26 @@ exports.reqacceptRequest = async (req, res) => {
       ),
     ]);
 
-    // console.log(userUpdate);
-    // console.log(profileUpdate);
-
     if (userUpdate.modifiedCount === 0 || profileUpdate.modifiedCount === 0) {
       return res.status(500).json({ message: "Failed to update status" });
     }
 
-    return res.status(200).json({ message: "Request accepted successfully" });
+    // Auto-create or update Chat document so both users immediately see each other in /message
+    let chat = await Chat.findOne({
+      participants: { $all: [userObjectId, profileObjectId] },
+    });
+    if (!chat) {
+      chat = new Chat({
+        participants: [userObjectId, profileObjectId],
+        status: "accepted",
+      });
+      await chat.save();
+    } else if (chat.status !== "accepted") {
+      chat.status = "accepted";
+      await chat.save();
+    }
+
+    return res.status(200).json({ message: "Request accepted successfully", chatId: chat._id });
   } catch (error) {
     console.error("Error accepting request:", error);
     return res.status(500).json({ message: "Server error", error });
@@ -1824,10 +1836,13 @@ exports.getprofiles = async (req, res) => {
       _id: { $ne: userId },
     };
 
-    if (gender) {
+    // Always strictly enforce opposite gender for logged-in user
+    if (user.gender === "Male") {
+      query.gender = "Female";
+    } else if (user.gender === "Female") {
+      query.gender = "Male";
+    } else if (gender) {
       query.gender = gender;
-    } else if (gender === undefined) {
-      query.gender = user.gender === "Male" ? "Female" : "Male";
     }
 
     if (minAge || maxAge) {
@@ -3258,6 +3273,46 @@ exports.getUserChats = async (req, res) => {
       return res.status(400).json({ message: "User ID is required." });
     }
 
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // Auto-create Chat documents for any accepted requests (interest, photo, or contact requests)
+    const currentUser = await User.findById(userId).select("reqSent reqReceived photoReqSent photoReqReceived").lean();
+    if (currentUser) {
+      const acceptedUserIds = new Set();
+      (currentUser.reqSent || []).forEach(r => { if (r.status === "accepted" && r.userId) acceptedUserIds.add(r.userId.toString()); });
+      (currentUser.reqReceived || []).forEach(r => { if (r.status === "accepted" && r.userId) acceptedUserIds.add(r.userId.toString()); });
+      (currentUser.photoReqSent || []).forEach(r => { if (r.status === "accepted" && r.userId) acceptedUserIds.add(r.userId.toString()); });
+      (currentUser.photoReqReceived || []).forEach(r => { if (r.status === "accepted" && r.userId) acceptedUserIds.add(r.userId.toString()); });
+
+      try {
+        const acceptedContactReqs = await UserContactRequest.find({
+          $or: [{ senderId: userId }, { receiverId: userId }],
+          status: "accepted"
+        }).lean();
+
+        acceptedContactReqs.forEach(c => {
+          const otherId = c.senderId?.toString() === userId ? c.receiverId?.toString() : c.senderId?.toString();
+          if (otherId) acceptedUserIds.add(otherId);
+        });
+      } catch (e) {
+        // UserContactRequest collection optional check
+      }
+
+      for (const otherUserIdStr of acceptedUserIds) {
+        if (!otherUserIdStr || otherUserIdStr === userId) continue;
+        const otherObjectId = new mongoose.Types.ObjectId(otherUserIdStr);
+        const existingChat = await Chat.findOne({
+          participants: { $all: [userObjectId, otherObjectId] },
+        });
+        if (!existingChat) {
+          await Chat.create({
+            participants: [userObjectId, otherObjectId],
+            status: "accepted",
+          });
+        }
+      }
+    }
+
     const chats = await Chat.find({
       participants: userId,
     })
@@ -3271,13 +3326,13 @@ exports.getUserChats = async (req, res) => {
       .lean();
 
     if (!chats.length) {
-      return res.status(404).json({ error: "No chats found for this user." });
+      return res.status(200).json([]);
     }
 
     // Filter messages based on `clearedBy`
     const filteredChats = chats.map((chat) => {
-      const clearedEntry = chat.clearedBy.find(
-        (entry) => entry.user.toString() === userId
+      const clearedEntry = (chat.clearedBy || []).find(
+        (entry) => entry.user?.toString() === userId
       );
       const clearedAt = clearedEntry ? clearedEntry.clearedAt : null;
 
@@ -3288,10 +3343,10 @@ exports.getUserChats = async (req, res) => {
       return chat;
     });
 
-    res.status(200).json(filteredChats);
+    return res.status(200).json(filteredChats);
   } catch (err) {
     console.error("Error in getUserChats:", err);
-    res.status(500).json({ error: "Server error. Please try again later." });
+    return res.status(500).json({ error: "Server error. Please try again later." });
   }
 };
 
@@ -4244,19 +4299,24 @@ exports.getdocumentRequests = async (req, res) => {
 // ── GET DISTINCT CLAN / SUBCLAN VALUES ──────────────────────────────────────
 exports.getDistinctClans = async (req, res) => {
   try {
-    const [clans, subclans] = await Promise.all([
+    const [clans, subclans, lastNames] = await Promise.all([
       HoroscopeDetails.distinct("clan"),
       HoroscopeDetails.distinct("subclan"),
+      User.distinct("lastName"),
     ]);
 
-    // Filter out empty / null values, sort alphabetically
-    const cleanClans    = clans.filter(Boolean).sort();
-    const cleanSubclans = subclans.filter(Boolean).sort();
+    // Filter out empty / null values, trim whitespace
+    const cleanClans    = clans.filter(Boolean).map(c => String(c).trim()).filter(c => c.length > 0);
+    const cleanSubclans = subclans.filter(Boolean).map(s => String(s).trim()).filter(s => s.length > 0);
+    const cleanLastNames= lastNames.filter(Boolean).map(l => String(l).trim()).filter(l => l.length > 0);
 
-    // Merge both into one sorted, de-duplicated list for the dropdown
-    const combined = [...new Set([...cleanClans, ...cleanSubclans])].sort();
+    // Merge clans & lastNames into one sorted, de-duplicated list for clans
+    const allClans = [...new Set([...cleanClans, ...cleanLastNames])].sort((a, b) => a.localeCompare(b));
+    const allSubclans = [...new Set(cleanSubclans)].sort((a, b) => a.localeCompare(b));
 
-    return res.status(200).json({ clans: cleanClans, subclans: cleanSubclans, combined });
+    const combined = [...new Set([...allClans, ...allSubclans])].sort((a, b) => a.localeCompare(b));
+
+    return res.status(200).json({ clans: allClans, subclans: allSubclans, combined });
   } catch (error) {
     console.error("Error fetching distinct clans:", error);
     return res.status(500).json({ message: "Server error", error });
@@ -4473,7 +4533,8 @@ exports.getSocialLinks = async (req, res) => {
 
 exports.updateSocialLinks = async (req, res) => {
   try {
-    const { facebook, instagram, whatsapp, telegram, youtube, twitter, linkedin, phone, email } = req.body;
+    const payload = req.body?.data || req.body;
+    const { facebook, instagram, whatsapp, telegram, youtube, twitter, linkedin, phone, email } = payload;
     let links = await SocialLinks.findOne();
     if (!links) {
       links = new SocialLinks();

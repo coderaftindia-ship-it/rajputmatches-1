@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
-import { FaShieldAlt, FaUserShield, FaInfoCircle, FaFileContract, FaEnvelope, FaCrown } from "react-icons/fa";
+import { FaShieldAlt, FaUserShield, FaInfoCircle, FaFileContract, FaEnvelope, FaCrown, FaStar } from "react-icons/fa";
 
 export default function PrivacyPolicy() {
   return (
@@ -50,7 +50,7 @@ export default function PrivacyPolicy() {
                 lineHeight: "1.8"
               }}
             >
-              At rajputmatches.com, we value your privacy and are committed to protecting your personal information. 
+              At Rajput Alliances.com, we value your privacy and are committed to protecting your personal information. 
               This Privacy Policy outlines how we collect, use, share, and protect your information when you use our website and services.
             </p>
           </div>
@@ -71,7 +71,6 @@ export default function PrivacyPolicy() {
                     className="fw-bold mb-4 d-flex align-items-center gap-2"
                     style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon)" }}
                   >
-                    <FaUserShield className="text-warning" size={24} style={{ color: "var(--royal-gold-dark)" }} />
                     1. Information We Collect
                   </h3>
                   <p className="mb-4" style={{ color: "var(--royal-text)", lineHeight: "1.8" }}>
@@ -111,7 +110,7 @@ export default function PrivacyPolicy() {
                       <div className="p-3 h-100 rounded-3" style={{ background: "rgba(237, 177, 57, 0.08)", border: "1px solid rgba(237, 177, 57, 0.2)" }}>
                         <h5 className="fw-bold mb-2" style={{ color: "var(--royal-maroon)" }}>Communication Data</h5>
                         <p className="mb-0 small" style={{ color: "var(--royal-text)", lineHeight: "1.6" }}>
-                          Messages, chats, and interactions with other members on rajputmatches.com.
+                          Messages, chats, and interactions with other members on Rajput Alliances.com.
                         </p>
                       </div>
                     </div>
@@ -120,7 +119,7 @@ export default function PrivacyPolicy() {
                   <div className="mt-4 p-3 rounded-3" style={{ borderLeft: "4px solid var(--royal-gold)", background: "rgba(252, 245, 234, 0.5)" }}>
                     <h5 className="fw-bold mb-1" style={{ color: "var(--royal-maroon)" }}>Cookies</h5>
                     <p className="mb-0" style={{ color: "var(--royal-text)", lineHeight: "1.7" }}>
-                      We use cookies to enhance your experience on rajputmatches.com. You can disable cookies in your browser settings, 
+                      We use cookies to enhance your experience on Rajput Alliances.com. You can disable cookies in your browser settings, 
                       but this may affect your ability to use certain features of our website.
                     </p>
                   </div>
@@ -134,7 +133,6 @@ export default function PrivacyPolicy() {
                     className="fw-bold mb-4 d-flex align-items-center gap-2"
                     style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon)" }}
                   >
-                    <FaInfoCircle className="text-warning" size={24} style={{ color: "var(--royal-gold-dark)" }} />
                     2. How We Use Your Information
                   </h3>
                   <p className="mb-3" style={{ color: "var(--royal-text)", lineHeight: "1.8" }}>
@@ -151,12 +149,20 @@ export default function PrivacyPolicy() {
                       "To comply with legal obligations and enforce our Terms of Use.",
                       "To send service-related notifications, promotions, or updates."
                     ].map((item, idx) => (
-                      <li key={idx} className="d-flex align-items-start gap-2">
-                        <span 
-                          className="d-inline-block rounded-circle mt-2" 
-                          style={{ width: "8px", height: "8px", backgroundColor: "var(--royal-gold)", flexShrink: 0 }}
-                        />
-                        <span style={{ color: "var(--royal-text)", lineHeight: "1.6" }}>{item}</span>
+                      <li key={idx} className="d-flex align-items-start gap-3 mb-2">
+                        <div 
+                          className="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 mt-1"
+                          style={{
+                            width: "22px",
+                            height: "22px",
+                            backgroundColor: "rgba(128, 0, 0, 0.08)",
+                            border: "1px solid #D4AF37",
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+                          }}
+                        >
+                          <FaStar size={10} color="#D4AF37" />
+                        </div>
+                        <span style={{ color: "var(--royal-text)", lineHeight: "1.75", fontSize: "0.98rem" }}>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -170,7 +176,6 @@ export default function PrivacyPolicy() {
                     className="fw-bold mb-4 d-flex align-items-center gap-2"
                     style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon)" }}
                   >
-                    <FaFileContract className="text-warning" size={24} style={{ color: "var(--royal-gold-dark)" }} />
                     3. Sharing Your Information
                   </h3>
                   <p className="mb-3" style={{ color: "var(--royal-text)", lineHeight: "1.8" }}>
@@ -184,12 +189,20 @@ export default function PrivacyPolicy() {
                       "When required by law, legal processes, or to protect our rights and the rights of others.",
                       "In case of business transfers, mergers, or acquisitions."
                     ].map((item, idx) => (
-                      <li key={idx} className="d-flex align-items-start gap-2">
-                        <span 
-                          className="d-inline-block rounded-circle mt-2" 
-                          style={{ width: "8px", height: "8px", backgroundColor: "var(--royal-gold)", flexShrink: 0 }}
-                        />
-                        <span style={{ color: "var(--royal-text)", lineHeight: "1.6" }}>{item}</span>
+                      <li key={idx} className="d-flex align-items-start gap-3 mb-2">
+                        <div 
+                          className="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 mt-1"
+                          style={{
+                            width: "22px",
+                            height: "22px",
+                            backgroundColor: "rgba(128, 0, 0, 0.08)",
+                            border: "1px solid #D4AF37",
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+                          }}
+                        >
+                          <FaStar size={10} color="#D4AF37" />
+                        </div>
+                        <span style={{ color: "var(--royal-text)", lineHeight: "1.75", fontSize: "0.98rem" }}>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -240,7 +253,7 @@ export default function PrivacyPolicy() {
                     5. Children's Privacy
                   </h3>
                   <p className="mb-0" style={{ color: "var(--royal-text)", lineHeight: "1.8" }}>
-                    rajputmatches.com is intended for users above the age of 18. We do not knowingly collect data from children under 18. 
+                    Rajput Alliances.com is intended for users above the age of 18. We do not knowingly collect data from children under 18. 
                     If we discover such data, we will take immediate action to delete it.
                   </p>
                 </section>
@@ -298,8 +311,8 @@ export default function PrivacyPolicy() {
                     If you have any questions or concerns regarding this Privacy Policy, please contact us at:
                   </p>
                   <h5 className="fw-bold mb-0">
-                    <a href="mailto:info@rajputmatches.com" style={{ color: "var(--royal-gold-light)", textDecoration: "none" }}>
-                      info@rajputmatches.com
+                    <a href="mailto:info@Rajput Alliances.com" style={{ color: "var(--royal-gold-light)", textDecoration: "none" }}>
+                      info@Rajput Alliances.com
                     </a>
                   </h5>
                 </div>

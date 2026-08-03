@@ -304,15 +304,30 @@ function PhotoRequest() {
 
   const totalPages = Math.ceil(profiles.length / profilesPerPage);
 
+  const getStatusCount = (status, tabKey = activeTab) => {
+    const list = tabKey === "requestReceived" ? (data?.photoReqReceived || []) : (data?.photoReqSent || []);
+    if (status === "all") return list.length;
+    return list.filter((p) => p?.status === status).length;
+  };
+
+  const handleStatusTabChange = (status) => {
+    setStatusFilter(status);
+    let list = activeTab === "requestReceived" ? [...(data?.photoReqReceived || [])] : [...(data?.photoReqSent || [])];
+    if (status !== "all") {
+      list = list.filter((profile) => profile?.status === status);
+    }
+    setProfiles(list);
+    setCurrentPage(1);
+  };
+
   const switchTab = (tab) => {
     console.log("Switching tab to:", tab);
 
     setActiveTab(tab);
+    setStatusFilter("all");
 
     const newProfiles =
-      tab === "requestSent" ? data.photoReqSent : data.photoReqReceived;
-
-    console.log("New profiles set:", newProfiles);
+      tab === "requestSent" ? (data.photoReqSent || []) : (data.photoReqReceived || []);
 
     setProfiles(newProfiles);
     setCurrentPage(1);
@@ -385,6 +400,7 @@ function PhotoRequest() {
         >
           <select
             className="form-select form-select-lg m-0"
+            value={statusFilter}
             style={{
               color: "rgba(97, 97, 97, 1)",
               borderRadius: "0%",
@@ -403,12 +419,54 @@ function PhotoRequest() {
               filterAndSortProfiles(e.target.value, sortCriteria)
             }
           >
-            <option value="all">All request</option>
+            <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
             <option value="accepted">Accepted</option>
             <option value="rejected">Rejected</option>
           </select>
         </div>
+      </div>
+
+      {/* Sub-Status Pill Tabs: All | Accepted | Pending | Rejected */}
+      <div className="d-flex gap-2 mb-3 px-2 flex-wrap">
+        {[
+          { id: "all", label: "All Requests" },
+          { id: "accepted", label: "Accepted", color: "#198754" },
+          { id: "pending", label: "Pending", color: "#d97706" },
+          { id: "rejected", label: "Rejected", color: "#dc3545" },
+        ].map((statusTab) => {
+          const isActive = statusFilter === statusTab.id;
+          const count = getStatusCount(statusTab.id);
+          return (
+            <button
+              key={statusTab.id}
+              onClick={() => handleStatusTabChange(statusTab.id)}
+              className="btn d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill shadow-sm"
+              style={{
+                backgroundColor: isActive ? (statusTab.color || "#991c1c") : "#ffffff",
+                color: isActive ? "#ffffff" : "#444444",
+                border: `1.5px solid ${isActive ? (statusTab.color || "#991c1c") : "#e2e8f0"}`,
+                fontSize: "0.85rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.2s ease"
+              }}
+            >
+              <span>{statusTab.label}</span>
+              <span
+                className="badge rounded-circle"
+                style={{
+                  backgroundColor: isActive ? "rgba(255,255,255,0.25)" : (statusTab.color || "#991c1c"),
+                  color: "#ffffff",
+                  fontSize: "0.75rem",
+                  padding: "4px 8px"
+                }}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="row m-0 p-0">

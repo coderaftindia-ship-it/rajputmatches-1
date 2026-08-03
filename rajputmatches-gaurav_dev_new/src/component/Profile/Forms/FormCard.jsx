@@ -181,7 +181,7 @@ function FormCard({
                 name="clan"
                 style={inputStyle}
                 placeholder="Select Clan"
-                value={formData.clan || ""}
+                value={formData.clan || formData.subclan || formData.lastName || ""}
                 onChange={handleInputChange}
               />
             </div>

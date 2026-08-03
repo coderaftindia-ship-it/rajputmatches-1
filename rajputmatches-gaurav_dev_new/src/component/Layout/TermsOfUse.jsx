@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
-import { FaFileSignature, FaUserShield, FaExclamationTriangle, FaGavel, FaEnvelope } from "react-icons/fa";
+import { FaFileSignature, FaUserShield, FaExclamationTriangle, FaGavel, FaEnvelope, FaStar } from "react-icons/fa";
 
 export default function TermsOfUse() {
   return (
@@ -50,7 +50,7 @@ export default function TermsOfUse() {
                 lineHeight: "1.8"
               }}
             >
-              Please read the following User Agreement. When you sign up for any service within rajputmatches.com, 
+              Please read the following User Agreement. When you sign up for any service within Rajput Alliances.com, 
               all of which are hereinafter referred to collectively as the "Website", you agree to all of the terms and conditions of this Agreement.
             </p>
           </div>
@@ -74,10 +74,10 @@ export default function TermsOfUse() {
                     1. User Agreement
                   </h3>
                   <p style={{ color: "var(--royal-text)", lineHeight: "1.8" }}>
-                    This Agreement constitutes your agreement with rajputmatches.com with respect to your use of the Website. 
+                    This Agreement constitutes your agreement with Rajput Alliances.com with respect to your use of the Website. 
                     You must agree to abide by all of the terms and conditions contained in this Agreement in order to become or remain 
-                    an authorized user of the Website. As used in this Agreement, "we" and "us" means rajputmatches.com, 
-                    or any successor or assignee of rajputmatches.com.
+                    an authorized user of the Website. As used in this Agreement, "we" and "us" means Rajput Alliances.com, 
+                    or any successor or assignee of Rajput Alliances.com.
                   </p>
                   
                   <div className="mt-4 p-3 rounded-3" style={{ borderLeft: "4px solid var(--royal-gold)", background: "rgba(252, 245, 234, 0.5)" }}>
@@ -97,7 +97,6 @@ export default function TermsOfUse() {
                     className="fw-bold mb-4 d-flex align-items-center gap-2"
                     style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon)" }}
                   >
-                    <FaUserShield className="text-warning" size={24} style={{ color: "var(--royal-gold-dark)" }} />
                     2. Age & Right to Use
                   </h3>
                   <p style={{ color: "var(--royal-text)", lineHeight: "1.8" }}>
@@ -131,16 +130,17 @@ export default function TermsOfUse() {
                     ].map((item, idx) => (
                       <div key={idx} className="p-3 rounded-3 bg-light border border-light d-flex gap-3">
                         <div 
-                          className="d-flex align-items-center justify-content-center fw-bold rounded-circle"
+                          className="d-flex align-items-center justify-content-center rounded-circle shadow-sm"
                           style={{
-                            width: "30px",
-                            height: "30px",
+                            width: "32px",
+                            height: "32px",
                             background: "var(--royal-maroon)",
-                            color: "var(--royal-gold-light)",
+                            color: "var(--royal-gold)",
+                            border: "1.5px solid var(--royal-gold)",
                             flexShrink: 0
                           }}
                         >
-                          {idx + 1}
+                          <FaStar size={14} color="var(--royal-gold)" />
                         </div>
                         <p className="mb-0 small" style={{ color: "var(--royal-text)", lineHeight: "1.6" }}>{item}</p>
                       </div>
@@ -167,14 +167,22 @@ export default function TermsOfUse() {
                       "We cannot ensure the security or privacy of information you provide through the Internet and your email messages, and you release us from any and all liability in connection with the use of such information by other parties.",
                       "We are not responsible for, and cannot control, the use by others of any information which you provide to them and you should use caution in selecting the personal information you provide to others through the Website.",
                       "We cannot assume any responsibility for the content of messages sent by other users of the Website, and you release us from any and all liability in connection with the contents of any communications you may receive from other users.",
-                      "You acknowledge that you cannot sue rajputmatches.com or any of its employees for any damages done to you through the site. We cannot guarantee, and assume no responsibility for verifying, the accuracy of the information provided by other users of the Website. You may not use the Website for any unlawful purpose."
+                      "You acknowledge that you cannot sue Rajput Alliances.com or any of its employees for any damages done to you through the site. We cannot guarantee, and assume no responsibility for verifying, the accuracy of the information provided by other users of the Website. You may not use the Website for any unlawful purpose."
                     ].map((item, idx) => (
-                      <li key={idx} className="d-flex align-items-start gap-2">
-                        <span 
-                          className="d-inline-block rounded-circle mt-2" 
-                          style={{ width: "8px", height: "8px", backgroundColor: "var(--royal-gold)", flexShrink: 0 }}
-                        />
-                        <span style={{ color: "var(--royal-text)", lineHeight: "1.6" }}>{item}</span>
+                      <li key={idx} className="d-flex align-items-start gap-3 mb-2">
+                        <div 
+                          className="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 mt-1"
+                          style={{
+                            width: "22px",
+                            height: "22px",
+                            backgroundColor: "rgba(128, 0, 0, 0.08)",
+                            border: "1px solid #D4AF37",
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+                          }}
+                        >
+                          <FaStar size={10} color="#D4AF37" />
+                        </div>
+                        <span style={{ color: "var(--royal-text)", lineHeight: "1.75", fontSize: "0.98rem" }}>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -281,7 +289,6 @@ export default function TermsOfUse() {
                     className="fw-bold mb-4 d-flex align-items-center gap-2"
                     style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon)" }}
                   >
-                    <FaGavel className="text-warning" size={24} style={{ color: "var(--royal-gold-dark)" }} />
                     9. Governing Law and Jurisdiction
                   </h3>
                   <p style={{ color: "var(--royal-text)", lineHeight: "1.8" }}>
@@ -311,8 +318,8 @@ export default function TermsOfUse() {
                     To resolve or report a complaint regarding the Website or members who use the Website, please write to our support email:
                   </p>
                   <h5 className="fw-bold mb-0">
-                    <a href="mailto:info@rajputmatches.com" style={{ color: "var(--royal-gold-light)", textDecoration: "none" }}>
-                      info@rajputmatches.com
+                    <a href="mailto:info@Rajput Alliances.com" style={{ color: "var(--royal-gold-light)", textDecoration: "none" }}>
+                      info@Rajput Alliances.com
                     </a>
                   </h5>
                 </div>

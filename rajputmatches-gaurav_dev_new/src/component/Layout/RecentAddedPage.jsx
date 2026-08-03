@@ -122,31 +122,22 @@ function RecentAddedPage() {
   };
 
   const getProfileImage = (prof) => {
-    if (prof.filesId) {
-      if (prof.filesId.isPrivate && prof.photoRequestStatus !== "accepted") return blurImage;
-      if (prof.filesId.photos?.length > 0) return prof.filesId.photos[0].url;
+    if (prof?.filesId?.photos?.length > 0 && (!prof?.filesId?.isPrivate || prof?.photoRequestStatus === "accepted")) {
+      return prof.filesId.photos[0].url;
     }
-    const url = prof.imageUrl;
+    const url = prof?.imageUrl;
     const isDefault = !url || 
       url.includes("profile.png") || 
       url.includes("user-icon-flat-isolated") || 
-      url.includes("istockphoto.com");
-    if (!isDefault) return url;
-    return prof.gender === "Female" ? femaleDefault : maleDefault;
+      url.includes("istockphoto.com") ||
+      url.includes("blurimage");
+    if (!isDefault && (!prof?.filesId?.isPrivate || prof?.photoRequestStatus === "accepted")) return url;
+    return prof?.gender === "Female" ? femaleDefault : maleDefault;
   };
 
   const isDefaultAvatar = (prof) => {
-    if (prof?.filesId?.photos?.length > 0) return false;
-    if (prof?.filesId?.isPrivate && prof?.photoRequestStatus !== "accepted") return false;
-    const img = getProfileImage(prof);
-    if (!img) return true;
-    const str = String(img).toLowerCase();
-    return (
-      str.includes("default") ||
-      str.includes("profile") ||
-      str.includes("user-icon") ||
-      str.includes("istock")
-    );
+    if (prof?.filesId?.photos?.length > 0 && (!prof?.filesId?.isPrivate || prof?.photoRequestStatus === "accepted")) return false;
+    return true;
   };
 
   const disabledOverlay = {
@@ -194,7 +185,6 @@ function RecentAddedPage() {
               alt="Profile"
               style={useDefault ? { objectFit: "cover", objectPosition: "center" } : { objectFit: "cover", objectPosition: "top" }}
             />
-            {isPrivate && profile.photoRequestStatus !== "accepted" && <div className={RecentAddedPageCss.privateOverlay}><span>Photo on Request</span></div>}
           </div>
 
           <div className={RecentAddedPageCss.cardBody}>

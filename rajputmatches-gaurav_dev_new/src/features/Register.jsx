@@ -127,9 +127,10 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  // Form State with all 11 required fields
+  // Form State with all required fields
   const [formData, setFormData] = useState({
     firstName: "",
+    middleName: "",
     lastName: "",
     countryCode: "+91",
     mobile: "",
@@ -195,7 +196,7 @@ function Register() {
       updatedValue = value.replace(/\D/g, "").slice(0, 12);
     } else if (name === "email" || name === "password") {
       updatedValue = value.trim();
-    } else if (name === "firstName" || name === "lastName") {
+    } else if (name === "firstName" || name === "middleName" || name === "lastName") {
       updatedValue = value.replace(/[^A-Za-z\s]/g, "");
     }
 
@@ -222,9 +223,14 @@ function Register() {
       newErrors.firstName = "Please enter a valid First Name.";
     }
 
-    // 2. Last Name
+    // 2. Middle Name (Optional)
+    if (formData.middleName && formData.middleName.trim() && !nameRegex.test(formData.middleName.trim())) {
+      newErrors.middleName = "Please enter a valid Middle Name.";
+    }
+
+    // 3. Last Name / Sub-clan
     if (!formData.lastName.trim() || !nameRegex.test(formData.lastName.trim())) {
-      newErrors.lastName = "Please enter a valid Last Name.";
+      newErrors.lastName = "Please enter a valid Last Name / Sub-clan.";
     }
 
     // 3. Country Code
@@ -437,8 +443,8 @@ function Register() {
             </div>
 
             <form onSubmit={handleSubmit} noValidate>
-              {/* Row 1: First Name & Last Name */}
-              <div className="royal-form-grid">
+              {/* Row 1: First Name, Middle Name & Last Name / Sub-clan */}
+              <div className="royal-form-grid-3">
                 <div className="royal-form-group">
                   <label className="royal-input-label">First Name *</label>
                   <div className="royal-input-wrapper">
@@ -456,7 +462,23 @@ function Register() {
                 </div>
 
                 <div className="royal-form-group">
-                  <label className="royal-input-label">Last Name *</label>
+                  <label className="royal-input-label">Middle Name</label>
+                  <div className="royal-input-wrapper">
+                    <FaUser className="royal-input-icon" />
+                    <input
+                      type="text"
+                      name="middleName"
+                      value={formData.middleName}
+                      onChange={handleChange}
+                      placeholder="Enter Middle Name"
+                      className="royal-input"
+                    />
+                  </div>
+                  {errors.middleName && <span className="royal-error-text">{errors.middleName}</span>}
+                </div>
+
+                <div className="royal-form-group">
+                  <label className="royal-input-label">Last Name / Sub-clan *</label>
                   <div className="royal-input-wrapper">
                     <FaUser className="royal-input-icon" />
                     <input
@@ -464,7 +486,7 @@ function Register() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
-                      placeholder="Enter Last Name"
+                      placeholder="Enter Sub-clan / Last Name"
                       className="royal-input"
                     />
                   </div>

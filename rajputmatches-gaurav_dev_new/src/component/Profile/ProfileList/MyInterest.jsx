@@ -13,15 +13,14 @@ import placeholderImage from "../../../assets/images/blurimage.png";
 
 function MyInterest() {
   const [activeTab, setActiveTab] = useState("requestSent");
+  const [currentStatusTab, setCurrentStatusTab] = useState("all");
   const { fetchUserData } = useAuth();
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState([]);
   const [data, setData] = useState({ reqSent: [], reqReceived: [] });
   const [error, setError] = useState(null);
-  // const [sortCriteria, setSortCriteria] = useState("");
   const [sortCriteria] = useState("");
   const [sortDirection, setSortDirection] = useState("asc");
-  // const [statusFilter, setStatusFilter] = useState("all");
   const profilesPerPage = 4;
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -32,7 +31,21 @@ function MyInterest() {
     return profiles?.slice(startIdx, startIdx + profilesPerPage);
   };
 
+  const getStatusCount = (status, tabKey = activeTab) => {
+    const list = tabKey === "requestReceived" ? (data?.reqReceived || []) : (data?.reqSent || []);
+    if (status === "all") return list.length;
+    return list.filter((p) => p?.status === status).length;
+  };
 
+  const handleStatusTabChange = (status) => {
+    setCurrentStatusTab(status);
+    let list = activeTab === "requestReceived" ? [...(data?.reqReceived || [])] : [...(data?.reqSent || [])];
+    if (status !== "all") {
+      list = list.filter((profile) => profile?.status === status);
+    }
+    setProfiles(list);
+    setCurrentPage(1);
+  };
 
   const fetchData = async () => {
     try {
@@ -44,7 +57,11 @@ function MyInterest() {
         throw new Error("Invalid data format");
       }
       setData(fetchedData);
-      setProfiles(activeTab === "requestSent" ? fetchedData.reqSent : fetchedData.reqReceived);
+      let list = activeTab === "requestSent" ? fetchedData.reqSent : fetchedData.reqReceived;
+      if (currentStatusTab !== "all") {
+        list = list.filter((p) => p?.status === currentStatusTab);
+      }
+      setProfiles(list);
     } catch (err) {
       console.error("Error fetching data:", err);
       setError("An error occurred while fetching data. Please try again.");
@@ -73,52 +90,19 @@ function MyInterest() {
     return (profile.height.feet || 0) * 12 + (profile.height.inches || 0);
   };
 
-  // const filterAndSortProfiles = (status, criteria) => {
-  //   let filteredProfiles =
-  //     activeTab === "requestReceived"
-  //       ? [...data.photoReqReceived]
-  //       : [...data.photoReqSent];
-
-  //   if (status !== "all") {
-  //     filteredProfiles = filteredProfiles.filter(
-  //       (profile) => profile.status === status
-  //     );
-  //   }
-
-  //   if (criteria) {
-  //     filteredProfiles.sort((a, b) => {
-  //       if (criteria === "age") {
-  //         return sortDirection === "asc"
-  //           ? calculateAge(a.userId.dateOfBirth) -
-  //               calculateAge(b.userId.dateOfBirth)
-  //           : calculateAge(b.userId.dateOfBirth) -
-  //               calculateAge(a.userId.dateOfBirth);
-  //       } else if (criteria === "height") {
-  //         return sortDirection === "asc"
-  //           ? calculateHeightInInches(a.userId) -
-  //               calculateHeightInInches(b.userId)
-  //           : calculateHeightInInches(b.userId) -
-  //               calculateHeightInInches(a.userId);
-  //       }
-  //       return 0;
-  //     });
-  //   }
-  //   setProfiles(filteredProfiles);
-  // };
   const filterAndSortProfiles = (status, criteria) => {
+    setCurrentStatusTab(status);
     let filteredProfiles =
       activeTab === "requestReceived"
         ? [...(data.reqReceived || [])]
         : [...(data.reqSent || [])];
 
-    // Filter by status
     if (status !== "all") {
       filteredProfiles = filteredProfiles.filter(
         (profile) => profile.status === status
       );
     }
 
-    // Apply sorting only when criteria matches the selected one
     if (criteria && sortDirection.criteria === criteria) {
       const direction = sortDirection.direction === "asc" ? 1 : -1;
 
@@ -145,7 +129,9 @@ function MyInterest() {
 
   const switchTab = (tab) => {
     setActiveTab(tab);
-    setProfiles(tab === "requestSent" ? data.reqSent : data.reqReceived);
+    setCurrentStatusTab("all");
+    const list = tab === "requestSent" ? [...(data?.reqSent || [])] : [...(data?.reqReceived || [])];
+    setProfiles(list);
     setCurrentPage(1);
   };
 
@@ -356,7 +342,7 @@ function MyInterest() {
         </div>
       </div>
 
-      <div className="row m-0 mb-1 p-0 bg-white">
+      <div className="row m-0 mb-3 p-0 bg-white">
         <div className="col-8 col-sm-9 col-md-10 d-flex p-0">
           {["requestSent", "requestReceived"].map((tab) => (
             <div
@@ -380,6 +366,7 @@ function MyInterest() {
         >
           <select
             className="form-select form-select-lg m-0"
+            value={currentStatusTab}
             style={{
               color: "rgba(97, 97, 97, 1)",
               borderRadius: "0%",
@@ -398,12 +385,54 @@ function MyInterest() {
               filterAndSortProfiles(e.target.value, sortCriteria)
             }
           >
-            <option value="all">All request</option>
+            <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
             <option value="accepted">Accepted</option>
             <option value="rejected">Rejected</option>
           </select>
         </div>
+      </div>
+
+      {/* Sub-Status Pill Tabs: All | Accepted | Pending | Rejected */}
+      <div className="d-flex gap-2 mb-3 px-2 flex-wrap">
+        {[
+          { id: "all", label: "All Requests" },
+          { id: "accepted", label: "Accepted", color: "#198754" },
+          { id: "pending", label: "Pending", color: "#d97706" },
+          { id: "rejected", label: "Rejected", color: "#dc3545" },
+        ].map((statusTab) => {
+          const isActive = currentStatusTab === statusTab.id;
+          const count = getStatusCount(statusTab.id);
+          return (
+            <button
+              key={statusTab.id}
+              onClick={() => handleStatusTabChange(statusTab.id)}
+              className="btn d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill shadow-sm"
+              style={{
+                backgroundColor: isActive ? (statusTab.color || "#991c1c") : "#ffffff",
+                color: isActive ? "#ffffff" : "#444444",
+                border: `1.5px solid ${isActive ? (statusTab.color || "#991c1c") : "#e2e8f0"}`,
+                fontSize: "0.85rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.2s ease"
+              }}
+            >
+              <span>{statusTab.label}</span>
+              <span
+                className="badge rounded-circle"
+                style={{
+                  backgroundColor: isActive ? "rgba(255,255,255,0.25)" : (statusTab.color || "#991c1c"),
+                  color: "#ffffff",
+                  fontSize: "0.75rem",
+                  padding: "4px 8px"
+                }}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="row m-0 p-0">

@@ -35,20 +35,48 @@ import ViewPage from "./component/Profile/Forms/ViewPage";
 import Dashboard from "./component/Layout/Dashboard";
 
 import { ToastContainer } from "react-toastify";
-import { FaFacebook, FaInstagram, FaWhatsapp, FaTelegram } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaWhatsapp, FaTelegram, FaYoutube, FaTwitter, FaLinkedin, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 
 import "react-toastify/dist/ReactToastify.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "http://localhost:5000/").replace(/\/$/, "");
 
+const getSocialUrl = (linksObj, key) => {
+  if (!linksObj) return null;
+  const val =
+    linksObj[key] ??
+    linksObj[`${key}Url`] ??
+    linksObj[`${key}_url`] ??
+    linksObj[`${key}Channel`] ??
+    (key === "supportPhone" ? (linksObj.supportPhone || linksObj.phone) : null) ??
+    (key === "supportEmail" ? (linksObj.supportEmail || linksObj.email) : null);
+
+  if (val === undefined || val === null) return null;
+  const str = String(val).trim();
+  if (str === "") return null;
+
+  if (str === "#") return "#";
+
+  if (key === "whatsapp") {
+    if (str.startsWith("http")) return str;
+    const cleanNum = str.replace(/\D/g, "");
+    return cleanNum ? `https://wa.me/${cleanNum}` : "#";
+  }
+  if (key === "supportPhone") {
+    if (str.startsWith("tel:")) return str;
+    const cleanNum = str.replace(/[^\d+]/g, "");
+    return cleanNum ? `tel:${cleanNum}` : "#";
+  }
+  if (key === "supportEmail") {
+    if (str.startsWith("mailto:")) return str;
+    return str.includes("@") ? `mailto:${str}` : "#";
+  }
+  return str;
+};
+
 function FloatingSocial() {
-  const [links, setLinks] = useState({
-    facebook: "#",
-    instagram: "#",
-    whatsapp: "#",
-    telegram: "#",
-  });
+  const [links, setLinks] = useState({});
 
   useEffect(() => {
     fetch(`${BASE_URL}/api/v1/auth/social-links`)
@@ -62,15 +90,23 @@ function FloatingSocial() {
   }, []);
 
   const socialConfig = [
-    { icon: <FaFacebook size={18} />, label: "Facebook",  key: "facebook",  color: "#1877F2" },
+    { icon: <FaFacebook size={18} />, label: "Facebook", key: "facebook", color: "#1877F2" },
     { icon: <FaInstagram size={18} />, label: "Instagram", key: "instagram", color: "#E1306C" },
-    { icon: <FaWhatsapp size={18} />, label: "WhatsApp",  key: "whatsapp",  color: "#25D366" },
-    { icon: <FaTelegram size={18} />, label: "Telegram",  key: "telegram",  color: "#0088cc" },
+    { icon: <FaWhatsapp size={18} />, label: "WhatsApp", key: "whatsapp", color: "#25D366" },
+    { icon: <FaTelegram size={18} />, label: "Telegram", key: "telegram", color: "#0088cc" },
+    { icon: <FaYoutube size={18} />, label: "YouTube", key: "youtube", color: "#FF0000" },
+    { icon: <FaTwitter size={18} />, label: "Twitter / X", key: "twitter", color: "#1DA1F2" },
+    { icon: <FaLinkedin size={18} />, label: "LinkedIn", key: "linkedin", color: "#0A66C2" },
+    { icon: <FaPhoneAlt size={16} />, label: "Support Phone", key: "supportPhone", color: "#28a745" },
+    { icon: <FaEnvelope size={16} />, label: "Support Email", key: "supportEmail", color: "#d97706" },
   ];
 
   const activeLinks = socialConfig
-    .map((item) => ({ ...item, href: links[item.key] || "#" }))
-    .filter((item) => item.href && item.href !== "");
+    .map((item) => {
+      const href = getSocialUrl(links, item.key);
+      return href ? { ...item, href } : null;
+    })
+    .filter(Boolean);
 
   if (activeLinks.length === 0) return null;
 

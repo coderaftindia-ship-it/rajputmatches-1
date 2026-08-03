@@ -199,8 +199,8 @@ function Mydetails() {
       height: user?.height ? `${user.height.feet || 5} ft ${user.height.inches || 0} in` : "",
       weight: user?.weight ? `${user.weight} kg` : "",
       maritalStatus: (user?.maritalStatus === "Single") ? "Never Married" : (user?.maritalStatus || ""),
-      clan: horoscope?.clan || "",
-      subclan: horoscope?.subclan || "",
+      clan: horoscope?.clan || user?.lastName || user?.subclan || "",
+      subclan: horoscope?.subclan || user?.lastName || "",
       currentCity: user?.city || user?.currentCity || "",
       nativePlace: user?.nativePlace || horoscope?.birthplace || "",
       birthplace: horoscope?.birthplace || "",
@@ -351,7 +351,14 @@ function Mydetails() {
       setBasicError("");
     }
 
-    if (name === "heightFeet" || name === "heightInch") {
+    if (name === "clan") {
+      setBasicFormData((prev) => ({
+        ...prev,
+        clan: value,
+        subclan: value,
+        lastName: value
+      }));
+    } else if (name === "heightFeet" || name === "heightInch") {
       setBasicFormData((prev) => ({
         ...prev,
         height: {
@@ -472,6 +479,7 @@ function Mydetails() {
 
       const profilePayload = {
         ...basicFormData,
+        lastName: basicFormData.clan || basicFormData.lastName || basicFormData.subclan,
         maritalStatus: mappedMaritalStatus,
         height: heightObj,
         weight: weightNum,
@@ -492,8 +500,9 @@ function Mydetails() {
         }
       }
 
+      const activeClan = basicFormData.clan || basicFormData.lastName || basicFormData.subclan;
       if (
-        basicFormData.clan || 
+        activeClan || 
         basicFormData.gotra || 
         basicFormData.manglik || 
         basicFormData.rashi || 
@@ -501,8 +510,8 @@ function Mydetails() {
         basicFormData.birthTime
       ) {
         await updateData("update-religiondetails", {
-          clan: basicFormData.clan,
-          subclan: basicFormData.subclan,
+          clan: activeClan,
+          subclan: basicFormData.subclan || activeClan,
           gotra: basicFormData.gotra,
           maglik: basicFormData.manglik,
           manglik: basicFormData.manglik,
@@ -944,8 +953,8 @@ function Mydetails() {
             <span>Matrimony for Rajput Clans</span>
           </div>
           <div className={styles.footerLogoRight}>
-            <span>www.rajputmatches.com</span>
-            <span>connect@rajputmatches.com</span>
+            <span>www.Rajput Alliances.com</span>
+            <span>connect@Rajput Alliances.com</span>
           </div>
         </div>
 

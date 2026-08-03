@@ -217,6 +217,12 @@ function DocumentRequest() {
   }
 
   // ── Render ────────────────────────────────────────────────────
+  const getStatusCount = (status, tabKey = activeTab) => {
+    const list = tabKey === "requestReceived" ? (data?.documentReqReceived || []) : (data?.documentReqSent || []);
+    if (status === "all") return list.length;
+    return list.filter((p) => p?.status === status).length;
+  };
+
   return (
     <div className="profileContainer">
       {/* Header */}
@@ -228,7 +234,7 @@ function DocumentRequest() {
       </div>
 
       {/* Tabs + filter */}
-      <div className="row m-0 mb-1 p-0 bg-white">
+      <div className="row m-0 mb-3 p-0 bg-white">
         <div className="col-8 col-sm-9 col-md-10 d-flex p-0">
           {[
             { key: "requestSent",     label: "Request Sent",     count: data.documentReqSent.length },
@@ -263,12 +269,54 @@ function DocumentRequest() {
             value={statusFilter}
             onChange={(e) => filterProfiles(e.target.value)}
           >
-            <option value="all">All Request</option>
+            <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
             <option value="accepted">Accepted</option>
             <option value="rejected">Rejected</option>
           </select>
         </div>
+      </div>
+
+      {/* Sub-Status Pill Tabs: All | Accepted | Pending | Rejected */}
+      <div className="d-flex gap-2 mb-3 px-2 flex-wrap">
+        {[
+          { id: "all", label: "All Requests" },
+          { id: "accepted", label: "Accepted", color: "#198754" },
+          { id: "pending", label: "Pending", color: "#d97706" },
+          { id: "rejected", label: "Rejected", color: "#dc3545" },
+        ].map((statusTab) => {
+          const isActive = statusFilter === statusTab.id;
+          const count = getStatusCount(statusTab.id);
+          return (
+            <button
+              key={statusTab.id}
+              onClick={() => filterProfiles(statusTab.id)}
+              className="btn d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill shadow-sm"
+              style={{
+                backgroundColor: isActive ? (statusTab.color || "#7B1A1A") : "#ffffff",
+                color: isActive ? "#ffffff" : "#444444",
+                border: `1.5px solid ${isActive ? (statusTab.color || "#7B1A1A") : "#e2e8f0"}`,
+                fontSize: "0.85rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.2s ease"
+              }}
+            >
+              <span>{statusTab.label}</span>
+              <span
+                className="badge rounded-circle"
+                style={{
+                  backgroundColor: isActive ? "rgba(255,255,255,0.25)" : (statusTab.color || "#7B1A1A"),
+                  color: "#ffffff",
+                  fontSize: "0.75rem",
+                  padding: "4px 8px"
+                }}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Profile cards */}

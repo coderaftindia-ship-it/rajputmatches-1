@@ -551,8 +551,10 @@ const ViewPage = () => {
     );
   }
 
-  const displayName = `${Data.middleName || ""} ${Data.lastName || ""}`.trim()
-    || `Matri ID: ${Data.martrId || "N/A"}`;
+  const displayName = [Data.firstName, Data.middleName, Data.lastName || Data.clan || Data.HoroscopicId?.clan]
+    .filter(Boolean)
+    .join(" ")
+    .trim() || `Matri ID: ${Data.martrId || "N/A"}`;
 
   const hasHoroscope = Data.HoroscopicId &&
     Object.keys(Data.HoroscopicId).some((k) => !["_id", "__v", "userId"].includes(k));
@@ -1265,7 +1267,7 @@ const ViewPage = () => {
                               <div style={{ position: "relative", width: "100%", height: "100%" }}>
                                 <motion.img
                                   key="private"
-                                  src={blurImage}
+                                  src={Data?.gender === "Female" ? femaleDefault : maleDefault}
                                   alt="Private"
                                   className={styles.carouselImg}
                                   initial={{ opacity: 0 }}

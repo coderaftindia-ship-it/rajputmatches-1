@@ -1,17 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaStar, FaQuoteLeft, FaHeart, FaUsers, FaRing, FaSmile } from "react-icons/fa";
 import { useAuth } from "./AuthContext";
-import { BASE_URL } from "../../api";
+import { publicApi, BASE_URL } from "../../api";
 import "./HappyClients.css";
 
-/* ── Static Data ── */
-const STATS = [
-  { icon: <FaUsers />,  value: 12500, suffix: "+", label: "Registered Members" },
-  { icon: <FaRing />,   value: 3200,  suffix: "+", label: "Successful Matches" },
-  { icon: <FaHeart />,  value: 980,   suffix: "+", label: "Happy Marriages" },
-  { icon: <FaSmile />,  value: 98,    suffix: "%", label: "Satisfaction Rate" },
-];
-
+/* ── Fallback Testimonials ── */
 const TESTIMONIALS = [
   {
     id: 1,
@@ -88,7 +81,7 @@ function Counter({ target, suffix }) {
           started.current = true;
           const duration = 2000;
           const steps = 60;
-          const increment = target / steps;
+          const increment = (target || 0) / steps;
           let current = 0;
           const timer = setInterval(() => {
             current += increment;
@@ -107,12 +100,13 @@ function Counter({ target, suffix }) {
     return () => observer.disconnect();
   }, [target]);
 
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+  return <span ref={ref}>{(count || 0).toLocaleString()}{suffix}</span>;
 }
 
 /* ── Main Component ── */
 const HappyClients = () => {
   const { fetchUserData } = useAuth();
+  const [cmsData, setCmsData] = useState(null);
   const [dynamicStories, setDynamicStories] = useState([]);
   const [active, setActive] = useState(0);
 
@@ -127,6 +121,21 @@ const HappyClients = () => {
     return `${BASE_URL}${formattedPath}`;
   };
 
+  // Fetch Home CMS Data for Heading, Subheading & Community Stats
+  useEffect(() => {
+    publicApi
+      .getHomeCMS()
+      .then((res) => {
+        if (res?.data?.data) {
+          setCmsData(res.data.data);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching Home CMS for HappyClients:", err);
+      });
+  }, []);
+
+  // Fetch Dynamic User Reviews/Testimonials
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -135,7 +144,6 @@ const HappyClients = () => {
           ? response
           : (response?.user || response?.reviews || response?.data || []);
         if (list && list.length > 0) {
-          // Normalize DB reviews to match the rendering shape
           const normalized = list.map((item) => ({
             id: item._id || item.id,
             name: item.name,
@@ -156,20 +164,38 @@ const HappyClients = () => {
     fetchReviews();
   }, [fetchUserData]);
 
+  // Compute Dynamic Stats Cards from CMS
+  const statMembersValue = cmsData?.stat_members_value !== undefined ? Number(cmsData.stat_members_value) : 12500;
+  const statMembersLabel = cmsData?.stat_members_label || "Registered Members";
+
+  const statMatchesValue = cmsData?.stat_matches_value !== undefined ? Number(cmsData.stat_matches_value) : 3200;
+  const statMatchesLabel = cmsData?.stat_matches_label || "Successful Matches";
+
+  const statMarriagesValue = cmsData?.stat_marriages_value !== undefined ? Number(cmsData.stat_marriages_value) : 980;
+  const statMarriagesLabel = cmsData?.stat_marriages_label || "Happy Marriages";
+
+  const statSatisfactionValue = cmsData?.stat_satisfaction_value !== undefined ? Number(cmsData.stat_satisfaction_value) : 98;
+  const statSatisfactionLabel = cmsData?.stat_satisfaction_label || "Satisfaction Rate";
+
+  const dynamicStats = [
+    { icon: <FaUsers className="hc-stat-icon" />,  value: statMembersValue,     suffix: "+", label: statMembersLabel },
+    { icon: <FaRing className="hc-stat-icon" />,   value: statMatchesValue,     suffix: "+", label: statMatchesLabel },
+    { icon: <FaHeart className="hc-stat-icon" />,  value: statMarriagesValue,   suffix: "+", label: statMarriagesLabel },
+    { icon: <FaSmile className="hc-stat-icon" />,  value: statSatisfactionValue, suffix: "%", label: statSatisfactionLabel },
+  ];
+
   const activeStories = dynamicStories.length > 0 ? dynamicStories : TESTIMONIALS;
   const total = activeStories.length;
 
   const prev = () => setActive((a) => (a === 0 ? total - 1 : a - 1));
   const next = () => setActive((a) => (a === total - 1 ? 0 : a + 1));
 
-  // Auto-play slider
   useEffect(() => {
     if (total === 0) return;
     const timer = setInterval(next, 4500);
     return () => clearInterval(timer);
-  }, [total]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [total]);
 
-  // Show 3 visible cards (center + sides)
   const getVisible = () => {
     if (total === 0) return [];
     if (total === 1) return [0, 0, 0];
@@ -192,13 +218,18 @@ const HappyClients = () => {
 
       {/* ── Heading ── */}
       <div className="hc-header">
-        <span className="hc-eyebrow">✦ Testimonials ✦</span>
-        <h2 className="hc-title">Happy Clients, <span>Real Stories</span></h2>
+        <span className="hc-eyebrow">✦ Community & Testimonials ✦</span>
+        <h2 className="hc-title">
+          {cmsData?.statsHeading || "Happy Clients, Real Stories"}
+        </h2>
         <p className="hc-subtitle">
-          Thousands of Rajput families have found their perfect match through our platform.
-          Here are their heartfelt stories.
+          {cmsData?.statsSubheading ||
+            "Thousands of Rajput families have found their perfect match through our platform. Here are their heartfelt stories."}
         </p>
       </div>
+
+      {/* ── Dynamic 4 Stats Cards ── */}
+      
 
       {/* ── Testimonial Slider ── */}
       <div className="hc-slider-wrap">

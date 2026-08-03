@@ -2,7 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { IoImageSharp } from "react-icons/io5";
-import placeholderImage from "../../../../assets/images/blurimage.png";
+import femaleDefault from "../../../../assets/images/female_default.png";
+import maleDefault from "../../../../assets/images/male_default.png";
 import styles from "../RequestCard.module.css";
 
 /**
@@ -22,20 +23,22 @@ const ProfileImageContainer = ({
     navigate(`view/images/${profileId}`);
   };
 
+  const defaultAvatar = profile?.gender === "Female" ? femaleDefault : maleDefault;
+
   const renderEmptyState = (actionButtons = null) => (
     <div
       className="image-container"
       style={{ position: "relative", width: "100%", height: "14rem" }}
     >
       <img
-        src={placeholderImage}
+        src={defaultAvatar}
         className="img-fluid m-auto"
-        alt="Placeholder"
+        alt="Default Avatar"
         style={{
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          objectPosition: "top",
+          objectPosition: "center",
         }}
       />
 

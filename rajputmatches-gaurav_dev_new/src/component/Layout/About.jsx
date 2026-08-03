@@ -14,6 +14,7 @@ import imageAbout2 from "../../assets/images/imageAbout2.jpg";
 import royalimg from "../../assets/images/royalimg.jpg";
 import royalimg2 from "../../assets/images/royalimg2.jpg";
 import HHpratapimage from "../../assets/images/HHpratapimage.png";
+import aboutVideo from "../../assets/images/about_video.mp4";
 
 // Lucide Icons for high-end visual appeal
 import {
@@ -154,19 +155,49 @@ function About() {
             color: "#ffffff"
           }}
         >
-          {/* Subtle Dynamic Background Image */}
-          <motion.div
-            initial={{ scale: 1 }}
-            animate={{ scale: 1.12 }}
-            transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", opacity: 0.25, zIndex: 0 }}
+          {/* Dynamic Background Video Layer */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              overflow: "hidden",
+              zIndex: 0
+            }}
           >
-            <img
-              src={royalimg}
-              alt="Rajput Alliance Royal Background"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          </motion.div>
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                filter: "brightness(0.75) contrast(1.1)",
+                opacity: 0.9
+              }}
+            >
+              <source src={aboutVideo} type="video/mp4" />
+              <source src="/about_video.mp4" type="video/mp4" />
+              <source src="/assets/images/about_video.mp4" type="video/mp4" />
+            </video>
+
+            {/* Subtle Royal Maroon Tint Overlay */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "linear-gradient(135deg, rgba(59, 0, 0, 0.45) 0%, rgba(80, 0, 0, 0.35) 50%, rgba(20, 0, 0, 0.65) 100%)",
+                zIndex: 1
+              }}
+            ></div>
+          </div>
 
           {/* Radial Overlay Glow */}
           <div
@@ -176,20 +207,18 @@ function About() {
               left: 0,
               right: 0,
               bottom: 0,
-              background: "radial-gradient(circle at center, rgba(212, 175, 55, 0.15) 0%, transparent 70%)",
-              zIndex: 1
+              background: "radial-gradient(circle at center, rgba(212, 175, 55, 0.18) 0%, transparent 70%)",
+              zIndex: 2
             }}
           ></div>
 
-          {/* Hero Content */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
             className="text-center w-100"
             style={{ zIndex: 10, position: "relative", padding: "3rem 1.25rem", maxWidth: "920px" }}
           >
-            {/* Royal Tagline Pill */}
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -209,7 +238,6 @@ function About() {
               <span>Connecting Rajputs Worldwide</span>
             </motion.div>
 
-            {/* Main Title */}
             <h1
               className="display-3 fw-bold mb-3"
               style={{
@@ -222,7 +250,6 @@ function About() {
               About <span style={{ color: "#E8C371", textShadow: "0 2px 15px rgba(232, 195, 113, 0.3)" }}>Rajput Alliance</span>
             </h1>
 
-            {/* Intro Text */}
             <p
               className="lead mx-auto mb-4"
               style={{
@@ -236,13 +263,12 @@ function About() {
               Rajput Alliance is a dedicated matrimonial platform created exclusively for the Rajput community. Our mission is simple to bring together individuals and families who value heritage, tradition, trust, and lifelong commitment.
             </p>
 
-            {/* Accent Gold Divider */}
             <div className="d-flex align-items-center justify-content-center gap-2 mt-4 opacity-75">
               <div style={{ width: "60px", height: "1px", backgroundColor: "#E8C371" }}></div>
               <Crown size={18} color="#E8C371" />
               <div style={{ width: "60px", height: "1px", backgroundColor: "#E8C371" }}></div>
             </div>
-          </motion.div>
+          </motion.div> */}
         </section>
 
         {/* Main Content Container */}
@@ -252,77 +278,208 @@ function About() {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.15 }}
             variants={containerVariants}
-            className="row g-4 align-items-center mb-5 pb-4"
+            className="mb-5 pb-3"
           >
-            {/* Left Column: Image Card */}
-            <motion.div variants={fadeLeftVariants} className="col-12 col-lg-5 text-center text-lg-start">
+            <div
+              className="bg-white rounded-4 p-4 p-md-5 position-relative overflow-hidden"
+              style={{
+                border: "2px solid rgba(212, 175, 55, 0.35)",
+                boxShadow: "0 15px 45px rgba(128, 0, 0, 0.06)",
+                background: "linear-gradient(135deg, #FFFFFF 0%, #FDFBF7 100%)"
+              }}
+            >
+              {/* Radial Ambient Glow */}
               <div
-                className="position-relative d-inline-block p-3 bg-white rounded-4 shadow-lg"
+                className="position-absolute"
                 style={{
-                  border: "2px solid rgba(212, 175, 55, 0.3)",
-                  boxShadow: "0 20px 40px rgba(128, 0, 0, 0.08)"
+                  top: "-30%",
+                  right: "-10%",
+                  width: "60%",
+                  height: "160%",
+                  background: "radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%)",
+                  pointerEvents: "none"
                 }}
-              >
-                <img
-                  src={imageAbout}
-                  alt="Rajput Alliance Heritage"
-                  className="img-fluid rounded-3"
-                  style={{ maxHeight: "420px", width: "100%", objectFit: "cover" }}
-                />
+              ></div>
 
-                {/* Floating Heritage Badge */}
-                <div
-                  className="position-absolute bottom-0 start-0 m-4 px-3 py-2 rounded-3 text-start shadow"
+              {/* Header */}
+              <div className="text-center max-w-800 mx-auto mb-4">
+                <span
+                  className="text-uppercase fw-bold d-inline-block mb-2 px-3 py-1 rounded-pill"
                   style={{
-                    background: "rgba(80, 0, 0, 0.92)",
-                    backdropFilter: "blur(8px)",
-                    border: "1px solid #D4AF37",
-                    color: "#FFFFFF"
+                    backgroundColor: "rgba(128, 0, 0, 0.06)",
+                    color: "#800000",
+                    fontSize: "0.85rem",
+                    letterSpacing: "2.5px"
                   }}
                 >
-                  <p className="mb-0 fw-bold fs-6" style={{ color: "#E8C371", fontFamily: "var(--font-heading)" }}>
-                    Sacred Bonds
-                  </p>
-                  <small style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.85)" }}>
-                    Connecting Rajput Families Worldwide
-                  </small>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Right Column: Text & Meaningful Connections */}
-            <motion.div variants={fadeRightVariants} className="col-12 col-lg-7">
-              <div className="p-4 p-md-5 bg-white rounded-4 shadow-sm" style={{ border: "1px solid rgba(212, 175, 55, 0.2)" }}>
-                <span
-                  className="text-uppercase fw-bold d-inline-block mb-2"
-                  style={{ color: "#800000", fontSize: "0.85rem", letterSpacing: "2px" }}
-                >
-                  ✦ Heritage & Harmony
+                  ✦ Heritage & Harmony ✦
                 </span>
                 <h2
-                  className="display-6 fw-bold mb-4"
-                  style={{ fontFamily: "var(--font-heading)", color: "#3B0000", lineHeight: 1.3 }}
+                  className="display-5 fw-bold mb-3"
+                  style={{ fontFamily: "var(--font-heading)", color: "#3B0000", lineHeight: 1.25 }}
                 >
-                  More Than Finding a Partner — <br />
+                  More Than Finding a Partner — <br className="d-none d-md-block" />
                   <span style={{ color: "#800000" }}>It Is the Union of Two Families</span>
                 </h2>
+                <div style={{ width: "80px", height: "3px", backgroundColor: "#D4AF37", margin: "0 auto" }}></div>
+              </div>
 
-                <p
-                  className="text-secondary mb-4"
-                  style={{ fontSize: "1.1rem", lineHeight: 1.8, fontFamily: "var(--font-body)" }}
-                >
-                  Marriage is more than finding a partner. It is the union of two families, two traditions, and two journeys. At Rajput Alliance, we help make that journey meaningful by connecting verified Rajput profiles from India and across the globe.
-                </p>
+              {/* Main Lead Paragraph */}
+              <p
+                className="text-secondary text-center mx-auto mb-5"
+                style={{
+                  maxWidth: "850px",
+                  fontSize: "1.15rem",
+                  lineHeight: 1.85,
+                  fontFamily: "var(--font-body)",
+                  color: "#4A4A4A"
+                }}
+              >
+                Marriage is more than finding a partner. It is the union of two families, two traditions, and two journeys. At Rajput Alliance, we help make that journey meaningful by connecting verified Rajput profiles from India and across the globe.
+              </p>
 
-                <div className="p-3 rounded-3 mb-2" style={{ backgroundColor: "#FDF9F2", borderLeft: "4px solid #D4AF37" }}>
-                  <p className="mb-0 fst-italic" style={{ color: "#500000", fontSize: "1rem" }}>
-                    "Rooted in Rajput pride and customs, we honor family values while giving you modern features to find your ideal match."
-                  </p>
+              {/* 3 Pillar Cards: Two Families, Two Traditions, Two Journeys */}
+              <div className="row g-4 mb-4">
+                {/* Pillar 1 */}
+                <div className="col-12 col-md-4">
+                  <div
+                    className="p-4 rounded-4 text-center h-100 transition-all"
+                    style={{
+                      backgroundColor: "#FDF9F2",
+                      border: "1px solid rgba(212, 175, 55, 0.3)",
+                      transition: "all 0.3s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-5px)";
+                      e.currentTarget.style.boxShadow = "0 10px 25px rgba(128, 0, 0, 0.08)";
+                      e.currentTarget.style.borderColor = "#D4AF37";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "none";
+                      e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.3)";
+                    }}
+                  >
+                    <div
+                      className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                      style={{
+                        width: "56px",
+                        height: "56px",
+                        backgroundColor: "#ffffff",
+                        border: "1.5px solid #D4AF37",
+                        color: "#800000"
+                      }}
+                    >
+                      <Users size={26} />
+                    </div>
+                    <h4 className="fw-bold mb-2" style={{ fontFamily: "var(--font-heading)", color: "#3B0000", fontSize: "1.2rem" }}>
+                      Two Families
+                    </h4>
+                    <p className="text-secondary mb-0" style={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
+                      Uniting honorable Rajput lineages built on shared values, heritage, and mutual respect.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Pillar 2 */}
+                <div className="col-12 col-md-4">
+                  <div
+                    className="p-4 rounded-4 text-center h-100 transition-all"
+                    style={{
+                      backgroundColor: "#FDF9F2",
+                      border: "1px solid rgba(212, 175, 55, 0.3)",
+                      transition: "all 0.3s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-5px)";
+                      e.currentTarget.style.boxShadow = "0 10px 25px rgba(128, 0, 0, 0.08)";
+                      e.currentTarget.style.borderColor = "#D4AF37";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "none";
+                      e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.3)";
+                    }}
+                  >
+                    <div
+                      className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                      style={{
+                        width: "56px",
+                        height: "56px",
+                        backgroundColor: "#ffffff",
+                        border: "1.5px solid #D4AF37",
+                        color: "#800000"
+                      }}
+                    >
+                      <Sparkles size={26} />
+                    </div>
+                    <h4 className="fw-bold mb-2" style={{ fontFamily: "var(--font-heading)", color: "#3B0000", fontSize: "1.2rem" }}>
+                      Two Traditions
+                    </h4>
+                    <p className="text-secondary mb-0" style={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
+                      Preserving sacred Rajput customs while embracing modern aspirations for life partners.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Pillar 3 */}
+                <div className="col-12 col-md-4">
+                  <div
+                    className="p-4 rounded-4 text-center h-100 transition-all"
+                    style={{
+                      backgroundColor: "#FDF9F2",
+                      border: "1px solid rgba(212, 175, 55, 0.3)",
+                      transition: "all 0.3s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-5px)";
+                      e.currentTarget.style.boxShadow = "0 10px 25px rgba(128, 0, 0, 0.08)";
+                      e.currentTarget.style.borderColor = "#D4AF37";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "none";
+                      e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.3)";
+                    }}
+                  >
+                    <div
+                      className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                      style={{
+                        width: "56px",
+                        height: "56px",
+                        backgroundColor: "#ffffff",
+                        border: "1.5px solid #D4AF37",
+                        color: "#800000"
+                      }}
+                    >
+                      <HeartHandshake size={26} />
+                    </div>
+                    <h4 className="fw-bold mb-2" style={{ fontFamily: "var(--font-heading)", color: "#3B0000", fontSize: "1.2rem" }}>
+                      Two Journeys
+                    </h4>
+                    <p className="text-secondary mb-0" style={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
+                      Connecting verified Rajput profiles across India and globally into a harmonious union.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+
+              {/* Bottom Quote Ribbon */}
+              <div
+                className="p-3 p-md-4 rounded-3 text-center"
+                style={{
+                  backgroundColor: "rgba(80, 0, 0, 0.04)",
+                  borderLeft: "4px solid #D4AF37",
+                  borderRight: "4px solid #D4AF37"
+                }}
+              >
+                <p className="mb-0 fst-italic fw-medium" style={{ color: "#500000", fontSize: "1.05rem" }}>
+                  "Rooted in Rajput pride and customs, we honor family values while giving you modern features to find your ideal match."
+                </p>
+              </div>
+            </div>
           </motion.div>
 
           {/* Ornamental Divider */}

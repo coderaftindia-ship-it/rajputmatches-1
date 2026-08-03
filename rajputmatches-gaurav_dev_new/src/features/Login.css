@@ -204,6 +204,13 @@
   margin-bottom: 1.25rem;
 }
 
+.royal-form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
 .royal-input-label {
   display: block;
   font-family: var(--font-body);
@@ -399,6 +406,14 @@
 }
 
 /* Responsive grid for registration on mobile */
+@media (max-width: 768px) {
+  .royal-form-grid,
+  .royal-form-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
 @media (max-width: 640px) {
   .royal-form-grid {
     grid-template-columns: 1fr;
