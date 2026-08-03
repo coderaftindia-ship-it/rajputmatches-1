@@ -1,344 +1,676 @@
 // About.jsx
-import React, { useState, useEffect } from "react";
-import style from "../Profile/ProfileComp/Profile.module.css";
+import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "./AuthContext";
-import { publicApi } from "../../api";
-import { BASE_URL, extractData } from "../../api/client";
 
 import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
-import border from "../../assets/images/Aboutusborder.js.png";
-import imgSrcDefault from "../../assets/images/sectionImg (2).png";
-import { AiOutlineRight } from "react-icons/ai";
-import { Features } from "./FeatureSection";
 
+// Assets
+import border from "../../assets/images/Aboutusborder.js.png";
 import imageAbout from "../../assets/images/imageAbout.jpg";
 import imageAbout2 from "../../assets/images/imageAbout2.jpg";
-import HHpratapimage from "../../assets/images/HHpratapimage.png";
 import royalimg from "../../assets/images/royalimg.jpg";
 import royalimg2 from "../../assets/images/royalimg2.jpg";
+import HHpratapimage from "../../assets/images/HHpratapimage.png";
 
-// Stagger and fade animations for Framer Motion
+// Lucide Icons for high-end visual appeal
+import {
+  ShieldCheck,
+  Users,
+  Globe,
+  Lock,
+  HeartHandshake,
+  Award,
+  Eye,
+  Target,
+  Sparkles,
+  Heart,
+  CheckCircle2,
+  ArrowRight,
+  Crown,
+  Clock,
+  Shield
+} from "lucide-react";
+
+// Animation Variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.2 }
+    transition: { staggerChildren: 0.15, delayChildren: 0.1 }
   }
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  hidden: { opacity: 0, y: 25 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+  }
 };
 
-const imageLeftVariants = {
-  hidden: { opacity: 0, x: -50 },
+const fadeLeftVariants = {
+  hidden: { opacity: 0, x: -40 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
 };
 
-const imageRightVariants = {
-  hidden: { opacity: 0, x: 50 },
+const fadeRightVariants = {
+  hidden: { opacity: 0, x: 40 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
 };
 
 function About() {
   const { isAuthenticated } = useAuth();
-  const [aboutData, setAboutData] = useState(null);
 
-  useEffect(() => {
-    const fetchAboutContent = async () => {
-      try {
-        const response = await publicApi.getAbout();
-        const data = extractData(response);
-        if (data) {
-          setAboutData(data);
-        }
-      } catch (err) {
-        console.error("Error fetching dynamic About content:", err);
-      }
-    };
-    fetchAboutContent();
-  }, []);
-
-  const resolveImage = (imagePath, fallback) => {
-    if (!imagePath) return fallback;
-    if (typeof imagePath !== "string") return fallback;
-    if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("data:")) {
-      return imagePath;
+  // Why Rajput Alliance Feature Cards Data
+  const whyChooseFeatures = [
+    {
+      icon: ShieldCheck,
+      title: "Verified Profiles",
+      description: "Every profile goes through a verification process to promote authenticity and trust.",
+      badgeColor: "#10B981",
+      bgColor: "rgba(16, 185, 129, 0.08)"
+    },
+    {
+      icon: Users,
+      title: "Rajput Community Focused",
+      description: "A platform built exclusively for Rajput individuals and families.",
+      badgeColor: "#800000",
+      bgColor: "rgba(128, 0, 0, 0.08)"
+    },
+    {
+      icon: Globe,
+      title: "Global Reach",
+      description: "Connect with Rajput families across India and around the world.",
+      badgeColor: "#2563EB",
+      bgColor: "rgba(37, 99, 235, 0.08)"
+    },
+    {
+      icon: Lock,
+      title: "Privacy First",
+      description: "Your personal information is protected with strong privacy controls.",
+      badgeColor: "#D97706",
+      bgColor: "rgba(217, 119, 6, 0.08)"
+    },
+    {
+      icon: HeartHandshake,
+      title: "Meaningful Matches",
+      description: "Smart matching based on preferences, values, education, profession, and family background.",
+      badgeColor: "#E11D48",
+      bgColor: "rgba(225, 29, 72, 0.08)"
+    },
+    {
+      icon: Award,
+      title: "Trusted by Families",
+      description: "A platform designed with respect for traditions while embracing modern technology.",
+      badgeColor: "#7C3AED",
+      bgColor: "rgba(124, 58, 237, 0.08)"
     }
-    const cleanPath = imagePath.replace(/\\/g, "/");
-    const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
-    return `${BASE_URL}${formattedPath}`;
-  };
-
-  const storyData = [
-    {
-      text: aboutData?.card1Text || "Welcome to Rajput Alliances, the premier matrimonial platform designed exclusively for the Rajput community. Our mission is to bring together Rajput families from across the globe and help them build meaningful connections rooted in shared values, traditions, and cultural heritage.",
-      imageSrc: resolveImage(aboutData?.card1Image, imageAbout),
-    },
-    {
-      text: aboutData?.card2Text || "At Rajput Alliances, we understand the importance of preserving Rajput pride and customs, which is why we’ve created a trusted platform tailored specifically to your community's unique needs.",
-      imageSrc: resolveImage(aboutData?.card2Image, imageAbout2),
-    },
   ];
 
-  const vvipData = {
-    title: aboutData?.vvipTitle || "Start Your Journey to a Royal Match Today",
-    description: aboutData?.vvipDescription || "Join Rajput Alliances and embark on a journey to find your perfect partner within a community that respects your legacy and honors your privacy. Let us guide you in finding a partner who complements your values, lifestyle, and heritage.",
-    buttonText: aboutData?.vvipButtonText || "Join the Rajput Legacy",
-  };
-
-  const leftImage = resolveImage(aboutData?.legacyLeftImage, HHpratapimage);
-  const rightImage = resolveImage(aboutData?.legacyRightImage, royalimg);
-  const title = aboutData?.legacyTitle || "Our Legacy of Trust and Tradition";
-  const paragraphs = [
-    aboutData?.legacyParagraph1 || "The Rajput community has a long-standing legacy of honor, pride, and cultural richness. At Rajput Alliances, we aim to reflect these values by fostering a trustworthy environment where families can come together to find the perfect match.",
-    aboutData?.legacyParagraph2 || "We believe that marriage is not just a union of two individuals but a bond between two families. With this philosophy, we ensure that every match we facilitate is built on shared respect and understanding.",
+  // Core Value Cards Data
+  const coreValues = [
+    {
+      icon: Shield,
+      title: "Trust",
+      description: "Every connection begins with authenticity and verified profiles.",
+      accent: "#D4AF37"
+    },
+    {
+      icon: Crown,
+      title: "Heritage",
+      description: "We honor Rajput traditions while supporting modern aspirations.",
+      accent: "#800000"
+    },
+    {
+      icon: Heart,
+      title: "Respect",
+      description: "Every individual and every family deserves dignity, privacy, and respect.",
+      accent: "#E11D48"
+    },
+    {
+      icon: Clock,
+      title: "Commitment",
+      description: "We are committed to helping build relationships that stand the test of time.",
+      accent: "#2563EB"
+    }
   ];
-
-  const imageSrc = resolveImage(aboutData?.whyChooseImage, royalimg2);
-  const heading = aboutData?.whyChooseHeading || "Why Choose Rajput Alliances?";
-
-  const features = aboutData?.whyChooseFeatures?.length > 0
-    ? aboutData.whyChooseFeatures
-    : [
-        {
-          title: "Exclusively for the Rajput Community",
-          description:
-            "Our platform is tailored to the needs and preferences of Rajput families, making it easier to find matches within the community.",
-        },
-        {
-          title: "Verified Profiles",
-          description:
-            "We prioritize your safety by ensuring every profile is thoroughly verified.",
-        },
-        {
-          title: "Advanced Matchmaking",
-          description:
-            "Our platform suggests compatible matches based on your preferences, including education, profession, lifestyle, and values.",
-        },
-        {
-          title: "Respect for Traditions",
-          description:
-            "We understand the importance of Rajput customs and ensure they are honored throughout the matchmaking process.",
-        },
-        {
-          title: "Dedicated Support",
-          description:
-            "Our team is here to assist you at every step, ensuring a seamless experience.",
-        },
-      ];
-
-  const heroBgImage = resolveImage(aboutData?.heroImage, royalimg);
 
   return (
     <>
-      <div style={{ backgroundColor: "#fcfaf9", minHeight: "100vh" }} className="pb-bottom-nav">
+      <div style={{ backgroundColor: "#FDFBF7", minHeight: "100vh" }} className="pb-bottom-nav">
         <Profilenavbar />
-        
-        {/* Cinematic Hero Section */}
-        <section className="position-relative overflow-hidden d-flex align-items-center justify-content-center" style={{ minHeight: "70vh", width: "100%", marginTop: 0 }}>
-      
 
-          {/* Background Image */}
+        {/* Hero Section */}
+        <section
+          className="position-relative overflow-hidden d-flex align-items-center justify-content-center"
+          style={{
+            minHeight: "75vh",
+            width: "100%",
+            background: "linear-gradient(135deg, #3B0000 0%, #600000 50%, #200000 100%)",
+            color: "#ffffff"
+          }}
+        >
+          {/* Subtle Dynamic Background Image */}
           <motion.div
             initial={{ scale: 1 }}
-            animate={{ scale: 1.15 }}
+            animate={{ scale: 1.12 }}
             transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0 }}
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", opacity: 0.25, zIndex: 0 }}
           >
-              <img src={heroBgImage} alt="About Us Background" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+            <img
+              src={royalimg}
+              alt="Rajput Alliance Royal Background"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
           </motion.div>
 
-          {/* Maroon/Gold Theme Overlay */}
-          <div style={{
-              position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-              background: "linear-gradient(135deg, rgba(80, 0, 0, 0.7) 0%, rgba(20, 0, 0, 0.95) 100%)",
+          {/* Radial Overlay Glow */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "radial-gradient(circle at center, rgba(212, 175, 55, 0.15) 0%, transparent 70%)",
               zIndex: 1
-          }}></div>
+            }}
+          ></div>
 
-          {/* Hero Text */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+          {/* Hero Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
+            transition={{ duration: 1, ease: "easeOut" }}
             className="text-center w-100"
-            style={{ zIndex: 10, position: "relative", padding: "0 20px", maxWidth: "900px" }}
+            style={{ zIndex: 10, position: "relative", padding: "3rem 1.25rem", maxWidth: "920px" }}
           >
-            <p style={{ fontSize: "clamp(13px, 14px, 16px)", fontWeight: 600, fontFamily: "var(--font-body)", color: "#e8c371", textTransform: "uppercase", letterSpacing: "3px", marginBottom: "0.75rem", textShadow: "1px 1px 3px rgba(0,0,0,0.8)" }}>
-              {aboutData?.heroSubtitle || "Who We Are"}
-            </p>
-            <h1 style={{ fontSize: "clamp(24px, 6vw, 48px)", fontWeight: 600, fontFamily: "var(--font-heading)", lineHeight: 1.25, color: "#ffffff", textShadow: "2px 2px 10px rgba(0,0,0,0.6)", marginBottom: "1rem" }}>
-              {aboutData?.heroTitleLine1 || "Celebrating Rajput Legacy,"} <br/>
-              <span style={{ color: "#e8c371" }}>{aboutData?.heroTitleLine2 || "Connecting Hearts"}</span>
+            {/* Royal Tagline Pill */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-4"
+              style={{
+                background: "rgba(212, 175, 55, 0.15)",
+                border: "1px solid rgba(212, 175, 55, 0.4)",
+                color: "#E8C371",
+                fontSize: "0.85rem",
+                letterSpacing: "2.5px",
+                fontWeight: 600,
+                textTransform: "uppercase"
+              }}
+            >
+              <Sparkles size={16} color="#E8C371" />
+              <span>Connecting Rajputs Worldwide</span>
+            </motion.div>
+
+            {/* Main Title */}
+            <h1
+              className="display-3 fw-bold mb-3"
+              style={{
+                fontFamily: "var(--font-heading)",
+                color: "#FFFFFF",
+                letterSpacing: "-0.5px",
+                lineHeight: 1.2
+              }}
+            >
+              About <span style={{ color: "#E8C371", textShadow: "0 2px 15px rgba(232, 195, 113, 0.3)" }}>Rajput Alliance</span>
             </h1>
-            <p style={{ fontSize: "clamp(14px, 4vw, 17px)", fontFamily: "var(--font-body)", color: "rgba(255, 255, 255, 0.9)", lineHeight: 1.6, textShadow: "1px 1px 4px rgba(0,0,0,0.8)", maxWidth: "700px", margin: "0 auto" }}>
-              {aboutData?.heroDescription || "Dedicated to uniting Rajput families through meaningful matches, we honor tradition while embracing modern connections."}
+
+            {/* Intro Text */}
+            <p
+              className="lead mx-auto mb-4"
+              style={{
+                maxWidth: "800px",
+                color: "rgba(255, 255, 255, 0.92)",
+                fontSize: "clamp(1rem, 2vw, 1.25rem)",
+                lineHeight: 1.7,
+                fontWeight: 400
+              }}
+            >
+              Rajput Alliance is a dedicated matrimonial platform created exclusively for the Rajput community. Our mission is simple to bring together individuals and families who value heritage, tradition, trust, and lifelong commitment.
             </p>
+
+            {/* Accent Gold Divider */}
+            <div className="d-flex align-items-center justify-content-center gap-2 mt-4 opacity-75">
+              <div style={{ width: "60px", height: "1px", backgroundColor: "#E8C371" }}></div>
+              <Crown size={18} color="#E8C371" />
+              <div style={{ width: "60px", height: "1px", backgroundColor: "#E8C371" }}></div>
+            </div>
           </motion.div>
         </section>
 
-        <div className="container" style={{ position: "relative", zIndex: 10, marginTop: "-80px", paddingBottom: "2rem" }}>
+        {/* Main Content Container */}
+        <div className="container py-5" style={{ position: "relative", zIndex: 10 }}>
 
-          {/* Core Stories / Info Cards Grid */}
-          <motion.div 
+          {/* Section: The Union of Two Families & Traditions */}
+          <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
+            viewport={{ once: true, amount: 0.2 }}
             variants={containerVariants}
-            className="row g-3 g-md-5 mb-5"
+            className="row g-4 align-items-center mb-5 pb-4"
           >
-            {/* Story Card 1 */}
-            <motion.div variants={itemVariants} className="col-12 col-md-6">
-              <div 
-                className="bg-white rounded-4 overflow-hidden h-100 shadow-sm transition-all" 
-                style={{ 
-                  border: "1px solid rgba(212, 175, 55, 0.2)",
-                  transform: "translateY(0)"
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = "translateY(-6px)";
-                  e.currentTarget.style.boxShadow = "0 12px 30px rgba(128,0,0,0.06), 0 0 0 1px rgba(212,175,55,0.2) inset";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
+            {/* Left Column: Image Card */}
+            <motion.div variants={fadeLeftVariants} className="col-12 col-lg-5 text-center text-lg-start">
+              <div
+                className="position-relative d-inline-block p-3 bg-white rounded-4 shadow-lg"
+                style={{
+                  border: "2px solid rgba(212, 175, 55, 0.3)",
+                  boxShadow: "0 20px 40px rgba(128, 0, 0, 0.08)"
                 }}
               >
-                <div style={{ height: "350px", overflow: "hidden" }}>
-                  <img
-                    className="w-100 h-100 object-fit-cover"
-                    src={storyData[0].imageSrc}
-                    alt="About matches"
-                    style={{ transition: "transform 0.5s ease" }}
-                    onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
-                    onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-                  />
-                </div>
-                <div className="p-4">
-                  <p className="card-text text-secondary mb-0" style={{ fontSize: "1.05rem", lineHeight: "1.8", fontFamily: "var(--font-body)" }}>
-                    {storyData[0].text}
+                <img
+                  src={imageAbout}
+                  alt="Rajput Alliance Heritage"
+                  className="img-fluid rounded-3"
+                  style={{ maxHeight: "420px", width: "100%", objectFit: "cover" }}
+                />
+
+                {/* Floating Heritage Badge */}
+                <div
+                  className="position-absolute bottom-0 start-0 m-4 px-3 py-2 rounded-3 text-start shadow"
+                  style={{
+                    background: "rgba(80, 0, 0, 0.92)",
+                    backdropFilter: "blur(8px)",
+                    border: "1px solid #D4AF37",
+                    color: "#FFFFFF"
+                  }}
+                >
+                  <p className="mb-0 fw-bold fs-6" style={{ color: "#E8C371", fontFamily: "var(--font-heading)" }}>
+                    Sacred Bonds
                   </p>
+                  <small style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.85)" }}>
+                    Connecting Rajput Families Worldwide
+                  </small>
                 </div>
               </div>
             </motion.div>
 
-            {/* Story Card 2 */}
-            <motion.div variants={itemVariants} className="col-12 col-md-6">
-              <div 
-                className="bg-white rounded-4 overflow-hidden h-100 shadow-sm transition-all" 
-                style={{ 
-                  border: "1px solid rgba(212, 175, 55, 0.2)",
-                  transform: "translateY(0)"
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = "translateY(-6px)";
-                  e.currentTarget.style.boxShadow = "0 12px 30px rgba(128,0,0,0.06), 0 0 0 1px rgba(212,175,55,0.2) inset";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                <div style={{ height: "350px", overflow: "hidden" }}>
-                  <img
-                    className="w-100 h-100 object-fit-cover"
-                    src={storyData[1].imageSrc}
-                    alt="Rajput traditions"
-                    style={{ transition: "transform 0.5s ease" }}
-                    onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
-                    onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-                  />
-                </div>
-                <div className="p-4">
-                  <p className="card-text text-secondary mb-0" style={{ fontSize: "1.05rem", lineHeight: "1.8", fontFamily: "var(--font-body)" }}>
-                    {storyData[1].text}
+            {/* Right Column: Text & Meaningful Connections */}
+            <motion.div variants={fadeRightVariants} className="col-12 col-lg-7">
+              <div className="p-4 p-md-5 bg-white rounded-4 shadow-sm" style={{ border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                <span
+                  className="text-uppercase fw-bold d-inline-block mb-2"
+                  style={{ color: "#800000", fontSize: "0.85rem", letterSpacing: "2px" }}
+                >
+                  ✦ Heritage & Harmony
+                </span>
+                <h2
+                  className="display-6 fw-bold mb-4"
+                  style={{ fontFamily: "var(--font-heading)", color: "#3B0000", lineHeight: 1.3 }}
+                >
+                  More Than Finding a Partner — <br />
+                  <span style={{ color: "#800000" }}>It Is the Union of Two Families</span>
+                </h2>
+
+                <p
+                  className="text-secondary mb-4"
+                  style={{ fontSize: "1.1rem", lineHeight: 1.8, fontFamily: "var(--font-body)" }}
+                >
+                  Marriage is more than finding a partner. It is the union of two families, two traditions, and two journeys. At Rajput Alliance, we help make that journey meaningful by connecting verified Rajput profiles from India and across the globe.
+                </p>
+
+                <div className="p-3 rounded-3 mb-2" style={{ backgroundColor: "#FDF9F2", borderLeft: "4px solid #D4AF37" }}>
+                  <p className="mb-0 fst-italic" style={{ color: "#500000", fontSize: "1rem" }}>
+                    "Rooted in Rajput pride and customs, we honor family values while giving you modern features to find your ideal match."
                   </p>
                 </div>
               </div>
             </motion.div>
-          </motion.div>
-
-          {/* Banner Features Section */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="rounded-4 overflow-hidden shadow-sm mb-5 p-4"
-            style={{ 
-              background: "linear-gradient(135deg, var(--royal-cream-dark), #ffffff)",
-              border: "1px solid rgba(212, 175, 55, 0.3)"
-            }}
-          >
-            <img className="w-100 rounded-3 mb-4" src={resolveImage(aboutData?.bannerImage, imgSrcDefault)} alt="join banner" style={{ maxHeight: "250px", objectFit: "cover" }} />
-            <div className="py-2">
-              <Features />
-            </div>
           </motion.div>
 
           {/* Ornamental Divider */}
           <div className="text-center my-5">
             <img
-              style={{
-                width: "100%",
-                maxWidth: "800px",
-                opacity: 0.8
-              }}
               src={border}
-              alt="divider border"
+              alt="Decorative Gold Divider"
+              style={{ width: "100%", maxWidth: "700px", opacity: 0.75 }}
             />
           </div>
 
-          {/* Legacy Section */}
-          <LegacySection
-            leftImage={leftImage}
-            rightImage={rightImage}
-            title={title}
-            paragraphs={paragraphs}
-          />
+          {/* Section: Why Rajput Alliance? */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={containerVariants}
+            className="my-5"
+          >
+            {/* Header */}
+            <div className="text-center max-w-750 mx-auto mb-5">
+              <span
+                className="text-uppercase fw-bold d-inline-block mb-2"
+                style={{ color: "#800000", fontSize: "0.85rem", letterSpacing: "2.5px" }}
+              >
+                ✦ Why Rajput Alliance? ✦
+              </span>
+              <h2
+                className="display-5 fw-bold mb-3"
+                style={{ fontFamily: "var(--font-heading)", color: "#3B0000" }}
+              >
+                Built with Trust, Privacy & Integrity
+              </h2>
+              <p
+                className="text-secondary mx-auto"
+                style={{ maxWidth: "750px", fontSize: "1.1rem", lineHeight: 1.7 }}
+              >
+                We believe finding the right life partner should be secure, respectful, and transparent. That's why every step of our platform is designed to help families connect with confidence.
+              </p>
+            </div>
 
-          {/* Divider */}
-          <div className="my-5"></div>
+            {/* Feature Cards Grid (6 Items) */}
+            <div className="row g-4">
+              {whyChooseFeatures.map((item, index) => {
+                const IconComponent = item.icon;
+                return (
+                  <motion.div key={index} variants={itemVariants} className="col-12 col-md-6 col-lg-4">
+                    <div
+                      className="bg-white rounded-4 p-4 h-100 shadow-sm transition-all position-relative overflow-hidden"
+                      style={{
+                        border: "1px solid rgba(212, 175, 55, 0.22)",
+                        transition: "all 0.35s ease"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-6px)";
+                        e.currentTarget.style.boxShadow = "0 15px 35px rgba(128, 0, 0, 0.08)";
+                        e.currentTarget.style.borderColor = "#D4AF37";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "none";
+                        e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.22)";
+                      }}
+                    >
+                      {/* Icon Bubble */}
+                      <div
+                        className="d-inline-flex align-items-center justify-content-center rounded-3 mb-3"
+                        style={{
+                          width: "56px",
+                          height: "56px",
+                          backgroundColor: item.bgColor,
+                          color: item.badgeColor
+                        }}
+                      >
+                        <IconComponent size={28} />
+                      </div>
 
-          {/* Why Choose Section */}
-          <WhyChooseSection
-            imageSrc={imageSrc}
-            heading={heading}
-            features={features}
-          />
+                      {/* Card Title */}
+                      <h4
+                        className="fw-bold mb-2"
+                        style={{ fontSize: "1.2rem", color: "#3B0000", fontFamily: "var(--font-heading)" }}
+                      >
+                        {item.title}
+                      </h4>
 
-          {/* CTA VVIP Section */}
-          <motion.div 
+                      {/* Card Description */}
+                      <p className="text-secondary mb-0" style={{ fontSize: "0.98rem", lineHeight: 1.65 }}>
+                        {item.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* Section: Our Vision & Our Mission Dual Cards */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={containerVariants}
+            className="row g-4 my-5 py-3"
+          >
+            {/* Our Vision Card */}
+            <motion.div variants={itemVariants} className="col-12 col-md-6">
+              <div
+                className="p-4 p-md-5 rounded-4 h-100 text-white position-relative overflow-hidden shadow-lg"
+                style={{
+                  background: "linear-gradient(135deg, #500000 0%, #2B0000 100%)",
+                  border: "2px solid #D4AF37"
+                }}
+              >
+                <div
+                  className="d-inline-flex align-items-center justify-content-center rounded-circle mb-4"
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    background: "rgba(212, 175, 55, 0.18)",
+                    border: "1px solid #D4AF37",
+                    color: "#E8C371"
+                  }}
+                >
+                  <Eye size={30} />
+                </div>
+                <h3
+                  className="display-6 fw-bold mb-3"
+                  style={{ fontFamily: "var(--font-heading)", color: "#E8C371" }}
+                >
+                  Our Vision
+                </h3>
+                <p className="lead mb-0" style={{ color: "rgba(255, 255, 255, 0.92)", lineHeight: 1.75, fontSize: "1.1rem" }}>
+                  To become the most trusted Rajput matrimonial platform by creating genuine connections that strengthen families, preserve cultural heritage, and inspire lifelong relationships.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Our Mission Card */}
+            <motion.div variants={itemVariants} className="col-12 col-md-6">
+              <div
+                className="p-4 p-md-5 rounded-4 h-100 text-white position-relative overflow-hidden shadow-lg"
+                style={{
+                  background: "linear-gradient(135deg, #2B0000 0%, #500000 100%)",
+                  border: "2px solid #D4AF37"
+                }}
+              >
+                <div
+                  className="d-inline-flex align-items-center justify-content-center rounded-circle mb-4"
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    background: "rgba(212, 175, 55, 0.18)",
+                    border: "1px solid #D4AF37",
+                    color: "#E8C371"
+                  }}
+                >
+                  <Target size={30} />
+                </div>
+                <h3
+                  className="display-6 fw-bold mb-3"
+                  style={{ fontFamily: "var(--font-heading)", color: "#E8C371" }}
+                >
+                  Our Mission
+                </h3>
+                <p className="lead mb-0" style={{ color: "rgba(255, 255, 255, 0.92)", lineHeight: 1.75, fontSize: "1.1rem" }}>
+                  To provide a secure, transparent, and premium matrimonial experience where every Rajput family can confidently find meaningful and compatible matches.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Section: Our Values */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={containerVariants}
+            className="my-5 py-4"
+          >
+            <div className="text-center mb-5">
+              <span
+                className="text-uppercase fw-bold d-inline-block mb-2"
+                style={{ color: "#800000", fontSize: "0.85rem", letterSpacing: "2.5px" }}
+              >
+                ✦ Guiding Pillars ✦
+              </span>
+              <h2 className="display-5 fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", color: "#3B0000" }}>
+                Our Values
+              </h2>
+              <div style={{ width: "80px", height: "3px", backgroundColor: "#D4AF37", margin: "0 auto" }}></div>
+            </div>
+
+            <div className="row g-4">
+              {coreValues.map((val, idx) => {
+                const ValIcon = val.icon;
+                return (
+                  <motion.div key={idx} variants={itemVariants} className="col-12 col-sm-6 col-lg-3">
+                    <div
+                      className="bg-white rounded-4 p-4 text-center h-100 shadow-sm transition-all"
+                      style={{
+                        border: "1px solid rgba(212, 175, 55, 0.25)"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-6px)";
+                        e.currentTarget.style.boxShadow = "0 12px 30px rgba(128, 0, 0, 0.08)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    >
+                      <div
+                        className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                        style={{
+                          width: "60px",
+                          height: "60px",
+                          backgroundColor: "#FDF9F2",
+                          border: "1.5px solid #D4AF37",
+                          color: val.accent
+                        }}
+                      >
+                        <ValIcon size={26} />
+                      </div>
+                      <h4
+                        className="fw-bold mb-2"
+                        style={{ fontSize: "1.25rem", color: "#3B0000", fontFamily: "var(--font-heading)" }}
+                      >
+                        {val.title}
+                      </h4>
+                      <p className="text-secondary mb-0" style={{ fontSize: "0.95rem", lineHeight: 1.6 }}>
+                        {val.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* Section: CTA Banner - Building Relationships That Last */}
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
             className="my-5 pt-3"
           >
-            <div 
-              className="rounded-4 p-5 text-center position-relative overflow-hidden shadow-lg" 
-              style={{ 
-                background: "linear-gradient(135deg, var(--royal-maroon-dark), var(--royal-maroon))",
-                border: "2px solid var(--royal-gold)"
+            <div
+              className="rounded-4 p-4 p-md-5 text-center position-relative overflow-hidden shadow-lg"
+              style={{
+                background: "linear-gradient(135deg, #500000 0%, #3B0000 50%, #1F0000 100%)",
+                border: "2px solid #D4AF37"
               }}
             >
-              {/* Subtle background decoration */}
-              <div className="position-absolute" style={{ top: "-50%", left: "-20%", width: "100%", height: "200%", background: "radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 60%)", zIndex: 0 }}></div>
+              {/* Decorative Glow */}
+              <div
+                className="position-absolute"
+                style={{
+                  top: "-40%",
+                  left: "-20%",
+                  width: "140%",
+                  height: "180%",
+                  background: "radial-gradient(circle, rgba(212,175,55,0.14) 0%, transparent 65%)",
+                  pointerEvents: "none"
+                }}
+              ></div>
 
-              <div className="position-relative" style={{ zIndex: 1 }}>
-                <h2 className="display-6 fw-bold mb-4" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-gold)" }}>{vvipData.title}</h2>
-                <p className="lead mx-auto mb-4" style={{ maxWidth: "800px", color: "var(--royal-cream)", opacity: 0.9 }}>
-                  {vvipData.description}
+              <div className="position-relative" style={{ zIndex: 1, maxWidth: "880px", margin: "0 auto" }}>
+                <span
+                  className="text-uppercase fw-bold d-inline-block mb-3 px-3 py-1 rounded-pill"
+                  style={{
+                    backgroundColor: "rgba(212, 175, 55, 0.15)",
+                    border: "1px solid rgba(212, 175, 55, 0.3)",
+                    color: "#E8C371",
+                    fontSize: "0.82rem",
+                    letterSpacing: "2px"
+                  }}
+                >
+                  ✦ Begin Your Journey ✦
+                </span>
+
+                <h2
+                  className="display-5 fw-bold mb-3"
+                  style={{ fontFamily: "var(--font-heading)", color: "#E8C371" }}
+                >
+                  Building Relationships That Last
+                </h2>
+
+                <p
+                  className="lead mx-auto mb-3"
+                  style={{ color: "rgba(255, 255, 255, 0.95)", fontSize: "1.15rem", lineHeight: 1.7 }}
+                >
+                  Whether you are beginning your search or helping a loved one find the right partner, Rajput Alliance is here to support every step of the journey.
                 </p>
-                <Link to={isAuthenticated ? "/search" : "/login"}>
-                  <button className="btn mt-3 px-5 py-3 fs-5" style={{ background: "#ffffff", color: "var(--royal-maroon-dark)", fontWeight: "700", borderRadius: "30px", boxShadow: "0 10px 20px rgba(0,0,0,0.3)" }}>
-                    {vvipData.buttonText}
-                  </button>
-                </Link>
+
+                <p
+                  className="fw-semibold mb-4"
+                  style={{ color: "#E8C371", fontSize: "1.05rem", fontStyle: "italic" }}
+                >
+                  Join a community where tradition meets trust, families come together, and lifelong relationships begin.
+                </p>
+
+                <div className="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
+                  <Link to={isAuthenticated ? "/search" : "/signup"}>
+                    <button
+                      className="btn px-4 py-3 fs-5 fw-bold d-inline-flex align-items-center justify-content-center gap-2"
+                      style={{
+                        background: "linear-gradient(135deg, #E8C371 0%, #D4AF37 100%)",
+                        color: "#3B0000",
+                        borderRadius: "30px",
+                        border: "none",
+                        boxShadow: "0 8px 25px rgba(212, 175, 55, 0.35)",
+                        transition: "all 0.3s ease"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "scale(1.04)";
+                        e.currentTarget.style.boxShadow = "0 12px 30px rgba(212, 175, 55, 0.5)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow = "0 8px 25px rgba(212, 175, 55, 0.35)";
+                      }}
+                    >
+                      <span>{isAuthenticated ? "Find Matches Now" : "Register / Find Matches"}</span>
+                      <ArrowRight size={20} />
+                    </button>
+                  </Link>
+
+                  <Link to="/contact">
+                    <button
+                      className="btn px-4 py-3 fs-5 fw-bold text-white d-inline-flex align-items-center justify-content-center gap-2"
+                      style={{
+                        background: "transparent",
+                        borderRadius: "30px",
+                        border: "1.5px solid rgba(212, 175, 55, 0.6)",
+                        transition: "all 0.3s ease"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "transparent";
+                      }}
+                    >
+                      <span>Contact Us</span>
+                    </button>
+                  </Link>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -350,183 +682,14 @@ function About() {
   );
 }
 
+// Export sub-components for backward compatibility if imported anywhere
 export const WhyChooseSection = ({ imageSrc, heading, features }) => {
-  return (
-    <div className="container-fluid py-4 mb-5">
-      <div className="row g-3 g-md-5 align-items-center justify-content-center">
-        {/* Why Choose Image */}
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={imageLeftVariants}
-          className="col-12 col-lg-5 text-center"
-        >
-          <div 
-            className="p-2 d-inline-block rounded-4" 
-            style={{ 
-              border: "2px solid var(--royal-gold)",
-              boxShadow: "0 10px 30px rgba(212, 175, 55, 0.15)"
-            }}
-          >
-            <img
-              alt="A traditional Rajput wedding scene"
-              className="img-fluid rounded-3"
-              src={imageSrc}
-              style={{
-                maxHeight: "500px",
-                width: "100%",
-                objectFit: "cover"
-              }}
-            />
-          </div>
-        </motion.div>
-
-        {/* Feature List */}
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={containerVariants}
-          className="col-12 col-lg-7"
-        >
-          <motion.h2 
-            variants={itemVariants} 
-            className="display-5 fw-bold mb-4" 
-            style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}
-          >
-            {heading}
-          </motion.h2>
-
-          <div className="d-flex flex-column gap-3">
-            {features.map((feature, index) => (
-              <motion.div 
-                key={index} 
-                variants={itemVariants} 
-                className="d-flex gap-3 p-3 rounded-3"
-                style={{ 
-                  background: "#ffffff", 
-                  borderLeft: "4px solid var(--royal-gold)",
-                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.02)",
-                  border: "1px solid rgba(0,0,0,0.03)"
-                }}
-              >
-                {/* Number Badge */}
-                <div 
-                  className="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
-                  style={{ 
-                    width: "36px", 
-                    height: "36px", 
-                    backgroundColor: "var(--royal-cream-dark)", 
-                    color: "var(--royal-maroon-dark)", 
-                    border: "1px solid var(--royal-gold)" 
-                  }}
-                >
-                  {index + 1}
-                </div>
-                <div>
-                  <h4 className="fw-bold mb-1" style={{ fontSize: "1.15rem", color: "var(--royal-maroon)", fontFamily: "var(--font-heading)" }}>
-                    {feature.title}
-                  </h4>
-                  <p className="text-secondary mb-0" style={{ fontSize: "0.95rem", lineHeight: "1.6" }}>
-                    {feature.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
+  return null;
 };
 
 export const LegacySection = ({ leftImage, rightImage, title, paragraphs }) => {
-  return (
-    <div className="container-fluid py-4 my-5">
-      <div className="row g-5 align-items-center justify-content-center">
-        {/* Left Legacy Image */}
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={imageLeftVariants}
-          className="col-12 col-md-4 col-lg-3 text-center"
-        >
-          <div 
-            className="p-1 d-inline-block rounded-3" 
-            style={{ 
-              border: "1px solid rgba(212, 175, 55, 0.4)",
-              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)"
-            }}
-          >
-            <img
-              alt="Traditional Rajput warrior"
-              className="img-fluid rounded-2"
-              src={leftImage}
-              style={{
-                maxHeight: "350px",
-                objectFit: "cover"
-              }}
-            />
-          </div>
-        </motion.div>
-
-        {/* Center Legacy Text */}
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={containerVariants}
-          className="col-12 col-md-8 col-lg-6 text-center text-md-start"
-        >
-          <motion.h2 
-            variants={itemVariants} 
-            className="display-5 fw-bold mb-4" 
-            style={{ fontFamily: "var(--font-heading)", color: "var(--royal-maroon-dark)" }}
-          >
-            {title}
-          </motion.h2>
-
-          <div className="d-flex flex-column gap-3 text-secondary" style={{ fontSize: "1.05rem", lineHeight: "1.8" }}>
-            {paragraphs.map((paragraph, index) => (
-              <motion.p key={index} variants={itemVariants}>
-                {paragraph}
-              </motion.p>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Right Legacy Image */}
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={imageRightVariants}
-          className="col-12 col-md-12 col-lg-3 text-center"
-        >
-          <div 
-            className="p-2 d-inline-block rounded-4" 
-            style={{ 
-              border: "2px solid var(--royal-gold)",
-              boxShadow: "0 10px 30px rgba(212, 175, 55, 0.12)"
-            }}
-          >
-            <img
-              alt="Rajput ceremony"
-              className="img-fluid rounded-3"
-              src={rightImage}
-              style={{
-                maxHeight: "400px",
-                width: "100%",
-                objectFit: "cover"
-              }}
-            />
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
+  return null;
 };
 
 export default About;
+

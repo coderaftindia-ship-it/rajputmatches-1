@@ -56,7 +56,7 @@ const Navbar = ({ forceSolid = false }) => {
               alt={siteSettings.companyName || "Logo"}
               onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
               style={{
-                height: "54px",
+                height: "46px",
                 width: "auto",
                 maxHeight: "54px",
                 objectFit: "contain",
@@ -64,7 +64,7 @@ const Navbar = ({ forceSolid = false }) => {
                 transition: "transform 0.3s ease"
               }}
             />
-            <div className="d-flex flex-column text-start" style={{ whiteSpace: "nowrap" }}>
+            <div className="d-none d-sm-flex flex-column text-start" style={{ whiteSpace: "nowrap" }}>
               <span style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
                 fontSize: "1.2rem",
@@ -102,11 +102,11 @@ const Navbar = ({ forceSolid = false }) => {
                 About
               </Link>
             </li>
-            <li style={{ flexShrink: 0 }}>
+            {/* <li style={{ flexShrink: 0 }}>
               <Link to="/how-to-use" className={navLinkClass("/how-to-use")}>
                 How to Use
               </Link>
-            </li>
+            </li> */}
             <li style={{ flexShrink: 0 }}>
               <Link to="/stories" className={navLinkClass("/stories")}>
                 Stories
@@ -191,10 +191,10 @@ const Navbar = ({ forceSolid = false }) => {
         </div>
 
         {/* Mobile Navbar Elements */}
-        <div className="d-flex d-lg-none align-items-center gap-3">
+        <div className="d-flex d-lg-none align-items-center gap-2">
           {isAuthenticated && (
             <div className="position-relative me-1">
-              <FaBell size={18} color="var(--royal-maroon)" />
+              <FaBell size={20} color="var(--royal-maroon)" />
               <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
                 <span className="visually-hidden">New alerts</span>
               </span>
@@ -202,8 +202,16 @@ const Navbar = ({ forceSolid = false }) => {
           )}
           <button 
             onClick={toggleDrawer}
-            className="btn p-1 d-flex align-items-center justify-content-center"
-            style={{ color: "var(--royal-maroon)", background: "transparent", border: "none" }}
+            className="btn p-2 d-flex align-items-center justify-content-center rounded-3"
+            style={{
+              color: "var(--royal-maroon, #59123B)",
+              background: "rgba(89, 18, 59, 0.06)",
+              border: "1.5px solid var(--royal-gold, #CD9024)",
+              width: "40px",
+              height: "40px",
+              boxShadow: "0 2px 6px rgba(89, 18, 59, 0.1)",
+              transition: "all 0.2s ease"
+            }}
             aria-label="Toggle Menu"
           >
             <FaBars size={22} />
@@ -221,7 +229,18 @@ const Navbar = ({ forceSolid = false }) => {
       <div className={`mobile-menu-drawer ${isDrawerOpen ? "active" : ""}`}>
         <div className="drawer-header">
           <img src={Logo} alt="Logo" />
-          <button className="drawer-close-btn" onClick={() => setIsDrawerOpen(false)} aria-label="Close Menu">
+          <button
+            className="drawer-close-btn d-flex align-items-center justify-content-center rounded-circle p-2"
+            onClick={() => setIsDrawerOpen(false)}
+            aria-label="Close Menu"
+            style={{
+              width: "40px",
+              height: "40px",
+              background: "rgba(89, 18, 59, 0.08)",
+              border: "1px solid rgba(205, 144, 36, 0.4)",
+              color: "var(--royal-maroon)"
+            }}
+          >
             <FaTimes size={22} />
           </button>
         </div>
@@ -233,9 +252,9 @@ const Navbar = ({ forceSolid = false }) => {
           <Link to="/about" className={`drawer-link ${isActive("/about") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
             About Us
           </Link>
-          <Link to="/how-to-use" className={`drawer-link ${isActive("/how-to-use") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
+          {/* <Link to="/how-to-use" className={`drawer-link ${isActive("/how-to-use") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
             How to Use
-          </Link>
+          </Link> */}
           <Link to="/stories" className={`drawer-link ${isActive("/stories") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
             Stories
           </Link>

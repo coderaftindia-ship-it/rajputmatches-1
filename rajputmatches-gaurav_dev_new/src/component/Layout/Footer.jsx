@@ -125,9 +125,9 @@ function Footer() {
               <li>
                 <Link to="/stories" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Stories</Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/how-to-use" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>How to Use</Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/contact-us" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Contact Us</Link>
               </li>
