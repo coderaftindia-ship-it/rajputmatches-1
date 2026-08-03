@@ -5,9 +5,9 @@ export const mediaApi = {
 
   getAvatar: () => apiClient.get("/auth/profile"),
 
-  uploadPhotos: (formData) => apiClient.post("/auth/upload-files", formData),
+  uploadPhotos: (formData, config = {}) => apiClient.post("/auth/upload-files", formData, config),
 
-  uploadDocuments: (formData) => apiClient.post("/auth/upload-documents", formData),
+  uploadDocuments: (formData, config = {}) => apiClient.post("/auth/upload-documents", formData, config),
 
   setAvatar: (photoId) => apiClient.put("/auth/set-profile-image", { data: photoId }),
 

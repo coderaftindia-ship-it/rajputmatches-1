@@ -212,25 +212,27 @@ function About() {
             }}
           ></div>
 
-          {/* <motion.div
-            initial={{ opacity: 0, y: 35 }}
+          {/* Hero Text Overlay */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-center w-100"
-            style={{ zIndex: 10, position: "relative", padding: "3rem 1.25rem", maxWidth: "920px" }}
+            style={{ zIndex: 10, position: "relative", padding: "3rem 1.25rem", maxWidth: "900px" }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-4"
+              className="d-inline-flex align-items-center gap-2 px-3.5 py-1.5 rounded-pill mb-3"
               style={{
-                background: "rgba(212, 175, 55, 0.15)",
-                border: "1px solid rgba(212, 175, 55, 0.4)",
+                background: "rgba(212, 175, 55, 0.2)",
+                border: "1.5px solid rgba(212, 175, 55, 0.6)",
+                backdropFilter: "blur(6px)",
                 color: "#E8C371",
                 fontSize: "0.85rem",
                 letterSpacing: "2.5px",
-                fontWeight: 600,
+                fontWeight: 700,
                 textTransform: "uppercase"
               }}
             >
@@ -239,36 +241,38 @@ function About() {
             </motion.div>
 
             <h1
-              className="display-3 fw-bold mb-3"
+              className="display-4 fw-bold mb-3"
               style={{
-                fontFamily: "var(--font-heading)",
+                fontFamily: "'Playfair Display', Georgia, serif",
                 color: "#FFFFFF",
                 letterSpacing: "-0.5px",
-                lineHeight: 1.2
+                lineHeight: 1.2,
+                textShadow: "0 4px 20px rgba(0,0,0,0.6)"
               }}
             >
-              About <span style={{ color: "#E8C371", textShadow: "0 2px 15px rgba(232, 195, 113, 0.3)" }}>Rajput Alliance</span>
+              About <span style={{ color: "#E8C371", textShadow: "0 2px 15px rgba(232, 195, 113, 0.4)" }}>Rajput Alliance</span>
             </h1>
 
             <p
               className="lead mx-auto mb-4"
               style={{
-                maxWidth: "800px",
-                color: "rgba(255, 255, 255, 0.92)",
-                fontSize: "clamp(1rem, 2vw, 1.25rem)",
+                maxWidth: "760px",
+                color: "rgba(255, 255, 255, 0.95)",
+                fontSize: "1.1rem",
                 lineHeight: 1.7,
-                fontWeight: 400
+                fontWeight: 400,
+                textShadow: "0 2px 10px rgba(0,0,0,0.7)"
               }}
             >
-              Rajput Alliance is a dedicated matrimonial platform created exclusively for the Rajput community. Our mission is simple to bring together individuals and families who value heritage, tradition, trust, and lifelong commitment.
+              Rajput Alliance is a premier matrimonial network created exclusively for the Rajput community — bringing together individuals and families who value heritage, tradition, trust, and lifelong commitment.
             </p>
 
-            <div className="d-flex align-items-center justify-content-center gap-2 mt-4 opacity-75">
-              <div style={{ width: "60px", height: "1px", backgroundColor: "#E8C371" }}></div>
+            <div className="d-flex align-items-center justify-content-center gap-2 mt-3 opacity-85">
+              <div style={{ width: "50px", height: "1px", backgroundColor: "#E8C371" }}></div>
               <Crown size={18} color="#E8C371" />
-              <div style={{ width: "60px", height: "1px", backgroundColor: "#E8C371" }}></div>
+              <div style={{ width: "50px", height: "1px", backgroundColor: "#E8C371" }}></div>
             </div>
-          </motion.div> */}
+          </motion.div>
         </section>
 
         {/* Main Content Container */}
@@ -783,7 +787,7 @@ function About() {
                 </p>
 
                 <div className="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
-                  <Link to={isAuthenticated ? "/search" : "/signup"}>
+                  <Link to={isAuthenticated ? "/search" : "/login"}>
                     <button
                       className="btn px-4 py-3 fs-5 fw-bold d-inline-flex align-items-center justify-content-center gap-2"
                       style={{

@@ -3,6 +3,141 @@ import style from "./Form.module.css";
 import { MdOutlineCancelPresentation } from "react-icons/md";
 import { FaPlus, FaTrash } from "react-icons/fa";
 
+const SiblingSection = ({
+  title,
+  arrayName,
+  items,
+  handleSiblingChange,
+  handleAddSiblingRow,
+  handleRemoveSiblingRow,
+  isSister,
+}) => (
+  <div
+    style={{
+      background: "#fdfafc",
+      border: "1px solid rgba(89, 18, 59, 0.12)",
+      borderRadius: "8px",
+      padding: "8px 10px",
+      marginBottom: "8px",
+    }}
+  >
+    <div className="d-flex justify-content-between align-items-center mb-1.5">
+      <span
+        style={{
+          fontSize: "0.72rem",
+          fontWeight: "700",
+          color: "#59123B",
+          textTransform: "uppercase",
+          letterSpacing: "0.02em",
+        }}
+      >
+        {title}
+      </span>
+      <button
+        type="button"
+        onClick={() => handleAddSiblingRow(arrayName)}
+        style={{
+          background: "#ffffff",
+          border: "1px solid #59123B",
+          color: "#59123B",
+          borderRadius: "4px",
+          padding: "2px 6px",
+          fontSize: "0.65rem",
+          fontWeight: "700",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: "3px",
+        }}
+      >
+        <FaPlus size={7} /> Add {title}
+      </button>
+    </div>
+
+    {items.map((item, idx) => (
+      <div
+        key={idx}
+        style={{
+          background: "#ffffff",
+          border: "1px solid #edf2f7",
+          borderRadius: "6px",
+          padding: "6px 8px",
+          marginBottom: "6px",
+          position: "relative",
+        }}
+      >
+        {items.length > 1 && (
+          <button
+            type="button"
+            onClick={() => handleRemoveSiblingRow(arrayName, idx)}
+            style={{
+              position: "absolute",
+              top: "4px",
+              right: "4px",
+              background: "none",
+              border: "none",
+              color: "#dc2626",
+              cursor: "pointer",
+              padding: "2px",
+            }}
+            title="Remove Sibling"
+          >
+            <FaTrash size={10} />
+          </button>
+        )}
+        <div className="row g-1.5">
+          <div className="col-6">
+            <label style={{ fontSize: "0.58rem", fontWeight: "700", color: "#4a4a5e", display: "block", marginBottom: "1px" }}>
+              NAME
+            </label>
+            <input
+              type="text"
+              placeholder="Name"
+              value={item.name || ""}
+              onChange={(e) => handleSiblingChange(arrayName, idx, "name", e.target.value)}
+            />
+          </div>
+          <div className="col-6">
+            <label style={{ fontSize: "0.58rem", fontWeight: "700", color: "#4a4a5e", display: "block", marginBottom: "1px" }}>
+              MARRIED TO
+            </label>
+            <input
+              type="text"
+              placeholder="Spouse Name"
+              value={item.marriedto || ""}
+              onChange={(e) => handleSiblingChange(arrayName, idx, "marriedto", e.target.value)}
+            />
+          </div>
+          <div className="col-6">
+            <label style={{ fontSize: "0.58rem", fontWeight: "700", color: "#4a4a5e", display: "block", marginBottom: "1px" }}>
+              {isSister ? "SON OF" : "DAUGHTER OF"}
+            </label>
+            <input
+              type="text"
+              placeholder="Parent Name"
+              value={isSister ? item.sonof || "" : item.daughterof || ""}
+              onChange={(e) =>
+                handleSiblingChange(arrayName, idx, isSister ? "sonof" : "daughterof", e.target.value)
+              }
+            />
+          </div>
+          <div className="col-6">
+            <label style={{ fontSize: "0.58rem", fontWeight: "700", color: "#4a4a5e", display: "block", marginBottom: "1px" }}>
+              NATIVE PLACE
+            </label>
+            <input
+              type="text"
+              placeholder="Thikana"
+              value={item.thikana || ""}
+              onChange={(e) => handleSiblingChange(arrayName, idx, "thikana", e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 function FamilyinfoForm({
   handleCancelClick,
   handleInputChange,
@@ -12,65 +147,58 @@ function FamilyinfoForm({
   formData,
   handleSaveClick,
 }) {
-  // Helpers for safe array rendering
-  const elderBrothers = formData.elderBrother && formData.elderBrother.length > 0
-    ? formData.elderBrother
-    : [{ name: "", marriedto: "", daughterof: "", thikana: "" }];
+  const elderBrothers =
+    formData.elderBrother && formData.elderBrother.length > 0
+      ? formData.elderBrother
+      : [{ name: "", marriedto: "", daughterof: "", thikana: "" }];
 
-  const elderSisters = formData.elderSister && formData.elderSister.length > 0
-    ? formData.elderSister
-    : [{ name: "", marriedto: "", sonof: "", thikana: "" }];
+  const elderSisters =
+    formData.elderSister && formData.elderSister.length > 0
+      ? formData.elderSister
+      : [{ name: "", marriedto: "", sonof: "", thikana: "" }];
 
-  const youngerBrothers = formData.youngerBrother && formData.youngerBrother.length > 0
-    ? formData.youngerBrother
-    : [{ name: "", marriedto: "", daughterof: "", thikana: "" }];
+  const youngerBrothers =
+    formData.youngerBrother && formData.youngerBrother.length > 0
+      ? formData.youngerBrother
+      : [{ name: "", marriedto: "", daughterof: "", thikana: "" }];
 
-  const youngerSisters = formData.youngerSister && formData.youngerSister.length > 0
-    ? formData.youngerSister
-    : [{ name: "", marriedto: "", sonof: "", thikana: "" }];
+  const youngerSisters =
+    formData.youngerSister && formData.youngerSister.length > 0
+      ? formData.youngerSister
+      : [{ name: "", marriedto: "", sonof: "", thikana: "" }];
 
   return (
     <div className={style.modalContainer}>
-      <div className={style.modalContent} style={{ maxWidth: "920px", width: "95vw" }}>
+      <div className={style.modalContent} style={{ maxWidth: "720px", borderRadius: "10px" }}>
         {/* Header */}
         <div className={style.modalHeader}>
           <h4 className={style.headerTitle}>Family Details</h4>
-          <div>
-            <MdOutlineCancelPresentation
-              onClick={handleCancelClick}
-              className={style.closeIcon}
-              size="22"
-            />
-          </div>
+          <MdOutlineCancelPresentation
+            onClick={handleCancelClick}
+            className={style.closeIcon}
+            size="20"
+          />
         </div>
 
         {/* Modal Form Body */}
-        <form className="p-4" onSubmit={(e) => e.preventDefault()}>
+        <form style={{ padding: "10px 12px" }} onSubmit={(e) => e.preventDefault()}>
           {/* Top Parent & Basic Family Details Section */}
-          <div className="row g-3 mb-4">
+          <div className="row g-1.5 mb-2">
             {/* Row 1: Father Name & Father Occupation */}
-            <div className="col-md-6">
-              <label htmlFor="fatherName" className="form-label fw-bold text-uppercase small text-secondary">
-                FATHER'S NAME
-              </label>
+            <div className="col-6">
+              <label>FATHER'S NAME</label>
               <input
                 type="text"
-                className="form-control rounded-2"
-                id="fatherName"
                 name="fatherName"
                 value={formData.fatherName || ""}
                 onChange={handleInputChange}
                 placeholder="Father's Name"
               />
             </div>
-            <div className="col-md-6">
-              <label htmlFor="occupation" className="form-label fw-bold text-uppercase small text-secondary">
-                OCCUPATION
-              </label>
+            <div className="col-6">
+              <label>FATHER'S OCCUPATION</label>
               <input
                 type="text"
-                className="form-control rounded-2"
-                id="occupation"
                 name="occupation"
                 value={formData.occupation || ""}
                 onChange={handleInputChange}
@@ -79,28 +207,20 @@ function FamilyinfoForm({
             </div>
 
             {/* Row 2: Father Native Place & Mother Name */}
-            <div className="col-md-6">
-              <label htmlFor="fatherNativePlace" className="form-label fw-bold text-uppercase small text-secondary">
-                FATHER'S NATIVE PLACE
-              </label>
+            <div className="col-6">
+              <label>FATHER'S NATIVE PLACE</label>
               <input
                 type="text"
-                className="form-control rounded-2"
-                id="fatherNativePlace"
                 name="fatherNativePlace"
                 value={formData.fatherNativePlace || ""}
                 onChange={handleInputChange}
-                placeholder="Father's Native Place"
+                placeholder="Native Place"
               />
             </div>
-            <div className="col-md-6">
-              <label htmlFor="motherName" className="form-label fw-bold text-uppercase small text-secondary">
-                MOTHER'S NAME
-              </label>
+            <div className="col-6">
+              <label>MOTHER'S NAME</label>
               <input
                 type="text"
-                className="form-control rounded-2"
-                id="motherName"
                 name="motherName"
                 value={formData.motherName || ""}
                 onChange={handleInputChange}
@@ -108,454 +228,134 @@ function FamilyinfoForm({
               />
             </div>
 
-            {/* Row 3 & 4: Family Info & Mother Native Place / Occupation */}
-            <div className="col-md-6">
-              <label htmlFor="familyInfo" className="form-label fw-bold text-uppercase small text-secondary">
-                FAMILY INFO
-              </label>
-              <textarea
-                className="form-control rounded-2"
-                id="familyInfo"
-                name="familyInfo"
-                rows="4"
-                value={formData.familyInfo || ""}
-                onChange={handleInputChange}
-                placeholder="Enter Family Information..."
-                style={{ minHeight: "116px" }}
-              ></textarea>
-            </div>
-
-            <div className="col-md-6 d-flex flex-column justify-content-between">
-              <div className="mb-3">
-                <label htmlFor="motherNativePlace" className="form-label fw-bold text-uppercase small text-secondary">
-                  MOTHER'S NATIVE PLACE
-                </label>
-                <input
-                  type="text"
-                  className="form-control rounded-2"
-                  id="motherNativePlace"
-                  name="motherNativePlace"
-                  value={formData.motherNativePlace || ""}
-                  onChange={handleInputChange}
-                  placeholder="Mother's Native Place"
-                />
-              </div>
-              <div>
-                <label htmlFor="motherOccupation" className="form-label fw-bold text-uppercase small text-secondary">
-                  MOTHER'S OCCUPATION
-                </label>
-                <input
-                  type="text"
-                  className="form-control rounded-2"
-                  id="motherOccupation"
-                  name="motherOccupation"
-                  value={formData.motherOccupation || ""}
-                  onChange={handleInputChange}
-                  placeholder="Mother's Occupation"
-                />
-              </div>
-            </div>
-
-            {/* Additional Details: Maternal Gotra & Location */}
-            <div className="col-md-4">
-              <label htmlFor="maternalGotra" className="form-label fw-bold text-uppercase small text-secondary">
-                MATERNAL GOTRA
-              </label>
+            {/* Row 3: Mother Occupation & Mother Native Place */}
+            <div className="col-6">
+              <label>MOTHER'S OCCUPATION</label>
               <input
                 type="text"
-                className="form-control rounded-2"
-                id="maternalGotra"
+                name="motherOccupation"
+                value={formData.motherOccupation || ""}
+                onChange={handleInputChange}
+                placeholder="Mother's Occupation"
+              />
+            </div>
+            <div className="col-6">
+              <label>MOTHER'S NATIVE PLACE</label>
+              <input
+                type="text"
+                name="motherNativePlace"
+                value={formData.motherNativePlace || ""}
+                onChange={handleInputChange}
+                placeholder="Mother's Native"
+              />
+            </div>
+
+            {/* Row 4: Maternal Gotra & Family Location */}
+            <div className="col-6">
+              <label>MATERNAL GOTRA</label>
+              <input
+                type="text"
                 name="maternalGotra"
                 value={formData.maternalGotra || ""}
                 onChange={handleInputChange}
                 placeholder="Gotra"
               />
             </div>
-            <div className="col-md-4">
-              <label htmlFor="familyLocation" className="form-label fw-bold text-uppercase small text-secondary">
-                FAMILY LOCATION
-              </label>
+            <div className="col-6">
+              <label>FAMILY LOCATION</label>
               <input
                 type="text"
-                className="form-control rounded-2"
-                id="familyLocation"
                 name="familyLocation"
                 value={formData.familyLocation || ""}
                 onChange={handleInputChange}
                 placeholder="Location"
               />
             </div>
-            <div className="col-md-4">
-              <label htmlFor="additionalMaternal" className="form-label fw-bold text-uppercase small text-secondary">
-                ADDITIONAL MATERNAL
-              </label>
+
+            {/* Row 5: Additional Maternal */}
+            <div className="col-12">
+              <label>ADDITIONAL MATERNAL</label>
               <input
                 type="text"
-                className="form-control rounded-2"
-                id="additionalMaternal"
                 name="additionalMaternal"
                 value={formData.additionalMaternal || ""}
                 onChange={handleInputChange}
-                placeholder="Info"
+                placeholder="Additional Maternal Info"
               />
             </div>
-          </div>
 
-          {/* ALL SIBLINGS SECTION */}
-          <div className="mb-4">
-            <h6
-              className="fw-bold text-uppercase mb-3"
-              style={{
-                fontSize: "0.85rem",
-                color: "#59123B",
-                letterSpacing: "0.05em",
-                borderBottom: "1.5px solid rgba(89, 18, 59, 0.15)",
-                paddingBottom: "6px",
-              }}
-            >
-              ALL SIBLINGS
-            </h6>
-
-            <div className="row g-3">
-              {/* 1. ELDER BROTHER CARD */}
-              <div className="col-md-6">
-                <div
-                  className="p-3 border rounded-3"
-                  style={{ background: "#FDF6EC", borderColor: "rgba(212, 175, 55, 0.3)" }}
-                >
-                  <div className="fw-bold text-uppercase small mb-2 text-secondary" style={{ fontSize: "0.75rem" }}>
-                    ELDER BROTHER
-                  </div>
-                  {elderBrothers.map((item, idx) => (
-                    <div key={`eb-${idx}`} className="mb-3 border-bottom pb-2 position-relative">
-                      {elderBrothers.length > 1 && (
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-link text-danger position-absolute top-0 end-0 p-0 text-decoration-none"
-                          onClick={() => handleRemoveSiblingRow("elderBrother", idx)}
-                          title="Remove"
-                        >
-                          <FaTrash size={12} />
-                        </button>
-                      )}
-                      <div className="row g-2 mb-2">
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>ELDER BROTHER NAME</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Name"
-                            value={item.name || ""}
-                            onChange={(e) => handleSiblingChange("elderBrother", idx, "name", e.target.value)}
-                          />
-                        </div>
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>MARRIED TO</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Spouse Name"
-                            value={item.marriedto || ""}
-                            onChange={(e) => handleSiblingChange("elderBrother", idx, "marriedto", e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      <div className="row g-2">
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>DAUGHTER OF</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Daughter Name"
-                            value={item.daughterof || ""}
-                            onChange={(e) => handleSiblingChange("elderBrother", idx, "daughterof", e.target.value)}
-                          />
-                        </div>
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>NATIVE PLACE</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Native Place"
-                            value={item.thikana || ""}
-                            onChange={(e) => handleSiblingChange("elderBrother", idx, "thikana", e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="text-end mt-2">
-                    <button
-                      type="button"
-                      className="btn btn-sm text-uppercase fw-bold p-0"
-                      style={{ color: "#8B1D5A", fontSize: "0.75rem" }}
-                      onClick={() => handleAddSiblingRow("elderBrother")}
-                    >
-                      <FaPlus size={10} className="me-1" /> ADD
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* 2. ELDER SISTER CARD */}
-              <div className="col-md-6">
-                <div
-                  className="p-3 border rounded-3"
-                  style={{ background: "#FDF6EC", borderColor: "rgba(212, 175, 55, 0.3)" }}
-                >
-                  <div className="fw-bold text-uppercase small mb-2 text-secondary" style={{ fontSize: "0.75rem" }}>
-                    ELDER SISTER
-                  </div>
-                  {elderSisters.map((item, idx) => (
-                    <div key={`es-${idx}`} className="mb-3 border-bottom pb-2 position-relative">
-                      {elderSisters.length > 1 && (
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-link text-danger position-absolute top-0 end-0 p-0 text-decoration-none"
-                          onClick={() => handleRemoveSiblingRow("elderSister", idx)}
-                          title="Remove"
-                        >
-                          <FaTrash size={12} />
-                        </button>
-                      )}
-                      <div className="row g-2 mb-2">
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>ELDER SISTER NAME</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Name"
-                            value={item.name || ""}
-                            onChange={(e) => handleSiblingChange("elderSister", idx, "name", e.target.value)}
-                          />
-                        </div>
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>MARRIED TO</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Spouse Name"
-                            value={item.marriedto || ""}
-                            onChange={(e) => handleSiblingChange("elderSister", idx, "marriedto", e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      <div className="row g-2">
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>SON OF</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Son Name"
-                            value={item.sonof || ""}
-                            onChange={(e) => handleSiblingChange("elderSister", idx, "sonof", e.target.value)}
-                          />
-                        </div>
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>NATIVE PLACE</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Native Place"
-                            value={item.thikana || ""}
-                            onChange={(e) => handleSiblingChange("elderSister", idx, "thikana", e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="text-end mt-2">
-                    <button
-                      type="button"
-                      className="btn btn-sm text-uppercase fw-bold p-0"
-                      style={{ color: "#8B1D5A", fontSize: "0.75rem" }}
-                      onClick={() => handleAddSiblingRow("elderSister")}
-                    >
-                      <FaPlus size={10} className="me-1" /> ADD
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. YOUNGER BROTHER CARD */}
-              <div className="col-md-6">
-                <div
-                  className="p-3 border rounded-3"
-                  style={{ background: "#FDF6EC", borderColor: "rgba(212, 175, 55, 0.3)" }}
-                >
-                  <div className="fw-bold text-uppercase small mb-2 text-secondary" style={{ fontSize: "0.75rem" }}>
-                    YOUNGER BROTHER
-                  </div>
-                  {youngerBrothers.map((item, idx) => (
-                    <div key={`yb-${idx}`} className="mb-3 border-bottom pb-2 position-relative">
-                      {youngerBrothers.length > 1 && (
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-link text-danger position-absolute top-0 end-0 p-0 text-decoration-none"
-                          onClick={() => handleRemoveSiblingRow("youngerBrother", idx)}
-                          title="Remove"
-                        >
-                          <FaTrash size={12} />
-                        </button>
-                      )}
-                      <div className="row g-2 mb-2">
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>YOUNGER BROTHER NAME</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Name"
-                            value={item.name || ""}
-                            onChange={(e) => handleSiblingChange("youngerBrother", idx, "name", e.target.value)}
-                          />
-                        </div>
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>MARRIED TO</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Spouse Name"
-                            value={item.marriedto || ""}
-                            onChange={(e) => handleSiblingChange("youngerBrother", idx, "marriedto", e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      <div className="row g-2">
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>DAUGHTER OF</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Daughter Name"
-                            value={item.daughterof || ""}
-                            onChange={(e) => handleSiblingChange("youngerBrother", idx, "daughterof", e.target.value)}
-                          />
-                        </div>
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>NATIVE PLACE</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Native Place"
-                            value={item.thikana || ""}
-                            onChange={(e) => handleSiblingChange("youngerBrother", idx, "thikana", e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="text-end mt-2">
-                    <button
-                      type="button"
-                      className="btn btn-sm text-uppercase fw-bold p-0"
-                      style={{ color: "#8B1D5A", fontSize: "0.75rem" }}
-                      onClick={() => handleAddSiblingRow("youngerBrother")}
-                    >
-                      <FaPlus size={10} className="me-1" /> ADD
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. YOUNGER SISTER CARD */}
-              <div className="col-md-6">
-                <div
-                  className="p-3 border rounded-3"
-                  style={{ background: "#FDF6EC", borderColor: "rgba(212, 175, 55, 0.3)" }}
-                >
-                  <div className="fw-bold text-uppercase small mb-2 text-secondary" style={{ fontSize: "0.75rem" }}>
-                    YOUNGER SISTER
-                  </div>
-                  {youngerSisters.map((item, idx) => (
-                    <div key={`ys-${idx}`} className="mb-3 border-bottom pb-2 position-relative">
-                      {youngerSisters.length > 1 && (
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-link text-danger position-absolute top-0 end-0 p-0 text-decoration-none"
-                          onClick={() => handleRemoveSiblingRow("youngerSister", idx)}
-                          title="Remove"
-                        >
-                          <FaTrash size={12} />
-                        </button>
-                      )}
-                      <div className="row g-2 mb-2">
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>YOUNGER SISTER NAME</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Name"
-                            value={item.name || ""}
-                            onChange={(e) => handleSiblingChange("youngerSister", idx, "name", e.target.value)}
-                          />
-                        </div>
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>MARRIED TO</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Spouse Name"
-                            value={item.marriedto || ""}
-                            onChange={(e) => handleSiblingChange("youngerSister", idx, "marriedto", e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      <div className="row g-2">
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>SON OF</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Son Name"
-                            value={item.sonof || ""}
-                            onChange={(e) => handleSiblingChange("youngerSister", idx, "sonof", e.target.value)}
-                          />
-                        </div>
-                        <div className="col-6">
-                          <label className="form-label text-muted" style={{ fontSize: "0.7rem" }}>NATIVE PLACE</label>
-                          <input
-                            type="text"
-                            className="form-control form-control-sm rounded-2"
-                            placeholder="Native Place"
-                            value={item.thikana || ""}
-                            onChange={(e) => handleSiblingChange("youngerSister", idx, "thikana", e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="text-end mt-2">
-                    <button
-                      type="button"
-                      className="btn btn-sm text-uppercase fw-bold p-0"
-                      style={{ color: "#8B1D5A", fontSize: "0.75rem" }}
-                      onClick={() => handleAddSiblingRow("youngerSister")}
-                    >
-                      <FaPlus size={10} className="me-1" /> ADD
-                    </button>
-                  </div>
-                </div>
-              </div>
-
+            {/* Row 6: Family Info */}
+            <div className="col-12">
+              <label>FAMILY INFO / DESCRIPTION</label>
+              <textarea
+                name="familyInfo"
+                rows="2"
+                value={formData.familyInfo || ""}
+                onChange={handleInputChange}
+                placeholder="Brief Family Information..."
+                style={{ minHeight: "40px" }}
+              ></textarea>
             </div>
           </div>
 
-          {/* Footer Save Button */}
-          <div className={style.modalFooter}>
+          {/* SIBLINGS SECTIONS */}
+          <div className="mb-2">
+            <SiblingSection
+              title="Elder Brother"
+              arrayName="elderBrother"
+              items={elderBrothers}
+              handleSiblingChange={handleSiblingChange}
+              handleAddSiblingRow={handleAddSiblingRow}
+              handleRemoveSiblingRow={handleRemoveSiblingRow}
+              isSister={false}
+            />
+
+            <SiblingSection
+              title="Elder Sister"
+              arrayName="elderSister"
+              items={elderSisters}
+              handleSiblingChange={handleSiblingChange}
+              handleAddSiblingRow={handleAddSiblingRow}
+              handleRemoveSiblingRow={handleRemoveSiblingRow}
+              isSister={true}
+            />
+
+            <SiblingSection
+              title="Younger Brother"
+              arrayName="youngerBrother"
+              items={youngerBrothers}
+              handleSiblingChange={handleSiblingChange}
+              handleAddSiblingRow={handleAddSiblingRow}
+              handleRemoveSiblingRow={handleRemoveSiblingRow}
+              isSister={false}
+            />
+
+            <SiblingSection
+              title="Younger Sister"
+              arrayName="youngerSister"
+              items={youngerSisters}
+              handleSiblingChange={handleSiblingChange}
+              handleAddSiblingRow={handleAddSiblingRow}
+              handleRemoveSiblingRow={handleRemoveSiblingRow}
+              isSister={true}
+            />
+          </div>
+
+          {/* Footer Actions */}
+          <div className={style.modalFooter} style={{ padding: "6px 0 0 0", borderTop: "1px solid #f0f0f0" }}>
             <button
               type="button"
-              className={`btn ${style.saveButton}`}
-              style={{
-                background: "linear-gradient(135deg, #59123B, #8B1D5A)",
-                color: "#fff",
-                borderRadius: "8px",
-                padding: "8px 32px",
-                fontWeight: "600",
-                letterSpacing: "0.05em",
-              }}
+              className={style.cancelBtn}
+              onClick={handleCancelClick}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className={style.saveBtn}
               onClick={handleSaveClick}
             >
-              SAVE
+              Save Changes
             </button>
           </div>
         </form>

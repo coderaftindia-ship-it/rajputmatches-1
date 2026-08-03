@@ -6,6 +6,7 @@ import { FaSearch, FaUserCircle, FaSignOutAlt, FaCommentDots, FaBell, FaBars, Fa
 import { MdDashboard } from "react-icons/md";
 import { useAuth } from "./AuthContext";
 import { useSiteSettings } from "../../context/SiteSettingsContext";
+import { chatApi } from "../../api";
 
 const Navbar = ({ forceSolid = false }) => {
   const { isAuthenticated, logout, userData, profile } = useAuth();
@@ -16,6 +17,28 @@ const Navbar = ({ forceSolid = false }) => {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(forceSolid);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [msgCount, setMsgCount] = useState(0);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let isMounted = true;
+    const fetchChatCount = async () => {
+      try {
+        const chats = await chatApi.listChats();
+        if (isMounted && Array.isArray(chats)) {
+          setMsgCount(chats.length);
+        }
+      } catch (e) {
+        console.error("Error fetching navbar message count:", e);
+      }
+    };
+    fetchChatCount();
+    const interval = setInterval(fetchChatCount, 15000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isAuthenticated]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -131,6 +154,21 @@ const Navbar = ({ forceSolid = false }) => {
               </Link>
               <Link to="/message" className="d-flex align-items-center gap-1" style={{ color: "var(--royal-maroon)", textDecoration: "none", fontWeight: "600", fontSize: "0.9rem", whiteSpace: "nowrap", flexShrink: 0, padding: "4px 8px" }}>
                 <FaCommentDots size={17} /> Messages
+                <span
+                  style={{
+                    background: "var(--royal-maroon, #59123B)",
+                    color: "#ffffff",
+                    fontSize: "0.68rem",
+                    fontWeight: 700,
+                    padding: "1px 6px",
+                    borderRadius: "10px",
+                    marginLeft: "2px",
+                    lineHeight: "1.2",
+                    boxShadow: "0 2px 4px rgba(89,18,59,0.2)"
+                  }}
+                >
+                  {msgCount}
+                </span>
               </Link>
               
               <div className="position-relative" style={{ flexShrink: 0 }}>
@@ -271,8 +309,11 @@ const Navbar = ({ forceSolid = false }) => {
               <Link to="/dashboard" className={`drawer-link ${isActive("/dashboard") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
                 Dashboard
               </Link>
-              <Link to="/message" className={`drawer-link ${isActive("/message") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
-                Messages
+              <Link to="/message" className={`drawer-link d-flex align-items-center justify-content-between ${isActive("/message") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
+                <span>Messages</span>
+                <span className="badge rounded-pill bg-danger" style={{ fontSize: "0.7rem" }}>
+                  {msgCount}
+                </span>
               </Link>
               <Link to="/profile" className={`drawer-link ${isActive("/profile") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
                 My Profile
@@ -298,7 +339,7 @@ const Navbar = ({ forceSolid = false }) => {
               <Link to="/login" className="royal-button text-center w-100 text-decoration-none" style={{ padding: "10px", fontSize: "0.9rem" }} onClick={() => setIsDrawerOpen(false)}>
                 Login
               </Link>
-              <Link to="/signup" className="royal-button-outline text-center w-100 text-decoration-none" style={{ padding: "9px", fontSize: "0.9rem", color: "var(--royal-maroon)", border: "1.5px solid var(--royal-maroon)", borderRadius: "8px" }} onClick={() => setIsDrawerOpen(false)}>
+              <Link to="/login" className="royal-button-outline text-center w-100 text-decoration-none" style={{ padding: "9px", fontSize: "0.9rem", color: "var(--royal-maroon)", border: "1.5px solid var(--royal-maroon)", borderRadius: "8px" }} onClick={() => setIsDrawerOpen(false)}>
                 Register
               </Link>
             </>

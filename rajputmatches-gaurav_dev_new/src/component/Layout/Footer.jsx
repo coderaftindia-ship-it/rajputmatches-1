@@ -33,13 +33,13 @@ function Footer() {
   }, []);
 
   const socialConfig = [
-    { icon: <FaFacebook size={18} color="var(--royal-gold)" />, label: "Facebook", key: "facebook" },
-    { icon: <FaInstagram size={18} color="var(--royal-gold)" />, label: "Instagram", key: "instagram" },
-    { icon: <FaWhatsapp size={18} color="var(--royal-gold)" />, label: "WhatsApp", key: "whatsapp" },
-    { icon: <FaTelegram size={18} color="var(--royal-gold)" />, label: "Telegram", key: "telegram" },
-    { icon: <FaYoutube size={18} color="var(--royal-gold)" />, label: "YouTube", key: "youtube" },
-    { icon: <FaTwitter size={18} color="var(--royal-gold)" />, label: "Twitter", key: "twitter" },
-    { icon: <FaLinkedin size={18} color="var(--royal-gold)" />, label: "LinkedIn", key: "linkedin" },
+    { icon: <FaFacebook size={14} color="var(--royal-gold)" />, label: "Facebook", key: "facebook" },
+    { icon: <FaInstagram size={14} color="var(--royal-gold)" />, label: "Instagram", key: "instagram" },
+    { icon: <FaWhatsapp size={14} color="var(--royal-gold)" />, label: "WhatsApp", key: "whatsapp" },
+    { icon: <FaTelegram size={14} color="var(--royal-gold)" />, label: "Telegram", key: "telegram" },
+    { icon: <FaYoutube size={14} color="var(--royal-gold)" />, label: "YouTube", key: "youtube" },
+    { icon: <FaTwitter size={14} color="var(--royal-gold)" />, label: "Twitter", key: "twitter" },
+    { icon: <FaLinkedin size={14} color="var(--royal-gold)" />, label: "LinkedIn", key: "linkedin" },
   ];
 
   const getSocialUrl = (linksObj, key) => {
@@ -63,57 +63,54 @@ function Footer() {
     .filter(Boolean);
 
   return (
-    <footer className="pb-bottom-nav pt-5" style={{ backgroundColor: "var(--royal-maroon-dark)", color: "var(--royal-cream)" }}>
-      <div className="container py-5">
-        <div className="row g-5">
+    <footer className="pb-bottom-nav" style={{ backgroundColor: "var(--royal-maroon-dark, #59123B)", color: "var(--royal-cream, #fdf6ec)", padding: "28px 0 16px" }}>
+      <div className="container">
+        <div className="row g-3">
           {/* About Section */}
-          <div className="col-12 col-lg-5">
-            <Link to="/" className="d-inline-flex align-items-center gap-3 mb-4 text-decoration-none">
+          <div className="col-12 col-lg-6">
+            <Link to="/" className="d-inline-flex align-items-center gap-2.5 mb-2 text-decoration-none">
               <img
                 src={siteSettings.logo || Logo}
                 alt={siteSettings.companyName || "Logo"}
                 onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
                 style={{
-                  height: "72px",
+                  height: "44px",
                   width: "auto",
-                  maxHeight: "72px",
+                  maxHeight: "44px",
                   objectFit: "contain",
-                  filter: "drop-shadow(0px 2px 12px rgba(237, 177, 57, 0.5))",
-                  transition: "transform 0.3s ease"
+                  filter: "drop-shadow(0px 2px 8px rgba(237, 177, 57, 0.4))",
                 }}
               />
               <div className="d-flex flex-column text-start">
                 <span style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: "1.45rem",
+                  fontSize: "1.15rem",
                   fontWeight: "800",
                   color: "var(--royal-gold, #EDB139)",
-                  letterSpacing: "1.5px",
+                  letterSpacing: "1px",
                   lineHeight: "1.1",
                   textTransform: "uppercase"
                 }}>
                   {siteSettings.companyName || "Rajput Alliances"}
                 </span>
                 <span style={{
-                  fontSize: "0.7rem",
+                  fontSize: "0.62rem",
                   color: "var(--royal-gold-light, #F5C870)",
-                  letterSpacing: "3px",
+                  letterSpacing: "2px",
                   fontWeight: "600",
                   textTransform: "uppercase",
-                  marginTop: "2px"
+                  marginTop: "1px"
                 }}>
                   {siteSettings.tagline || "Royal Matrimonial"}
                 </span>
               </div>
             </Link>
-            <p className="mb-4" style={{ color: "rgba(255, 255, 255, 0.8)", lineHeight: "1.8" }}>
-              Rajput Alliances is your gateway to a premier, privacy-focused
-              matrimonial network for Rajputs seeking serious and secure
-              connections. With an exclusive selection of elite profiles, we
-              offer a tailored experience for those who value heritage,
-              tradition, and privacy.
+
+            <p className="mb-2.5" style={{ color: "rgba(255, 255, 255, 0.75)", fontSize: "0.82rem", lineHeight: "1.45", maxWidth: "520px" }}>
+              India's premier Rajput matrimonial platform. Discover verified profiles from esteemed Rajput families across the globe, where heritage, trust, and shared values come together to create lifelong relationship
             </p>
-            <div className="d-flex gap-3 flex-wrap">
+
+            <div className="d-flex gap-2 flex-wrap mb-2">
               {activeSocials.map((s) => (
                 <a
                   key={s.label}
@@ -121,7 +118,7 @@ function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center"
-                  style={{ width: "40px", height: "40px", borderColor: "rgba(255,255,255,0.2)" }}
+                  style={{ width: "32px", height: "32px", borderColor: "rgba(255,255,255,0.25)", padding: 0 }}
                   aria-label={s.label}
                 >
                   {s.icon}
@@ -130,52 +127,47 @@ function Footer() {
             </div>
           </div>
 
-          {/* Spacer */}
-          <div className="col-12 col-lg-1"></div>
-
           {/* Quick Links */}
           <div className="col-6 col-lg-3">
-            <h5 className="fw-bold mb-4" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-gold)", letterSpacing: "1px" }}>Quick Links</h5>
-            <ul className="list-unstyled d-flex flex-column gap-3">
+            <h6 className="fw-bold mb-2" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-gold, #EDB139)", fontSize: "0.9rem", letterSpacing: "0.5px" }}>
+              Quick Links
+            </h6>
+            <ul className="list-unstyled d-flex flex-column gap-1.5 mb-0" style={{ fontSize: "0.82rem" }}>
               <li>
-                <Link to="/about" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>About Us</Link>
+                <Link to="/about" className="text-decoration-none" style={{ color: "rgba(255, 255, 255, 0.75)" }}>About Us</Link>
               </li>
               <li>
-                <Link to="/stories" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Stories</Link>
-              </li>
-              {/* <li>
-                <Link to="/how-to-use" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>How to Use</Link>
-              </li> */}
-              <li>
-                <Link to="/contact-us" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Contact Us</Link>
+                <Link to="/stories" className="text-decoration-none" style={{ color: "rgba(255, 255, 255, 0.75)" }}>Stories</Link>
               </li>
               <li>
-                <Link to="/login" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Login</Link>
+                <Link to="/contact-us" className="text-decoration-none" style={{ color: "rgba(255, 255, 255, 0.75)" }}>Contact Us</Link>
               </li>
-              {/* <li>
-                <Link to="/signup" onClick={logout} className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Signup</Link>
-              </li> */}
+              <li>
+                <Link to="/login" className="text-decoration-none" style={{ color: "rgba(255, 255, 255, 0.75)" }}>Login</Link>
+              </li>
             </ul>
           </div>
 
           {/* Legal Section */}
           <div className="col-6 col-lg-3">
-            <h5 className="fw-bold mb-4" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-gold)", letterSpacing: "1px" }}>Legal</h5>
-            <ul className="list-unstyled d-flex flex-column gap-3">
+            <h6 className="fw-bold mb-2" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-gold, #EDB139)", fontSize: "0.9rem", letterSpacing: "0.5px" }}>
+              Legal
+            </h6>
+            <ul className="list-unstyled d-flex flex-column gap-1.5 mb-0" style={{ fontSize: "0.82rem" }}>
               <li>
-                <Link to="/terms-of-use" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Terms of Use</Link>
+                <Link to="/terms-of-use" className="text-decoration-none" style={{ color: "rgba(255, 255, 255, 0.75)" }}>Terms of Use</Link>
               </li>
               <li>
-                <Link to="/privacy-policy" className="text-decoration-none transition-all" style={{ color: "rgba(255, 255, 255, 0.8)" }}>Privacy Policy</Link>
+                <Link to="/privacy-policy" className="text-decoration-none" style={{ color: "rgba(255, 255, 255, 0.75)" }}>Privacy Policy</Link>
               </li>
             </ul>
           </div>
         </div>
 
-        <hr className="my-5" style={{ borderColor: "rgba(255,255,255,0.1)" }} />
-        
-        <div className="text-center pb-3">
-          <p className="mb-0" style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "0.9rem" }}>
+        <hr className="my-2.5" style={{ borderColor: "rgba(255,255,255,0.12)" }} />
+
+        <div className="text-center">
+          <p className="mb-0" style={{ color: "rgba(255, 255, 255, 0.55)", fontSize: "0.78rem" }}>
             {siteSettings.copyrightText || "© 2025-26 Rajput Alliances Matrimony. All Rights Reserved."}
           </p>
         </div>

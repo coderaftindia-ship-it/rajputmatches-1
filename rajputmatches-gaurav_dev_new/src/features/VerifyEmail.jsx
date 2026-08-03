@@ -24,7 +24,7 @@ function VerifyEmail() {
           position: "top-center",
           autoClose: 2000,
         });
-        navigate("/signup");
+        navigate("/login");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Invalid OTP. Try again.", {

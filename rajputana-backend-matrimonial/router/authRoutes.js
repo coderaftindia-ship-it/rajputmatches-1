@@ -499,8 +499,6 @@ router.put("/delete-image", isAuth, async (req, res) => {
 router.put("/update-privacy", isAuth, updateimageprivacy);
 
 // User authentication routes
-router.post("/signup", signup);
-// Alias for frontend: POST /api/v1/auth/register
 router.post("/register", signup);
 router.post("/login", login);
 router.post("/forgot-password", forgotPassword);

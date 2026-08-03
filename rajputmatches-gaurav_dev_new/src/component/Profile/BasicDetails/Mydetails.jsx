@@ -28,6 +28,7 @@ import {
   FaSun,
   FaUsers,
   FaGraduationCap,
+  FaUserTie,
   FaDollarSign,
   FaBuilding,
   FaBriefcase,
@@ -87,9 +88,9 @@ const MandalaSVG = ({ className }) => (
 const DetailRow = ({ icon, label, value }) => (
   <div className={styles.detailRow}>
     <div className={styles.detailIconCircle}>{icon}</div>
-    <div>
+    <div style={{ minWidth: 0, flex: 1 }}>
       <div className={styles.detailLabel}>{label}</div>
-      <div className={styles.detailValue}>{value || "—"}</div>
+      <div className={styles.detailValue} title={value}>{value || "—"}</div>
     </div>
   </div>
 );
@@ -102,17 +103,16 @@ const AncestryRow = ({ label, value }) => (
   </div>
 );
 
-// Section Ribbon header wrapper with ornaments and inline edit button support
+// Section Ribbon header wrapper with inline edit button support
 const SectionRibbon = ({ children, onEditClick, editTitle }) => (
   <div className={styles.sectionRibbon}>
     <div className={styles.ribbonTitleContainer}>
-      <span className={`${styles.ribbonOrn} ${styles.ribbonOrnLeft}`}>✦</span>
+      <span className={styles.ribbonOrn}>✦</span>
       <span>{children}</span>
-      <span className={`${styles.ribbonOrn} ${styles.ribbonOrnRight}`}>✦</span>
     </div>
     {onEditClick && (
       <div className={styles.inlineEditBtn} onClick={onEditClick} title={editTitle}>
-        <FaRegEdit size={13} />
+        <FaRegEdit size={11} />
       </div>
     )}
   </div>
@@ -210,6 +210,7 @@ function Mydetails() {
       gotra: horoscope?.gotra || "",
       rashi: horoscope?.rashi || horoscope?.zodiac || "",
       manglik: horoscope?.maglik || horoscope?.manglik || "",
+      class: user?.class || professional?.class || horoscope?.class || "",
     });
     setActiveModal("basic");
   };
@@ -484,6 +485,7 @@ function Mydetails() {
         height: heightObj,
         weight: weightNum,
         city: basicFormData.currentCity,
+        class: basicFormData.class,
       };
 
       await updateData("update-profile", profilePayload, true);
@@ -635,15 +637,7 @@ function Mydetails() {
         {/* Background Spinning Mandala Decorative Element */}
         <MandalaSVG className={styles.spinningMandala} />
 
-        {/* ── Top Header ── */}
-        <div className={styles.biodataHeader}>
-          <p className={styles.biodataSlogan}>Trusted Connections. Happy Futures.</p>
-          <div className={styles.goldFlourish}>
-            <span>❧</span>
-            <span>✦</span>
-            <span>❧</span>
-          </div>
-        </div>
+
 
         {/* ── Grid Columns (Left Profile, Right Picture) ── */}
         <div className={styles.biodataGrid}>
@@ -669,11 +663,12 @@ function Mydetails() {
               <DetailRow icon={<FaMoon />} label="Zodiac (Rashi)" value={horoscope?.rashi || horoscope?.zodiac || "N/A"} />
               <DetailRow icon={<FaSun />} label="Manglik" value={horoscope?.maglik || horoscope?.manglik || "N/A"} />
               <DetailRow icon={<FaHeart />} label="Marital Status" value={user?.maritalStatus || "N/A"} />
+              <DetailRow icon={<FaUserTie />} label="Class" value={user?.class || professional?.class || horoscope?.class || "N/A"} />
             </div>
 
             {/* EDUCATION SECTION */}
             <SectionRibbon onEditClick={openEducationEdit} editTitle="Edit Academics & Profession">
-              ✦ EDUCATION / CAREER ✦
+              Education / Career
             </SectionRibbon>
             
             <div className={styles.detailsList}>
@@ -690,8 +685,6 @@ function Mydetails() {
                   <DetailRow icon={<FaBuilding />} label="Institution" value={professional?.institution || "N/A"} />
                 </>
               )}
-            </div>
-            <div className={styles.detailsList}>
               {professional?.occupationsList && professional.occupationsList.length > 0 ? (
                 professional.occupationsList.map((o, idx) => (
                   <React.Fragment key={idx}>
@@ -711,26 +704,46 @@ function Mydetails() {
           {/* Right Column: Profile Picture & Short Bio */}
           <div className={styles.rightPanel}>
             
-            <div className={styles.photoFrame} onClick={openMediaEdit} title="Upload / Edit Profile Images">
-              <img src={currentAvatar} alt="Profile" className={styles.profileImage} />
-              <div className={styles.photoEditOverlay}>
-                <FaCamera size={20} />
-                <span>Upload Photos</span>
+            <div className={styles.photoContainer}>
+              <div className={styles.photoFrame} onClick={openMediaEdit} title="Upload / Edit Profile Images">
+                <img src={currentAvatar} alt="Profile" className={styles.profileImage} />
+                <div className={styles.photoEditOverlay}>
+                  <FaCamera size={18} />
+                  <span>Upload / Edit</span>
+                </div>
+              </div>
+
+              {media?.photos && media.photos.length > 0 && (
+                <div className={styles.photoThumbnails}>
+                  {media.photos.slice(0, 4).map((p, idx) => (
+                    <img
+                      key={idx}
+                      src={p.url}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className={`${styles.thumbImg} ${p.url === currentAvatar ? styles.activeThumb : ""}`}
+                      onClick={openMediaEdit}
+                    />
+                  ))}
+                  {media.photos.length > 4 && (
+                    <div className={styles.thumbMore} onClick={openMediaEdit}>
+                      +{media.photos.length - 4}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <h2 className={styles.profileName}>{fullName || "Your Name"}</h2>
+              <div>
+                <span className={styles.profileId}>
+                  ID: {user?.martrId || "—"}
+                </span>
               </div>
             </div>
 
-            <h2 className={styles.profileName}>{fullName || "Your Name"}</h2>
-            
-            <div className={styles.nameDivider}>
-              <span>❧ ✦ ❧</span>
-            </div>
-
-            <div className={styles.profileId}>
-              PROFILE ID: {user?.martrId || "—"}
-            </div>
-
-            <div className={styles.inlineTextAreaContainer} style={{ marginTop: "12px" }}>
-              <label style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--text-soft)", textTransform: "uppercase", letterSpacing: "0.05em", textAlign: "center", width: "100%", display: "block" }}>
+            <div className={styles.inlineTextAreaContainer} style={{ marginTop: "6px" }}>
+              <label style={{ fontSize: "0.65rem", fontWeight: "700", color: "var(--text-soft)", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "center", width: "100%", display: "block", marginBottom: "2px" }}>
                 About Me
               </label>
               <textarea
@@ -738,7 +751,7 @@ function Mydetails() {
                 value={aboutText}
                 onChange={(e) => setAboutText(e.target.value)}
                 placeholder="Tell us about yourself..."
-                rows="4"
+                rows="2"
               />
               {aboutText !== (user?.additionalInfo || "") && (
                 <button
@@ -772,7 +785,7 @@ function Mydetails() {
           </div>
         ) : (
           <p style={{ textAlign: "center", fontStyle: "italic", color: "var(--text-soft)", fontSize: "0.85rem", marginBottom: "20px" }}>
-            Add hobbies to complete your profile
+           
           </p>
         )}
 
@@ -937,26 +950,7 @@ function Mydetails() {
           </div>
         )}
 
-        {/* ── Footer Banner ── */}
-        <div className={styles.biodataFooterBanner}>
-          <FaShieldAlt /> PROFILE VERIFICATION | PERSONAL ASSISTANCE | PRIVACY PROTECTION
-        </div>
 
-        <p className={styles.footerSubtext}>
-          Trusted by Millions. Delivered by Rajput Alliances.
-        </p>
-
-        {/* Footer Brand Logo Block */}
-        <div className={styles.footerLogoBlock}>
-          <div className={styles.footerLogoLeft}>
-            <span className={styles.footerLogoTitle}>THE Rajput Alliances</span>
-            <span>Matrimony for Rajput Clans</span>
-          </div>
-          <div className={styles.footerLogoRight}>
-            <span>www.Rajput Alliances.com</span>
-            <span>connect@Rajput Alliances.com</span>
-          </div>
-        </div>
 
       </div>
 

@@ -50,9 +50,14 @@ function RecentAddedPage() {
       try {
         setLoading(true);
         const res = await publicApi.getRecentProfiles();
-        if (Array.isArray(res?.data?.data))       setProfiles(res.data.data);
-        else if (Array.isArray(res?.data))        setProfiles(res.data);
-        else if (Array.isArray(res))              setProfiles(res);
+        let fetchedList = [];
+        if (Array.isArray(res?.data?.data))       fetchedList = res.data.data;
+        else if (Array.isArray(res?.data))        fetchedList = res.data;
+        else if (Array.isArray(res))              fetchedList = res;
+
+        // Display ONLY admin approved profiles & max top 9 recent profiles
+        const approvedOnly = fetchedList.filter(p => p.isApproved !== false);
+        setProfiles(approvedOnly.slice(0, 9));
       } catch (err) {
         console.error("Failed to fetch recent profiles:", err);
         setError("Failed to load profiles");
@@ -417,18 +422,24 @@ function RecentAddedPage() {
                 </button>
 
                 <div className="d-flex gap-2">
-                  {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => setCurrentIndex(idx)}
-                      className="rounded-circle"
-                      style={{
-                        width: 12, height: 12, cursor: "pointer",
-                        backgroundColor: currentIndex === idx ? "var(--royal-maroon)" : "rgba(128,0,0,0.2)",
-                        transition: "all 0.3s ease",
-                      }}
-                    />
-                  ))}
+                  {Array.from({ length: Math.ceil(profiles.length / visibleCards) }).map((_, pageIdx) => {
+                    const targetIdx = Math.min(pageIdx * visibleCards, maxIndex);
+                    const isActive = currentIndex >= pageIdx * visibleCards && currentIndex < (pageIdx + 1) * visibleCards;
+                    return (
+                      <div
+                        key={pageIdx}
+                        onClick={() => setCurrentIndex(targetIdx)}
+                        style={{
+                          width: isActive ? 22 : 10,
+                          height: 10,
+                          borderRadius: 6,
+                          cursor: "pointer",
+                          backgroundColor: isActive ? "var(--royal-maroon)" : "rgba(89,18,59,0.25)",
+                          transition: "all 0.3s ease",
+                        }}
+                      />
+                    );
+                  })}
                 </div>
 
                 <button

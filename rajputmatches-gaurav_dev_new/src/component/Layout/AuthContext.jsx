@@ -119,12 +119,18 @@ export const AuthProvider = ({ children }) => {
           position: "top-center",
           autoClose: 2000,
         });
+        return { success: true, token };
+      } else {
+        const errorMsg = responseMessage || "Login failed. Please check your credentials.";
+        toast.error(errorMsg, { position: "top-center", autoClose: 3000 });
+        return { success: false, message: errorMsg };
       }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "An error occurred. Please try again.";
       setMessage(errorMessage);
       toast.error(errorMessage, { position: "top-center", autoClose: 3000 });
+      return { success: false, message: errorMessage };
     }
   };
 

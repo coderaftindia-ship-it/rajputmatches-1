@@ -5,6 +5,8 @@ import { fetchByRoute } from "../../api/routeAdapter";
 import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
 import styles from "./Dashboard.module.css";
+import femaleDefault from "../../assets/images/female_default.png";
+import maleDefault from "../../assets/images/male_default.png";
 import {
   Heart, Eye, UserCheck, Camera, Phone, MessageSquare,
   Star, TrendingUp, Users, Bell, ChevronRight, Zap,
@@ -50,7 +52,8 @@ function StatCard({ icon, label, value, color, trend, onClick }) {
 
 /* ── Profile Mini Card ── */
 function ProfileMiniCard({ profile, onView, onInterest }) {
-  const photo = profile?.filesId?.photos?.[0]?.url || PRO;
+  const defaultPhoto = profile?.gender === "Female" ? femaleDefault : maleDefault;
+  const photo = profile?.filesId?.photos?.[0]?.url || defaultPhoto;
   const age = calculateAge(profile?.dateOfBirth);
   const city = profile?.address?.city || profile?.address?.state || "";
   const name = [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") || "Unknown";
@@ -58,7 +61,7 @@ function ProfileMiniCard({ profile, onView, onInterest }) {
   return (
     <div className={styles.miniCard}>
       <div className={styles.miniCardImg}>
-        <img src={photo} alt={name} onError={e => { e.target.src = PRO; }} />
+        <img src={photo} alt={name} onError={e => { e.target.src = defaultPhoto; }} />
         <div className={styles.miniCardBadge}><Sparkles size={10} /></div>
       </div>
       <div className={styles.miniCardInfo}>
@@ -117,10 +120,10 @@ const Dashboard = () => {
 
   const [userData, setUserData] = useState(null);
   const [requests, setRequests]   = useState(null);
+  const [contactReqs, setContactReqs] = useState({ sent: [], received: [] });
   const [viewedList, setViewedList] = useState([]);
   const [visitedList, setVisitedList] = useState([]);
   const [shortlisted, setShortlisted] = useState([]);
-  const [interests, setInterests]   = useState({ sent: [], received: [] });
   const [photoReqs, setPhotoReqs]   = useState({ sent: [], received: [] });
   const [mediaFiles, setMediaFiles] = useState(null);
   const [loading, setLoading]       = useState(true);
@@ -135,7 +138,7 @@ const Dashboard = () => {
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [user, reqs, viewed, visited, sl, photoR, mediaRes] = await Promise.allSettled([
+      const [user, reqs, viewed, visited, sl, photoR, mediaRes, contactR] = await Promise.allSettled([
         fetchByRoute("user"),
         fetchByRoute("profile/myrequests"),
         fetchByRoute("profile/viewed"),
@@ -143,6 +146,7 @@ const Dashboard = () => {
         fetchByRoute("profile/show-shortlisted"),
         fetchByRoute("profile/photorequests"),
         fetchByRoute("files"),
+        fetchByRoute("profile/contactrequests"),
       ]);
       if (user.status === "fulfilled")     setUserData(user.value);
       if (reqs.status === "fulfilled" && reqs.value) {
@@ -155,6 +159,12 @@ const Dashboard = () => {
         setPhotoReqs({
           sent:     photoR.value?.photoReqSent     || [],
           received: photoR.value?.photoReqReceived || [],
+        });
+      }
+      if (contactR.status === "fulfilled" && contactR.value) {
+        setContactReqs({
+          sent:     contactR.value?.contactReqSent     || [],
+          received: contactR.value?.contactReqReceived || [],
         });
       }
       if (mediaRes.status === "fulfilled" && mediaRes.value) {
@@ -176,10 +186,12 @@ const Dashboard = () => {
     userData?.avatar;
   const initials   = `${(userData?.firstName || "").charAt(0)}${(userData?.lastName || "").charAt(0)}`.toUpperCase();
 
-  const contactSent     = requests?.reqSent     || [];
-  const contactReceived = requests?.reqReceived || [];
-  const contactPending  = contactReceived.filter(r => r.status === "pending").length;
-  const photoReqPending = photoReqs.received.filter(r => r.status === "pending").length;
+  const interestSent       = requests?.reqSent             || [];
+  const interestReceived   = requests?.reqReceived         || [];
+  const contactReqReceived = contactReqs?.received         || [];
+  const contactReqSent     = contactReqs?.sent             || [];
+  const contactPending     = contactReqReceived.filter(r => r.status === "pending").length;
+  const photoReqPending    = photoReqs.received.filter(r => r.status === "pending").length;
 
   /* recent activity (combine lists into timeline) */
   const recentVisitors = visitedList.slice(0, 3);
@@ -261,7 +273,7 @@ const Dashboard = () => {
                 <span className={styles.ringLabel}>Complete</span>
               </div>
             </div>
-            <button className={styles.completeBtn} onClick={() => navigate("/profile")}>
+            <button className={styles.completeBtn} onClick={() => goProfile("myDetails")}>
               Complete Profile <ChevronRight size={14} />
             </button>
           </div>
@@ -279,29 +291,29 @@ const Dashboard = () => {
               label="Shortlisted"
               value={shortlisted.length}
               color="linear-gradient(135deg,#f43f5e,#e11d48)"
-              onClick={() => navigate("/profile")}
+              onClick={() => goProfile("shortlisted")}
             />
             <StatCard
               icon={<Eye size={20} />}
               label="Viewed Profiles"
               value={viewedList.length}
               color="linear-gradient(135deg,#8b5cf6,#6d28d9)"
-              onClick={() => navigate("/profile")}
+              onClick={() => goProfile("viewed")}
             />
             <StatCard
               icon={<UserCheck size={20} />}
               label="Profile Visitors"
               value={visitedList.length}
               color="linear-gradient(135deg,#0ea5e9,#0284c7)"
-              onClick={() => navigate("/profile")}
+              onClick={() => goProfile("visited")}
             />
             <StatCard
               icon={<Phone size={20} />}
               label="Contact Requests"
-              value={contactReceived.length}
+              value={contactReqReceived.length}
               color="linear-gradient(135deg,#f59e0b,#d97706)"
               trend={contactPending > 0 ? `${contactPending} pending` : undefined}
-              onClick={() => navigate("/profile")}
+              onClick={() => goProfile("interest")}
             />
             <StatCard
               icon={<Camera size={20} />}
@@ -309,14 +321,14 @@ const Dashboard = () => {
               value={photoReqs.received.length}
               color="linear-gradient(135deg,#10b981,#059669)"
               trend={photoReqPending > 0 ? `${photoReqPending} pending` : undefined}
-              onClick={() => navigate("/profile")}
+              onClick={() => goProfile("request")}
             />
             <StatCard
               icon={<HeartHandshake size={20} />}
               label="Interests Received"
-              value={contactSent.length}
+              value={interestReceived.length}
               color="linear-gradient(135deg,#ec4899,#db2777)"
-              onClick={() => navigate("/profile")}
+              onClick={() => goProfile("interest")}
             />
           </section>
         )}
@@ -334,7 +346,7 @@ const Dashboard = () => {
                   <UserCheck size={18} />
                   <span>Recent Visitors</span>
                 </div>
-                <button className={styles.seeAll} onClick={() => navigate("/profile")}>
+                <button className={styles.seeAll} onClick={() => goProfile("visited")}>
                   See all <ChevronRight size={13} />
                 </button>
               </div>
@@ -369,7 +381,7 @@ const Dashboard = () => {
                     <span className={styles.chip}>{contactPending}</span>
                   )}
                 </div>
-                <button className={styles.seeAll} onClick={() => navigate("/profile")}>
+                <button className={styles.seeAll} onClick={() => goProfile("interest")}>
                   Manage <ChevronRight size={13} />
                 </button>
               </div>
@@ -380,7 +392,7 @@ const Dashboard = () => {
                     <p>All requests handled</p>
                   </div>
                 ) : (
-                  contactReceived
+                  contactReqReceived
                     .filter(r => r.status === "pending")
                     .slice(0, 4)
                     .map((r, i) => {
@@ -422,21 +434,21 @@ const Dashboard = () => {
                   label="My Shortlist"
                   desc="View saved profiles"
                   accent="#f43f5e"
-                  onClick={() => navigate("/profile")}
+                  onClick={() => goProfile("shortlisted")}
                 />
                 <QuickAction
                   icon={<Phone size={18} />}
                   label="Contact Requests"
                   desc={`${contactPending} pending action${contactPending !== 1 ? "s" : ""}`}
                   accent="#f59e0b"
-                  onClick={() => navigate("/profile")}
+                  onClick={() => goProfile("interest")}
                 />
                 <QuickAction
                   icon={<Camera size={18} />}
                   label="Photo Requests"
                   desc={`${photoReqPending} pending approval${photoReqPending !== 1 ? "s" : ""}`}
                   accent="#10b981"
-                  onClick={() => navigate("/profile")}
+                  onClick={() => goProfile("request")}
                 />
                 <QuickAction
                   icon={<MessageSquare size={18} />}
@@ -475,7 +487,7 @@ const Dashboard = () => {
                   ))}
                 </div>
                 {completionPct < 100 && (
-                  <button className={styles.editProfileBtn} onClick={() => navigate("/profile")}>
+                  <button className={styles.editProfileBtn} onClick={() => goProfile("myDetails")}>
                     <Gift size={14} /> Complete to get more matches
                   </button>
                 )}
@@ -547,7 +559,7 @@ const Dashboard = () => {
                 <Star size={18} />
                 <span>Shortlisted Profiles</span>
               </div>
-              <button className={styles.seeAll} onClick={() => navigate("/profile")}>
+              <button className={styles.seeAll} onClick={() => goProfile("shortlisted")}>
                 See all <ChevronRight size={13} />
               </button>
             </div>

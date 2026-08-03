@@ -514,11 +514,14 @@ const SearchPage = () => {
       };
       const res = await updateData("getprofiles", payload, showToast);
       const rawList = res?.data || [];
+      const selectedClass = formDataRef.current?.class;
       const filteredList = rawList.filter(p => {
         const isSelf = p._id === userData?._id || p.userId === userData?._id;
         const isAdmin = p.role === "admin";
         const matchesTarget = !targetGender || p.gender === targetGender;
-        return !isSelf && !isAdmin && matchesTarget;
+        const profileClass = p.class || p.profdetailsId?.class || p.HoroscopicId?.class;
+        const matchesClass = !selectedClass || (profileClass && String(profileClass).toLowerCase() === String(selectedClass).toLowerCase());
+        return !isSelf && !isAdmin && matchesTarget && matchesClass;
       });
       setProfiles(filteredList);
       setCurrentPage(1);
@@ -536,11 +539,14 @@ const SearchPage = () => {
       };
       const res = await updateData("getprofiles", payload, false);
       const rawList = res?.data || [];
+      const selectedClass = formDataRef.current?.class;
       const filteredList = rawList.filter(p => {
         const isSelf = p._id === userData?._id || p.userId === userData?._id;
         const isAdmin = p.role === "admin";
         const matchesTarget = !targetGender || p.gender === targetGender;
-        return !isSelf && !isAdmin && matchesTarget;
+        const profileClass = p.class || p.profdetailsId?.class || p.HoroscopicId?.class;
+        const matchesClass = !selectedClass || (profileClass && String(profileClass).toLowerCase() === String(selectedClass).toLowerCase());
+        return !isSelf && !isAdmin && matchesTarget && matchesClass;
       });
       setProfiles(filteredList);
       // currentPage intentionally NOT reset — stay on same page
@@ -694,13 +700,14 @@ const SearchPage = () => {
 
       {/* Family Class */}
       <div style={{ marginBottom:"24px" }}>
-        <FilterLabel>Family Class</FilterLabel>
+        <FilterLabel>Class / Family Class</FilterLabel>
         <FilterSelect name="class" value={formData.class||""} onChange={handleChange}>
-          <option value="">Any</option>
-          <option value="Business">Business</option>
+          <option value="">Any Class</option>
           <option value="Royalty">Royalty</option>
-          <option value="Political">Political</option>
+          <option value="Business">Business</option>
           <option value="Service">Service</option>
+          <option value="Political">Political</option>
+          <option value="Agriculture">Agriculture</option>
           <option value="Others">Others</option>
         </FilterSelect>
       </div>

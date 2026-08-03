@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 
 import ProfileInfoHeader from "./ProfileInfoHeader";
@@ -20,7 +20,23 @@ import Footer from "../../Layout/Footer";
 import { ProfileDetailsProvider } from "../../../context/ProfileDetailsContext";
 
 const Profile = () => {
-  const [activeContent, setActiveContent] = useState("myDetails");
+  const location = useLocation();
+
+  const getInitialTab = () => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryTab = searchParams.get("tab") || searchParams.get("section");
+    return location.state?.section || location.state?.tab || queryTab || "myDetails";
+  };
+
+  const [activeContent, setActiveContent] = useState(getInitialTab);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const targetSection = location.state?.section || location.state?.tab || searchParams.get("tab") || searchParams.get("section");
+    if (targetSection) {
+      setActiveContent(targetSection);
+    }
+  }, [location.state, location.search]);
 
   const renderContent = () => {
     switch (activeContent) {
@@ -88,9 +104,6 @@ const Profile = () => {
 
         {/* Profile Header & Tab Context Provider */}
         <ProfileDetailsProvider enabled={true}>
-          {/* Profile Banner & Info Header */}
-          <ProfileInfoHeader />
-
           {/* Desktop & Mobile Split Layout */}
           <div className={styles.profileLayout}>
             {/* Left: Vertical Sidebar (hidden on mobile via CSS) */}

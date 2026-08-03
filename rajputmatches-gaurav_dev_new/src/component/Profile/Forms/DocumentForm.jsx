@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { FaUpload, FaLock } from "react-icons/fa";
+import { FaUpload, FaLock, FaImage, FaFileAlt, FaStar, FaCheckCircle, FaTimes, FaShieldAlt, FaCamera } from "react-icons/fa";
 import { MdOutlineCancelPresentation } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
@@ -22,11 +22,39 @@ const DocumentForm = ({
   setSelectedDocOption: propSetSelectedDocOption,
 }) => {
   const { updateData, fetchprofile } = useAuth();
-  const [profileImage, setProfileImage] = useState(null);
   const [localDocOption, setLocalDocOption] = useState(false);
+
+  // Local Display Lists
+  const [localImages, setLocalImages] = useState([]);
+  const [localDocuments, setLocalDocuments] = useState([]);
+
+  // Pending File Selections (File Objects)
+  const [pendingPhotoFiles, setPendingPhotoFiles] = useState([]);
+  const [pendingDocFiles, setPendingDocFiles] = useState([]);
+  const [pendingDeletions, setPendingDeletions] = useState([]);
+
+  // Avatar Selection Tracking
+  const [selectedAvatarId, setSelectedAvatarId] = useState(null);
+
+  // Upload Progress & Saving States
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imageProgress, setImageProgress] = useState(0);
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+  const [docProgress, setDocProgress] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
 
   const selectedDocOption = propSelectedDocOption !== undefined ? propSelectedDocOption : localDocOption;
   const setSelectedDocOption = propSetSelectedDocOption || setLocalDocOption;
+
+  // Initialize local display state from props
+  useEffect(() => {
+    setLocalImages(images || []);
+    setLocalDocuments(documents || []);
+    const currentAvatar = (images || []).find((img) => img.isAvatar);
+    if (currentAvatar) {
+      setSelectedAvatarId(currentAvatar._id);
+    }
+  }, [images, documents]);
 
   const options = [
     { id: "publicOption", value: false, label: "Public" },
@@ -42,15 +70,10 @@ const DocumentForm = ({
     const newValue = event.target.value === "true";
     try {
       setSelectedOption(newValue);
-
-      console.log("Selected Option (new):", newValue);
       const route = "update-privacy";
-      console.log("Saving Data:", newValue);
-
       await updateData(route, newValue, true);
-      await fetchData();
     } catch (error) {
-      console.error("Error updating data:", error.message);
+      console.error("Error updating privacy:", error.message);
     }
   };
 
@@ -60,19 +83,19 @@ const DocumentForm = ({
       setSelectedDocOption(newValue);
       const route = "update-privacy";
       await updateData(route, { isDocPrivate: newValue, type: "document" }, true);
-      await fetchData();
     } catch (error) {
       console.error("Error updating document privacy:", error.message);
     }
   };
 
-  const handleImageUpload = async (event) => {
+  // Local File Selection (Does NOT hit DB yet)
+  const handleImageUpload = (event) => {
     const files = Array.from(event.target.files) || [];
     const maxSizeBytes = 2 * 1024 * 1024; // 2 MB limit
     const oversized = files.find((file) => file.size > maxSizeBytes);
 
     if (oversized) {
-      alert("File size exceeds 2 MB limit. Please select an image under 2 MB.");
+      toast.error("File size exceeds 2 MB limit. Please select an image under 2 MB.");
       event.target.value = "";
       return;
     }
@@ -81,33 +104,33 @@ const DocumentForm = ({
     const validFiles = files.filter((file) => allowedTypes.includes(file.type));
 
     if (validFiles.length === 0) {
-      alert("Invalid file type. Only JPEG, PNG, and JPG are allowed.");
+      toast.error("Invalid file type. Only JPEG, PNG, and JPG are allowed.");
       event.target.value = "";
       return;
     }
 
-    const formData = new FormData();
-    validFiles.forEach((file) => formData.append("avatars", file));
+    const newPreviewItems = validFiles.map((file) => ({
+      _id: `temp_${Date.now()}_${Math.random()}`,
+      url: URL.createObjectURL(file),
+      fileObj: file,
+      isPending: true,
+      isAvatar: false,
+    }));
 
-    try {
-      const response = await mediaApi.uploadPhotos(formData);
-      const uploadedPhotos = extractData(response)?.photos || [];
-      setImages((prev) => [...uploadedPhotos]);
-    } catch (error) {
-      console.error(
-        "Error uploading files:",
-        error.response?.data?.message || error.message
-      );
-    }
+    setPendingPhotoFiles((prev) => [...prev, ...validFiles]);
+    setLocalImages((prev) => [...prev, ...newPreviewItems]);
+    toast.info(`${validFiles.length} photo(s) selected. Click 'Save & Close' to upload.`);
+    event.target.value = "";
   };
 
-  const handleDocumentUpload = async (event) => {
+  // Local Document Selection (Does NOT hit DB yet)
+  const handleDocumentUpload = (event) => {
     const files = Array.from(event.target.files) || [];
     const maxSizeBytes = 2 * 1024 * 1024; // 2 MB limit
     const oversized = files.find((file) => file.size > maxSizeBytes);
 
     if (oversized) {
-      alert("File size exceeds 2 MB limit. Please select a document under 2 MB.");
+      toast.error("File size exceeds 2 MB limit. Please select a document under 2 MB.");
       event.target.value = "";
       return;
     }
@@ -123,285 +146,608 @@ const DocumentForm = ({
     const validFiles = files.filter((file) => allowedTypes.includes(file.type));
 
     if (validFiles.length === 0) {
-      alert("Invalid file type. Only JPEG, PNG, JPG, PDF, DOC, and DOCX are allowed.");
+      toast.error("Invalid file type. Only JPEG, PNG, JPG, PDF, DOC, and DOCX are allowed.");
       event.target.value = "";
       return;
     }
 
-    const formData = new FormData();
-    validFiles.forEach((file) => formData.append("avatars", file));
+    const newPreviewItems = validFiles.map((file) => ({
+      _id: `temp_doc_${Date.now()}_${Math.random()}`,
+      url: URL.createObjectURL(file),
+      fileObj: file,
+      isPending: true,
+    }));
 
-    try {
-      const response = await mediaApi.uploadDocuments(formData);
-      const uploadedDocuments = extractData(response)?.documents || [];
-      setdocuments((prev) => [...uploadedDocuments]);
-    } catch (error) {
-      console.error(
-        "Error uploading files:",
-        error.response?.data?.message || error.message
-      );
-    }
+    setPendingDocFiles((prev) => [...prev, ...validFiles]);
+    setLocalDocuments((prev) => [...prev, ...newPreviewItems]);
+    toast.info(`${validFiles.length} document(s) selected. Click 'Save & Close' to upload.`);
+    event.target.value = "";
   };
 
-  const setAsProfileImage = async (profileId) => {
-    try {
-      const updatedImages = images.map((img) =>
-        img._id == profileId
+  // Local Avatar Toggle
+  const setAsProfileImage = (profileId) => {
+    setSelectedAvatarId(profileId);
+    setLocalImages((prev) =>
+      prev.map((img) =>
+        img._id === profileId
           ? { ...img, isAvatar: true }
           : { ...img, isAvatar: false }
-      );
-      setImages(updatedImages);
-
-      const response = await mediaApi.setAvatar(profileId);
-      await fetchprofile();
-
-      if (response.data?.message) {
-        toast.success(response.data.message);
-      }
-    } catch (error) {
-      console.log(
-        "Error setting profile image on server:",
-        error.response?.data || error.message
-      );
-    }
+      )
+    );
   };
 
-  const handleDelete = async (profileId) => {
+  // Local Deletion
+  const handleDelete = (profileId) => {
+    const isPendingPhoto = localImages.find((img) => img._id === profileId && img.isPending);
+    if (isPendingPhoto) {
+      setLocalImages((prev) => prev.filter((img) => img._id !== profileId));
+      setPendingPhotoFiles((prev) => prev.filter((f) => f !== isPendingPhoto.fileObj));
+      return;
+    }
+
+    const isPendingDoc = localDocuments.find((doc) => doc._id === profileId && doc.isPending);
+    if (isPendingDoc) {
+      setLocalDocuments((prev) => prev.filter((doc) => doc._id !== profileId));
+      setPendingDocFiles((prev) => prev.filter((f) => f !== isPendingDoc.fileObj));
+      return;
+    }
+
+    // Existing Database File -> Track for deletion on Save
+    setPendingDeletions((prev) => [...prev, profileId]);
+    setLocalImages((prev) => prev.filter((img) => img._id !== profileId));
+    setLocalDocuments((prev) => prev.filter((doc) => doc._id !== profileId));
+  };
+
+  // SAVE & CLOSE: Executes actual Database API calls with progress percentage
+  const handleSaveAll = async () => {
+    setIsSaving(true);
+
     try {
-      const updatedImages = images.filter((img) => img._id !== profileId);
-      const updatedDocuments = documents.filter((doc) => doc._id !== profileId);
-      setImages(updatedImages);
-      setdocuments(updatedDocuments);
-
-      const response = await mediaApi.deleteFile(profileId);
-
-      if (response.data?.message) {
-        toast.success(response.data.message);
+      // 1. Delete files marked for removal
+      if (pendingDeletions.length > 0) {
+        for (const fileId of pendingDeletions) {
+          try {
+            await mediaApi.deleteFile(fileId);
+          } catch (err) {
+            console.error("Error deleting file:", err);
+          }
+        }
       }
+
+      // 2. Upload Pending Photos with Progress Bar
+      let uploadedPhotoResult = null;
+      if (pendingPhotoFiles.length > 0) {
+        setIsUploadingImage(true);
+        setImageProgress(10);
+
+        const formData = new FormData();
+        pendingPhotoFiles.forEach((file) => formData.append("avatars", file));
+
+        const response = await mediaApi.uploadPhotos(formData, {
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              setImageProgress(percent);
+            }
+          },
+        });
+        setImageProgress(100);
+        uploadedPhotoResult = extractData(response)?.photos;
+      }
+
+      // 3. Upload Pending Documents with Progress Bar
+      if (pendingDocFiles.length > 0) {
+        setIsUploadingDoc(true);
+        setDocProgress(10);
+
+        const formData = new FormData();
+        pendingDocFiles.forEach((file) => formData.append("avatars", file));
+
+        await mediaApi.uploadDocuments(formData, {
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              setDocProgress(percent);
+            }
+          },
+        });
+        setDocProgress(100);
+      }
+
+      // 4. Update Avatar Image if changed
+      if (selectedAvatarId && !selectedAvatarId.startsWith("temp_")) {
+        try {
+          await mediaApi.setAvatar(selectedAvatarId);
+          await fetchprofile();
+        } catch (err) {
+          console.error("Avatar setting error:", err);
+        }
+      }
+
+      toast.success("Changes saved successfully to database!");
+      await fetchData();
+      handleSaveClick();
     } catch (error) {
-      console.log(
-        "Error deleting file on server:",
-        error.response?.data || error.message
-      );
+      console.error("Error during save:", error);
+      toast.error("An error occurred while saving. Please try again.");
+    } finally {
+      setIsSaving(false);
+      setIsUploadingImage(false);
+      setIsUploadingDoc(false);
     }
   };
 
   return (
     <div className={style.modalContainer}>
-      <div className={style.modalContent}>
-        <div className={style.modalHeader}>
-          <h4 className={style.headerTitle}>Images and Documents</h4>
+      <div className={style.modalContent} style={{ maxWidth: "750px" }}>
+        
+        {/* Header Bar */}
+        <div className={style.modalHeader} style={{ background: "linear-gradient(135deg, #59123B 0%, #3d0826 100%)" }}>
+          <div className="d-flex align-items-center gap-2">
+            <FaImage size={18} style={{ color: "#c59b27" }} />
+            <h4 className={style.headerTitle} style={{ fontSize: "1.05rem", fontWeight: "700" }}>
+              Upload Photos &amp; Documents
+            </h4>
+          </div>
           <MdOutlineCancelPresentation
             onClick={handleCancelClick}
             className={style.closeIcon}
-            size="22"
+            size="24"
           />
         </div>
 
-        <form>
-          {/* Images Section */}
-          <div className="mb-4">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h2 className="h6">Images</h2>
-              <label className="btn btn-sm text-danger">
-                <FaUpload className="me-1" />
-                Upload
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  style={{ display: "none" }}
-                />
-              </label>
-            </div>
+        <form style={{ padding: "20px 24px" }} onSubmit={(e) => e.preventDefault()}>
+          
+          {/* Images Section Card */}
+          <div
+            style={{
+              background: "#fdfafc",
+              border: "1px solid rgba(89, 18, 59, 0.12)",
+              borderRadius: "14px",
+              padding: "16px 18px",
+              marginBottom: "18px",
+            }}
+          >
+            {/* Top Toolbar */}
+            <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+              <div>
+                <h6 style={{ margin: 0, fontWeight: 700, color: "#59123B", fontSize: "0.88rem" }}>
+                  <FaCamera className="me-1.5" style={{ color: "#c59b27" }} /> Photo Gallery
+                </h6>
+                <span style={{ fontSize: "0.68rem", color: "#6c6c80" }}>
+                  Max 2MB per photo • Uploads on 'Save &amp; Close'
+                </span>
+              </div>
 
-            <div className="d-flex flex-wrap gap-2">
-              {images.map((image, index) => (
-                <div key={image._id} className="position-relative">
-                  <img
-                    src={
-                      `${image?.url}` ||
-                      "https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o="
-                    }
-                    alt="avatars"
-                    className={`${
-                      profileImage === image.url ? "border border-success" : ""
-                    }`}
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      objectFit: "cover",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => setAsProfileImage(image._id)}
-                  />
-                  {image.isAvatar ? (
-                    <span
-                      className="text-white position-absolute bottom-0 start-0 w-100 d-flex align-items-center justify-content-center"
-                      style={{
-                        backgroundColor: "#802d2d",
-                        fontSize: "12px",
-                        minHeight: "20px", // Ensures same height as checkbox div
-                        lineHeight: "1.5",
-                      }}
-                    >
-                      Profile Image
-                    </span>
-                  ) : (
-                    <div
-                      className="text-white position-absolute bottom-0 start-0 w-100 d-flex align-items-center justify-content-center gap-1"
-                      style={{
-                        backgroundColor: "rgba(0, 0, 0, 0.6)",
-                        minHeight: "20px", // Matches the "Profile Image" span
-                        lineHeight: "1.5",
-                      }}
-                    >
+              <div className="d-flex align-items-center gap-2 flex-wrap">
+                {/* Privacy Radios */}
+                <div className="d-flex align-items-center gap-2 bg-white px-2.5 py-1 rounded-pill border">
+                  <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#59123B" }}>Privacy:</span>
+                  {options.map((option) => (
+                    <div key={option.id} className="d-flex align-items-center">
                       <input
-                        type="checkbox"
-                        onChange={() => setAsProfileImage(image._id)}
-                        style={{ margin: 0, padding: 0 }}
+                        className="form-check-input me-1"
+                        type="radio"
+                        name="privacyOptions"
+                        id={option.id}
+                        value={option.value}
+                        checked={selectedOption === option.value}
+                        onChange={handleOptionChange}
+                        style={{ cursor: "pointer" }}
                       />
                       <label
-                        className="text-white m-0"
-                        style={{ fontSize: "12px" }}
+                        className="m-0"
+                        htmlFor={option.id}
+                        style={{ fontSize: "0.7rem", fontWeight: 600, color: "#4a4a5e", cursor: "pointer", whiteSpace: "nowrap" }}
                       >
-                        Make Profile
+                        {option.label}
                       </label>
                     </div>
-                  )}
-                  {/* <FaLock className="position-absolute top-0 end-0 m-1 text-secondary" /> */}
-
-                  <RiDeleteBin6Line
-                    onClick={() => handleDelete(image._id)}
-                    className="position-absolute top-0 end-0 m-2 text-secondary bg-light"
-                  />
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
 
-          <div className="row align-items-center">
-            <div className="col d-flex gap-3 align-items-center flex-wrap">
-              <span className={style.headerTitle}>Images Privacy</span>
-              {options.map((option) => (
-                <div key={option.id} className="d-flex align-items-center">
+                {/* Upload Button */}
+                <label
+                  className="btn btn-sm text-white"
+                  style={{
+                    background: isUploadingImage ? "#888888" : "linear-gradient(135deg, #59123B, #3d0826)",
+                    border: "none",
+                    borderRadius: "6px",
+                    padding: "5px 12px",
+                    fontSize: "0.76rem",
+                    fontWeight: 600,
+                    cursor: isUploadingImage || isSaving ? "not-allowed" : "pointer",
+                    boxShadow: "0 2px 6px rgba(89, 18, 59, 0.2)",
+                    pointerEvents: isUploadingImage || isSaving ? "none" : "auto",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <FaUpload className="me-1" />
+                  {isUploadingImage ? `Uploading ${imageProgress}%...` : "+ Select Photos"}
                   <input
-                    className="form-check-input m-1"
-                    type="radio"
-                    name="privacyOptions"
-                    id={option.id}
-                    value={option.value}
-                    checked={selectedOption === option.value}
-                    onChange={handleOptionChange}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={isUploadingImage || isSaving}
+                    onChange={handleImageUpload}
+                    style={{ display: "none" }}
                   />
-                  <label
-                    className="sectionTitle m-0 text-secondary"
-                    htmlFor={option.id}
-                  >
-                    {option.label}
-                  </label>
+                </label>
+              </div>
+            </div>
+
+            {/* Photo Upload Progress Bar */}
+            {isUploadingImage && (
+              <div className="mb-3 p-2 bg-white rounded border" style={{ borderColor: "rgba(89, 18, 59, 0.2)" }}>
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#59123B" }}>
+                    Uploading Photos to Database... {imageProgress}%
+                  </span>
+                  <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#c59b27" }}>
+                    {imageProgress}%
+                  </span>
                 </div>
-              ))}
-            </div>
-          </div>
-          <hr />
-          {/* Documents Section */}
-          <div className="mb-4">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h2 className="h6">Documents</h2>
-              <label className="btn btn-sm text-danger">
-                <FaUpload className="me-1" />
-                Upload
-                <input
-                  type="file"
-                  accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                  multiple
-                  onChange={handleDocumentUpload}
-                  style={{ display: "none" }}
-                />
-              </label>
-            </div>
-            <div className="d-flex flex-wrap gap-2">
-              {documents?.map((document, index) => {
-                const isImage = document?.url?.startsWith("data:image");
-                return (
-                  <div key={document._id} className="position-relative">
-                    {isImage ? (
-                      <img
-                        src={document.url}
-                        alt="document"
-                        className="img-fluid"
+                <div style={{ height: "6px", width: "100%", background: "#f3e8ee", borderRadius: "10px", overflow: "hidden" }}>
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${imageProgress}%`,
+                      background: "linear-gradient(90deg, #59123B, #c59b27)",
+                      borderRadius: "10px",
+                      transition: "width 0.2s linear"
+                    }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
+            {/* Photos Grid */}
+            {localImages.length === 0 ? (
+              <div
+                style={{
+                  border: "1.5px dashed rgba(89, 18, 59, 0.2)",
+                  borderRadius: "10px",
+                  padding: "24px",
+                  textAlign: "center",
+                  background: "#ffffff",
+                  color: "#78788c",
+                  fontSize: "0.82rem",
+                }}
+              >
+                <FaImage size={24} style={{ color: "#c59b27", marginBottom: "6px", display: "block", margin: "0 auto 6px" }} />
+                No photos selected. Click <strong>+ Select Photos</strong> to choose images.
+              </div>
+            ) : (
+              <div className="d-flex flex-wrap gap-3">
+                {localImages.map((image, index) => (
+                  <div
+                    key={image._id || index}
+                    className="position-relative"
+                    style={{
+                      width: "105px",
+                      height: "105px",
+                      borderRadius: "10px",
+                      overflow: "hidden",
+                      boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
+                      border: image.isAvatar ? "2px solid #c59b27" : image.isPending ? "1.5px dashed #59123B" : "1px solid rgba(0,0,0,0.1)",
+                      background: "#ffffff",
+                    }}
+                  >
+                    <img
+                      src={image?.url}
+                      alt="uploaded profile"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => setAsProfileImage(image._id)}
+                    />
+
+                    {/* Pending Badge */}
+                    {image.isPending && (
+                      <span
+                        className="position-absolute top-0 start-0 bg-warning text-dark px-1"
+                        style={{ fontSize: "0.55rem", fontWeight: 700, borderRadius: "0 0 4px 0" }}
+                      >
+                        Pending
+                      </span>
+                    )}
+
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); handleDelete(image._id); }}
+                      style={{
+                        position: "absolute",
+                        top: "4px",
+                        right: "4px",
+                        background: "rgba(255, 255, 255, 0.9)",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: "22px",
+                        height: "22px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#dc2626",
+                        cursor: "pointer",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                        zIndex: 10,
+                      }}
+                      title="Remove Image"
+                    >
+                      <RiDeleteBin6Line size={12} />
+                    </button>
+
+                    {/* Avatar Status Overlay */}
+                    {image.isAvatar ? (
+                      <span
+                        className="position-absolute bottom-0 start-0 w-100 text-center py-0.5"
                         style={{
-                          width: "100px",
-                          height: "100px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <div
-                        className="d-flex flex-column justify-content-center align-items-center border bg-light"
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          padding: "10px",
-                          textAlign: "center",
-                          fontSize: "12px",
+                          backgroundColor: "#59123B",
+                          color: "#f7e7b6",
+                          fontSize: "0.62rem",
+                          fontWeight: 700,
+                          letterSpacing: "0.02em",
                         }}
                       >
-                        <span>Document</span>
-                        <a
-                          href={document.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ fontSize: "10px" }}
-                        >
-                          View
-                        </a>
+                        ★ Main Photo
+                      </span>
+                    ) : (
+                      <div
+                        className="position-absolute bottom-0 start-0 w-100 text-center py-0.5"
+                        style={{
+                          backgroundColor: "rgba(0, 0, 0, 0.65)",
+                          color: "#ffffff",
+                          fontSize: "0.6rem",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => setAsProfileImage(image._id)}
+                      >
+                        Make Main
                       </div>
                     )}
-                    <RiDeleteBin6Line
-                      onClick={() => handleDelete(document._id)}
-                      className="position-absolute top-0 end-0 m-2 text-secondary bg-light"
-                    />
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="row align-items-center mb-3">
-            <div className="col d-flex gap-3 align-items-center flex-wrap">
-              <span className={style.headerTitle}>Documents Privacy</span>
-              {docOptions.map((option) => (
-                <div key={option.id} className="d-flex align-items-center">
-                  <input
-                    className="form-check-input m-1"
-                    type="radio"
-                    name="docPrivacyOptions"
-                    id={option.id}
-                    value={option.value}
-                    checked={selectedDocOption === option.value}
-                    onChange={handleDocOptionChange}
-                  />
-                  <label
-                    className="sectionTitle m-0 text-secondary"
-                    htmlFor={option.id}
-                  >
-                    {option.label}
-                  </label>
+          {/* Documents Section Card */}
+          <div
+            style={{
+              background: "#fdfafc",
+              border: "1px solid rgba(89, 18, 59, 0.12)",
+              borderRadius: "14px",
+              padding: "16px 18px",
+              marginBottom: "18px",
+            }}
+          >
+            {/* Top Toolbar */}
+            <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+              <div>
+                <h6 style={{ margin: 0, fontWeight: 700, color: "#59123B", fontSize: "0.88rem" }}>
+                  <FaFileAlt className="me-1.5" style={{ color: "#c59b27" }} /> Verification Documents
+                </h6>
+                <span style={{ fontSize: "0.68rem", color: "#6c6c80" }}>
+                  Aadhar, Horoscope, Identity • Uploads on 'Save &amp; Close'
+                </span>
+              </div>
+
+              <div className="d-flex align-items-center gap-2 flex-wrap">
+                {/* Privacy Radios */}
+                <div className="d-flex align-items-center gap-2 bg-white px-2.5 py-1 rounded-pill border">
+                  <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#59123B" }}>Privacy:</span>
+                  {docOptions.map((option) => (
+                    <div key={option.id} className="d-flex align-items-center">
+                      <input
+                        className="form-check-input me-1"
+                        type="radio"
+                        name="docPrivacyOptions"
+                        id={option.id}
+                        value={option.value}
+                        checked={selectedDocOption === option.value}
+                        onChange={handleDocOptionChange}
+                        style={{ cursor: "pointer" }}
+                      />
+                      <label
+                        className="m-0"
+                        htmlFor={option.id}
+                        style={{ fontSize: "0.7rem", fontWeight: 600, color: "#4a4a5e", cursor: "pointer", whiteSpace: "nowrap" }}
+                      >
+                        {option.label}
+                      </label>
+                    </div>
+                  ))}
                 </div>
-              ))}
+
+                {/* Upload Button */}
+                <label
+                  className="btn btn-sm btn-outline-danger"
+                  style={{
+                    borderRadius: "6px",
+                    padding: "4px 12px",
+                    fontSize: "0.76rem",
+                    fontWeight: 600,
+                    cursor: isUploadingDoc || isSaving ? "not-allowed" : "pointer",
+                    borderColor: isUploadingDoc ? "#888888" : "#59123B",
+                    color: isUploadingDoc ? "#888888" : "#59123B",
+                    pointerEvents: isUploadingDoc || isSaving ? "none" : "auto",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <FaUpload className="me-1" />
+                  {isUploadingDoc ? `Uploading ${docProgress}%...` : "+ Select Document"}
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                    multiple
+                    disabled={isUploadingDoc || isSaving}
+                    onChange={handleDocumentUpload}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              </div>
             </div>
+
+            {/* Document Upload Progress Bar */}
+            {isUploadingDoc && (
+              <div className="mb-3 p-2 bg-white rounded border" style={{ borderColor: "rgba(89, 18, 59, 0.2)" }}>
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#59123B" }}>
+                    Uploading Documents to Database... {docProgress}%
+                  </span>
+                  <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#c59b27" }}>
+                    {docProgress}%
+                  </span>
+                </div>
+                <div style={{ height: "6px", width: "100%", background: "#f3e8ee", borderRadius: "10px", overflow: "hidden" }}>
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${docProgress}%`,
+                      background: "linear-gradient(90deg, #59123B, #c59b27)",
+                      borderRadius: "10px",
+                      transition: "width 0.2s linear"
+                    }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
+            {/* Documents Grid */}
+            {!localDocuments || localDocuments.length === 0 ? (
+              <div
+                style={{
+                  border: "1.5px dashed rgba(89, 18, 59, 0.2)",
+                  borderRadius: "10px",
+                  padding: "20px",
+                  textAlign: "center",
+                  background: "#ffffff",
+                  color: "#78788c",
+                  fontSize: "0.82rem",
+                }}
+              >
+                <FaFileAlt size={22} style={{ color: "#c59b27", marginBottom: "4px", display: "block", margin: "0 auto 4px" }} />
+                No verification documents selected. Click <strong>+ Select Document</strong> to choose files.
+              </div>
+            ) : (
+              <div className="d-flex flex-wrap gap-3">
+                {localDocuments.map((document, index) => {
+                  const isImage = document?.url?.startsWith("blob:") || document?.url?.startsWith("data:image") || document?.url?.match(/\.(jpeg|jpg|gif|png)$/i);
+                  return (
+                    <div
+                      key={document._id || index}
+                      className="position-relative"
+                      style={{
+                        width: "105px",
+                        height: "105px",
+                        borderRadius: "10px",
+                        overflow: "hidden",
+                        boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
+                        border: document.isPending ? "1.5px dashed #59123B" : "1px solid rgba(0,0,0,0.1)",
+                        background: "#ffffff",
+                      }}
+                    >
+                      {isImage ? (
+                        <img
+                          src={document.url}
+                          alt="document"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : (
+                        <div
+                          className="d-flex flex-column justify-content-center align-items-center h-100 p-2"
+                          style={{ background: "#f8f9fa", textAlign: "center" }}
+                        >
+                          <FaFileAlt size={24} style={{ color: "#59123B", marginBottom: "4px" }} />
+                          <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#1a1a2e" }}>Doc File</span>
+                          {!document.isPending && (
+                            <a
+                              href={document.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ fontSize: "0.62rem", color: "#59123B", fontWeight: 600, textDecoration: "underline" }}
+                            >
+                              View File
+                            </a>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Pending Badge */}
+                      {document.isPending && (
+                        <span
+                          className="position-absolute top-0 start-0 bg-warning text-dark px-1"
+                          style={{ fontSize: "0.55rem", fontWeight: 700, borderRadius: "0 0 4px 0" }}
+                        >
+                          Pending
+                        </span>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(document._id)}
+                        style={{
+                          position: "absolute",
+                          top: "4px",
+                          right: "4px",
+                          background: "rgba(255, 255, 255, 0.9)",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: "22px",
+                          height: "22px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#dc2626",
+                          cursor: "pointer",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                          zIndex: 10,
+                        }}
+                        title="Remove Document"
+                      >
+                        <RiDeleteBin6Line size={12} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          <div className={style.modalFooter}>
+          {/* Modal Actions */}
+          <div className="d-flex justify-content-end gap-2 pt-2 border-top">
             <button
               type="button"
-              className={`btn btn-primary ${style.saveButton}`}
-              onClick={handleSaveClick}
+              className="btn btn-sm btn-outline-secondary"
+              onClick={handleCancelClick}
+              disabled={isSaving}
+              style={{ padding: "6px 18px", borderRadius: "8px", fontWeight: 600 }}
             >
-              SAVE
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm text-white"
+              onClick={handleSaveAll}
+              disabled={isSaving}
+              style={{
+                background: "linear-gradient(135deg, #59123B 0%, #3d0826 100%)",
+                padding: "6px 24px",
+                borderRadius: "8px",
+                fontWeight: 600,
+                boxShadow: "0 2px 8px rgba(89, 18, 59, 0.3)",
+                opacity: isSaving ? 0.7 : 1,
+              }}
+            >
+              {isSaving ? "Saving & Uploading..." : "Save & Close"}
             </button>
           </div>
         </form>

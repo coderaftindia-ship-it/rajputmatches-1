@@ -66,11 +66,16 @@ function Login() {
     e.preventDefault();
     if (verify()) {
       const route = "login";
-      console.log("logging in ");
-      console.log({ formData });
+      const loginPayload = {
+        username: formData.username.trim(),
+        email: formData.username.trim(),
+        password: formData.password,
+      };
       try {
-        await login(route, formData);
-        navigate("/home");
+        const res = await login(route, loginPayload);
+        if (res?.success) {
+          navigate("/profile");
+        }
       } catch (error) {
         console.error("Error during login:", error);
       }

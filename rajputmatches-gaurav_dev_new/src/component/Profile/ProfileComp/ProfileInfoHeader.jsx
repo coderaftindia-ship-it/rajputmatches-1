@@ -4,6 +4,9 @@ import { useAuth } from "../../Layout/AuthContext";
 import { useOptionalProfileDetails } from "../../../context/ProfileDetailsContext";
 import { Calendar, Phone, Mail, BadgeCheck, Printer } from "lucide-react";
 
+import femaleDefault from "../../../assets/images/female_default.png";
+import maleDefault from "../../../assets/images/male_default.png";
+
 const ProfileInfoHeader = () => {
   const { fetchUserData, profile, fetchprofile, userData: authUserData } = useAuth();
   const profileDetails = useOptionalProfileDetails();
@@ -14,9 +17,12 @@ const ProfileInfoHeader = () => {
     fetchprofile();
   }, []);
 
+  const defaultAvatar = authUserData?.gender === "Female" ? femaleDefault : maleDefault;
+
   const avatarUrl =
     authUserData?.avatar ||
-    (profile && !profile.includes("user-icon-flat-isolated") ? profile : null);
+    (profile && !profile.includes("user-icon-flat-isolated") ? profile : null) ||
+    defaultAvatar;
 
   const initials = `${(authUserData?.firstName || "").charAt(0)}${(authUserData?.lastName || "").charAt(0)}`.toUpperCase();
 
@@ -131,6 +137,7 @@ const ProfileInfoHeader = () => {
                 height: 116,
                 borderRadius: "50%",
                 objectFit: "cover",
+                objectPosition: "center",
                 border: "5px solid white",
                 boxShadow: "0 6px 24px rgba(0,0,0,0.18)",
                 display: "block",

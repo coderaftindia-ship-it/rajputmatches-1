@@ -1,4 +1,6 @@
 import React from "react";
+import style from "./Form.module.css";
+import { MdOutlineCancelPresentation } from "react-icons/md";
 import indiaStatesData from "../../../features/state";
 
 const POPULAR_COUNTRIES = [
@@ -49,280 +51,230 @@ const ReligionForm = ({
   }, [formData.birthState]);
 
   return (
-    <div className={styles.modalContainer}>
-      <div className={styles.modalContent}>
-        <div className={styles.modalHeader}>
-          <h4 className={styles.headerTitle}>
-            Birth/ Religious/ Astro Details
+    <div className={style.modalContainer}>
+      <div className={style.modalContent} style={{ maxWidth: "740px", borderRadius: "12px" }}>
+        {/* Header */}
+        <div className={style.modalHeader}>
+          <h4 className={style.headerTitle}>
+            Birth, Religious &amp; Astro Details
           </h4>
-          <div>
-            <MdOutlineCancelPresentation
-              onClick={handleCancelClick}
-              className={styles.closeIcon}
-              size="22"
-            />
-          </div>
+          <MdOutlineCancelPresentation
+            onClick={handleCancelClick}
+            className={style.closeIcon}
+            size="22"
+          />
         </div>
 
-        <form className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="row">
-              {/* <div className="col-sm-6">
-                <label htmlFor="dateOfBirth" className="form-label">
-                  Date Of Birth
-                </label>
-                <input
-                  type="date"
-                  className="form-control rounded-0"
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth || ""}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div> */}
-
-              <div className="col-sm-6">
-                <label htmlFor="birthTime" className="form-label">
-                  Birth Time
-                </label>
-                <div className="input-group">
-                  <select
-                    className="form-select rounded-0"
-                    name="birthHour"
-                    value={formData.birthHour || ""}
-                    onChange={handleInputChange}
-                    style={{ width: "20%" }}
-                  >
-                    <option value="">Hour</option>
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {String(i + 1).padStart(2, "0")}
-                      </option>
-                    ))}
-                  </select>
-
-                  <select
-                    className="form-select rounded-0"
-                    name="birthMinute"
-                    value={formData.birthMinute || ""}
-                    onChange={handleInputChange}
-                  >
-                    <option value="">Min</option>
-                    {Array.from({ length: 60 }, (_, i) => (
-                      <option key={i} value={i}>
-                        {String(i).padStart(2, "0")}
-                      </option>
-                    ))}
-                  </select>
-
-                  <select
-                    className="form-select rounded-0"
-                    name="birthTimePeriod"
-                    value={formData.birthTimePeriod || "AM"}
-                    onChange={handleInputChange}
-                  >
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="mb-3 col-sm-6">
-                <label htmlFor="birthplace" className="form-label">
-                  Birthplace
-                </label>
-                <input
-                  type="text"
-                  className="form-control rounded-0"
-                  id="birthplace"
-                  name="birthplace"
-                  placeholder="Exact Place"
-                  value={formData.birthplace || ""}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-
-            <div className="row mb-3">
-              {/* Birth Country */}
-              <div className="col-md-4">
-                <label htmlFor="birthCountry" className="form-label">
-                  Birth Country
-                </label>
+        {/* Modal Body */}
+        <form style={{ padding: "14px 18px" }} onSubmit={(e) => e.preventDefault()}>
+          <div className="row g-2 mb-2">
+            {/* Birth Time */}
+            <div className="col-md-6 col-12">
+              <label>BIRTH TIME</label>
+              <div className="d-flex gap-1">
                 <select
-                  className="form-select rounded-0"
-                  id="birthCountry"
-                  name="birthCountry"
-                  value={formData.birthCountry || ""}
+                  name="birthHour"
+                  value={formData.birthHour || ""}
                   onChange={handleInputChange}
-                  required
+                  style={{ flex: 1 }}
                 >
-                  <option value="">Select Country</option>
-                  {ALL_COUNTRIES.map((country) => (
-                    <option key={country.name} value={country.name}>
-                      {country.name}
+                  <option value="">Hour</option>
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {String(i + 1).padStart(2, "0")}
                     </option>
                   ))}
                 </select>
-              </div>
 
-              {/* Birth State */}
-              <div className="col-md-4">
-                <label htmlFor="birthState" className="form-label">
-                  Birth State
-                </label>
                 <select
-                  className="form-select rounded-0"
-                  id="birthState"
-                  name="birthState"
-                  value={formData.birthState || ""}
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      birthState: e.target.value, // Store state name
-                      birthCity: "",
-                    });
-                  }}
-                  disabled={!formData.birthCountry}
+                  name="birthMinute"
+                  value={formData.birthMinute || ""}
+                  onChange={handleInputChange}
+                  style={{ flex: 1 }}
                 >
-                  <option value="">Enter State</option>
-                  {states.map((state) => (
-                    <option key={state.isoCode} value={state.name}>
-                      {state.name}
+                  <option value="">Min</option>
+                  {Array.from({ length: 60 }, (_, i) => (
+                    <option key={i} value={i}>
+                      {String(i).padStart(2, "0")}
                     </option>
                   ))}
                 </select>
-              </div>
 
-              {/* Birth City */}
-              <div className="col-md-4">
-                <label htmlFor="birthCity" className="form-label">
-                  Birth City
-                </label>
                 <select
-                  className="form-select rounded-0"
-                  id="birthCity"
-                  name="birthCity"
-                  value={formData.birthCity || ""}
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      birthCity: e.target.value,
-                    });
-                  }}
-                  disabled={!formData.birthState}
+                  name="birthTimePeriod"
+                  value={formData.birthTimePeriod || "AM"}
+                  onChange={handleInputChange}
+                  style={{ flex: 1 }}
                 >
-                  <option value="">Enter City</option>
-                  {cities.map((city) => (
-                    <option key={city.name} value={city.name}>
-                      {city.name}
-                    </option>
-                  ))}
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
                 </select>
               </div>
             </div>
 
-            <div className="row mb-3">
-              {/* Birth Country */}
-              <div className="col-12">
-                <label htmlFor="" className="form-label">
-                  Manglik
-                </label>
-                <select
-                  className="form-select rounded-0"
-                  id="maglik"
-                  name="maglik"
-                  value={formData.maglik || ""}
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      maglik: e.target.value,
-                    });
-                  }}
-                >
-                  <option value="">Select Manglik</option>
+            {/* Birthplace */}
+            <div className="col-md-6 col-12">
+              <label>EXACT BIRTHPLACE</label>
+              <input
+                type="text"
+                name="birthplace"
+                placeholder="Exact Birthplace"
+                value={formData.birthplace || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
 
-                  <option key={1} value="Yes">
-                    Yes
+          <div className="row g-2 mb-2">
+            {/* Birth Country */}
+            <div className="col-md-4 col-6">
+              <label>BIRTH COUNTRY</label>
+              <select
+                name="birthCountry"
+                value={formData.birthCountry || "India"}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Country</option>
+                {POPULAR_COUNTRIES.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
                   </option>
-                  <option key={2} value="No">
-                    No
+                ))}
+              </select>
+            </div>
+
+            {/* Birth State */}
+            <div className="col-md-4 col-6">
+              <label>BIRTH STATE</label>
+              <select
+                name="birthState"
+                value={formData.birthState || ""}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    birthState: e.target.value,
+                    birthCity: "",
+                  });
+                }}
+                disabled={!formData.birthCountry}
+              >
+                <option value="">Select State</option>
+                {states.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
                   </option>
-                </select>
-              </div>
+                ))}
+              </select>
             </div>
 
-            <div className="row mb-3">
-              <div className="col-md-4">
-                <label htmlFor="clan" className="form-label">
-                  Clan / Vansh
-                </label>
-                <input
-                  type="text"
-                  className="form-control rounded-0"
-                  id="clan"
-                  name="clan"
-                  placeholder="Enter Clan"
-                  value={formData.clan || ""}
-                  onChange={handleInputChange}
-                />
-              </div>
+            {/* Birth City */}
+            <div className="col-md-4 col-12">
+              <label>BIRTH CITY</label>
+              <select
+                name="birthCity"
+                value={formData.birthCity || ""}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    birthCity: e.target.value,
+                  });
+                }}
+                disabled={!formData.birthState}
+              >
+                <option value="">Select City</option>
+                {cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-              <div className="col-md-4">
-                <label htmlFor="subclan" className="form-label">
-                  Subclan / Upvansh
-                </label>
-                <input
-                  type="text"
-                  className="form-control rounded-0"
-                  id="subclan"
-                  name="subclan"
-                  placeholder="Enter Subclan"
-                  value={formData.subclan || ""}
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              <div className="col-md-4">
-                <label htmlFor="gotra" className="form-label">
-                  Enter Gotra / Tribe
-                </label>
-                <input
-                  type="text"
-                  className="form-control rounded-0"
-                  id="gotra"
-                  name="gotra"
-                  placeholder="Enter Gotra/Tribe"
-                  value={formData.gotra || ""}
-                  onChange={handleInputChange}
-                />
-              </div>
+          <div className="row g-2 mb-2">
+            <div className="col-md-4 col-6">
+              <label>MANGLIK STATUS</label>
+              <select
+                name="maglik"
+                value={formData.maglik || formData.manglik || ""}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    maglik: e.target.value,
+                    manglik: e.target.value,
+                  });
+                }}
+              >
+                <option value="">Select Manglik</option>
+                <option value="Non Manglik">Non Manglik</option>
+                <option value="Manglik">Manglik</option>
+                <option value="Anshik Manglik">Anshik Manglik</option>
+                <option value="Don't Know">Don't Know</option>
+              </select>
             </div>
 
-            <div className="mb-3">
-              <label htmlFor="additionalInfo" className="form-label">
-                Additional Info
-              </label>
+            <div className="col-md-4 col-6">
+              <label>CLAN / VANSH</label>
+              <input
+                type="text"
+                name="clan"
+                placeholder="Enter Clan"
+                value={formData.clan || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="col-md-4 col-12">
+              <label>SUBCLAN / UPVANSH</label>
+              <input
+                type="text"
+                name="subclan"
+                placeholder="Enter Subclan"
+                value={formData.subclan || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          <div className="row g-2 mb-2">
+            <div className="col-md-6 col-12">
+              <label>GOTRA / TRIBE</label>
+              <input
+                type="text"
+                name="gotra"
+                placeholder="Enter Gotra"
+                value={formData.gotra || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="col-md-6 col-12">
+              <label>ADDITIONAL ASTRO INFO</label>
               <textarea
-                className="form-control rounded-0"
-                id="additionalInfo"
                 name="additionalInfo"
-                rows="3"
-                placeholder="Enter text"
+                rows="2"
+                placeholder="Additional details..."
                 value={formData.additionalInfo || ""}
                 onChange={handleInputChange}
+                style={{ minHeight: "40px" }}
               ></textarea>
             </div>
           </div>
 
-          <div className={styles.modalFooter}>
+          {/* Footer Actions */}
+          <div className={style.modalFooter} style={{ padding: "8px 0 0 0", borderTop: "1px solid #f0f0f0" }}>
             <button
               type="button"
-              className={`btn btn-primary ${styles.saveButton}`}
+              className={style.cancelBtn}
+              onClick={handleCancelClick}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className={style.saveBtn}
               onClick={handleSaveClick}
             >
-              SAVE
+              Save Changes
             </button>
           </div>
         </form>

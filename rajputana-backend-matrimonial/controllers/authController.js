@@ -3667,7 +3667,7 @@ exports.getPublicRecentProfiles = async (req, res) => {
     const profiles = await User.find(query)
       .select("-password")
       .sort({ createdAt: -1 })
-      .limit(10)
+      .limit(9)
       .populate("filesId")
       .populate("HoroscopicId")
       .populate({ path: "familydetailsId", select: "occupation" })

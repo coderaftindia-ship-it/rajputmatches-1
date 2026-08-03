@@ -436,7 +436,7 @@ function Register() {
               <button 
                 type="button" 
                 className="royal-tab-btn active"
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate("/login")}
               >
                 Register
               </button>
