@@ -46,56 +46,105 @@ function useSidebarCounts() {
     chat: 0,
   });
 
+  // Separate state for userId so we can use it in unread calc
+  const [userId, setUserId] = useState("");
+
+  // Get userId once from localStorage/auth
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        // Parse JWT to get userId (middle part)
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setUserId(payload?.id || payload?.userId || payload?._id || "");
+      }
+    } catch (e) {}
+  }, []);
+
+  const loadCounts = async () => {
+    try {
+      const [sl, viewed, visited, reqs, photoR, docR, contactR, bl, chats] = await Promise.allSettled([
+        fetchByRoute("profile/show-shortlisted"),
+        fetchByRoute("profile/viewed"),
+        fetchByRoute("profile/visited"),
+        fetchByRoute("profile/myrequests"),
+        fetchByRoute("profile/photorequests"),
+        fetchByRoute("profile/documentrequests"),
+        fetchByRoute("profile/contactrequests"),
+        fetchByRoute("profile/show-blocked"),
+        chatApi.listChats(),
+      ]);
+
+      const getLen = (res, field1, field2) => {
+        if (res?.status !== "fulfilled" || !res.value) return 0;
+        const val = res.value;
+        if (Array.isArray(val)) return val.length;
+        if (field1 && Array.isArray(val[field1])) return val[field1].length;
+        if (field2 && Array.isArray(val[field2])) return val[field2].length;
+        return 0;
+      };
+
+      // ── Unread chat count (same logic as Navbar) ──
+      let unreadChatCount = 0;
+      if (chats?.status === "fulfilled" && Array.isArray(chats.value)) {
+        unreadChatCount = chats.value.reduce((acc, chat) => {
+          if (!chat?.lastMessage) return acc;
+          const senderId = typeof chat.lastMessage.sender === "object"
+            ? chat.lastMessage.sender?._id
+            : chat.lastMessage.sender;
+          const isFromOther = senderId && userId
+            ? senderId.toString() !== userId.toString()
+            : true;
+          const isUnread =
+            (chat.unreadCount > 0) ||
+            chat.isUnread ||
+            chat.lastMessage.isRead === false ||
+            chat.lastMessage.seen === false ||
+            (Array.isArray(chat.lastMessage.seenBy) && userId && !chat.lastMessage.seenBy.includes(userId));
+          return isFromOther && isUnread ? acc + 1 : acc;
+        }, 0);
+      }
+
+      setCounts({
+        shortlisted: getLen(sl, "shortlisted", "profiles"),
+        viewed: getLen(viewed, "visitedAt", "viewedProfiles"),
+        visited: getLen(visited, "viewedBy", "visitors"),
+        interest: getLen(reqs, "reqReceived"),
+        request: getLen(photoR, "photoReqReceived"),
+        documentRequest: getLen(docR, "documentReqReceived"),
+        contactRequest: getLen(contactR, "contactReqReceived"),
+        blocked: getLen(bl),
+        chat: unreadChatCount,
+      });
+    } catch (err) {
+      console.error("Error fetching sidebar counts:", err);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
-    const loadCounts = async () => {
-      try {
-        const [sl, viewed, visited, reqs, photoR, docR, contactR, bl, chats] = await Promise.allSettled([
-          fetchByRoute("profile/show-shortlisted"),
-          fetchByRoute("profile/viewed"),
-          fetchByRoute("profile/visited"),
-          fetchByRoute("profile/myrequests"),
-          fetchByRoute("profile/photorequests"),
-          fetchByRoute("profile/documentrequests"),
-          fetchByRoute("profile/contactrequests"),
-          fetchByRoute("profile/show-blocked"),
-          chatApi.listChats(),
-        ]);
+    const safeLoad = () => { if (isMounted) loadCounts(); };
 
-        if (!isMounted) return;
+    safeLoad();
 
-        const getLen = (res, field1, field2) => {
-          if (res?.status !== "fulfilled" || !res.value) return 0;
-          const val = res.value;
-          if (Array.isArray(val)) return val.length;
-          if (field1 && Array.isArray(val[field1])) return val[field1].length;
-          if (field2 && Array.isArray(val[field2])) return val[field2].length;
-          return 0;
-        };
+    // Re-fetch count when a chat is read or new message arrives
+    window.addEventListener("chatRead", safeLoad);
+    window.addEventListener("newMessage", safeLoad);
 
-        setCounts({
-          shortlisted: getLen(sl, "shortlisted", "profiles"),
-          viewed: getLen(viewed, "visitedAt", "viewedProfiles"),
-          visited: getLen(visited, "viewedBy", "visitors"),
-          interest: getLen(reqs, "reqReceived"),
-          request: getLen(photoR, "photoReqReceived"),
-          documentRequest: getLen(docR, "documentReqReceived"),
-          contactRequest: getLen(contactR, "contactReqReceived"),
-          blocked: getLen(bl),
-          chat: getLen(chats),
-        });
-      } catch (err) {
-        console.error("Error fetching sidebar counts:", err);
-      }
-    };
-    loadCounts();
+    // Poll every 15 seconds for new messages
+    const interval = setInterval(safeLoad, 15000);
+
     return () => {
       isMounted = false;
+      window.removeEventListener("chatRead", safeLoad);
+      window.removeEventListener("newMessage", safeLoad);
+      clearInterval(interval);
     };
-  }, []);
+  }, [userId]); // re-run when userId is available
 
   return counts;
 }
+
 
 /* ------------------------------------------------------------------ */
 /* Vertical sidebar — rendered inside the desktop split-pane layout   */

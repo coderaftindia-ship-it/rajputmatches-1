@@ -26,7 +26,7 @@ const STATUS_BADGE = {
 const PER_PAGE = 8;
 
 export default function ContactRequest() {
-  const { fetchUserData, updateData } = useAuth();
+  const { fetchUserData, updateData, userData: myProfile } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab,   setActiveTab]   = useState("received");
@@ -293,28 +293,44 @@ export default function ContactRequest() {
 
                     {/* Contact (only if accepted) */}
                     <td style={{ padding: "12px 16px" }}>
-                      {status === "accepted" ? (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                          {user?.mobile && (
-                            <a href={`tel:${user.mobile}`} style={{
-                              display: "flex", alignItems: "center", gap: "6px",
-                              fontSize: "0.78rem", color: "#59123b", fontWeight: 600,
-                              textDecoration: "none",
-                            }}>
-                              <FaPhone size={10} color="#c8973a" /> {user.mobile}
-                            </a>
-                          )}
-                          {user?.email && (
-                            <a href={`mailto:${user.email}`} style={{
-                              display: "flex", alignItems: "center", gap: "6px",
-                              fontSize: "0.78rem", color: "#59123b", fontWeight: 600,
-                              textDecoration: "none",
-                            }}>
-                              <FaEnvelope size={10} color="#c8973a" /> {user.email}
-                            </a>
-                          )}
-                        </div>
-                      ) : (
+                      {status === "accepted" ? (() => {
+                        // Sent tab: show MY contact details (I shared mine when accepted)
+                        // Received tab: show the OTHER person's contact details
+                        const contactPhone = activeTab === "sent"
+                          ? (myProfile?.mobile || "—")
+                          : (user?.mobile || null);
+                        const contactEmail = activeTab === "sent"
+                          ? (myProfile?.email || "—")
+                          : (user?.email || null);
+                        const contactLabel = activeTab === "sent" ? "My Contact" : null;
+                        return (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                            {contactLabel && (
+                              <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#1a7a45", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "2px" }}>
+                                ✓ My Shared Details
+                              </span>
+                            )}
+                            {contactPhone && contactPhone !== "—" && (
+                              <a href={`tel:${contactPhone}`} style={{
+                                display: "flex", alignItems: "center", gap: "6px",
+                                fontSize: "0.78rem", color: "#59123b", fontWeight: 600,
+                                textDecoration: "none",
+                              }}>
+                                <FaPhone size={10} color="#c8973a" /> {contactPhone}
+                              </a>
+                            )}
+                            {contactEmail && contactEmail !== "—" && (
+                              <a href={`mailto:${contactEmail}`} style={{
+                                display: "flex", alignItems: "center", gap: "6px",
+                                fontSize: "0.78rem", color: "#59123b", fontWeight: 600,
+                                textDecoration: "none",
+                              }}>
+                                <FaEnvelope size={10} color="#c8973a" /> {contactEmail}
+                              </a>
+                            )}
+                          </div>
+                        );
+                      })() : (
                         <span style={{ fontSize: "0.75rem", color: "#ccc" }}>—</span>
                       )}
                     </td>

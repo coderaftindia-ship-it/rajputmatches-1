@@ -147,9 +147,8 @@ const MandalaSVG = ({ className }) => (
 // ─────────────────────────────────────────────────
 const SectionRibbon = ({ children }) => (
   <div className={styles.sectionRibbon}>
-    <span className={`${styles.ribbonOrn} ${styles.ribbonOrnLeft}`}>✦</span>
+    <span className={styles.ribbonOrn}>✦</span>
     <span>{children}</span>
-    <span className={`${styles.ribbonOrn} ${styles.ribbonOrnRight}`}>✦</span>
   </div>
 );
 
@@ -184,33 +183,31 @@ const formatArrayValue = (key, val) => {
 const DetailRow = ({ icon, label, value, isLockedContact, contactRequestStatus, onRequestAccess }) => (
   <div className={styles.detailRow}>
     <div className={styles.detailIconCircle}>{icon}</div>
-    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: "6px 10px", flexWrap: "wrap", minWidth: 0 }}>
-      <div style={{ minWidth: 0 }}>
-        <div className={styles.detailLabel}>{label}</div>
-        <div className={styles.detailValue} style={{ wordBreak: "break-all" }}>{value || "N/A"}</div>
-      </div>
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div className={styles.detailLabel}>{label}</div>
+      <div className={styles.detailValue} style={{ wordBreak: "break-word", overflowWrap: "break-word" }}>{value || "N/A"}</div>
       {isLockedContact && (
         contactRequestStatus === "pending" ? (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "4px 8px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: "600", backgroundColor: "#fffbeb", color: "#d97706", border: "1px solid #fef3c7", flexShrink: 0 }}>
-            <FaClock size={10} /> Pending
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", padding: "2px 7px", borderRadius: "10px", fontSize: "0.65rem", fontWeight: "600", backgroundColor: "#fffbeb", color: "#d97706", border: "1px solid #fef3c7", marginTop: "4px" }}>
+            <FaClock size={9} /> Pending
           </span>
         ) : contactRequestStatus === "rejected" ? (
-          <button 
-            className={styles.requestAccessBadge} 
+          <button
+            className={styles.requestAccessBadge}
             onClick={(e) => { e.stopPropagation(); onRequestAccess(); }}
             title="Resend Contact Access Request"
-            style={{ flexShrink: 0, backgroundColor: "#fef2f2", color: "#dc2626", border: "1px solid #fee2e2", cursor: "pointer" }}
+            style={{ backgroundColor: "#fef2f2", color: "#dc2626", border: "1px solid #fee2e2", cursor: "pointer", marginTop: "4px", display: "inline-flex", alignItems: "center", gap: "3px", fontSize: "0.65rem" }}
           >
-            <FaTimes size={10} /> Resend Request
+            <FaTimes size={9} /> Resend
           </button>
         ) : (
-          <button 
-            className={styles.requestAccessBadge} 
+          <button
+            className={styles.requestAccessBadge}
             onClick={(e) => { e.stopPropagation(); onRequestAccess(); }}
             title="Request Contact Access"
-            style={{ flexShrink: 0, cursor: "pointer" }}
+            style={{ cursor: "pointer", marginTop: "4px", display: "inline-flex", alignItems: "center", gap: "3px", fontSize: "0.65rem" }}
           >
-            <FaLock size={10} /> Send Request
+            <FaLock size={9} /> Send Request
           </button>
         )
       )}
@@ -708,10 +705,10 @@ const ViewPage = () => {
                 </div>
               </div>
 
-              {/* Grid Layout */}
+              {/* Grid Layout - rightPanel first in DOM so photo is at top on mobile */}
               <div className={styles.biodataGrid} style={{ position: "relative", zIndex: 2 }}>
                 {/* Left panel dynamic tab content */}
-                <div>
+                <div className={styles.tabContent}>
                   <AnimatePresence mode="wait">
                     {activeTab === "summary" && (
                       <motion.div

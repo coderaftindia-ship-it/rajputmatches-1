@@ -213,6 +213,11 @@ const ChatApp = () => {
         } else {
           loadMessages(activeChatRef.current, false);
         }
+        // Message seen immediately (chat is open) → update counts
+        window.dispatchEvent(new Event("chatRead"));
+      } else {
+        // Message in another chat → increment unread
+        window.dispatchEvent(new Event("newMessage"));
       }
       loadChats(false);
     });

@@ -277,6 +277,13 @@
   align-items: start;
 }
 
+/* Desktop: tab content in col 1, rightPanel in col 2 */
+.tabContent {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
 /* ────────────────────────────────────────────
    SECTION RIBBON
    ──────────────────────────────────────────── */
@@ -284,63 +291,27 @@
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  background: linear-gradient(135deg, var(--maroon-deep), var(--maroon), var(--maroon-deep));
-  color: var(--gold-light);
-  font: 700 0.98rem/1.2 'Cinzel', serif;
-  letter-spacing: .22em;
+  justify-content: flex-start;
+  gap: 10px;
+  background: #FAF3F6;
+  border-left: 4px solid var(--maroon, #59123b);
+  border-top: 1px solid rgba(89, 18, 59, 0.08);
+  border-right: 1px solid rgba(89, 18, 59, 0.08);
+  border-bottom: 1px solid rgba(89, 18, 59, 0.08);
+  color: var(--maroon, #59123b);
+  font: 700 0.95rem/1.2 'Cinzel', serif;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  padding: 14px 28px;
-  margin-bottom: 26px;
-  border-radius: 8px;
-  border: 1.5px solid var(--gold);
-  outline: 1.5px solid var(--gold);
-  outline-offset: -4px;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(89, 18, 59, 0.2);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-  transition: var(--transition);
-}
-
-.sectionRibbon:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(89, 18, 59, 0.35);
-  border-color: var(--gold-bright);
-  outline-color: var(--gold-bright);
-}
-
-.sectionRibbon::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg,transparent 30%,rgba(255,255,255,.1) 50%,transparent 70%);
-  animation: ribbonShimmer 4s ease-in-out infinite;
-}
-
-@keyframes ribbonShimmer {
-  0% { transform: translateX(-120%); }
-  100% { transform: translateX(250%); }
+  padding: 11px 18px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(89, 18, 59, 0.03);
 }
 
 .ribbonOrn {
-  color: var(--gold-bright);
-  font-size: 0.95rem;
+  color: var(--gold, #c8973a);
+  font-size: 0.9rem;
   display: inline-block;
-  text-shadow: 0 0 6px rgba(237, 177, 57, 0.6);
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.sectionRibbon:hover .ribbonOrn {
-  transform: scale(1.2) rotate(180deg);
-}
-
-.ribbonOrnLeft {
-  margin-right: 4px;
-}
-
-.ribbonOrnRight {
-  margin-left: 4px;
 }
 
 /* ────────────────────────────────────────────
@@ -349,60 +320,62 @@
 .detailsList {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 14px;
   margin-bottom: 30px;
 }
 
 .detailRow {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
-  background: rgba(255,255,255,0.65);
-  border: 1px solid rgba(200,151,58,0.18);
-  border-radius: 8px;
+  gap: 12px;
+  padding: 11px 14px;
+  background: #ffffff;
+  border: 1.5px solid #EFE4EA;
+  border-radius: 12px;
   cursor: default;
   transition: var(--transition);
   position: relative;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+  box-shadow: 0 2px 6px rgba(89, 18, 59, 0.02);
 }
+
 .detailRow:hover {
-  background: rgba(255,255,255,0.95);
-  border-color: var(--gold);
+  background: #ffffff;
+  border-color: rgba(89, 18, 59, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(200,151,58,0.08);
+  box-shadow: 0 6px 16px rgba(89, 18, 59, 0.06);
 }
 
 .detailIconCircle {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--maroon), var(--maroon-deep));
-  color: var(--gold-light);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #FDF4F8;
+  border: 1px solid rgba(89, 18, 59, 0.08);
+  color: var(--maroon, #59123b);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: .95rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
-  box-shadow: 0 3px 8px rgba(89,18,59,.15);
   transition: var(--transition);
 }
+
 .detailRow:hover .detailIconCircle {
-  transform: scale(1.08) rotate(5deg);
-  box-shadow: 0 4px 12px rgba(89,18,59,.25);
-  color: var(--gold-bright);
+  background: var(--maroon, #59123b);
+  color: #ffffff;
 }
 
 .detailLabel {
-  font: 700 0.72rem/1 var(--font-body);
-  color: var(--text-soft);
+  font: 700 0.65rem/1.2 var(--font-body);
+  color: #8C7B83;
   text-transform: uppercase;
-  letter-spacing: .08em;
-  margin-bottom: 4px;
+  letter-spacing: .05em;
+  margin-bottom: 3px;
 }
+
 .detailValue {
-  font: 600 0.94rem/1.3 var(--font-body);
-  color: var(--text-dark);
+  font: 700 0.88rem/1.3 var(--font-body);
+  color: #1F0B17;
 }
 
 /* ────────────────────────────────────────────
@@ -535,21 +508,25 @@
 
 .verifiedBadge {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: 8px;
+  left: 8px;
+  transform: none;
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font: 700 0.68rem/1 var(--font-body);
-  letter-spacing: 0.05em;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   z-index: 4;
-  box-shadow: 0 4px 10px rgba(16,185,129,0.3);
+  white-space: nowrap;
+  box-shadow: 0 1px 6px rgba(16,185,129,0.35);
   border: 1px solid rgba(255,255,255,0.25);
+  line-height: 1;
 }
 
 .profileName {
@@ -1049,120 +1026,220 @@
    ──────────────────────────────────────────── */
 @media (max-width: 1040px) {
   .biodataGrid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
+
+  .tabContent {
+    width: 100%;
+    min-width: 0;
+  }
+
   .rightPanel {
     position: static;
     max-width: 440px;
-    margin: 0 auto 30px;
+    margin: 0 auto;
     width: 100%;
   }
+
   .floatingActions {
-    bottom: 90px; /* Keep above mobile bottom bar */
+    bottom: 90px;
     right: 20px;
   }
 }
 
 @media (max-width: 768px) {
+
+  /* ── Page shell ── */
   .pageWrapper {
-    padding-top: 75px !important;
-    padding-bottom: 90px !important;
+    padding-top: 68px !important;
+    padding-bottom: 80px !important;
+    background: #f9f3f7 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
   .pageContainer {
-    padding: 0 10px !important;
+    padding: 0 4px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
+  /* ── Header row (Back / Share / Print buttons) ── */
   .headerRow {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
-    margin-bottom: 14px !important;
-    gap: 8px !important;
+    margin-bottom: 10px !important;
+    gap: 6px !important;
+    padding: 0 2px !important;
   }
 
   .backBtn, .printBtn {
-    width: auto !important;
-    padding: 6px 14px !important;
-    font-size: 0.78rem !important;
+    padding: 5px 12px !important;
+    font-size: 0.72rem !important;
     border-radius: 20px !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
   }
 
+  /* ── Main biodata card ── */
   .biodataCard {
-    padding: 16px 12px !important;
-    outline-offset: 3px !important;
-    border-radius: 12px !important;
+    padding: 10px 8px 14px !important;
+    border-radius: 14px !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 4px 20px rgba(89,18,59,0.1) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
+  /* ── Header ornament ── */
   .biodataHeader {
-    padding-bottom: 12px !important;
-    margin-bottom: 14px !important;
-  }
-
-  .biodataTitle {
-    font-size: 1.3rem !important;
-    letter-spacing: 2px !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 10px !important;
   }
 
   .biodataSlogan {
-    font-size: 0.85rem !important;
+    font-size: 0.78rem !important;
+    letter-spacing: 1px !important;
   }
 
+  .goldFlourish {
+    gap: 6px !important;
+    margin: 4px 0 !important;
+  }
+
+  /* ── Grid: RIGHT PANEL (photo) comes FIRST on mobile ── */
+  .biodataGrid {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  /* ── Right panel (photo card) -> TOP ── */
+  .rightPanel {
+    order: -1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 14px 0 !important;
+    position: static !important;
+  }
+
+  /* ── Photo frame ── */
+  .photoFrame {
+    max-width: 190px !important;
+    height: 210px !important;
+    margin: 0 auto 10px !important;
+    border-radius: 14px !important;
+    border-width: 2px !important;
+  }
+
+  /* ── Profile name & ID ── */
   .profileName {
-    font-size: 1.35rem !important;
+    font-size: 1.2rem !important;
     margin-bottom: 2px !important;
+    text-align: center !important;
+    line-height: 1.3 !important;
   }
 
   .profileId {
-    font-size: 0.82rem !important;
+    font-size: 0.76rem !important;
+    text-align: center !important;
     margin-bottom: 8px !important;
   }
 
-  .photoFrame {
-    max-width: 220px !important;
-    height: 240px !important;
-    margin: 0 auto 12px !important;
-    border-radius: 14px !important;
-  }
-
+  /* ── Quick info pills ── */
   .quickPills {
     gap: 4px !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 10px !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
   }
 
   .pill {
     padding: 3px 8px !important;
-    font-size: 0.72rem !important;
+    font-size: 0.68rem !important;
+    border-radius: 30px !important;
+    gap: 3px !important;
   }
 
+  .pillIcon {
+    font-size: 0.68rem !important;
+  }
+
+  /* ── Footer badges ── */
+  .biodataFooter {
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+    justify-content: center !important;
+    margin-top: 10px !important;
+  }
+
+  .footerBadge {
+    font-size: 0.65rem !important;
+    padding: 4px 8px !important;
+    border-radius: 20px !important;
+    gap: 4px !important;
+  }
+
+  /* ── Tabs (Sleek Single-Line Segmented Control) ── */
   .tabsContainer {
-    border-radius: 30px !important;
-    padding: 4px !important;
-    gap: 2px !important;
-    margin-bottom: 14px !important;
     display: flex !important;
     flex-direction: row !important;
+    flex-wrap: nowrap !important;
     justify-content: space-between !important;
     align-items: center !important;
     width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
-    overflow: hidden !important;
+    border-radius: 30px !important;
+    padding: 4px !important;
+    gap: 3px !important;
+    margin-bottom: 12px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    background: #FAF3F6 !important;
+    border: 1.5px solid rgba(89, 18, 59, 0.12) !important;
+    box-shadow: inset 0 1px 3px rgba(89, 18, 59, 0.04) !important;
+  }
+
+  .tabsContainer::-webkit-scrollbar {
+    display: none !important;
   }
 
   .tabButton {
-    padding: 6px 2px !important;
-    font-size: 0.72rem !important;
-    white-space: nowrap !important;
     flex: 1 1 0 !important;
-    min-width: 0 !important;
+    min-width: max-content !important;
+    padding: 6px 10px !important;
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    border-radius: 22px !important;
+    letter-spacing: 0.02em !important;
     justify-content: center !important;
     text-align: center !important;
-    border-radius: 20px !important;
-    letter-spacing: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    color: #59123b !important;
+  }
+
+  .activeTabBg {
+    border-radius: 22px !important;
   }
 
   .tabIcon {
-    font-size: 0.75rem !important;
+    font-size: 0.72rem !important;
   }
 
   .tabTextFull {
@@ -1173,127 +1250,215 @@
     display: inline !important;
   }
 
-  .sectionRibbon {
-    font-size: 0.8rem !important;
-    padding: 8px 12px !important;
-    margin-top: 16px !important;
-    margin-bottom: 12px !important;
-    letter-spacing: 1.5px !important;
+  /* ── Progress bar ── */
+  .progressBarContainer {
+    height: 2px !important;
+    border-radius: 2px !important;
+    margin-bottom: 10px !important;
   }
 
-  .detailsList {
-    grid-template-columns: 1fr !important;
-    gap: 8px !important;
+  /* ── Section ribbon ── */
+  .sectionRibbon {
+    background: #FAF3F6 !important;
+    border-left: 4px solid var(--maroon, #59123b) !important;
+    border-top: 1px solid rgba(89, 18, 59, 0.08) !important;
+    border-right: 1px solid rgba(89, 18, 59, 0.08) !important;
+    border-bottom: 1px solid rgba(89, 18, 59, 0.08) !important;
+    color: var(--maroon, #59123b) !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    padding: 8px 12px !important;
+    margin-top: 14px !important;
+    margin-bottom: 10px !important;
+    letter-spacing: 1.2px !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
+  /* ── Details list -> 2 columns ── */
+  .detailsList {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-bottom: 14px !important;
+    align-items: stretch !important;
+  }
+
+  /* ── Each detail card ── */
   .detailRow {
-    padding: 10px 12px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 8px 9px !important;
     border-radius: 10px !important;
     min-width: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
+    background: #ffffff !important;
+    border: 1.5px solid #EFE4EA !important;
+    box-shadow: 0 1px 4px rgba(89,18,59,0.02) !important;
+    transition: none !important;
+  }
+
+  .detailRow:hover {
+    transform: none !important;
+    background: #ffffff !important;
   }
 
   .detailIconCircle {
-    width: 32px !important;
-    height: 32px !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 8px !important;
+    background: #FDF4F8 !important;
+    border: 1px solid rgba(89,18,59,0.08) !important;
+    color: var(--maroon, #59123b) !important;
+    font-size: 0.76rem !important;
+    flex-shrink: 0 !important;
+    margin-top: 1px !important;
+  }
+
+  .detailLabel {
+    font-size: 0.58rem !important;
+    font-weight: 700 !important;
+    color: #8C7B83 !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    margin-bottom: 2px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .detailValue {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    color: #1F0B17 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.25 !important;
+    min-width: 0 !important;
+  }
+
+  .requestAccessBadge {
+    font-size: 0.62rem !important;
+    padding: 3px 8px !important;
+    white-space: nowrap !important;
+    margin-top: 4px !important;
+    border-radius: 12px !important;
+    max-width: 100% !important;
+  }
+
+  /* ── About Me / Partner Pref cards ── */
+  .premiumTextCard {
+    padding: 12px 10px !important;
+    gap: 10px !important;
+    border-radius: 10px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin-top: 8px !important;
+  }
+
+  .premiumCardIcon {
+    width: 30px !important;
+    height: 30px !important;
     font-size: 0.85rem !important;
     flex-shrink: 0 !important;
   }
 
-  .detailLabel {
-    font-size: 0.68rem !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  .detailValue {
-    font-size: 0.82rem !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-  }
-
-  .requestAccessBadge {
-    font-size: 0.68rem !important;
-    padding: 4px 10px !important;
-    white-space: nowrap !important;
-    margin-top: 4px !important;
-  }
-
-  .premiumTextCard {
-    padding: 14px 12px !important;
-    gap: 12px !important;
-    border-radius: 10px !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  .premiumCardIcon {
-    width: 34px !important;
-    height: 34px !important;
-    font-size: 0.95rem !important;
-    flex-shrink: 0 !important;
-  }
-
   .premiumCardText {
-    font-size: 0.92rem !important;
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
   }
 
+  /* ── Astro grid -> 2 cols ── */
+  .astroGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  /* ── Ancestry grid -> 2 cols ── */
   .ancestryGrid {
-    grid-template-columns: 1fr !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
   }
 
   .ancestryCard {
-    padding: 10px !important;
-    border-radius: 10px !important;
+    padding: 8px 9px !important;
+    border-radius: 8px !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
   }
 
+  .ancestryHeader {
+    font-size: 0.7rem !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 5px !important;
+  }
+
+  /* ── Relatives grid -> 2 cols ── */
   .relGrid {
-    grid-template-columns: 1fr !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
   }
 
   .relCard {
-    padding: 8px !important;
-    border-radius: 10px !important;
+    padding: 7px !important;
+    border-radius: 8px !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
   }
 
+  .relRelation {
+    font-size: 0.6rem !important;
+    margin-bottom: 5px !important;
+    padding-bottom: 3px !important;
+  }
+
+  .relInfoItem {
+    font-size: 0.72rem !important;
+    margin-bottom: 3px !important;
+  }
+
+  .relInfoLabel {
+    font-size: 0.62rem !important;
+  }
+
+  /* ── Document viewer ── */
+  .docContainer {
+    padding: 0 !important;
+  }
+
+  .docFrame {
+    border-radius: 10px !important;
+    max-height: 260px !important;
+  }
+
+  /* ── Hide floating action bubble ── */
   .floatingActions {
     display: none !important;
   }
 
+  /* ── Lightbox nav ── */
   .lightboxNavBtn {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 1rem !important;
   }
-  .lightboxPrev { left: -5px; }
-  .lightboxNext { right: -5px; }
-  .lightboxClose {
-    top: -40px;
-    right: 10px;
-  }
-}
 
-@media (min-width: 576px) and (max-width: 768px) {
-  .detailsList {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-  .ancestryGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-  .relGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  .lightboxPrev { left: -4px !important; }
+  .lightboxNext { right: -4px !important; }
+
+  .lightboxClose {
+    top: -38px !important;
+    right: 8px !important;
   }
 }
 

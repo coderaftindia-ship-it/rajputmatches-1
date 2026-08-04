@@ -69,15 +69,18 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  background: var(--maroon-soft);
-  border-left: 3.5px solid var(--maroon);
-  color: var(--maroon);
-  font: 700 0.8rem/1.2 'Cinzel', serif;
+  background: #FAF3F6;
+  border-left: 4px solid var(--maroon, #59123b);
+  border-top: 1px solid rgba(89, 18, 59, 0.08);
+  border-right: 1px solid rgba(89, 18, 59, 0.08);
+  border-bottom: 1px solid rgba(89, 18, 59, 0.08);
+  color: var(--maroon, #59123b);
+  font: 700 0.82rem/1.2 'Cinzel', serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 7px 12px;
+  padding: 8px 12px;
   margin-bottom: 10px;
-  border-radius: 0 6px 6px 0;
+  border-radius: 6px;
   transition: all 0.2s ease;
 }
 
@@ -88,8 +91,8 @@
 }
 
 .ribbonOrn {
-  color: var(--gold);
-  font-size: 0.7rem;
+  color: var(--gold, #c8973a);
+  font-size: 0.75rem;
 }
 
 /* Small Edit Button */
@@ -125,47 +128,48 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 9px;
-  background: #fdfafc;
-  border: 1px solid rgba(89, 18, 59, 0.07);
-  border-radius: 8px;
+  padding: 7px 10px;
+  background: #ffffff;
+  border: 1.5px solid #EFE4EA;
+  border-radius: 10px;
   transition: all 0.2s ease;
 }
 
 .detailRow:hover {
-  border-color: rgba(89, 18, 59, 0.2);
+  border-color: rgba(89, 18, 59, 0.25);
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(89, 18, 59, 0.04);
 }
 
 .detailIconCircle {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  background: var(--maroon-soft);
-  color: var(--maroon);
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #FDF4F8;
+  border: 1px solid rgba(89, 18, 59, 0.08);
+  color: var(--maroon, #59123b);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.76rem;
   flex-shrink: 0;
 }
 
 .detailLabel {
   font-size: 0.6rem;
-  font-weight: 600;
-  color: var(--text-soft);
+  font-weight: 700;
+  color: #8C7B83;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  line-height: 1;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
   margin-bottom: 2px;
 }
 
 .detailValue {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--text-dark);
-  line-height: 1.15;
+  color: #1F0B17;
+  line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

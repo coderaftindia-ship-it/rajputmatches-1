@@ -32,7 +32,9 @@ import {
   ArrowRight,
   Crown,
   Clock,
-  Shield
+  Shield,
+  Handshake,
+  Gem
 } from "lucide-react";
 
 // Animation Variants
@@ -127,13 +129,13 @@ function About() {
       accent: "#800000"
     },
     {
-      icon: Heart,
+      icon: Handshake,
       title: "Respect",
       description: "Every individual and every family deserves dignity, privacy, and respect.",
       accent: "#E11D48"
     },
     {
-      icon: Clock,
+      icon: Gem,
       title: "Commitment",
       description: "We are committed to helping build relationships that stand the test of time.",
       accent: "#2563EB"
