@@ -313,7 +313,7 @@ const Dashboard = () => {
               value={contactReqReceived.length}
               color="linear-gradient(135deg,#f59e0b,#d97706)"
               trend={contactPending > 0 ? `${contactPending} pending` : undefined}
-              onClick={() => goProfile("interest")}
+              onClick={() => goProfile("contactRequest")}
             />
             <StatCard
               icon={<Camera size={20} />}
@@ -325,7 +325,7 @@ const Dashboard = () => {
             />
             <StatCard
               icon={<HeartHandshake size={20} />}
-              label="Interests Received"
+              label="Request Manager"
               value={interestReceived.length}
               color="linear-gradient(135deg,#ec4899,#db2777)"
               onClick={() => goProfile("interest")}

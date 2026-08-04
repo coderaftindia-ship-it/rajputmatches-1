@@ -259,6 +259,14 @@
   font-size: 0.95rem;
 }
 
+.tabTextFull {
+  display: inline;
+}
+
+.tabTextShort {
+  display: none;
+}
+
 /* ────────────────────────────────────────────
    TWO-COLUMN GRID
    ──────────────────────────────────────────── */
@@ -1056,56 +1064,236 @@
 }
 
 @media (max-width: 768px) {
-  .tabsContainer {
-    border-radius: 16px;
-    padding: 6px;
-  }
-  .tabButton {
-    padding: 8px 14px;
-    font-size: 0.78rem;
-  }
-  .detailsList {
-    grid-template-columns: 1fr;
-  }
-  .ancestryGrid {
-    grid-template-columns: 1fr;
-  }
-  .lightboxNavBtn {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
-  }
-  .lightboxPrev { left: -10px; }
-  .lightboxNext { right: -10px; }
-}
-
-@media (max-width: 600px) {
   .pageWrapper {
-    padding-top: 20px;
-    padding-bottom: 100px;
+    padding-top: 75px !important;
+    padding-bottom: 90px !important;
   }
-  .biodataCard {
-    padding: 24px 16px;
-    outline-offset: 4px;
+
+  .pageContainer {
+    padding: 0 10px !important;
   }
-  .profileName {
-    font-size: 1.8rem;
-  }
+
   .headerRow {
-    flex-direction: column;
-    align-items: stretch;
-    margin-bottom: 20px;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 14px !important;
+    gap: 8px !important;
   }
+
   .backBtn, .printBtn {
-    width: 100%;
-    justify-content: center;
+    width: auto !important;
+    padding: 6px 14px !important;
+    font-size: 0.78rem !important;
+    border-radius: 20px !important;
   }
+
+  .biodataCard {
+    padding: 16px 12px !important;
+    outline-offset: 3px !important;
+    border-radius: 12px !important;
+  }
+
+  .biodataHeader {
+    padding-bottom: 12px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .biodataTitle {
+    font-size: 1.3rem !important;
+    letter-spacing: 2px !important;
+  }
+
+  .biodataSlogan {
+    font-size: 0.85rem !important;
+  }
+
+  .profileName {
+    font-size: 1.35rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  .profileId {
+    font-size: 0.82rem !important;
+    margin-bottom: 8px !important;
+  }
+
+  .photoFrame {
+    max-width: 220px !important;
+    height: 240px !important;
+    margin: 0 auto 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .quickPills {
+    gap: 4px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .pill {
+    padding: 3px 8px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .tabsContainer {
+    border-radius: 30px !important;
+    padding: 4px !important;
+    gap: 2px !important;
+    margin-bottom: 14px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .tabButton {
+    padding: 6px 2px !important;
+    font-size: 0.72rem !important;
+    white-space: nowrap !important;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    justify-content: center !important;
+    text-align: center !important;
+    border-radius: 20px !important;
+    letter-spacing: 0 !important;
+  }
+
+  .tabIcon {
+    font-size: 0.75rem !important;
+  }
+
+  .tabTextFull {
+    display: none !important;
+  }
+
+  .tabTextShort {
+    display: inline !important;
+  }
+
+  .sectionRibbon {
+    font-size: 0.8rem !important;
+    padding: 8px 12px !important;
+    margin-top: 16px !important;
+    margin-bottom: 12px !important;
+    letter-spacing: 1.5px !important;
+  }
+
+  .detailsList {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .detailRow {
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .detailIconCircle {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.85rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .detailLabel {
+    font-size: 0.68rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .detailValue {
+    font-size: 0.82rem !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .requestAccessBadge {
+    font-size: 0.68rem !important;
+    padding: 4px 10px !important;
+    white-space: nowrap !important;
+    margin-top: 4px !important;
+  }
+
+  .premiumTextCard {
+    padding: 14px 12px !important;
+    gap: 12px !important;
+    border-radius: 10px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .premiumCardIcon {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.95rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .premiumCardText {
+    font-size: 0.92rem !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .ancestryGrid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .ancestryCard {
+    padding: 10px !important;
+    border-radius: 10px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .relGrid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .relCard {
+    padding: 8px !important;
+    border-radius: 10px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
   .floatingActions {
-    display: none; /* Hide floating actions on very small screens to avoid clutter */
+    display: none !important;
   }
+
+  .lightboxNavBtn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+  .lightboxPrev { left: -5px; }
+  .lightboxNext { right: -5px; }
   .lightboxClose {
     top: -40px;
     right: 10px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+  .detailsList {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .ancestryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .relGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
@@ -1511,10 +1699,12 @@
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.2rem;
   font-style: italic;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--text-dark);
   margin: 0;
   flex-grow: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* Contact Access Request Badge */

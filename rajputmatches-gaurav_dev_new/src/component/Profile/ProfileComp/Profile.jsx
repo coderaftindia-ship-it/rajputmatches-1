@@ -22,10 +22,16 @@ import { ProfileDetailsProvider } from "../../../context/ProfileDetailsContext";
 const Profile = () => {
   const location = useLocation();
 
+  const normalizeTab = (tab) => {
+    if (tab === "contact") return "contactRequest";
+    return tab;
+  };
+
   const getInitialTab = () => {
     const searchParams = new URLSearchParams(location.search);
     const queryTab = searchParams.get("tab") || searchParams.get("section");
-    return location.state?.section || location.state?.tab || queryTab || "myDetails";
+    const raw = location.state?.section || location.state?.tab || queryTab || "myDetails";
+    return normalizeTab(raw);
   };
 
   const [activeContent, setActiveContent] = useState(getInitialTab);
@@ -34,7 +40,7 @@ const Profile = () => {
     const searchParams = new URLSearchParams(location.search);
     const targetSection = location.state?.section || location.state?.tab || searchParams.get("tab") || searchParams.get("section");
     if (targetSection) {
-      setActiveContent(targetSection);
+      setActiveContent(normalizeTab(targetSection));
     }
   }, [location.state, location.search]);
 
@@ -55,6 +61,7 @@ const Profile = () => {
       case "documentRequest":
         return <DocumentRequest />;
       case "contactRequest":
+      case "contact":
         return <ContactRequest />;
       case "blocked":
         return <BlockedProfile />;

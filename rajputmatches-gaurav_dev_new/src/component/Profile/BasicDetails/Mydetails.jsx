@@ -137,6 +137,33 @@ function Mydetails() {
     }
   }, [user, isInitialized]);
 
+  const countWords = (str) => {
+    if (!str || !str.trim()) return 0;
+    return str.trim().split(/\s+/).filter(Boolean).length;
+  };
+
+  const handleAboutChange = (e) => {
+    const text = e.target.value;
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (words.length > 80 && text.length > aboutText.length) {
+      const truncated = words.slice(0, 80).join(" ");
+      setAboutText(truncated);
+    } else {
+      setAboutText(text);
+    }
+  };
+
+  const handlePrefChange = (e) => {
+    const text = e.target.value;
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (words.length > 80 && text.length > prefText.length) {
+      const truncated = words.slice(0, 80).join(" ");
+      setPrefText(truncated);
+    } else {
+      setPrefText(text);
+    }
+  };
+
   const saveAboutMe = async (text) => {
     const payload = {
       firstName: user?.firstName || "",
@@ -756,29 +783,6 @@ function Mydetails() {
               </div>
             </div>
 
-            <div className={styles.inlineTextAreaContainer} style={{ marginTop: "10px", width: "100%" }}>
-              <label style={{ fontSize: "0.72rem", fontWeight: "700", color: "var(--maroon, #59123b)", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "center", width: "100%", display: "block", marginBottom: "4px" }}>
-                About Me
-              </label>
-              <textarea
-                className={styles.inlineBioTextArea}
-                value={aboutText}
-                onChange={(e) => setAboutText(e.target.value)}
-                placeholder="Tell us about yourself..."
-                rows="5"
-                style={{ minHeight: "115px", fontSize: "0.88rem", lineHeight: "1.45", padding: "10px 12px" }}
-              />
-              {aboutText !== (user?.additionalInfo || "") && (
-                <button
-                  className={styles.inlineSaveBtn}
-                  onClick={() => saveAboutMe(aboutText)}
-                  style={{ marginTop: "6px" }}
-                >
-                  Save About Me
-                </button>
-              )}
-            </div>
-
           </div>
 
         </div>
@@ -805,9 +809,44 @@ function Mydetails() {
           </p>
         )}
 
-        {/* ── Partner Preferences & Family Boxes ── */}
+        {/* ── About Me, Partner Preferences & Family Boxes ── */}
         <div className={styles.prefFamilyBox}>
           
+          {/* About Me */}
+          <div className={styles.premiumInfoCard}>
+            <h4 className={styles.partnerPrefTitle}>
+              <span>About Me</span>
+            </h4>
+            <div className={styles.partnerPrefContent}>
+              <div className={styles.prefIconLeft}>
+                <FaUser />
+              </div>
+              <div className={styles.inlineTextAreaContainer} style={{ flexGrow: 1 }}>
+                <textarea
+                  className={styles.inlinePrefTextArea}
+                  value={aboutText}
+                  onChange={handleAboutChange}
+                  placeholder="Tell us about yourself (60 to 80 words recommended)..."
+                  rows="4"
+                  style={{ width: "100%", minHeight: "85px", fontSize: "0.88rem", lineHeight: "1.5" }}
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "6px", flexWrap: "wrap", gap: "6px" }}>
+                  <span style={{ fontSize: "0.75rem", fontWeight: "600", color: countWords(aboutText) >= 60 && countWords(aboutText) <= 80 ? "#166534" : countWords(aboutText) > 80 ? "#dc2626" : "var(--text-soft)" }}>
+                    Words: {countWords(aboutText)} / 80 max {countWords(aboutText) >= 60 && countWords(aboutText) <= 80 ? "✓ Ideal length (60-80 words)" : countWords(aboutText) > 80 ? "(80 words limit reached)" : "(Recommended: 60 - 80 words)"}
+                  </span>
+                  {aboutText !== (user?.additionalInfo || "") && (
+                    <button
+                      className={styles.inlineSaveBtn}
+                      onClick={() => saveAboutMe(aboutText)}
+                    >
+                      Save About Me
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Partner Preferences */}
           <div className={styles.premiumInfoCard}>
             <h4 className={styles.partnerPrefTitle}>
@@ -817,28 +856,34 @@ function Mydetails() {
               <div className={styles.prefIconLeft}>
                 <FaHeart />
               </div>
-              <div className={styles.inlineTextAreaContainer}>
+              <div className={styles.inlineTextAreaContainer} style={{ flexGrow: 1 }}>
                 <textarea
                   className={styles.inlinePrefTextArea}
                   value={prefText}
-                  onChange={(e) => setPrefText(e.target.value)}
-                  placeholder="Describe your ideal partner..."
+                  onChange={handlePrefChange}
+                  placeholder="Describe your ideal partner (60 to 80 words recommended)..."
                   rows="4"
+                  style={{ width: "100%", minHeight: "85px", fontSize: "0.88rem", lineHeight: "1.5" }}
                 />
-                {prefText !== (user?.partnerPreferences || "") && (
-                  <button
-                    className={styles.inlineSaveBtn}
-                    onClick={() => savePartnerPref(prefText)}
-                  >
-                    Save Preferences
-                  </button>
-                )}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "6px", flexWrap: "wrap", gap: "6px" }}>
+                  <span style={{ fontSize: "0.75rem", fontWeight: "600", color: countWords(prefText) >= 60 && countWords(prefText) <= 80 ? "#166534" : countWords(prefText) > 80 ? "#dc2626" : "var(--text-soft)" }}>
+                    Words: {countWords(prefText)} / 80 max {countWords(prefText) >= 60 && countWords(prefText) <= 80 ? "✓ Ideal length (60-80 words)" : countWords(prefText) > 80 ? "(80 words limit reached)" : "(Recommended: 60 - 80 words)"}
+                  </span>
+                  {prefText !== (user?.partnerPreferences || "") && (
+                    <button
+                      className={styles.inlineSaveBtn}
+                      onClick={() => savePartnerPref(prefText)}
+                    >
+                      Save Preferences
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Family Summary */}
-          <div className={styles.premiumInfoCard}>
+          {/* Family Summary - Full Width */}
+          <div className={styles.premiumInfoCard} style={{ gridColumn: "1 / -1", marginTop: "4px" }}>
             <h4 className={styles.partnerPrefTitle}>
               <span>Family Background</span>
               <div className={styles.inlineEditBtn} onClick={openFamilyEdit} title="Edit Family Details">
@@ -850,15 +895,23 @@ function Mydetails() {
                 <FaHome />
               </div>
               <div style={{ flexGrow: 1 }}>
-                <AncestryRow label="Father" value={family?.fatherName} />
-                <AncestryRow label="Father Occ." value={family?.occupation} />
-                <AncestryRow label="Father Native Place" value={family?.fatherNativePlace} />
-                <AncestryRow label="Mother" value={family?.motherName} />
-                <AncestryRow label="Mother Occ." value={family?.motherOccupation} />
-                <AncestryRow label="Mother Native Place" value={family?.motherNativePlace} />
-                <AncestryRow label="Maternal Gotra" value={family?.maternalGotra} />
-                <AncestryRow label="Family Thikana" value={family?.familyLocation} />
-                <AncestryRow label="Family Info" value={family?.familyInfo} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "6px 24px" }}>
+                  <div>
+                    <AncestryRow label="Father" value={family?.fatherName} />
+                    <AncestryRow label="Father Occ." value={family?.occupation} />
+                    <AncestryRow label="Father Native Place" value={family?.fatherNativePlace} />
+                  </div>
+                  <div>
+                    <AncestryRow label="Mother" value={family?.motherName} />
+                    <AncestryRow label="Mother Occ." value={family?.motherOccupation} />
+                    <AncestryRow label="Mother Native Place" value={family?.motherNativePlace} />
+                  </div>
+                  <div>
+                    <AncestryRow label="Maternal Gotra" value={family?.maternalGotra} />
+                    <AncestryRow label="Family Thikana" value={family?.familyLocation} />
+                    <AncestryRow label="Family Info" value={family?.familyInfo} />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

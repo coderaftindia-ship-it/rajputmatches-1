@@ -210,7 +210,8 @@ export default function ContactRequest() {
             <tbody>
               {paged.map((req, idx) => {
                 const user   = req.userId;
-                const status = req.status;
+                const status = req.status || "pending";
+                const badge  = STATUS_BADGE[status] || STATUS_BADGE.pending;
                 const defaultAvatar = user?.gender === "Female" ? femaleDefault : maleDefault;
                 const photo  = user?.filesId?.photos?.[0]?.url || defaultAvatar;
                 const age    = user?.dateOfBirth ? calculateAge(user.dateOfBirth) : null;

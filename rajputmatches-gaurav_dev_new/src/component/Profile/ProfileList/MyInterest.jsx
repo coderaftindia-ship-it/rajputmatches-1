@@ -298,7 +298,7 @@ function MyInterest() {
   return (
     <div className="profileContainer">
       <div className="profileListHeader">
-        <div className="pagetitle">My Interests</div>
+        <div className="pagetitle">Request Manager</div>
         {/* <div className="filters">
           {["age", "height"].map((criteria) => (
             <div

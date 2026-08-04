@@ -594,14 +594,14 @@ const ViewPage = () => {
                 className={styles.backBtn}
                 onClick={handleGoBack}
               >
-                <FaArrowLeft /> Back to Profiles
+                <FaArrowLeft /> Back
               </button>
-              <div style={{ display: "flex", gap: "10px" }}>
+              <div style={{ display: "flex", gap: "8px" }}>
                 <button className={styles.backBtn} onClick={copyProfileLink}>
-                  <FaCopy /> Share Profile
+                  <FaCopy /> Share
                 </button>
                 <button className={styles.printBtn} onClick={() => window.print()}>
-                  <FaPrint /> Print Biodata
+                  <FaPrint /> Print
                 </button>
               </div>
             </div>
@@ -619,7 +619,7 @@ const ViewPage = () => {
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
                   />
                 )}
-                <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "6px" }}>
                   <FaInfoCircle className={styles.tabIcon} /> Summary
                 </span>
               </button>
@@ -634,8 +634,10 @@ const ViewPage = () => {
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
                   />
                 )}
-                <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "8px" }}>
-                  <FaSun className={styles.tabIcon} /> Kundali &amp; Astro
+                <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "6px" }}>
+                  <FaSun className={styles.tabIcon} />
+                  <span className={styles.tabTextFull}>Kundali &amp; Astro</span>
+                  <span className={styles.tabTextShort}>Kundali</span>
                 </span>
               </button>
               <button
@@ -649,8 +651,10 @@ const ViewPage = () => {
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
                   />
                 )}
-                <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "8px" }}>
-                  <FaUsers className={styles.tabIcon} /> Family &amp; Ancestry
+                <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "6px" }}>
+                  <FaUsers className={styles.tabIcon} />
+                  <span className={styles.tabTextFull}>Family &amp; Ancestry</span>
+                  <span className={styles.tabTextShort}>Family</span>
                 </span>
               </button>
               <button
@@ -664,8 +668,10 @@ const ViewPage = () => {
                     transition={{ type: "spring", stiffness: 350, damping: 28 }}
                   />
                 )}
-                <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "8px" }}>
-                  <FaFileAlt className={styles.tabIcon} /> Verification Docs
+                <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "6px" }}>
+                  <FaFileAlt className={styles.tabIcon} />
+                  <span className={styles.tabTextFull}>Verification Docs</span>
+                  <span className={styles.tabTextShort}>Docs</span>
                 </span>
               </button>
             </div>
