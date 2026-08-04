@@ -19,26 +19,51 @@ const Navbar = ({ forceSolid = false }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [msgCount, setMsgCount] = useState(0);
 
-  useEffect(() => {
+  const fetchChatCount = async () => {
     if (!isAuthenticated) return;
-    let isMounted = true;
-    const fetchChatCount = async () => {
-      try {
-        const chats = await chatApi.listChats();
-        if (isMounted && Array.isArray(chats)) {
-          setMsgCount(chats.length);
-        }
-      } catch (e) {
-        console.error("Error fetching navbar message count:", e);
+    try {
+      const chats = await chatApi.listChats();
+      if (Array.isArray(chats)) {
+        const currentUserId = userData?._id || profile?._id || "";
+        const unreadCount = chats.reduce((acc, chat) => {
+          if (!chat?.lastMessage) return acc;
+          const senderId = typeof chat.lastMessage.sender === "object"
+            ? chat.lastMessage.sender?._id
+            : chat.lastMessage.sender;
+          
+          const isFromOther = senderId && currentUserId 
+            ? senderId.toString() !== currentUserId.toString() 
+            : true;
+            
+          const isUnread = (chat.unreadCount > 0) ||
+            chat.isUnread ||
+            chat.lastMessage.isRead === false ||
+            chat.lastMessage.seen === false ||
+            (Array.isArray(chat.lastMessage.seenBy) && currentUserId && !chat.lastMessage.seenBy.includes(currentUserId));
+            
+          return isFromOther && isUnread ? acc + 1 : acc;
+        }, 0);
+        setMsgCount(unreadCount);
       }
-    };
+    } catch (e) {
+      console.error("Error fetching navbar message count:", e);
+    }
+  };
+
+  useEffect(() => {
     fetchChatCount();
-    const interval = setInterval(fetchChatCount, 15000);
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
+    const interval = setInterval(fetchChatCount, 10000);
+    const handleChatRead = () => {
+      fetchChatCount();
     };
-  }, [isAuthenticated]);
+    window.addEventListener("chatRead", handleChatRead);
+    window.addEventListener("newMessage", handleChatRead);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("chatRead", handleChatRead);
+      window.removeEventListener("newMessage", handleChatRead);
+    };
+  }, [isAuthenticated, userData, profile]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -154,21 +179,23 @@ const Navbar = ({ forceSolid = false }) => {
               </Link>
               <Link to="/message" className="d-flex align-items-center gap-1" style={{ color: "var(--royal-maroon)", textDecoration: "none", fontWeight: "600", fontSize: "0.9rem", whiteSpace: "nowrap", flexShrink: 0, padding: "4px 8px" }}>
                 <FaCommentDots size={17} /> Messages
-                <span
-                  style={{
-                    background: "var(--royal-maroon, #59123B)",
-                    color: "#ffffff",
-                    fontSize: "0.68rem",
-                    fontWeight: 700,
-                    padding: "1px 6px",
-                    borderRadius: "10px",
-                    marginLeft: "2px",
-                    lineHeight: "1.2",
-                    boxShadow: "0 2px 4px rgba(89,18,59,0.2)"
-                  }}
-                >
-                  {msgCount}
-                </span>
+                {msgCount > 0 && (
+                  <span
+                    style={{
+                      background: "var(--royal-maroon, #59123B)",
+                      color: "#ffffff",
+                      fontSize: "0.68rem",
+                      fontWeight: 700,
+                      padding: "1px 6px",
+                      borderRadius: "10px",
+                      marginLeft: "2px",
+                      lineHeight: "1.2",
+                      boxShadow: "0 2px 4px rgba(89,18,59,0.2)"
+                    }}
+                  >
+                    {msgCount}
+                  </span>
+                )}
               </Link>
               
               <div className="position-relative" style={{ flexShrink: 0 }}>
@@ -311,9 +338,11 @@ const Navbar = ({ forceSolid = false }) => {
               </Link>
               <Link to="/message" className={`drawer-link d-flex align-items-center justify-content-between ${isActive("/message") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
                 <span>Messages</span>
-                <span className="badge rounded-pill bg-danger" style={{ fontSize: "0.7rem" }}>
-                  {msgCount}
-                </span>
+                {msgCount > 0 && (
+                  <span className="badge rounded-pill bg-danger" style={{ fontSize: "0.7rem" }}>
+                    {msgCount}
+                  </span>
+                )}
               </Link>
               <Link to="/profile" className={`drawer-link ${isActive("/profile") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
                 My Profile

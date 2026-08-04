@@ -139,6 +139,22 @@ const ChatApp = () => {
     try {
       const msgs = await chatApi.getMessages(chatId);
       setMessages(Array.isArray(msgs) ? msgs : []);
+      setChats((prevChats) =>
+        prevChats.map((c) => {
+          if (c._id === chatId) {
+            return {
+              ...c,
+              unreadCount: 0,
+              isUnread: false,
+              lastMessage: c.lastMessage
+                ? { ...c.lastMessage, seen: true, isRead: true }
+                : c.lastMessage,
+            };
+          }
+          return c;
+        })
+      );
+      window.dispatchEvent(new Event("chatRead"));
     } catch { 
       setMessages([]); 
     } finally {
@@ -340,18 +356,33 @@ const ChatApp = () => {
         <div className="chat-container">
 
           {/* ── SIDEBAR ─────────────────────────────────────── */}
-          {(!isMobile || !activeChat) && (
-            <aside className="chat-sidebar">
-              {/* Header */}
-              <div className="chat-sidebar-header">
-                <h2 className="chat-sidebar-title">
-                  <FaCommentDots style={{ marginRight: 8, opacity: 0.85 }} />
-                  Messages
-                </h2>
-                {chats.length > 0 && (
-                  <span className="chat-sidebar-badge">{chats.length}</span>
-                )}
-              </div>
+          {(!isMobile || !activeChat) && (() => {
+            const unreadChatsCount = chats.reduce((acc, chat) => {
+              if (!chat?.lastMessage) return acc;
+              const senderId = typeof chat.lastMessage.sender === "object"
+                ? chat.lastMessage.sender?._id
+                : chat.lastMessage.sender;
+              const isFromOther = senderId && userId ? senderId.toString() !== userId.toString() : true;
+              const isUnread = (chat.unreadCount > 0) ||
+                chat.isUnread ||
+                chat.lastMessage.isRead === false ||
+                chat.lastMessage.seen === false ||
+                (Array.isArray(chat.lastMessage.seenBy) && userId && !chat.lastMessage.seenBy.includes(userId));
+              return isFromOther && isUnread ? acc + 1 : acc;
+            }, 0);
+
+            return (
+              <aside className="chat-sidebar">
+                {/* Header */}
+                <div className="chat-sidebar-header">
+                  <h2 className="chat-sidebar-title">
+                    <FaCommentDots style={{ marginRight: 8, opacity: 0.85 }} />
+                    Messages
+                  </h2>
+                  {unreadChatsCount > 0 && (
+                    <span className="chat-sidebar-badge">{unreadChatsCount}</span>
+                  )}
+                </div>
 
               {/* Search */}
               <div className="chat-search-box">
@@ -419,7 +450,8 @@ const ChatApp = () => {
                 )}
               </div>
             </aside>
-          )}
+            );
+          })()}
 
           {/* ── MAIN CHAT ────────────────────────────────────── */}
           {(!isMobile || activeChat) && (
