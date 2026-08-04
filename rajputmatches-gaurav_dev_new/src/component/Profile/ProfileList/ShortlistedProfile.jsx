@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import "./ShortListedProfile.css";
 import ProfileCard from "./ProfileCard";
-import placeholderImage from "../../../assets/images/blurimage.png";
+import femaleDefault from "../../../assets/images/female_default.png";
+import maleDefault from "../../../assets/images/male_default.png";
 import { useAuth } from "../../Layout/AuthContext";
 
 export function RequestImageContainer({ profile }) {
   const isPrivate = profile?.filesId?.isPrivate && profile?.photoRequestStatus !== "accepted";
   const photos = profile?.filesId?.photos || [];
+  const defaultAvatar = profile?.gender === "Female" ? femaleDefault : maleDefault;
+
   if (isPrivate || photos.length === 0) {
     return (
       <div className="image-container">
-        <img src={placeholderImage} alt="profile" className="profileImage" />
+        <img src={defaultAvatar} alt="profile" className="profileImage" />
       </div>
     );
   }
@@ -20,7 +23,7 @@ export function RequestImageContainer({ profile }) {
       {photos.map((photo, index) => (
         <img
           key={photo?._id || index}
-          src={photo?.url || placeholderImage}
+          src={photo?.url || defaultAvatar}
           className="profileImage"
           alt="Profile"
         />

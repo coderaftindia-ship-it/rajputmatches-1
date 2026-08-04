@@ -383,7 +383,7 @@ function RecentAddedPage() {
                   className="d-flex flex-nowrap"
                   style={{
                     width: `${(profiles.length / visibleCards) * 100}%`,
-                    transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
+                    transform: `translateX(-${currentIndex * (100 / profiles.length)}%)`,
                     transition: "transform 0.5s ease-in-out",
                     willChange: "transform"
                   }}
@@ -424,7 +424,8 @@ function RecentAddedPage() {
                 <div className="d-flex gap-2">
                   {Array.from({ length: Math.ceil(profiles.length / visibleCards) }).map((_, pageIdx) => {
                     const targetIdx = Math.min(pageIdx * visibleCards, maxIndex);
-                    const isActive = currentIndex >= pageIdx * visibleCards && currentIndex < (pageIdx + 1) * visibleCards;
+                    const pageCount = Math.ceil(profiles.length / visibleCards);
+                    const isActive  = Math.min(Math.round(currentIndex / visibleCards), pageCount - 1) === pageIdx;
                     return (
                       <div
                         key={pageIdx}

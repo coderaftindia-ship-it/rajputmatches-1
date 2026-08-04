@@ -11,7 +11,8 @@ import {
 import { IoImageSharp } from "react-icons/io5";
 import { useAuth } from "../../Layout/AuthContext";
 import styles from "./RequestCard.module.css";
-import placeholderImage from "../../../assets/images/blurimage.png";
+import femaleDefault from "../../../assets/images/female_default.png";
+import maleDefault from "../../../assets/images/male_default.png";
 import { useParams, useNavigate } from "react-router-dom";
 function PhotoRequest() {
   const [activeTab, setActiveTab] = useState("requestSent");
@@ -79,16 +80,19 @@ function PhotoRequest() {
       }
     };
 
+    const defaultImg = profile?.gender === "Female" ? femaleDefault : maleDefault;
+
     const renderEmptyState = (actionButtons = null) => (
-      <div className="image-container" style={{ position: "relative", width: "230px", height: "230px" }}>
+      <div className="image-container" style={{ position: "relative", width: "100%", height: "175px", display: "flex", alignItems: "center", justifyContent: "center", padding: "6px", backgroundColor: "#fdf8f4", borderRadius: "8px", overflow: "hidden" }}>
         <img
-          src={placeholderImage}
-          className="img-fluid m-auto"
+          src={defaultImg}
+          className="img-fluid"
           alt="Placeholder"
           style={{
-            width: "230px",
-            height: "230px",
-            objectFit: "cover",
+            maxWidth: "100%",
+            maxHeight: "100%",
+            objectFit: "contain",
+            objectPosition: "center",
           }}
         />
 
@@ -199,12 +203,12 @@ function PhotoRequest() {
     const avatar = photos.find((p) => p?.isAvatar) || photos[0];
 
     return (
-      <div className="image-container" style={{ position: "relative", width: "230px", height: "230px" }}>
+      <div className="image-container" style={{ position: "relative", width: "100%", height: "175px", display: "flex", alignItems: "center", justifyContent: "center", padding: "4px", backgroundColor: "#fdf8f4", borderRadius: "8px", overflow: "hidden" }}>
         <img
           src={avatar?.url}
-          className="img-fluid m-auto"
+          className="img-fluid"
           alt="Profile"
-          style={{ width: "230px", height: "230px", objectFit: "cover" }}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", borderRadius: "6px" }}
         />
         <span
           style={{

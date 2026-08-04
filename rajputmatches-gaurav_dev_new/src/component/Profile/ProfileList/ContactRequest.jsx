@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Layout/AuthContext";
 import { calculateAge } from "../ProfileComp/ProfileInfoHeader";
-import pro from "../../../assets/images/blurimage.png";
+import femaleDefault from "../../../assets/images/female_default.png";
+import maleDefault from "../../../assets/images/male_default.png";
 import {
   FaPhone, FaEnvelope, FaCheck, FaTimes, FaUserCircle,
   FaMapMarkerAlt, FaHeart, FaUndoAlt, FaClock, FaCheckCircle,
@@ -210,8 +211,8 @@ export default function ContactRequest() {
               {paged.map((req, idx) => {
                 const user   = req.userId;
                 const status = req.status;
-                const badge  = STATUS_BADGE[status] || STATUS_BADGE.pending;
-                const photo  = user?.filesId?.photos?.[0]?.url || pro;
+                const defaultAvatar = user?.gender === "Female" ? femaleDefault : maleDefault;
+                const photo  = user?.filesId?.photos?.[0]?.url || defaultAvatar;
                 const age    = user?.dateOfBirth ? calculateAge(user.dateOfBirth) : null;
                 const isEven = idx % 2 === 0;
 
@@ -242,7 +243,7 @@ export default function ContactRequest() {
                           src={photo}
                           alt={user?.firstName || "Profile"}
                           style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                          onError={e => { e.target.src = pro; }}
+                          onError={e => { e.target.src = defaultAvatar; }}
                         />
                       </div>
                     </td>

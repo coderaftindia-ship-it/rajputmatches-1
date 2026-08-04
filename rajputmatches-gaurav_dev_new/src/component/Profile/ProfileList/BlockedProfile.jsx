@@ -49,10 +49,11 @@ const BlockedProfile = () => {
   }, []);
 
   const getProfileImage = (prof) => {
-    if (!prof) return placeholderImage;
+    const defaultAvatar = prof?.gender === "Female" ? femaleDefault : maleDefault;
+    if (!prof) return defaultAvatar;
     if (prof.filesId) {
       if (prof.filesId.isPrivate) {
-        return placeholderImage;
+        return defaultAvatar;
       }
       if (prof.filesId.photos && prof.filesId.photos.length > 0) {
         return prof.filesId.photos[0].url;
@@ -64,7 +65,7 @@ const BlockedProfile = () => {
       url.includes("user-icon-flat-isolated") || 
       url.includes("istockphoto.com");
     if (!isDefault) return url;
-    return prof.gender === "Female" ? femaleDefault : maleDefault;
+    return defaultAvatar;
   };
 
   if (loading) {

@@ -201,7 +201,8 @@ function Mydetails() {
       maritalStatus: (user?.maritalStatus === "Single") ? "Never Married" : (user?.maritalStatus || ""),
       clan: horoscope?.clan || user?.lastName || user?.subclan || "",
       subclan: horoscope?.subclan || user?.lastName || "",
-      currentCity: user?.city || user?.currentCity || "",
+      currentCity: user?.city || user?.currentCity || user?.address?.city || "",
+      state: user?.state || user?.address?.state || "",
       nativePlace: user?.nativePlace || horoscope?.birthplace || "",
       birthplace: horoscope?.birthplace || "",
       birthTime: horoscope?.birthHour && horoscope?.birthMinute
@@ -485,6 +486,8 @@ function Mydetails() {
         height: heightObj,
         weight: weightNum,
         city: basicFormData.currentCity,
+        currentCity: basicFormData.currentCity,
+        state: basicFormData.state,
         class: basicFormData.class,
       };
 
@@ -651,7 +654,8 @@ function Mydetails() {
             </SectionRibbon>
             
             <div className={styles.detailsList}>
-              <DetailRow icon={<FaMapMarkerAlt />} label="Current City" value={user?.city || user?.currentCity || "N/A"} />
+              <DetailRow icon={<FaMapMarkerAlt />} label="Current City" value={user?.city || user?.currentCity || user?.address?.city || "N/A"} />
+              <DetailRow icon={<FaMapMarkerAlt />} label="State" value={user?.state || user?.address?.state || "N/A"} />
               <DetailRow icon={<FaHome />} label="Native Place" value={user?.nativePlace || horoscope?.birthplace || "N/A"} />
               <DetailRow icon={<FaCalendarAlt />} label="Date of Birth" value={formatDob(user?.dateOfBirth)} />
               <DetailRow icon={<FaMapMarkerAlt />} label="Place of Birth" value={horoscope?.birthplace || "N/A"} />
@@ -664,6 +668,16 @@ function Mydetails() {
               <DetailRow icon={<FaSun />} label="Manglik" value={horoscope?.maglik || horoscope?.manglik || "N/A"} />
               <DetailRow icon={<FaHeart />} label="Marital Status" value={user?.maritalStatus || "N/A"} />
               <DetailRow icon={<FaUserTie />} label="Class" value={user?.class || professional?.class || horoscope?.class || "N/A"} />
+            </div>
+
+            {/* CONTACT INFORMATION SECTION */}
+            <SectionRibbon onEditClick={openBasicEdit} editTitle="Edit Contact Information">
+              Contact Information
+            </SectionRibbon>
+
+            <div className={styles.detailsList}>
+              <DetailRow icon={<FaPhoneAlt />} label="Mobile Number" value={user?.mobile ? `${user?.countryCode || "+91"} ${user.mobile}` : "N/A"} />
+              <DetailRow icon={<FaEnvelope />} label="Email Address" value={user?.email || "N/A"} />
             </div>
 
             {/* EDUCATION SECTION */}
@@ -742,8 +756,8 @@ function Mydetails() {
               </div>
             </div>
 
-            <div className={styles.inlineTextAreaContainer} style={{ marginTop: "6px" }}>
-              <label style={{ fontSize: "0.65rem", fontWeight: "700", color: "var(--text-soft)", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "center", width: "100%", display: "block", marginBottom: "2px" }}>
+            <div className={styles.inlineTextAreaContainer} style={{ marginTop: "10px", width: "100%" }}>
+              <label style={{ fontSize: "0.72rem", fontWeight: "700", color: "var(--maroon, #59123b)", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "center", width: "100%", display: "block", marginBottom: "4px" }}>
                 About Me
               </label>
               <textarea
@@ -751,12 +765,14 @@ function Mydetails() {
                 value={aboutText}
                 onChange={(e) => setAboutText(e.target.value)}
                 placeholder="Tell us about yourself..."
-                rows="2"
+                rows="5"
+                style={{ minHeight: "115px", fontSize: "0.88rem", lineHeight: "1.45", padding: "10px 12px" }}
               />
               {aboutText !== (user?.additionalInfo || "") && (
                 <button
                   className={styles.inlineSaveBtn}
                   onClick={() => saveAboutMe(aboutText)}
+                  style={{ marginTop: "6px" }}
                 >
                   Save About Me
                 </button>

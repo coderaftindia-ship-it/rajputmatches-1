@@ -8,7 +8,8 @@ import {
   FaChevronUp,
 } from "react-icons/fa";
 import { useAuth } from "../../Layout/AuthContext";
-import placeholderImage from "../../../assets/images/blurimage.png";
+import femaleDefault from "../../../assets/images/female_default.png";
+import maleDefault from "../../../assets/images/male_default.png";
 import styles from "./RequestCard.module.css";
 
 export function RequestImageContainer({ profile }) {
@@ -25,6 +26,7 @@ export function RequestImageContainer({ profile }) {
 
   const isPrivate = profile?.filesId?.isPrivate && profile?.photoRequestStatus !== "accepted";
   const photos = profile?.filesId?.photos || [];
+  const defaultAvatar = profile?.gender === "Female" ? femaleDefault : maleDefault;
 
   if (isPrivate || photos.length === 0) {
     return (
@@ -33,7 +35,7 @@ export function RequestImageContainer({ profile }) {
         style={{ position: "relative", width: "100%", height: "14rem" }}
       >
         <img
-          src={placeholderImage}
+          src={defaultAvatar}
           className="img-fluid m-auto"
           alt="Placeholder"
           style={{

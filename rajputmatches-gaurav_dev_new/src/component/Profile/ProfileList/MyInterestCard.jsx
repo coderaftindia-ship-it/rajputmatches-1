@@ -45,40 +45,27 @@ const MyInterestCard = ({
       { label: "Clan", value: profile?.HoroscopicId?.clan },
       {
         label: "Age",
-        value: `${calculateAge(profile?.dateOfBirth)} years old`,
+        value: profile?.dateOfBirth ? `${calculateAge(profile.dateOfBirth)} Years` : "N/A",
       },
       {
         label: "Location",
-        value: `${profile?.address?.city}, ${profile?.address?.state}`,
+        value: profile?.address?.city 
+          ? profile.address.city
+          : (profile?.city || profile?.currentCity || "N/A"),
       },
       {
-        label: "High. Education",
+        label: "Education",
         value: profile?.profdetailsId?.qualifications,
       },
       { label: "Occupation", value: profile?.familydetailsId?.occupation },
-      { label: "Class", value: profile?.profdetailsId?.class },
     ];
 
     return details.map(({ label, value }, index) => (
-      <div key={index} className={`card-text m-1 d-flex ${styles.textSm}`}>
-        <span
-          className="text-secondary w-50"
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {label}
+      <div key={index} className="d-flex justify-content-between my-1" style={{ fontSize: "0.85rem" }}>
+        <span className="text-secondary" style={{ minWidth: "80px" }}>
+          {label}:
         </span>
-        <span
-          className="w-50 fw-bold text-black"
-          style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
+        <span className="fw-bold text-dark text-end" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {value || "N/A"}
         </span>
       </div>
@@ -90,17 +77,17 @@ const MyInterestCard = ({
       className="col-12 col-lg-6 mb-3 p-1 p-md-2"
       style={{ boxSizing: "border-box" }}
     >
-      <div className="card shadow-sm border-0 rounded-3 overflow-hidden d-flex flex-column h-100" style={{ minHeight: "285px", border: "1px solid rgba(212, 175, 55, 0.15)" }}>
+      <div className="card shadow-sm border-0 rounded-3 overflow-hidden d-flex flex-column h-100" style={{ minHeight: "285px", border: "1px solid rgba(212, 175, 55, 0.2)" }}>
         <div
-          className="row g-0 p-2 bg-white flex-grow-1"
+          className="row g-0 p-2 bg-white flex-grow-1 align-items-center"
           style={{
             borderBottom: "1px solid rgba(0,0,0,0.08)",
             boxSizing: "border-box",
           }}
         >
           <div
-            className="col-5 col-md-5 d-flex align-items-center justify-content-center"
-            style={{ maxWidth: "230px" }}
+            className="col-5 col-sm-5 d-flex align-items-center justify-content-center overflow-hidden p-0"
+            style={{ height: "100%", minHeight: "175px" }}
           >
             {profile && (
               <ProfileImagerender
@@ -111,11 +98,11 @@ const MyInterestCard = ({
             )}
           </div>
 
-          <div className="col-7 col-md-7">
-            <div className="card-body p-2 p-md-1">
-              <div className="d-flex align-items-center justify-content-start mb-2">
-                <span className={`${styles.textLg}`}>
-                  Matri ID: {profile.martrId}
+          <div className="col-7 col-sm-7 ps-2 ps-md-3">
+            <div className="card-body p-1">
+              <div className="d-flex align-items-center justify-content-between mb-2 pb-1" style={{ borderBottom: "1px dashed rgba(212, 175, 55, 0.4)" }}>
+                <span className="fw-bold fs-5" style={{ color: "var(--royal-maroon-dark, #59123b)", fontFamily: "serif" }}>
+                  ID: {profile?.martrId || profile?.matrimonialid || "N/A"}
                 </span>
                 <StatusTag text={status} />
               </div>

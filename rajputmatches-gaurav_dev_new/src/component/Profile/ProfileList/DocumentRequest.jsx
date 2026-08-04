@@ -3,7 +3,8 @@ import "./ShortListedProfile.css";
 import { FaChevronLeft, FaChevronRight, FaFileAlt } from "react-icons/fa";
 import { useAuth } from "../../Layout/AuthContext";
 import styles from "./RequestCard.module.css";
-import placeholderImage from "../../../assets/images/blurimage.png";
+import femaleDefault from "../../../assets/images/female_default.png";
+import maleDefault from "../../../assets/images/male_default.png";
 import { useNavigate } from "react-router-dom";
 import RequestCard from "./RequestCard";
 
@@ -103,17 +104,23 @@ function DocumentRequest() {
 
     const photos = profile?.filesId?.photos || [];
     const avatar = photos.find((p) => p?.isAvatar) || photos[0];
+    const defaultAvatar = profile?.gender === "Female" ? femaleDefault : maleDefault;
 
     const renderPlaceholderWithActions = (actionButtons = null) => (
       <div
         className="image-container"
-        style={{ position: "relative", width: "230px", height: "230px" }}
+        style={{ position: "relative", width: "100%", height: "175px", display: "flex", alignItems: "center", justifyContent: "center", padding: "6px", backgroundColor: "#fdf8f4", borderRadius: "8px", overflow: "hidden" }}
       >
         <img
-          src={avatar?.url || placeholderImage}
-          className="img-fluid m-auto"
+          src={avatar?.url || defaultAvatar}
+          className="img-fluid"
           alt="Profile"
-          style={{ width: "230px", height: "230px", objectFit: "cover" }}
+          style={{
+            maxWidth: "100%",
+            maxHeight: "100%",
+            objectFit: avatar?.url ? "cover" : "contain",
+            objectPosition: "center",
+          }}
         />
         {actionButtons && (
           <div

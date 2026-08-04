@@ -123,9 +123,9 @@ function FormCard({
             </div>
           </div>
 
-          {/* ROW 2: CURRENT CITY & NATIVE PLACE */}
+          {/* ROW 2: CURRENT CITY, STATE & NATIVE PLACE */}
           <div className="row g-1.5 mb-1.5">
-            <div className="col-6">
+            <div className="col-md-4 col-6">
               <label>CURRENT CITY</label>
               <input
                 type="text"
@@ -135,7 +135,17 @@ function FormCard({
                 onChange={handleInputChange}
               />
             </div>
-            <div className="col-6">
+            <div className="col-md-4 col-6">
+              <label>STATE</label>
+              <input
+                type="text"
+                name="state"
+                placeholder="State"
+                value={formData.state || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="col-md-4 col-12 mt-md-0 mt-1">
               <label>NATIVE PLACE (THIKANA)</label>
               <input
                 type="text"
@@ -268,7 +278,7 @@ function FormCard({
           </div>
 
           {/* ROW 7: MARITAL STATUS & CLASS */}
-          <div className="row g-1.5 mb-2">
+          <div className="row g-1.5 mb-1.5">
             <div className="col-6">
               <label>MARITAL STATUS</label>
               <select
@@ -299,6 +309,30 @@ function FormCard({
                   </option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          {/* ROW 8: CONTACT DETAILS (MOBILE & EMAIL) */}
+          <div className="row g-1.5 mb-2">
+            <div className="col-6">
+              <label>MOBILE NUMBER</label>
+              <input
+                type="text"
+                name="mobile"
+                placeholder="Mobile Number"
+                value={formData.mobile || ""}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="col-6">
+              <label>EMAIL ADDRESS</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email || ""}
+                onChange={handleInputChange}
+              />
             </div>
           </div>
 
