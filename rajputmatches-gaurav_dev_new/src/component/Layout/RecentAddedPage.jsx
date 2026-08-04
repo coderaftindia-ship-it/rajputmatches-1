@@ -307,8 +307,8 @@ function RecentAddedPage() {
   }
 
   return (
-    <div className="py-5" style={{ backgroundColor: "var(--royal-cream-dark)", position: "relative" }}>
-      <div className="py-4" style={{ overflow: "hidden" }}>
+    <div className="py-3 py-md-5" style={{ backgroundColor: "var(--royal-cream-dark)", position: "relative" }}>
+      <div className="py-2 py-md-4" style={{ overflow: "hidden" }}>
 
         {/* Section heading */}
         <div className="text-center mb-4 mb-md-5 px-3">

@@ -293,6 +293,12 @@
 }
 
 @media (max-width: 768px) {
+  .hc-section {
+    padding: 30px 16px 40px;
+  }
+  .hc-header {
+    margin-bottom: 24px;
+  }
   .hc-slider-wrap {
     position: relative;
     padding: 0 50px; /* Space for absolute navigation arrows */
@@ -320,7 +326,10 @@
 
 @media (max-width: 576px) {
   .hc-section {
-    padding: 60px 16px 60px;
+    padding: 24px 16px 30px;
+  }
+  .hc-header {
+    margin-bottom: 20px;
   }
   .hc-stats {
     gap: 12px;

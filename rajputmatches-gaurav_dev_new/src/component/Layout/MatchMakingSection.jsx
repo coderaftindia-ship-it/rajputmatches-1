@@ -38,7 +38,7 @@ const MatchmakingSection = () => {
 
   return (
     <div
-      className="py-5 position-relative overflow-hidden"
+      className="py-3 py-md-5 position-relative overflow-hidden matchmaking-section"
       style={{
         backgroundColor: "var(--royal-cream)",
         backgroundImage: `
@@ -67,13 +67,13 @@ const MatchmakingSection = () => {
         </div>
       </div>
 
-      <div className="container py-4 position-relative" style={{ zIndex: 2 }}>
-        <div className="row align-items-center g-5">
+      <div className="container py-2 py-md-4 position-relative" style={{ zIndex: 2 }}>
+        <div className="row align-items-center g-3 g-md-5">
           {/* Left Column: Premium Jharokha Framed Image */}
-          <div className="col-12 col-lg-6 mb-5 mb-lg-0 d-flex justify-content-center">
+          <div className="col-12 col-lg-6 mb-3 mb-lg-0 d-flex justify-content-center">
             {/* The Royal Jharokha Palace Frame */}
             <div
-              className="position-relative"
+              className="position-relative matchmaking-jharokha-frame"
               style={{
                 width: "100%",
                 maxWidth: "440px",
@@ -105,7 +105,7 @@ const MatchmakingSection = () => {
 
               {/* Jharokha Arch Window Body */}
               <div
-                className="position-relative w-100 overflow-hidden"
+                className="position-relative w-100 overflow-hidden matchmaking-jharokha-arch"
                 style={{
                   borderRadius: "185px 185px 16px 16px",
                   border: "6px double var(--royal-gold)",
@@ -116,10 +116,9 @@ const MatchmakingSection = () => {
                 <img
                   src={matchImg}
                   alt="Royal Rajput Matchmaking"
-                  className="img-fluid w-100"
+                  className="img-fluid w-100 matchmaking-img"
                   style={{
                     objectFit: "cover",
-                    minHeight: "450px",
                     borderRadius: "175px 175px 10px 10px",
                     transition: "transform 0.8s ease",
                     filter: "brightness(0.97) contrast(1.03)"
@@ -129,10 +128,10 @@ const MatchmakingSection = () => {
                 />
 
                 {/* Traditional Rajput Gold Corners */}
-                <div style={{ position: "absolute", top: "180px", left: "15px", width: "16px", height: "16px", borderLeft: "2px solid var(--royal-gold)", borderTop: "2px solid var(--royal-gold)" }}></div>
-                <div style={{ position: "absolute", top: "180px", right: "15px", width: "16px", height: "16px", borderRight: "2px solid var(--royal-gold)", borderTop: "2px solid var(--royal-gold)" }}></div>
-                <div style={{ position: "absolute", bottom: "15px", left: "15px", width: "16px", height: "16px", borderLeft: "2px solid var(--royal-gold)", borderBottom: "2px solid var(--royal-gold)" }}></div>
-                <div style={{ position: "absolute", bottom: "15px", right: "15px", width: "16px", height: "16px", borderRight: "2px solid var(--royal-gold)", borderBottom: "2px solid var(--royal-gold)" }}></div>
+                <div className="matchmaking-corner-tl"></div>
+                <div className="matchmaking-corner-tr"></div>
+                <div className="matchmaking-corner-bl"></div>
+                <div className="matchmaking-corner-br"></div>
               </div>
 
               {/* Lower frame Cultural Accent Info */}
@@ -147,15 +146,15 @@ const MatchmakingSection = () => {
           {/* Right Column: Heritage Text & Luxury UX Content */}
           <div className="col-12 col-lg-6 text-center text-lg-start px-lg-5">
             {/* Heritage Badge */}
-            <div className="mb-4">
+            <div className="mb-2 mb-md-4">
               <span
                 className="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill"
                 style={{
                   color: "var(--royal-gold-dark)",
                   background: "rgba(237, 177, 57, 0.08)",
                   border: "1.5px solid rgba(237, 177, 57, 0.3)",
-                  letterSpacing: "3px",
-                  fontSize: "0.82rem",
+                  letterSpacing: "2px",
+                  fontSize: "0.78rem",
                   fontWeight: "700",
                   textTransform: "uppercase"
                 }}
@@ -166,22 +165,22 @@ const MatchmakingSection = () => {
 
             {/* Main Heading */}
             <h2
-              className="display-5 fw-bold mb-4"
+              className="display-5 fw-bold mb-2 mb-md-4"
               style={{
                 fontFamily: "var(--font-heading)",
                 color: "var(--royal-maroon)",
                 lineHeight: "1.25",
-                fontSize: "clamp(2.2rem, 5vw, 3.2rem)"
+                fontSize: "clamp(1.5rem, 4.8vw, 3.2rem)"
               }}
             >
               {cms.matchHeading}
             </h2>
 
             <p
-              className="mb-4 text-secondary"
+              className="mb-3 mb-md-4 text-secondary"
               style={{
-                lineHeight: "1.9",
-                fontSize: "1.1rem",
+                lineHeight: "1.6",
+                fontSize: "clamp(0.88rem, 3.2vw, 1.1rem)",
                 fontFamily: "var(--font-body)",
                 maxWidth: "540px"
               }}
@@ -190,19 +189,19 @@ const MatchmakingSection = () => {
             </p>
 
             {/* Traditional Bullet highlights */}
-            <div className="row g-3 mb-5 text-start mx-auto mx-lg-0" style={{ maxWidth: "480px" }}>
+            <div className="row g-2 g-md-3 mb-3 mb-md-4 text-start mx-auto mx-lg-0" style={{ maxWidth: "480px" }}>
               <div className="col-12 col-sm-6 d-flex align-items-start gap-2">
                 <span className="mt-1 d-flex align-items-center justify-content-center" style={{ width: "20px", height: "20px", background: "var(--royal-gold)", borderRadius: "50%", color: "var(--royal-maroon-dark)", fontSize: "0.75rem", fontWeight: "bold" }}>✓</span>
                 <div>
                   <h6 className="mb-0 fw-bold" style={{ color: "var(--royal-maroon)" }}>{cms.matchBullet1Title}</h6>
-                  <p className="text-muted mb-0" style={{ fontSize: "0.85rem" }}>{cms.matchBullet1Desc}</p>
+                  <p className="text-muted mb-0" style={{ fontSize: "0.82rem" }}>{cms.matchBullet1Desc}</p>
                 </div>
               </div>
               <div className="col-12 col-sm-6 d-flex align-items-start gap-2">
                 <span className="mt-1 d-flex align-items-center justify-content-center" style={{ width: "20px", height: "20px", background: "var(--royal-gold)", borderRadius: "50%", color: "var(--royal-maroon-dark)", fontSize: "0.75rem", fontWeight: "bold" }}>✓</span>
                 <div>
                   <h6 className="mb-0 fw-bold" style={{ color: "var(--royal-maroon)" }}>{cms.matchBullet2Title}</h6>
-                  <p className="text-muted mb-0" style={{ fontSize: "0.85rem" }}>{cms.matchBullet2Desc}</p>
+                  <p className="text-muted mb-0" style={{ fontSize: "0.82rem" }}>{cms.matchBullet2Desc}</p>
                 </div>
               </div>
             </div>
@@ -210,14 +209,16 @@ const MatchmakingSection = () => {
             {/* Call to Action Button */}
             <Link to={isAuthenticated ? "/search" : "/login"}>
               <button
-                className="royal-button px-5 py-3 fs-5 shadow-lg border-0"
+                className="royal-button px-4 px-md-5 py-2.5 py-md-3 shadow-lg border-0 d-inline-flex align-items-center justify-content-center"
                 style={{
-                  letterSpacing: "2px",
+                  letterSpacing: "1px",
                   transition: "all 0.35s ease",
                   textTransform: "uppercase",
                   fontWeight: "700",
-                  fontSize: "1.05rem",
-                  boxShadow: "0 10px 25px rgba(89, 18, 59, 0.25)"
+                  fontSize: "clamp(0.85rem, 3.8vw, 1.05rem)",
+                  whiteSpace: "nowrap",
+                  boxShadow: "0 10px 25px rgba(89, 18, 59, 0.25)",
+                  maxWidth: "92%"
                 }}
               >
                 {cms.matchCTAText}
@@ -227,7 +228,7 @@ const MatchmakingSection = () => {
         </div>
 
         {/* Decorative Traditional Border Underneath */}
-        <div className="text-center mt-5 pt-4">
+        <div className="text-center mt-3 mt-md-5 pt-2 pt-md-4 matchmaking-border-img">
           <img
             style={{ width: "100%", maxWidth: "900px", height: "auto", opacity: 0.8 }}
             src={border}

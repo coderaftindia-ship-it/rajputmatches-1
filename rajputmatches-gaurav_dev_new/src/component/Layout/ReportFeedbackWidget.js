@@ -158,8 +158,8 @@ export default function ReportFeedbackWidget() {
           e.currentTarget.style.boxShadow = "0 6px 24px rgba(89,18,59,0.45)";
         }}
       >
-        <FaExclamationTriangle size={14} />
-        Report &amp; Feedback
+        <FaExclamationTriangle size={15} />
+        <span className="rf-fab-text">Report &amp; Feedback</span>
       </button>
 
       {/* ── Backdrop ── */}
@@ -539,17 +539,16 @@ export default function ReportFeedbackWidget() {
           #report-feedback-fab {
             bottom: 74px !important;
             right: 14px !important;
-            padding: 8px 14px !important;
-            font-size: 0.78rem !important;
+            padding: 0 !important;
+            width: 44px !important;
+            height: 44px !important;
+            border-radius: 50% !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 15px rgba(89,18,59,0.5) !important;
             z-index: 1030 !important;
           }
-        }
-        @media (max-width: 480px) {
-          #report-feedback-fab {
-            bottom: 74px !important;
-            right: 12px !important;
-            padding: 7px 12px !important;
-            font-size: 0.75rem !important;
+          .rf-fab-text {
+            display: none !important;
           }
         }
       `}</style>

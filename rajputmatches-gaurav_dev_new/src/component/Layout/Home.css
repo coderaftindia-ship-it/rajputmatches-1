@@ -370,9 +370,102 @@
   100% { transform: translate3d(-100%, 0, 0); }
 }
 
-/* Mobile responsive padding for fixed navbar */
+/* Matchmaking Jharokha Image & Corners */
+.matchmaking-img {
+  min-height: 420px;
+}
+
+.matchmaking-corner-tl { position: absolute; top: 35%; left: 12px; width: 14px; height: 14px; border-left: 2px solid var(--royal-gold); border-top: 2px solid var(--royal-gold); }
+.matchmaking-corner-tr { position: absolute; top: 35%; right: 12px; width: 14px; height: 14px; border-right: 2px solid var(--royal-gold); border-top: 2px solid var(--royal-gold); }
+.matchmaking-corner-bl { position: absolute; bottom: 12px; left: 12px; width: 14px; height: 14px; border-left: 2px solid var(--royal-gold); border-bottom: 2px solid var(--royal-gold); }
+.matchmaking-corner-br { position: absolute; bottom: 12px; right: 12px; width: 14px; height: 14px; border-right: 2px solid var(--royal-gold); border-bottom: 2px solid var(--royal-gold); }
+
+/* Mobile responsive padding and scaling for Home page */
 @media (max-width: 991px) {
+  .matchmaking-img {
+    min-height: 220px !important;
+    max-height: 260px !important;
+    border-radius: 120px 120px 8px 8px !important;
+  }
+
+  .matchmaking-jharokha-arch {
+    border-radius: 130px 130px 12px 12px !important;
+  }
+
   .banner-wrapper {
-    padding-top: 80px; /* Offset the fixed navbar on mobile devices */
+    padding-top: 70px; /* Offset the fixed navbar on mobile devices */
+    min-height: auto !important;
+    padding-bottom: 24px !important;
+  }
+
+  .banner-wrapper h1 {
+    font-size: clamp(1.6rem, 5.5vw, 2.2rem) !important;
+    line-height: 1.25 !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .banner-wrapper p.lead {
+    font-size: 0.88rem !important;
+    line-height: 1.45 !important;
+    margin-bottom: 1rem !important;
+    max-width: 100% !important;
+  }
+
+  .banner-wrapper .royal-button,
+  .banner-wrapper .royal-button-outline {
+    padding: 9px 18px !important;
+    font-size: 0.85rem !important;
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .home-search-card {
+    padding: 1.25rem 1rem !important;
+    margin-top: 0.5rem !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25) !important;
+  }
+
+  .home-search-card h2 {
+    font-size: 1.35rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .home-search-card label {
+    font-size: 0.78rem !important;
+  }
+
+  .home-search-card select,
+  .home-search-card input {
+    font-size: 0.85rem !important;
+    padding: 8px 10px !important;
+  }
+
+  /* Matchmaking section mobile scaling */
+  .matchmaking-jharokha-frame {
+    max-width: 260px !important;
+    padding: 8px !important;
+    margin-bottom: 1.5rem !important;
+    border-radius: 130px 130px 16px 16px !important;
+  }
+
+  /* Features section mobile grid */
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+
+  .features-grid .icon {
+    font-size: 36px !important;
+    margin-bottom: 0.4rem !important;
+  }
+
+  .features-grid div {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .features-grid p {
+    font-size: 0.78rem !important;
   }
 }

@@ -257,14 +257,6 @@ const Navbar = ({ forceSolid = false }) => {
 
         {/* Mobile Navbar Elements */}
         <div className="d-flex d-lg-none align-items-center gap-2">
-          {isAuthenticated && (
-            <div className="position-relative me-1">
-              <FaBell size={20} color="var(--royal-maroon)" />
-              <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
-                <span className="visually-hidden">New alerts</span>
-              </span>
-            </div>
-          )}
           <button 
             onClick={toggleDrawer}
             className="btn p-2 d-flex align-items-center justify-content-center rounded-3"

@@ -318,3 +318,24 @@
   color: #7B1A1A;
 }
 
+@media (max-width: 768px) {
+  .premiumFeatureCard {
+    min-height: 130px !important;
+    padding: 14px 8px !important;
+    border-radius: 10px !important;
+  }
+
+  .featureIconCircle {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 1.15rem !important;
+    margin-bottom: 8px !important;
+  }
+
+  .featureTitle {
+    font-size: 0.78rem !important;
+    line-height: 1.25 !important;
+    letter-spacing: 0 !important;
+  }
+}
+

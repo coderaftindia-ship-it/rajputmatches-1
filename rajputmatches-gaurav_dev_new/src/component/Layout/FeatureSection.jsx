@@ -57,16 +57,17 @@ function FeatureSection() {
   ];
 
   return (
-    <section className="bg-white pb-5">
+    <section className="bg-white py-2 py-md-5 feature-section">
       <div className="container">
-        <div className="text-center pt-0">
+        <div className="text-center pt-1 pt-md-4">
           <h2
-            className="display-6 fw-bold mb-2"
+            className="display-6 fw-bold mb-2 mb-md-4"
             style={{
               textTransform: "uppercase",
-              letterSpacing: "0.2em",
+              letterSpacing: "0.15em",
               color: "var(--royal-maroon-dark)",
               fontFamily: "var(--font-heading)",
+              fontSize: "clamp(1.3rem, 4.5vw, 2.4rem)",
               textShadow: "0 0 18px rgba(212, 175, 55, 0.18)",
             }}
           >
@@ -89,13 +90,13 @@ export const Features = ({ featureTitles }) => {
 
   return (
     <div
-      className="d-flex flex-wrap justify-content-center gap-4 pt-3"
-      style={{ rowGap: "1.25rem", columnGap: "1.75rem" }}
+      className="d-flex flex-wrap justify-content-center gap-2 gap-md-4 pt-1 pt-md-3 features-flex-container"
+      style={{ rowGap: "0.75rem", columnGap: "1rem" }}
     >
       {featuresData.map((feature, index) => (
         <div
           key={index}
-          style={{ flex: "1 1 170px", maxWidth: "190px", minWidth: "160px" }}
+          style={{ flex: "1 1 135px", maxWidth: "180px", minWidth: "130px" }}
         >
           <FeatureCard iconClass={feature.icon} title={feature.title} description={feature.description} />
         </div>

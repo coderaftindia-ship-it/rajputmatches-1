@@ -155,12 +155,12 @@ function Banner() {
                 <span style={{ fontSize: "0.85rem", color: "var(--royal-gold)", letterSpacing: "0.5px" }}>{cms.heroBadgeText}</span>
               </div>
 
-              <h1 className="display-5 display-md-3 fw-bold mb-3" style={{ fontFamily: "var(--font-heading)", textShadow: "0 4px 15px rgba(0,0,0,0.65)", lineHeight: "1.1", fontSize: "clamp(2rem, 7vw, 4rem)" }}>
+              <h1 className="display-5 display-md-3 fw-bold mb-3 text-white" style={{ fontFamily: "var(--font-heading)", textShadow: "0 4px 15px rgba(0,0,0,0.85)", lineHeight: "1.15", fontSize: "clamp(1.8rem, 6.5vw, 3.5rem)", color: "#ffffff" }}>
                 {cms.heroTitleLine1}<br/>
-                <span style={{ color: "var(--royal-gold)" }}>{cms.heroTitleLine2}</span>
+                <span style={{ color: "var(--royal-gold, #EDB139)" }}>{cms.heroTitleLine2}</span>
               </h1>
 
-              <div className="mb-4">
+              <div className="mb-3 mb-md-4">
                 <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M10 10 Q 30 0, 60 10 T 110 10" stroke="var(--royal-gold)" strokeWidth="1.5" fill="none" />
                   <circle cx="60" cy="10" r="3" fill="var(--royal-gold)" />
@@ -169,7 +169,7 @@ function Banner() {
                 </svg>
               </div>
 
-              <p className="lead mb-3 mb-md-5 text-white-50" style={{ fontSize: "clamp(0.9rem, 3.5vw, 1.1rem)", maxWidth: "90%", lineHeight: "1.6", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+              <p className="lead mb-3 mb-md-5" style={{ fontSize: "clamp(0.85rem, 3.2vw, 1.05rem)", maxWidth: "95%", lineHeight: "1.55", color: "rgba(255,255,255,0.92)", textShadow: "0 2px 6px rgba(0,0,0,0.7)" }}>
                 {cms.heroDescription}
               </p>
 
@@ -203,7 +203,7 @@ function Banner() {
             <div className="col-12 col-lg-5 offset-lg-1">
               <form
                 onSubmit={handleSubmit}
-                className="p-4 p-md-5 rounded-4 d-flex flex-column"
+                className="p-3 p-sm-4 p-md-5 rounded-4 d-flex flex-column home-search-card"
                 style={{
                   background: "rgba(252, 245, 234, 0.95)",
                   border: "1.5px solid rgba(212, 175, 55, 0.35)",
