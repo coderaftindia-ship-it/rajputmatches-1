@@ -84,13 +84,38 @@ export function Interestimagecontainer({ profile, status, fetchData }) {
 }
 
 /* ─── Premium Search Card (RecentAddedPage style) ─── */
-const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
-  const { updateData } = useAuth();
+const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
+  const { updateData, userData } = useAuth();
   const navigate = useNavigate();
 
   // ── Local optimistic connection status ──
-  const [connStatus, setConnStatus] = useState(profile?.connectionStatus || null);
-  useEffect(() => { setConnStatus(profile?.connectionStatus || null); }, [profile?._id, profile?.connectionStatus]);
+  const getEffectiveConnectionStatus = (profile) => {
+    const status = String(profile?.connectionStatus || profile?.contactRequestStatus || profile?.status || "").trim().toLowerCase();
+    if (["accepted", "pending", "rejected"].includes(status)) return status;
+
+    const currentUserId = String(userData?._id || "").trim();
+    const getParticipantId = (item) => {
+      return String(item?.userId?._id || item?.userId || item?._id || item?.profile?._id || item?.profile || item?.to?._id || item?.to || "").trim();
+    };
+    const acceptedArray = (arr) => Array.isArray(arr) && arr.some((item) => {
+      const s = String(item?.status || "").trim().toLowerCase();
+      if (s !== "accepted") return false;
+      if (!currentUserId) return true; // if no auth info, fallback to truthy accepted
+      return getParticipantId(item) === currentUserId;
+    });
+
+    if (acceptedArray(profile?.reqSent)) return "accepted";
+    if (acceptedArray(profile?.reqReceived)) return "accepted";
+    if (acceptedArray(profile?.contactReqSent)) return "accepted";
+    if (acceptedArray(profile?.contactReqReceived)) return "accepted";
+
+    return null;
+  };
+
+  const [connStatus, setConnStatus] = useState(getEffectiveConnectionStatus(profile));
+  useEffect(() => {
+    setConnStatus(getEffectiveConnectionStatus(profile));
+  }, [profile?._id, profile?.connectionStatus, profile?.contactRequestStatus, profile?.status, profile?.reqSent, profile?.reqReceived, profile?.contactReqSent, profile?.contactReqReceived]);
 
   // ── Local optimistic photo request status ──
   const [photoReqStatus, setPhotoReqStatus] = useState(profile?.photoRequestStatus || null);
@@ -99,6 +124,10 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
   // ── Local optimistic shortlist state ──
   const [isShortlisted, setIsShortlisted] = useState(!!profile?.isShortlisted);
   useEffect(() => { setIsShortlisted(!!profile?.isShortlisted); }, [profile?._id, profile?.isShortlisted]);
+
+  // ── Local optimistic block state ──
+  const [isBlocked, setIsBlocked] = useState(!!profile?.isBlocked);
+  useEffect(() => { setIsBlocked(!!profile?.isBlocked); }, [profile?._id, profile?.isBlocked]);
 
   const getImg = () => {
     if (profile?.filesId?.photos?.length > 0 && (!profile?.filesId?.isPrivate || photoReqStatus === "accepted")) {
@@ -144,6 +173,15 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
   if (loc?.trim()) parts.push(loc);
   const subtitle = parts.join("  |  ");
 
+  const profileName = profile?.name || [profile?.firstName, profile?.middleName, profile?.lastName]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  const canShowName = connStatus === "accepted";
+  const titleText = canShowName ? (profileName || `Matri ID: ${profile?.martrId}`) : `Matri ID: ${profile?.martrId}`;
+  const titleStyle = {};
+
   const details = [
     { label:"Clan",            icon:<GiSwordClash />,      value: profile?.HoroscopicId?.clan },
     { label:"Age",             icon:<FaCalendarAlt />,     value: age ? `${age} yrs old` : null },
@@ -160,6 +198,18 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
       if (fetchData) fetchData();
     } catch(e) {
       setIsShortlisted(prev => !prev); // rollback on error
+      console.error(e);
+    }
+  };
+
+  const handleBlockToggle = async (id) => {
+    setIsBlocked(prev => !prev);  // instant toggle
+    if (onBlock) onBlock(id);
+    try {
+      await updateData("profile/block-toggle", id, true);
+      if (fetchData) fetchData();
+    } catch(e) {
+      setIsBlocked(prev => !prev); // rollback on error
       console.error(e);
     }
   };
@@ -311,7 +361,9 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
       </div>
       {/* Body */}
       <div className={styles.cardBody}>
-        <h3 className={styles.profileTitle}>{profile?.name || `Matri ID: ${profile?.martrId}`}</h3>
+        <h3 className={styles.profileTitle} style={titleStyle}>
+          {titleText}
+        </h3>
         <p className={styles.profileSubtitle}>{subtitle || "—"}</p>
         <div className={styles.detailsGrid}>
           {details.map((d,i)=>(
@@ -322,15 +374,20 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
           ))}
         </div>
         <div className={styles.actionsRow}>
-          <button
-            className={styles.viewButton}
-            disabled={connStatus !== "accepted"}
-            style={connStatus !== "accepted" ? { border: "none", ...disabledBtnStyle } : { border: "none", cursor: "pointer" }}
-            onClick={() => handleView(profile._id)}
-            title={connStatus === "accepted" ? "View Profile" : "View disabled until request is accepted"}
-          >
-            <IoEyeOutline className="me-2"/>View
-          </button>
+          {(() => {
+            const isViewDisabledByVisibility = profile?.isVisible === false && connStatus !== "accepted";
+            return (
+              <button
+                className={styles.viewButton}
+                disabled={isViewDisabledByVisibility}
+                style={isViewDisabledByVisibility ? { border: "none", ...disabledBtnStyle } : { border: "none", cursor: "pointer" }}
+                onClick={() => !isViewDisabledByVisibility && handleView(profile._id)}
+                title={!isViewDisabledByVisibility ? "View Profile" : "View disabled until request is accepted"}
+              >
+                <IoEyeOutline className="me-2"/>View
+              </button>
+            );
+          })()}
           <button
             className={styles.squareButton}
             disabled={connStatus !== "accepted"}
@@ -350,6 +407,17 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled }) => {
             {totalPhotos>0 && <span className={styles.photoCount}>{totalPhotos}</span>}
           </span>
           <ConnBtn/>
+          <button
+            className={styles.squareButton}
+            onClick={() => handleBlockToggle(profile._id)}
+            title={isBlocked ? "Unblock Profile" : "Block Profile"}
+            style={isBlocked
+              ? { cursor: "pointer", color: "#dc3545", borderColor: "rgba(220,53,69,0.4)", background: "#fff5f5" }
+              : { cursor: "pointer", color: "var(--royal-maroon, #59123B)" }
+            }
+          >
+            <MdBlock size={16}/>
+          </button>
         </div>
       </div>
     </div>
@@ -904,7 +972,12 @@ const SearchPage = () => {
             ) : (
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(260px, 1fr))", gap:"1.4rem" }}>
                 {getPage().map(profile => (
-                  <SearchProfileCard key={profile._id} profile={profile} fetchData={refreshData}/>
+                  <SearchProfileCard
+                    key={profile._id}
+                    profile={profile}
+                    fetchData={refreshData}
+                    onBlock={(id) => setProfiles((prev) => prev.filter((p) => p._id !== id))}
+                  />
                 ))}
               </div>
             )}

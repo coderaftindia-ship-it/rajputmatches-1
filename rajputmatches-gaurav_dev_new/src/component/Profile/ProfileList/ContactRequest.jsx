@@ -9,7 +9,7 @@ import {
   FaMapMarkerAlt, FaHeart, FaUndoAlt, FaClock, FaCheckCircle,
   FaTimesCircle, FaChevronLeft, FaChevronRight, FaEye, FaSearch
 } from "react-icons/fa";
-import { MdContactPhone } from "react-icons/md";
+import { MdContactPhone, MdBlock } from "react-icons/md";
 import styles from "./ContactRequest.module.css";
 
 const TABS = [
@@ -81,6 +81,20 @@ export default function ContactRequest() {
       showToast("Something went wrong. Please try again.", "error");
     } finally {
       setActionLoad(null);
+    }
+  };
+
+  const handleBlock = async (profileId) => {
+    try {
+      // Instantly remove from local lists
+      setData(prev => ({
+        received: prev.received.filter(r => r.userId?._id !== profileId),
+        sent: prev.sent.filter(r => r.userId?._id !== profileId)
+      }));
+      await updateData("profile/block-toggle", profileId, true);
+      fetchData();
+    } catch {
+      showToast("Something went wrong. Please try again.", "error");
     }
   };
 
@@ -424,6 +438,24 @@ export default function ContactRequest() {
                             <FaHeart size={10} /> Resend
                           </button>
                         )}
+
+                        {/* Block Button */}
+                        <button
+                          title="Block User"
+                          onClick={() => handleBlock(user?._id)}
+                          style={{
+                            display: "flex", alignItems: "center", gap: "5px",
+                            padding: "6px 12px", borderRadius: "20px",
+                            border: "1.5px solid rgba(220,53,69,0.3)",
+                            background: "#fff5f5", color: "#dc3545",
+                            fontSize: "0.75rem", fontWeight: 700, cursor: "pointer",
+                            whiteSpace: "nowrap", transition: "all 0.2s",
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = "#dc3545"; e.currentTarget.style.color = "#fff"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.color = "#dc3545"; }}
+                        >
+                          <MdBlock size={11} /> Block
+                        </button>
                       </div>
                     </td>
                   </tr>

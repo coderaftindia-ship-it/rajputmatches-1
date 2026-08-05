@@ -35,12 +35,8 @@
 .pageWrapper {
   min-height: 100vh;
   padding: 40px 0 80px;
-  background-color: var(--cream-warm);
-  background-image:
-    radial-gradient(ellipse at 8%   5%,  rgba(237,177,57,.06)  0%,transparent 50%),
-    radial-gradient(ellipse at 92%  95%, rgba(89,18,59,.04)   0%,transparent 50%),
-    radial-gradient(ellipse at 50%  50%, rgba(252,245,234,.95) 0%,transparent 100%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+  background: var(--cream-warm);
+  transform: translateZ(0);
 }
 
 .pageContainer {
@@ -67,9 +63,7 @@
   padding: 10px 22px;
   border-radius: 40px;
   border: 1px solid rgba(89,18,59,.18);
-  background: rgba(255,255,255,.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255,255,255,.92);
   color: var(--maroon);
   font: 600 0.88rem/1 var(--font-body);
   cursor: pointer;
@@ -182,12 +176,10 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 28px;
-  background: rgba(89, 18, 59, 0.04);
+  background: rgba(255, 255, 255, 0.95);
   padding: 8px;
   border-radius: 50px;
   border: 1.5px solid var(--divider);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   max-width: 820px;
   margin-left: auto;
   margin-right: auto;
@@ -221,14 +213,14 @@
 
 .tabButton {
   position: relative;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(89, 18, 59, 0.12);
   padding: 10px 22px;
-  font: 600 0.85rem 'Cinzel', serif;
+  font: 700 0.85rem 'Cinzel', serif;
   letter-spacing: 0.08em;
-  color: var(--text-soft);
+  color: #7A5C66;
   cursor: pointer;
-  transition: color 0.3s ease;
+  transition: all 0.25s ease;
   border-radius: 40px;
   display: flex;
   align-items: center;
@@ -238,11 +230,19 @@
 }
 
 .tabButton:hover {
-  color: var(--maroon);
+  color: #59123B;
+  background: rgba(89, 18, 59, 0.08);
 }
 
 .tabButtonActive {
-  color: var(--cream) !important;
+  color: #FFFFFF !important;
+  background: linear-gradient(135deg, #59123B 0%, #3f0c2a 100%) !important;
+  border: 1.5px solid #EDB139 !important;
+  box-shadow: 0 4px 14px rgba(89, 18, 59, 0.35) !important;
+}
+
+.tabButtonActive .tabIcon {
+  color: #EDB139 !important;
 }
 
 .activeTabBg {
@@ -442,9 +442,7 @@
   height: 36px;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(0,0,0,.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0,0,0,.75);
   color: white;
   display: flex;
   align-items: center;
@@ -708,9 +706,7 @@
 .lockOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 253, 245, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 253, 245, 0.96);
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -809,9 +805,7 @@
 .lightboxOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 5, 5, 0.95);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  background: rgba(10, 5, 5, 0.96);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -1795,7 +1789,6 @@
   pointer-events: none;
   color: var(--gold);
   z-index: 0;
-  animation: slowRotate 180s linear infinite;
 }
 
 .spinningMandalaLeft {
@@ -1808,7 +1801,6 @@
   pointer-events: none;
   color: var(--gold);
   z-index: 0;
-  animation: slowRotateLeft 180s linear infinite;
 }
 
 @keyframes slowRotateLeft {

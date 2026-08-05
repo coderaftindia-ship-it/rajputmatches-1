@@ -485,6 +485,14 @@ function PhotoRequest() {
               ProfileImagerender={RequestImageContainer}
               activeTab={activeTab}
               fetchData={fetchData}
+              handlecheck={(id) => {
+                const targetId = id || profile?.userId?._id || profile?.userId;
+                setProfiles((prev) => prev.filter((p) => (p.userId?._id || p.userId || p._id) !== targetId));
+                setData((prev) => ({
+                  photoReqSent: (prev?.photoReqSent || []).filter((p) => (p.userId?._id || p.userId || p._id) !== targetId),
+                  photoReqReceived: (prev?.photoReqReceived || []).filter((p) => (p.userId?._id || p.userId || p._id) !== targetId),
+                }));
+              }}
             />
           ))
         )}

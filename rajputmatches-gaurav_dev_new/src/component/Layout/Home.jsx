@@ -7,6 +7,7 @@ import Footer from "./Footer";
 import LandingPage from "./LandingPage";
 import RecentAddedPage from "./RecentAddedPage";
 import HappyClients from "./HappyClients";
+import VideoSection from "./VideoSection";
 
 function Home() {
   return (
@@ -16,6 +17,7 @@ function Home() {
       <FeatureSection /> 
       <RecentAddedPage />
       <LandingPage />
+      <VideoSection />
       <HappyClients />
       <Footer />
     </>

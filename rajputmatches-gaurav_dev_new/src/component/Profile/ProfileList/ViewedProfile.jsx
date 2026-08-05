@@ -183,7 +183,7 @@ function ViewedProfile() {
   };
 
   const handleCheck = (id) => {
-    setProfiles(profiles.filter((profile) => profile._id !== id));
+    setProfiles((prev) => prev.filter((profile) => (profile._id || profile.profile?._id || profile.userId?._id) !== id));
   };
 
   useEffect(() => {
@@ -244,6 +244,7 @@ function ViewedProfile() {
                 profile={profile}
                 handleCheck={handleCheck}
                 ProfileImagerender={RequestImageContainer}
+                fetchData={fetchData}
               />
             ))}
           </div>

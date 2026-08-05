@@ -22,6 +22,8 @@ const BlockedProfile = () => {
       const data = await fetchUserData(route);
       if (data && Array.isArray(data)) {
         setProfiles(data);
+      } else if (data && Array.isArray(data.blockedUsers)) {
+        setProfiles(data.blockedUsers);
       } else {
         setProfiles([]);
       }

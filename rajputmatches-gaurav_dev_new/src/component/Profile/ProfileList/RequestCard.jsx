@@ -196,13 +196,16 @@ const ActionButtons = ({
             openMessageCard("message", profile._id);
           },
         },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => {
+            handleAction("block-toggle", profile._id);
+            if (handlecheck) handlecheck();
+          },
+        },
       ],
       rejected: [
-        // {
-        //   icon: <RiDeleteBin4Line />,
-        //   label: "Delete",
-        //   onClick: () => handleAction("delete", profile._id),
-        // },
         {
           icon: <FaRegEye />,
           label: "View",
@@ -211,9 +214,16 @@ const ActionButtons = ({
             handleAction("view", profile._id);
           },
         },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => {
+            handleAction("block-toggle", profile._id);
+            if (handlecheck) handlecheck();
+          },
+        },
       ],
       accepted: [
-        //   { icon: <RiDeleteBin4Line />, label: "Delete" },
         {
           icon: <FaRegEye />,
           label: "View",
@@ -227,6 +237,14 @@ const ActionButtons = ({
           label: "Message",
           onClick: () => {
             openMessageCard("message", profile._id);
+          },
+        },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => {
+            handleAction("block-toggle", profile._id);
+            if (handlecheck) handlecheck();
           },
         },
       ],
@@ -263,13 +281,16 @@ const ActionButtons = ({
           label: "Delete",
           onClick: () => handleAction("delete/delete", profile._id),
         },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => {
+            handleAction("block-toggle", profile._id);
+            if (handlecheck) handlecheck();
+          },
+        },
       ],
       rejected: [
-        // {
-        //   icon: <RiDeleteBin4Line />,
-        //   label: "Delete",
-        //   onClick: () => handleAction("delete", profile._id),
-        // },
         {
           icon: <FaRegEye />,
           label: "View",
@@ -278,9 +299,16 @@ const ActionButtons = ({
             handleAction("view", profile._id);
           },
         },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => {
+            handleAction("block-toggle", profile._id);
+            if (handlecheck) handlecheck();
+          },
+        },
       ],
       accepted: [
-        //   { icon: <RiDeleteBin4Line />, label: "Delete" },
         {
           icon: <FaRegEye />,
           label: "View",
@@ -294,6 +322,14 @@ const ActionButtons = ({
           label: "Message",
           onClick: () => {
             openMessageCard("message", profile._id);
+          },
+        },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => {
+            handleAction("block-toggle", profile._id);
+            if (handlecheck) handlecheck();
           },
         },
       ],

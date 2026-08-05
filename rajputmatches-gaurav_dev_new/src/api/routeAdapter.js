@@ -57,7 +57,7 @@ const GET_ROUTE_HANDLERS = {
 
   "profile/show-blocked": async () => {
     const response = await apiClient.get("/auth/profile/show-blocked");
-    return response.data?.data;
+    return response.data?.blockedUsers || response.data?.data || [];
   },
 
   "profile/viewed": async () => {

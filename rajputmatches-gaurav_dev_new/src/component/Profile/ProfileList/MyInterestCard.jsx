@@ -17,7 +17,7 @@ import { BsBell } from "react-icons/bs";
 import { FaRegHeart } from "react-icons/fa6";
 import { FaUserPlus } from "react-icons/fa6";
 import { IoImageSharp } from "react-icons/io5";
-import { MdOutlineCancelPresentation } from "react-icons/md";
+import { MdOutlineCancelPresentation, MdBlock } from "react-icons/md";
 import { GiCancel } from "react-icons/gi";
 import { FaCheck } from "react-icons/fa6";
 
@@ -117,6 +117,7 @@ const MyInterestCard = ({
           profile={profile}
           fetchData={fetchData}
           activeTab={activeTab}
+          handlecheck={handlecheck}
         />
       </div>
     </div>
@@ -136,6 +137,7 @@ const ActionButtons = ({
   profile,
   fetchData,
   activeTab,
+  handlecheck,
 }) => {
   const { updateData } = useAuth();
   const navigate = useNavigate();
@@ -143,6 +145,9 @@ const ActionButtons = ({
   const handleAction = async (action, profileId) => {
     try {
       let route = `profile/${action}`;
+      if (action === "block-toggle" && handlecheck) {
+        handlecheck(profileId);
+      }
       await updateData(route, profileId, true);
       fetchData();
     } catch (error) {
@@ -187,13 +192,13 @@ const ActionButtons = ({
             handleAction("reqsent/accept", profile._id);
           },
         },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => handleAction("block-toggle", profile._id),
+        },
       ],
       rejected: [
-        //   {
-        //     icon: <RiDeleteBin4Line />,
-        //     label: "Delete",
-        //     onClick: () => handleAction("delete", profile._id),
-        //   },
         {
           icon: <FaRegEye />,
           label: "View",
@@ -202,9 +207,13 @@ const ActionButtons = ({
             handleAction("view", profile._id);
           },
         },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => handleAction("block-toggle", profile._id),
+        },
       ],
       accepted: [
-        //   { icon: <RiDeleteBin4Line />, label: "Delete" },
         {
           icon: <FaRegEye />,
           label: "View",
@@ -219,6 +228,11 @@ const ActionButtons = ({
           onClick: () => {
             openMessageCard("message", profile._id);
           },
+        },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => handleAction("block-toggle", profile._id),
         },
       ],
       new: [
@@ -239,6 +253,11 @@ const ActionButtons = ({
           icon: <FaUserPlus />,
           label: "Send Request",
           onClick: () => handleAction("request", profile._id),
+        },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => handleAction("block-toggle", profile._id),
         },
       ],
     };
@@ -250,13 +269,13 @@ const ActionButtons = ({
           label: "Delete",
           onClick: () => handleAction("delete/delete", profile._id),
         },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => handleAction("block-toggle", profile._id),
+        },
       ],
       rejected: [
-        // {
-        //   icon: <RiDeleteBin4Line />,
-        //   label: "Delete",
-        //   onClick: () => handleAction("delete", profile._id),
-        // },
         {
           icon: <FaRegEye />,
           label: "View",
@@ -265,9 +284,13 @@ const ActionButtons = ({
             handleAction("view", profile._id);
           },
         },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => handleAction("block-toggle", profile._id),
+        },
       ],
       accepted: [
-        //   { icon: <RiDeleteBin4Line />, label: "Delete" },
         {
           icon: <FaRegEye />,
           label: "View",
@@ -282,6 +305,11 @@ const ActionButtons = ({
           onClick: () => {
             openMessageCard("message", profile._id);
           },
+        },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => handleAction("block-toggle", profile._id),
         },
       ],
       new: [
@@ -302,6 +330,11 @@ const ActionButtons = ({
           icon: <FaUserPlus />,
           label: "Send Request",
           onClick: () => handleAction("request", profile._id),
+        },
+        {
+          icon: <MdBlock />,
+          label: "Block",
+          onClick: () => handleAction("block-toggle", profile._id),
         },
       ],
     };

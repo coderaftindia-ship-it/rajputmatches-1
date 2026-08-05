@@ -41,83 +41,63 @@ import {
 } from "react-icons/fa";
 
 import { useAuth } from "../../Layout/AuthContext";
+import { BASE_URL } from "../../../api";
 import blurImage from "../../../assets/images/blurimage.png";
 import maleDefault from "../../../assets/images/male_default.png";
 import femaleDefault from "../../../assets/images/female_default.png";
 
 // ─────────────────────────────────────────────────
+// Media URL Helper (Safely format images & docs)
+// ─────────────────────────────────────────────────
+const getMediaUrl = (item) => {
+  if (!item) return "";
+  let raw = "";
+  if (typeof item === "string") {
+    raw = item;
+  } else if (typeof item === "object") {
+    raw = item.url || item.path || item.secure_url || item.filename || "";
+  }
+  if (!raw) return "";
+  if (raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("data:") || raw.startsWith("blob:")) {
+    return raw;
+  }
+  const cleanPath = raw.replace(/\\/g, "/");
+  const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+  return `${BASE_URL}${formattedPath}`;
+};
+
+// ─────────────────────────────────────────────────
 // Scroll-reveal wrapper
 // ─────────────────────────────────────────────────
-const Reveal = ({ children, delay = 0 }) => (
+// Scroll-reveal wrapper (Lightweight & fast)
+// ─────────────────────────────────────────────────
+const Reveal = ({ children }) => (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, ease: "easeOut", delay }}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.15 }}
   >
     {children}
   </motion.div>
 );
 
 // ─────────────────────────────────────────────────
-// Staggered list animations
+// Fast list animations
 // ─────────────────────────────────────────────────
 const listVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.04
-    }
-  }
+  visible: { opacity: 1, transition: { duration: 0.15 } }
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 100, damping: 15 }
-  }
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.15 } }
 };
 
 // ─────────────────────────────────────────────────
-// Gold Dust Floating Spec System
+// Gold Dust Floating Spec System (Disabled for zero lag)
 // ─────────────────────────────────────────────────
-const GoldDust = () => {
-  const particles = Array.from({ length: 18 });
-  return (
-    <div className={styles.goldDustContainer}>
-      {particles.map((_, i) => {
-        const size = Math.random() * 4 + 2; // 2px to 6px
-        const left = Math.random() * 100;
-        const duration = Math.random() * 8 + 12; // 12s to 20s
-        const delay = Math.random() * -20;
-        return (
-          <motion.div
-            key={i}
-            className={styles.goldDustParticle}
-            style={{
-              left: `${left}%`,
-              width: `${size}px`,
-              height: `${size}px`,
-            }}
-            animate={{
-              y: ["100vh", "-10vh"],
-              x: ["0px", `${Math.random() * 80 - 40}px`],
-              opacity: [0, 0.7, 0.7, 0]
-            }}
-            transition={{
-              duration,
-              repeat: Infinity,
-              ease: "linear",
-              delay
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-};
+const GoldDust = () => null;
 
 // ─────────────────────────────────────────────────
 // Slowly Spinning Mandala SVG Watermark
@@ -219,7 +199,7 @@ const DetailRow = ({ icon, label, value, isLockedContact, contactRequestStatus, 
 // Main Component
 // ─────────────────────────────────────────────────
 const ViewPage = () => {
-  const { fetchUserData, updateData } = useAuth();
+  const { fetchUserData, updateData, userData: authUserData } = useAuth();
 
   const [loading, setLoading]                 = useState(true);
   const [error, setError]                     = useState(null);
@@ -261,31 +241,35 @@ const ViewPage = () => {
         ? `${response.height.feet} feet ${response.height.inches} inches`
         : "N/A";
 
-      const formattedDateOfBirth = response.dateOfBirth
-        ? new Date(response.dateOfBirth)
+      const profileData = Array.isArray(response)
+        ? response[0] || {}
+        : response || {};
+
+      const formattedDateOfBirth = profileData.dateOfBirth
+        ? new Date(profileData.dateOfBirth)
             .toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
             .replace(/ /g, "-")
         : "N/A";
 
-      setData(response);
-      setImages(response?.filesId?.photos || []);
-      setdocuments(response?.filesId?.documents || []);
+      setData(profileData);
+      setImages(profileData?.filesId?.photos || []);
+      setdocuments(profileData?.filesId?.documents || []);
 
-      if (response?.paternaldetails) {
-        setPaternaldetails(response?.paternaldetails);
+      if (profileData?.paternaldetails) {
+        setPaternaldetails(profileData?.paternaldetails);
       }
 
       setFormData({
-        matrimonialid:  response.martrId || "N/A",
-        lastName:       `${response.lastName || ""}`.trim(),
+        matrimonialid:  profileData.martrId || "N/A",
+        lastName:       `${profileData.lastName || ""}`.trim(),
         dateOfBirth:    formattedDateOfBirth,
-        mobile:         response.mobile || "N/A",
-        email:          response.email || "N/A",
+        mobile:         profileData.mobile || "N/A",
+        email:          profileData.email || "N/A",
         height:         formattedHeight,
-        weight:         response.weight || "N/A",
-        maritalStatus:  response.maritalStatus || "N/A",
-        address:        `${response.address?.city || ""}, ${response.address?.state || ""}, ${response.address?.country || ""}`.trim() || "N/A",
-        profileFor:     response.profilefor || "N/A",
+        weight:         profileData.weight || "N/A",
+        maritalStatus:  profileData.maritalStatus || "N/A",
+        address:        `${profileData.address?.city || ""}, ${profileData.address?.state || ""}, ${profileData.address?.country || ""}`.trim() || "N/A",
+        profileFor:     profileData.profilefor || "N/A",
       });
 
       setLoading(false);
@@ -467,7 +451,7 @@ const ViewPage = () => {
 
     if (isLimitError) {
       return (
-        <>
+        <>s
           <Profilenavbar />
           <div className={styles.centerState} style={{ padding: "40px 20px", maxWidth: "600px", margin: "40px auto" }}>
             <div style={{
@@ -548,10 +532,39 @@ const ViewPage = () => {
     );
   }
 
-  const displayName = [Data.firstName, Data.middleName, Data.lastName || Data.clan || Data.HoroscopicId?.clan]
-    .filter(Boolean)
-    .join(" ")
-    .trim() || `Matri ID: ${Data.martrId || "N/A"}`;
+  const displayName = (Data?.name && String(Data.name).trim()) ||
+    [Data?.firstName, Data?.middleName, Data?.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim() || `Matri ID: ${Data.martrId || "N/A"}`;
+  // Use same effective connection detection as SearchPage to keep behavior consistent
+  const getEffectiveConnectionStatus = (profile) => {
+    const status = String(profile?.connectionStatus || profile?.contactRequestStatus || profile?.status || "").trim().toLowerCase();
+    if (["accepted", "pending", "rejected"].includes(status)) return status;
+
+    const currentUserId = String(authUserData?._id || "").trim();
+    const getParticipantId = (item) => {
+      return String(item?.userId?._id || item?.userId || item?._id || item?.profile?._id || item?.profile || item?.to?._id || item?.to || "").trim();
+    };
+    const acceptedArray = (arr) => Array.isArray(arr) && arr.some((item) => {
+      const s = String(item?.status || "").trim().toLowerCase();
+      if (s !== "accepted") return false;
+      if (!currentUserId) return true;
+      return getParticipantId(item) === currentUserId;
+    });
+
+    if (acceptedArray(profile?.reqSent)) return "accepted";
+    if (acceptedArray(profile?.reqReceived)) return "accepted";
+    if (acceptedArray(profile?.contactReqSent)) return "accepted";
+    if (acceptedArray(profile?.contactReqReceived)) return "accepted";
+
+    return null;
+  };
+
+  const connStatus = getEffectiveConnectionStatus(Data);
+  const isOwnProfile = Data?._id && authUserData?._id && String(Data._id) === String(authUserData._id);
+  const canShowName = isOwnProfile || connStatus === "accepted";
+  const profileTitleStyle = {};
 
   const hasHoroscope = Data.HoroscopicId &&
     Object.keys(Data.HoroscopicId).some((k) => !["_id", "__v", "userId"].includes(k));
@@ -603,19 +616,12 @@ const ViewPage = () => {
               </div>
             </div>
 
-            {/* Premium Glassmorphic Tabs Navigation with Sliding Indicators */}
+            {/* Premium Navigation Tabs */}
             <div className={styles.tabsContainer}>
               <button
                 className={`${styles.tabButton} ${activeTab === "summary" ? styles.tabButtonActive : ""}`}
                 onClick={() => setActiveTab("summary")}
               >
-                {activeTab === "summary" && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className={styles.activeTabBg}
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
                 <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "6px" }}>
                   <FaInfoCircle className={styles.tabIcon} /> Summary
                 </span>
@@ -624,13 +630,6 @@ const ViewPage = () => {
                 className={`${styles.tabButton} ${activeTab === "astro" ? styles.tabButtonActive : ""}`}
                 onClick={() => setActiveTab("astro")}
               >
-                {activeTab === "astro" && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className={styles.activeTabBg}
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
                 <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "6px" }}>
                   <FaSun className={styles.tabIcon} />
                   <span className={styles.tabTextFull}>Kundali &amp; Astro</span>
@@ -641,13 +640,6 @@ const ViewPage = () => {
                 className={`${styles.tabButton} ${activeTab === "family" ? styles.tabButtonActive : ""}`}
                 onClick={() => setActiveTab("family")}
               >
-                {activeTab === "family" && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className={styles.activeTabBg}
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
                 <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "6px" }}>
                   <FaUsers className={styles.tabIcon} />
                   <span className={styles.tabTextFull}>Family &amp; Ancestry</span>
@@ -658,13 +650,6 @@ const ViewPage = () => {
                 className={`${styles.tabButton} ${activeTab === "documents" ? styles.tabButtonActive : ""}`}
                 onClick={() => setActiveTab("documents")}
               >
-                {activeTab === "documents" && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className={styles.activeTabBg}
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
                 <span style={{ position: "relative", zIndex: 3, display: "flex", alignItems: "center", gap: "6px" }}>
                   <FaFileAlt className={styles.tabIcon} />
                   <span className={styles.tabTextFull}>Verification Docs</span>
@@ -673,23 +658,12 @@ const ViewPage = () => {
               </button>
             </div>
 
-            {/* Auto-scroll Progress Indicator */}
-            <div className={styles.progressBarContainer}>
-              <motion.div
-                key={activeTab}
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 15, ease: "linear" }}
-                className={styles.progressBar}
-              />
-            </div>
-
             {/* Main Master Card */}
             <motion.div
               className={styles.biodataCard}
-              initial={{ opacity: 0, y: 25 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
             >
               {/* Spinning Mandala Watermarks in Background */}
               <MandalaSVG className={styles.spinningMandala} />
@@ -707,16 +681,15 @@ const ViewPage = () => {
 
               {/* Grid Layout - rightPanel first in DOM so photo is at top on mobile */}
               <div className={styles.biodataGrid} style={{ position: "relative", zIndex: 2 }}>
-                {/* Left panel dynamic tab content */}
                 <div className={styles.tabContent}>
-                  <AnimatePresence mode="wait">
+                  <AnimatePresence>
                     {activeTab === "summary" && (
                       <motion.div
                         key="summary"
-                        initial={{ opacity: 0, x: -15 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 15 }}
-                        transition={{ duration: 0.35 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
                       >
                         {/* PERSONAL DETAILS */}
                         <SectionRibbon>Personal Information</SectionRibbon>
@@ -825,10 +798,10 @@ const ViewPage = () => {
                     {activeTab === "astro" && (
                       <motion.div
                         key="astro"
-                        initial={{ opacity: 0, x: -15 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 15 }}
-                        transition={{ duration: 0.35 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
                       >
                         <SectionRibbon>Zodiac &amp; Horoscope Details</SectionRibbon>
                         {hasHoroscope ? (
@@ -861,10 +834,10 @@ const ViewPage = () => {
                     {activeTab === "family" && (
                       <motion.div
                         key="family"
-                        initial={{ opacity: 0, x: -15 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 15 }}
-                        transition={{ duration: 0.35 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
                       >
                         {isaccepted ? (
                           <div>
@@ -1091,10 +1064,10 @@ const ViewPage = () => {
                     {activeTab === "documents" && (
                       <motion.div
                         key="documents"
-                        initial={{ opacity: 0, x: -15 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 15 }}
-                        transition={{ duration: 0.35 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
                       >
                         <SectionRibbon>Verification &amp; Documents</SectionRibbon>
                         {(() => {
@@ -1212,7 +1185,7 @@ const ViewPage = () => {
                                 <AnimatePresence initial={false} mode="wait">
                                   <motion.img
                                     key={currentIndexDoc}
-                                    src={documents[currentIndexDoc].url}
+                                    src={getMediaUrl(documents[currentIndexDoc])}
                                     alt="Document"
                                     className={styles.docImg}
                                     initial={{ opacity: 0 }}
@@ -1343,7 +1316,7 @@ const ViewPage = () => {
                             ) : images.length > 0 ? (
                               <motion.img
                                 key={currentIndex}
-                                src={images[currentIndex].url}
+                                src={getMediaUrl(images[currentIndex])}
                                 alt="Profile"
                                 className={styles.carouselImg}
                                 initial={{ opacity: 0, x: 30 }}
@@ -1354,7 +1327,7 @@ const ViewPage = () => {
                             ) : (
                               <motion.img
                                 key="placeholder"
-                                src={(Data?.imageUrl && !Data.imageUrl.includes("profile.png") && !Data.imageUrl.includes("user-icon-flat-isolated") && !Data.imageUrl.includes("istockphoto.com")) ? Data.imageUrl : (Data?.gender === "Female" ? femaleDefault : maleDefault)}
+                                src={getMediaUrl(Data?.imageUrl) || (Data?.gender === "Female" ? femaleDefault : maleDefault)}
                                 alt="Placeholder"
                                 className={styles.carouselImg}
                                 initial={{ opacity: 0 }}
@@ -1396,7 +1369,7 @@ const ViewPage = () => {
                             {images.map((img, i) => (
                               <img
                                 key={i}
-                                src={img.url}
+                                src={getMediaUrl(img)}
                                 alt={`Thumbnail ${i + 1}`}
                                 className={`${styles.thumb} ${i === currentIndex ? styles.thumbActive : ""}`}
                                 onClick={() => setCurrentIndex(i)}
@@ -1408,11 +1381,9 @@ const ViewPage = () => {
                     );
                   })()}
 
-                  {/* Name and ID details */}
-                  <h2 className={styles.profileName}>
-                    {displayName}
-                  </h2>
-                  <div className={styles.profileId}>ID: {Data.martrId || "N/A"}</div>
+               
+                  <h1 className={styles.profileName} style={profileTitleStyle}>{canShowName ? displayName : `Matri ID: ${Data.martrId || "N/A"}`}</h1>
+                  {!canShowName && <div className={styles.profileId}>ID: {Data.martrId || "N/A"}</div>}
 
                   {/* Quick pills info */}
                   <div className={styles.quickPills}>
@@ -1545,7 +1516,7 @@ const ViewPage = () => {
                       style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   </div>
-                  <h2 className={styles.profileName}>{displayName}</h2>
+                
                   <div className={styles.profileId}>ID: {Data.martrId || "N/A"}</div>
                   <div className={styles.quickPills} style={{ justifyContent: "center" }}>
                     {Data.maritalStatus && <span className={styles.pill}>{Data.maritalStatus}</span>}
@@ -1683,7 +1654,7 @@ const ViewPage = () => {
                   <FaTimes />
                 </button>
                 <img
-                  src={images.length > 0 ? images[lightboxIndex].url : ((Data?.imageUrl && !Data.imageUrl.includes("profile.png") && !Data.imageUrl.includes("user-icon-flat-isolated") && !Data.imageUrl.includes("istockphoto.com")) ? Data.imageUrl : (Data?.gender === "Female" ? femaleDefault : maleDefault))}
+                  src={images.length > 0 ? getMediaUrl(images[lightboxIndex]) : (getMediaUrl(Data?.imageUrl) || (Data?.gender === "Female" ? femaleDefault : maleDefault))}
                   alt="Full-size Profile"
                   className={styles.lightboxImg}
                 />

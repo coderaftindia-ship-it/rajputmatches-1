@@ -149,6 +149,13 @@ exports.login = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Invalid credentials" });
 
+    if (user.isEnable === false) {
+      return res.status(403).json({
+        message: "Your account has been deleted. You cannot log in with this account.",
+        success: false,
+      });
+    }
+
     if (user.role !== "admin" && !user.isApproved) {
       return res.status(403).json({
         message: "Your profile is pending approval from Admin. You cannot log in yet.",
@@ -242,6 +249,12 @@ exports.verifyOtp = async (req, res) => {
     const user = await User.findOne({
       $or: [{ email: username }, { mobile: username }],
     });
+    if (user && user.isEnable === false) {
+      return res.status(403).json({
+        message: "Your account has been deleted. You cannot log in with this account.",
+        success: false,
+      });
+    }
     const token = generateToken(user._id);
     return res
       .status(200)
@@ -360,9 +373,25 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+const getBlockedIdsSet = async (userId) => {
+  try {
+    const userObj = await User.findById(userId).select("blocked").lean();
+    const blockedByMe = (userObj?.blocked || []).map((id) => id.toString());
+    const mongoose = require("mongoose");
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const usersWhoBlockedMe = await User.find({ blocked: userObjectId }).select("_id").lean();
+    const blockedByOthers = (usersWhoBlockedMe || []).map((u) => u._id.toString());
+    return new Set([...blockedByMe, ...blockedByOthers]);
+  } catch (err) {
+    return new Set();
+  }
+};
+
 exports.getshortlistedData = async (req, res) => {
   try {
     const userId = req.user.id;
+    const blockedIds = await getBlockedIdsSet(userId);
+
     const user = await User.findById(userId)
       .select("shortlisted photoReqSent")
       .populate([
@@ -396,26 +425,28 @@ exports.getshortlistedData = async (req, res) => {
     );
 
     // Modify shortlisted profiles while keeping structure same
-    user.shortlisted = user.shortlisted.map((entry) => {
-      if (!entry.profile || !entry.profile.filesId) return entry; // Return unchanged if no filesId exists
+    user.shortlisted = (user.shortlisted || [])
+      .filter((entry) => entry && entry.profile && !blockedIds.has((entry.profile._id || entry.profile).toString()))
+      .map((entry) => {
+        if (!entry.profile || !entry.profile.filesId) return entry; // Return unchanged if no filesId exists
 
-      const { filesId } = entry.profile;
-      const isAccepted = acceptedPhotoReqs.has(entry.profile._id.toString());
+        const { filesId } = entry.profile;
+        const isAccepted = acceptedPhotoReqs.has(entry.profile._id.toString());
 
-      return {
-        ...entry, // Keep the original structure intact
-        profile: {
-          ...entry.profile,
-          filesId: {
-            ...filesId,
-            photos:
-              !filesId.isPrivate || isAccepted
-                ? filesId.photos.filter((photo) => photo.isAvatar)
-                : [], // If private and not accepted, send an empty array
+        return {
+          ...entry, // Keep the original structure intact
+          profile: {
+            ...entry.profile,
+            filesId: {
+              ...filesId,
+              photos:
+                !filesId.isPrivate || isAccepted
+                  ? filesId.photos.filter((photo) => photo.isAvatar)
+                  : [], // If private and not accepted, send an empty array
+            },
           },
-        },
-      };
-    });
+        };
+      });
 
     return res.status(200).json({
       message: "Shortlisted profiles fetched successfully.",
@@ -430,6 +461,7 @@ exports.getshortlistedData = async (req, res) => {
 exports.getviewedData = async (req, res) => {
   try {
     const userId = req.user.id;
+    const blockedIds = await getBlockedIdsSet(userId);
 
     const user = await User.findById(userId)
       .select("visitedAt photoReqSent")
@@ -460,42 +492,44 @@ exports.getviewedData = async (req, res) => {
 
     const acceptedPhotoReqs = new Set(
       user.photoReqSent
-        .filter((req) => req.status === "accepted")
+        ?.filter((req) => req.status === "accepted")
         .map((req) => req.userId.toString())
     );
 
-    user.visitedAt = user.visitedAt.map((profile) => {
-      const isAccepted = acceptedPhotoReqs.has(profile._id.toString());
+    user.visitedAt = (user.visitedAt || [])
+      .filter((profile) => profile && profile._id && !blockedIds.has(profile._id.toString()))
+      .map((profile) => {
+        const isAccepted = acceptedPhotoReqs.has(profile._id.toString());
 
-      const hasReceivedPhotoRequest = profile.photoReqReceived?.some(
-        (req) => req.userId.toString() === userId && req.status === "accepted"
-      );
+        const hasReceivedPhotoRequest = profile.photoReqReceived?.some(
+          (req) => req.userId.toString() === userId && req.status === "accepted"
+        );
 
-      let filteredPhotos = [];
+        let filteredPhotos = [];
 
-      if (profile.filesId) {
-        if (
-          !profile.filesId.isPrivate ||
-          isAccepted ||
-          hasReceivedPhotoRequest
-        ) {
-          filteredPhotos = profile.filesId.photos.filter(
-            (photo) => photo.isAvatar === true
-          );
+        if (profile.filesId) {
+          if (
+            !profile.filesId.isPrivate ||
+            isAccepted ||
+            hasReceivedPhotoRequest
+          ) {
+            filteredPhotos = profile.filesId.photos.filter(
+              (photo) => photo.isAvatar === true
+            );
+          }
         }
-      }
 
-      return {
-        ...profile,
-        HoroscopicId: profile.HoroscopicId || {},
-        profdetailsId: profile.profdetailsId || {},
-        familydetailsId: profile.familydetailsId || {},
-        filesId: {
-          ...profile.filesId,
-          photos: filteredPhotos,
-        },
-      };
-    });
+        return {
+          ...profile,
+          HoroscopicId: profile.HoroscopicId || {},
+          profdetailsId: profile.profdetailsId || {},
+          familydetailsId: profile.familydetailsId || {},
+          filesId: {
+            ...profile.filesId,
+            photos: filteredPhotos,
+          },
+        };
+      });
 
     console.log("Visited Data After Processing:", user.visitedAt);
 
@@ -509,6 +543,7 @@ exports.getviewedData = async (req, res) => {
 exports.getvisitedData = async (req, res) => {
   try {
     const userId = req.user.id;
+    const blockedIds = await getBlockedIdsSet(userId);
 
     // Fetch user and apply full population
     const user = await User.findById(userId)
@@ -539,12 +574,14 @@ exports.getvisitedData = async (req, res) => {
     // Extract accepted photo requests
     const acceptedPhotoReqs = new Set(
       user.photoReqSent
-        .filter((req) => req.status === "accepted")
+        ?.filter((req) => req.status === "accepted")
         .map((req) => req.userId.toString())
     );
 
     // Modify the `viewedBy` array
-    user.viewedBy = user.viewedBy.map((profile) => {
+    user.viewedBy = (user.viewedBy || [])
+      .filter((profile) => profile && profile._id && !blockedIds.has(profile._id.toString()))
+      .map((profile) => {
       const isAccepted = acceptedPhotoReqs.has(profile._id.toString());
 
       // Check if current user's ID is in profile's photoReqReceived and accepted
@@ -1162,6 +1199,7 @@ exports.getphotoRequests = async (req, res) => {
   const userId = req.user.id;
 
   try {
+    const blockedIds = await getBlockedIdsSet(userId);
     const user = await User.findById(userId)
       .select("photoReqSent photoReqReceived")
       .populate([
@@ -1195,7 +1233,7 @@ exports.getphotoRequests = async (req, res) => {
     }
 
     user.photoReqSent = (user.photoReqSent || [])
-      .filter((profile) => profile && profile.userId)
+      .filter((profile) => profile && profile.userId && !blockedIds.has((profile.userId._id || profile.userId).toString()))
       .map((profile) => {
         const photos = profile.userId?.filesId?.photos || [];
         const isPrivate = profile.userId?.filesId?.isPrivate ?? false;
@@ -1218,7 +1256,7 @@ exports.getphotoRequests = async (req, res) => {
       });
 
     user.photoReqReceived = (user.photoReqReceived || [])
-      .filter((profile) => profile && profile.userId)
+      .filter((profile) => profile && profile.userId && !blockedIds.has((profile.userId._id || profile.userId).toString()))
       .map((profile) => {
         const photos = profile.userId?.filesId?.photos || [];
         const isPrivate = profile.userId?.filesId?.isPrivate ?? false;
@@ -1250,6 +1288,7 @@ exports.getphotoRequests = async (req, res) => {
 exports.getDocumentRequests = async (req, res) => {
   const userId = req.user.id;
   try {
+    const blockedIds = await getBlockedIdsSet(userId);
     const user = await User.findById(userId)
       .select("documentReqSent documentReqReceived")
       .populate([
@@ -1276,7 +1315,10 @@ exports.getDocumentRequests = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const filterValid = (arr) => (arr || []).filter((e) => e && e.userId);
+    const filterValid = (arr) =>
+      (arr || []).filter(
+        (e) => e && e.userId && !blockedIds.has((e.userId._id || e.userId).toString())
+      );
 
     return res.status(200).json({
       documentReqSent: filterValid(user.documentReqSent),
@@ -1399,6 +1441,7 @@ exports.getRequests = async (req, res) => {
   const userId = req.user.id;
 
   try {
+    const blockedIds = await getBlockedIdsSet(userId);
     const user = await User.findById(userId)
       .select("reqSent reqReceived photoReqSent photoReqReceived")
       .populate([
@@ -1449,7 +1492,7 @@ exports.getRequests = async (req, res) => {
     };
 
     user.reqSent = (user.reqSent || [])
-      .filter((profile) => profile && profile.userId)
+      .filter((profile) => profile && profile.userId && !blockedIds.has((profile.userId._id || profile.userId).toString()))
       .map((profile) => {
         const photoRequestStatus = getPhotoReqStatus(profile.userId?._id);
         const photos = profile.userId?.filesId?.photos || [];
@@ -1475,7 +1518,7 @@ exports.getRequests = async (req, res) => {
       });
 
     user.reqReceived = (user.reqReceived || [])
-      .filter((profile) => profile && profile.userId)
+      .filter((profile) => profile && profile.userId && !blockedIds.has((profile.userId._id || profile.userId).toString()))
       .map((profile) => {
         const photoRequestStatus = getPhotoReqStatus(profile.userId?._id);
         const photos = profile.userId?.filesId?.photos || [];
@@ -1820,7 +1863,7 @@ exports.getprofiles = async (req, res) => {
     console.log(req.body.data);
 
     const user = await User.findById(userId)
-      .select("gender isSubscribed photoReqSent reqSent reqReceived shortlisted")
+      .select("gender isSubscribed photoReqSent reqSent reqReceived shortlisted blocked")
       .lean();
 
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -1828,12 +1871,17 @@ exports.getprofiles = async (req, res) => {
     const mongoose = require("mongoose");
     const userObjectId = new mongoose.Types.ObjectId(userId);
 
+    // Exclude users blocked by current user, users who blocked current user, and current user themselves
+    const usersWhoBlockedMe = await User.find({ blocked: userObjectId }).select("_id").lean();
+    const blockedByMe = Array.isArray(user.blocked) ? user.blocked : [];
+    const blockedByOthers = Array.isArray(usersWhoBlockedMe) ? usersWhoBlockedMe.map((u) => u._id) : [];
+    const excludedIds = [userObjectId, ...blockedByMe, ...blockedByOthers];
+
     const query = {
-      isVisible: true,
       isbloacked: false,
       isApproved: true,
       role: { $ne: "admin" },
-      _id: { $ne: userId },
+      _id: { $nin: excludedIds },
     };
 
     // Always strictly enforce opposite gender for logged-in user
@@ -3437,7 +3485,12 @@ exports.viewDetails = async (req, res) => {
         .populate("filesId")
         .populate("HoroscopicId")
         .populate("profdetailsId"),
-      UserContactRequest.findOne({ senderId: userId, receiverId: profileId }),
+      UserContactRequest.findOne({
+        $or: [
+          { senderId: userId, receiverId: profileId },
+          { senderId: profileId, receiverId: userId },
+        ],
+      }),
     ]);
 
     if (!user) {
@@ -3445,6 +3498,17 @@ exports.viewDetails = async (req, res) => {
     }
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
+    }
+
+    if (
+      profile.isVisible === false &&
+      contactReqDoc?.status !== "accepted" &&
+      userId.toString() !== profileId.toString() &&
+      user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "This profile is hidden until connection request is accepted.",
+      });
     }
 
     const isAlreadyVisited = Array.isArray(user.visitedAt) && user.visitedAt.some(
@@ -3524,7 +3588,10 @@ exports.viewDetails = async (req, res) => {
           req.userId && req.userId.toString() === profileId && req.status === "accepted"
       );
 
-    const contactRequestStatus = contactReqDoc ? contactReqDoc.status : null;
+    let contactRequestStatus = contactReqDoc ? contactReqDoc.status : null;
+    if (!contactRequestStatus && isReqSent) {
+      contactRequestStatus = "accepted";
+    }
 
     console.log("isPhotoReqSent:", isPhotoReqSent);
     console.log("isReqSent:", isReqSent);
@@ -4454,6 +4521,7 @@ exports.getUserContactRequests = async (req, res) => {
   const userId = req.user.id;
 
   try {
+    const blockedIds = await getBlockedIdsSet(userId);
     const userPopulateSelect =
       "dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId gender mobile email firstName lastName";
     const userPopulateOptions = [
@@ -4473,7 +4541,7 @@ exports.getUserContactRequests = async (req, res) => {
     ]);
 
     const contactReqSent = sentDocs
-      .filter((doc) => doc && doc.receiverId)
+      .filter((doc) => doc && doc.receiverId && !blockedIds.has((doc.receiverId._id || doc.receiverId).toString()))
       .map((doc) => {
         let userObj = { ...doc.receiverId };
         if (doc.status !== "accepted") {
@@ -4489,7 +4557,7 @@ exports.getUserContactRequests = async (req, res) => {
       });
 
     const contactReqReceived = receivedDocs
-      .filter((doc) => doc && doc.senderId)
+      .filter((doc) => doc && doc.senderId && !blockedIds.has((doc.senderId._id || doc.senderId).toString()))
       .map((doc) => {
         let userObj = { ...doc.senderId };
         if (doc.status !== "accepted") {

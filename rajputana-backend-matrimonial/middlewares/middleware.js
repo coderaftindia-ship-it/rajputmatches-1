@@ -158,6 +158,10 @@ const isAuth = async (req, res, next) => {
       return res.status(401).json({ message: "User not found" });
     }
 
+    if (user.role !== "admin" && user.isEnable === false) {
+      return res.status(403).json({ message: "Your account has been deleted." });
+    }
+
     if (user.role !== "admin" && !user.isApproved) {
       return res.status(403).json({ message: "Your profile is pending admin approval." });
     }

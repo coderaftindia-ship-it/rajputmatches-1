@@ -92,6 +92,16 @@ const ShortlistedProfile = () => {
     fetchData();
   };
 
+  const handleBlock = async (id) => {
+    try {
+      await updateData("profile/block-toggle", id, true);
+      // Instantly filter out blocked profile from local state
+      setProfiles((prev) => prev.filter((p) => p?.profile?._id !== id));
+    } catch (err) {
+      console.error("Block error:", err);
+    }
+  };
+
   const handleBookmark = async (id) => {
     if (!Array.isArray(profiles)) return;
     let route = "profile/shortlisted/edit";
@@ -170,6 +180,7 @@ const ShortlistedProfile = () => {
           key={element._id}
           element={element}
           handleDelete={handleDelete}
+          handleBlock={handleBlock}
           ProfileImagerender={RequestImageContainer}
           handleBookmark={handleBookmark}
         />

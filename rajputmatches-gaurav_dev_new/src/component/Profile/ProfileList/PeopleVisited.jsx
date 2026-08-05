@@ -196,6 +196,10 @@ function PeopleVisited() {
     }));
   };
 
+  const handleCheck = (id) => {
+    setProfiles((prev) => prev.filter((profile) => (profile._id || profile.profile?._id || profile.userId?._id) !== id));
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -246,7 +250,9 @@ function PeopleVisited() {
               <ProfileBoxCard
                 key={profile._id}
                 profile={profile}
+                handleCheck={handleCheck}
                 ProfileImagerender={RequestImageContainer}
+                fetchData={fetchData}
               />
             ))}
           </div>

@@ -191,6 +191,9 @@ export const AuthProvider = ({ children }) => {
         });
       }
 
+      // Trigger sidebar/navbar counts to refresh immediately
+      window.dispatchEvent(new Event("profileUpdate"));
+
       return result;
     } catch (error) {
       if (showToast) {

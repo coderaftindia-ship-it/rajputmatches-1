@@ -1,9 +1,22 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { AiOutlineDelete } from "react-icons/ai";
+import { MdBlock } from "react-icons/md";
 import style from "./RequestCard.module.css";
 import { formatDate, calculateAge } from "../ProfileComp/ProfileInfoHeader";
+import { useAuth } from "../../Layout/AuthContext";
 
-const ProfileBoxCard = ({ profile, handleCheck, ProfileImagerender }) => {
+const ProfileBoxCard = ({ profile, handleCheck, ProfileImagerender, fetchData }) => {
+  const { updateData } = useAuth();
+
+  const handleBlockToggle = async () => {
+    try {
+      if (handleCheck) handleCheck(profile._id);
+      await updateData("profile/block-toggle", profile._id, true);
+      if (fetchData) fetchData();
+    } catch (e) {
+      console.error("Block error:", e);
+    }
+  };
   return (
     <div
       className="col-12 col-md-6 mb-3 p-1 p-sm-2"
@@ -116,6 +129,39 @@ const ProfileBoxCard = ({ profile, handleCheck, ProfileImagerender }) => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Block Button */}
+        <div
+          style={{
+            borderTop: "1px solid rgba(212,175,55,0.2)",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <button
+            onClick={handleBlockToggle}
+            title="Block Profile"
+            style={{
+              width: "100%",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+              fontSize: "0.78rem",
+              fontWeight: 600,
+              color: "var(--royal-maroon, #59123B)",
+              transition: "background 0.2s",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(89,18,59,0.06)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+          >
+            <MdBlock size={15}/> Block
+          </button>
         </div>
       </div>
     </div>

@@ -448,6 +448,9 @@ function MyInterest() {
               activeTab={activeTab}
               ProfileImagerender={RequestImageContainer}
               fetchData={fetchData}
+              handlecheck={(id) => {
+                setProfiles((prev) => prev.filter((p) => p.userId?._id !== id));
+              }}
             />
           ))
         )}

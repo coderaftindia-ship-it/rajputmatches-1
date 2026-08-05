@@ -1,12 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, Trash2 } from "lucide-react";
+import { Eye, Trash2, Ban } from "lucide-react";
 import { formatDate, calculateAge } from "../ProfileComp/ProfileInfoHeader";
 import "./ShortListedProfile.css";
 
 function ProfileCard({
   element,
   handleDelete,
+  handleBlock,
   ProfileImagerender,
   handleBookmark,
 }) {
@@ -80,6 +81,17 @@ function ProfileCard({
           <Trash2 size={16} />
           <span>Remove</span>
         </button>
+        {handleBlock && (
+          <button 
+            className="profile-card-btn btn-delete-profile"
+            onClick={() => handleBlock(element?.profile?._id)}
+            style={{ color: "#e53e3e" }}
+            title="Block User"
+          >
+            <Ban size={16} />
+            <span>Block</span>
+          </button>
+        )}
       </div>
     </div>
   );

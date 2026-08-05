@@ -127,9 +127,10 @@ function useSidebarCounts() {
 
     safeLoad();
 
-    // Re-fetch count when a chat is read or new message arrives
+    // Re-fetch count when a chat is read, new message, or profile update occurs
     window.addEventListener("chatRead", safeLoad);
     window.addEventListener("newMessage", safeLoad);
+    window.addEventListener("profileUpdate", safeLoad);
 
     // Poll every 15 seconds for new messages
     const interval = setInterval(safeLoad, 15000);
@@ -138,6 +139,7 @@ function useSidebarCounts() {
       isMounted = false;
       window.removeEventListener("chatRead", safeLoad);
       window.removeEventListener("newMessage", safeLoad);
+      window.removeEventListener("profileUpdate", safeLoad);
       clearInterval(interval);
     };
   }, [userId]); // re-run when userId is available

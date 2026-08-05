@@ -344,6 +344,13 @@ function DocumentRequest() {
                 ProfileImagerender={DocumentImageContainer}
                 activeTab={activeTab}
                 fetchData={fetchData}
+                handlecheck={(id) => {
+                  setProfiles((prev) => prev.filter((p) => (p.userId?._id || p.userId || p._id) !== id));
+                  setData((prev) => ({
+                    documentReqSent: (prev?.documentReqSent || []).filter((p) => (p.userId?._id || p.userId || p._id) !== id),
+                    documentReqReceived: (prev?.documentReqReceived || []).filter((p) => (p.userId?._id || p.userId || p._id) !== id),
+                  }));
+                }}
               />
             ))
           )}

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Profilenavbar from "./Profilenavbar";
 import { useAuth } from "../../Layout/AuthContext";
 import { apiClient } from "../../../api/client";
 import { toast } from "react-toastify";
-import { FaLock, FaEye, FaPowerOff, FaSpinner } from "react-icons/fa";
+import { FaLock, FaEye, FaTrash, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
 import styles from "./Settings.module.css";
 
 function Settings() {
-  const { updateData, fetchUserData } = useAuth();
+  const navigate = useNavigate();
+  const { logout, updateData, fetchUserData } = useAuth();
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState(null);
 
@@ -16,6 +18,10 @@ function Settings() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Load user data on mount
   useEffect(() => {
@@ -32,7 +38,7 @@ function Settings() {
       }
     };
     loadProfile();
-  }, []);
+  }, [fetchUserData]);
 
   // Handle visibility toggle
   const handleVisibilityToggle = async () => {
@@ -52,20 +58,22 @@ function Settings() {
     }
   };
 
-  // Handle activation toggle
-  const handleActivationToggle = async () => {
-    if (!profile) return;
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
     try {
-      const nextValue = !profile.isEnable;
-      setProfile({ ...profile, isEnable: nextValue });
+      setDeleteLoading(true);
+      await updateData("update-profile", { isEnable: false }, false);
+      toast.success("Account deleted successfully.");
+      setShowDeleteModal(false);
 
-      await updateData("update-profile", { isEnable: nextValue }, true);
-      toast.success(
-        nextValue ? "Account activated successfully." : "Account deactivated."
-      );
+      // Logout user and redirect to login page
+      await logout();
+      navigate("/login");
     } catch (err) {
-      toast.error("Failed to update account status.");
-      console.error(err);
+      toast.error("Failed to delete account. Please try again.");
+      console.error("Error deleting account:", err);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -141,27 +149,23 @@ function Settings() {
               </div>
             </div>
 
-            {/* Account Settings Card */}
-            <div className={styles.settingsCard}>
+            {/* Account Deletion Card */}
+            <div className={`${styles.settingsCard} ${styles.deleteCard}`}>
               <div className={styles.cardHeader}>
-                <FaPowerOff className={styles.cardIcon} />
-                <h3>Account Activation</h3>
+                <FaTrash className={`${styles.cardIcon} ${styles.deleteIcon}`} />
+                <h3 className={styles.deleteTitle}>Delete Account</h3>
               </div>
               <p className={styles.cardDesc}>
-                Deactivate your account if you want to temporarily freeze your activity on the platform.
+                Permanently delete your account. Once deleted, you will be logged out and will not be able to log in to this account again.
               </p>
-              <div className={styles.switchWrapper}>
-                <span className={styles.statusLabel}>
-                  Status: <strong>{profile?.isEnable ? "Active" : "Deactivated"}</strong>
-                </span>
-                <label className={styles.switch}>
-                  <input
-                    type="checkbox"
-                    checked={profile?.isEnable ?? true}
-                    onChange={handleActivationToggle}
-                  />
-                  <span className={`${styles.slider} ${styles.round}`}></span>
-                </label>
+              <div className={styles.deleteActionWrapper}>
+                <button
+                  type="button"
+                  className={styles.deleteAccountBtn}
+                  onClick={() => setShowDeleteModal(true)}
+                >
+                  <FaTrash /> Delete My Account
+                </button>
               </div>
             </div>
 
@@ -215,8 +219,48 @@ function Settings() {
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      {showDeleteModal && (
+        <div className={styles.deleteModalOverlay}>
+          <div className={styles.deleteModalContent}>
+            <div className={styles.modalIconWrapper}>
+              <FaExclamationTriangle className={styles.warningIcon} />
+            </div>
+            <h3>Delete Account?</h3>
+            <p>
+              Are you sure you want to delete your account? This action is permanent. You will be logged out immediately and won't be able to log in with this account again.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelBtn}
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleteLoading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={styles.confirmDeleteBtn}
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? (
+                  <>
+                    <FaSpinner className="spin" /> Deleting...
+                  </>
+                ) : (
+                  "Yes, Delete Account"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default Settings;
+
