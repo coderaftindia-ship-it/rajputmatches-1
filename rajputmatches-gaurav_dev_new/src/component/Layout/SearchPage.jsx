@@ -163,8 +163,10 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
   const totalPhotos= profile?.filesId?.totalPhotos || 0;
   const age        = profile?.dateOfBirth ? calculateAge(profile.dateOfBirth) : null;
 
+  // Height: check all possible DB paths
+  const heightObj = profile?.height || profile?.personaldetailsId?.height || profile?.basicdetailsId?.height;
   let heightStr = "";
-  if (profile?.height?.feet) heightStr = `${profile.height.feet}'${profile.height.inches||0}"`;
+  if (heightObj?.feet) heightStr = `${heightObj.feet}'${heightObj.inches || 0}"`;
 
   const parts = [];
   if (age) parts.push(`${age} Yrs`);
@@ -182,13 +184,21 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
   const titleText = canShowName ? (profileName || `Matri ID: ${profile?.martrId}`) : `Matri ID: ${profile?.martrId}`;
   const titleStyle = {};
 
+  // Class: check all possible DB paths
+  const profileClassValue =
+    profile?.profdetailsId?.class ||
+    profile?.class ||
+    profile?.familydetailsId?.class ||
+    profile?.basicdetailsId?.class ||
+    null;
+
   const details = [
-    { label:"Clan",            icon:<GiSwordClash />,      value: profile?.HoroscopicId?.clan },
+    { label:"Clan",            icon:<GiSwordClash />,      value: profile?.HoroscopicId?.clan || profile?.clan || null },
     { label:"Age",             icon:<FaCalendarAlt />,     value: age ? `${age} yrs old` : null },
     { label:"Location",        icon:<FaMapMarkerAlt />,    value: profile?.address?.city && profile?.address?.state ? `${profile.address.city}, ${profile.address.state}` : (profile?.address?.city || profile?.address?.state || null) },
     { label:"High. Education", icon:<FaGraduationCap />,   value: profile?.profdetailsId?.qualifications },
     { label:"Occupation",      icon:<FaBriefcase />,       value: profile?.familydetailsId?.occupation || profile?.profdetailsId?.occupation },
-    { label:"Class",           icon:<FaUserTie />,         value: profile?.profdetailsId?.class },
+    { label:"Class",           icon:<FaUserTie />,         value: profileClassValue },
   ];
 
   const handleShortlist = async (id) => {
@@ -571,27 +581,54 @@ const SearchPage = () => {
     return formDataRef.current?.gender || "";
   };
 
+  // ── Helper: check all class paths ──
+  const getProfileClass = (p) =>
+    p?.class || p?.profdetailsId?.class || p?.familydetailsId?.class ||
+    p?.basicdetailsId?.class || p?.HoroscopicId?.class || "";
+
+  // ── Helper: check all height paths ──
+  const getProfileHeightFeet = (p) =>
+    p?.height?.feet || p?.personaldetailsId?.height?.feet ||
+    p?.basicdetailsId?.height?.feet || null;
+
+  // ── Client-side filter function (class + height) ──
+  const applyClientFilters = (rawList, targetGender) => {
+    const fd = formDataRef.current || {};
+    const selectedClass = fd.class;
+    const heightFrom = fd.HeightFeetfrom ? Number(fd.HeightFeetfrom) : null;
+    const heightTo   = fd.HeightFeetto   ? Number(fd.HeightFeetto)   : null;
+
+    return rawList.filter(p => {
+      const isSelf     = p._id === userData?._id || p.userId === userData?._id;
+      const isAdmin    = p.role === "admin";
+      const matchesGender = !targetGender || p.gender === targetGender;
+
+      // Class filter
+      const profileClass = getProfileClass(p);
+      const matchesClass = !selectedClass ||
+        (profileClass && String(profileClass).toLowerCase() === String(selectedClass).toLowerCase());
+
+      // Height filter
+      const feet = getProfileHeightFeet(p);
+      const matchesHeight =
+        (!heightFrom && !heightTo) ||
+        (feet !== null &&
+          (heightFrom === null || feet >= heightFrom) &&
+          (heightTo   === null || feet <= heightTo));
+
+      return !isSelf && !isAdmin && matchesGender && matchesClass && matchesHeight;
+    });
+  };
+
   // ── Full search: resets to page 1 (used when user clicks "Search Profiles") ──
   const handleSearch = async (showToast=false) => {
     try {
       setLoading(true);
       const targetGender = getEnforcedTargetGender();
-      const payload = {
-        ...(formDataRef.current || {}),
-        gender: targetGender
-      };
+      const payload = { ...(formDataRef.current || {}), gender: targetGender };
       const res = await updateData("getprofiles", payload, showToast);
       const rawList = res?.data || [];
-      const selectedClass = formDataRef.current?.class;
-      const filteredList = rawList.filter(p => {
-        const isSelf = p._id === userData?._id || p.userId === userData?._id;
-        const isAdmin = p.role === "admin";
-        const matchesTarget = !targetGender || p.gender === targetGender;
-        const profileClass = p.class || p.profdetailsId?.class || p.HoroscopicId?.class;
-        const matchesClass = !selectedClass || (profileClass && String(profileClass).toLowerCase() === String(selectedClass).toLowerCase());
-        return !isSelf && !isAdmin && matchesTarget && matchesClass;
-      });
-      setProfiles(filteredList);
+      setProfiles(applyClientFilters(rawList, targetGender));
       setCurrentPage(1);
     } catch(e){ console.error(e); }
     finally { setLoading(false); }
@@ -601,22 +638,10 @@ const SearchPage = () => {
   const refreshData = useCallback(async () => {
     try {
       const targetGender = userData?.gender === "Male" ? "Female" : (userData?.gender === "Female" ? "Male" : (formDataRef.current?.gender || ""));
-      const payload = {
-        ...(formDataRef.current || {}),
-        gender: targetGender
-      };
+      const payload = { ...(formDataRef.current || {}), gender: targetGender };
       const res = await updateData("getprofiles", payload, false);
       const rawList = res?.data || [];
-      const selectedClass = formDataRef.current?.class;
-      const filteredList = rawList.filter(p => {
-        const isSelf = p._id === userData?._id || p.userId === userData?._id;
-        const isAdmin = p.role === "admin";
-        const matchesTarget = !targetGender || p.gender === targetGender;
-        const profileClass = p.class || p.profdetailsId?.class || p.HoroscopicId?.class;
-        const matchesClass = !selectedClass || (profileClass && String(profileClass).toLowerCase() === String(selectedClass).toLowerCase());
-        return !isSelf && !isAdmin && matchesTarget && matchesClass;
-      });
-      setProfiles(filteredList);
+      setProfiles(applyClientFilters(rawList, targetGender));
       // currentPage intentionally NOT reset — stay on same page
     } catch(e){ console.error(e); }
   }, [updateData, userData]);

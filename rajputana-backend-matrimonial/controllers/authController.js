@@ -1880,6 +1880,7 @@ exports.getprofiles = async (req, res) => {
     const query = {
       isbloacked: false,
       isApproved: true,
+      isEnable: true,
       role: { $ne: "admin" },
       _id: { $nin: excludedIds },
     };
@@ -3728,6 +3729,7 @@ exports.getPublicRecentProfiles = async (req, res) => {
       isVisible: true,
       isbloacked: false,
       isApproved: true,
+      isEnable: true,
       role: { $ne: "admin" },
     };
 

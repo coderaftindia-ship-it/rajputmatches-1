@@ -519,7 +519,25 @@ function Mydetails() {
       };
 
       await updateData("update-profile", profilePayload, true);
-      
+
+      // class is stored in ProfessionalDetails — save it there too
+      if (basicFormData.class) {
+        await updateData("save-professional-data", {
+          class: basicFormData.class,
+          // preserve existing professional fields
+          qualifications: educationFormData.qualifications || professional?.qualifications,
+          institution: educationFormData.institution || professional?.institution,
+          professional: educationFormData.professional || professional?.professional,
+          annualIncome: educationFormData.annualIncome || professional?.annualIncome,
+          company: educationFormData.company || professional?.company,
+          hobbies: educationFormData.hobbies || professional?.hobbies || [],
+          additionalInfo: educationFormData.additionalInfo || professional?.additionalInfo,
+          qualificationsList: educationFormData.qualificationsList || professional?.qualificationsList || [],
+          occupationsList: educationFormData.occupationsList || professional?.occupationsList || [],
+        }, false);
+        await refreshSection("professional");
+      }
+
       let birthHour = "";
       let birthMinute = "";
       let birthTimePeriod = "AM";

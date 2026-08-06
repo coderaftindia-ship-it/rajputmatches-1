@@ -51,7 +51,7 @@ function StatCard({ icon, label, value, color, trend, onClick }) {
 }
 
 /* ── Profile Mini Card ── */
-function ProfileMiniCard({ profile, onView, onInterest }) {
+function ProfileMiniCard({ profile, onView, onInterest, isAccepted }) {
   const defaultPhoto = profile?.gender === "Female" ? femaleDefault : maleDefault;
   const photo = profile?.filesId?.photos?.[0]?.url || defaultPhoto;
   const age = calculateAge(profile?.dateOfBirth);
@@ -61,11 +61,17 @@ function ProfileMiniCard({ profile, onView, onInterest }) {
   return (
     <div className={styles.miniCard}>
       <div className={styles.miniCardImg}>
-        <img src={photo} alt={name} onError={e => { e.target.src = defaultPhoto; }} />
+        <img src={photo} alt={isAccepted ? name : "Profile"} onError={e => { e.target.src = defaultPhoto; }} />
         <div className={styles.miniCardBadge}><Sparkles size={10} /></div>
       </div>
       <div className={styles.miniCardInfo}>
-        <p className={styles.miniCardName}>{name}</p>
+        <p
+          className={styles.miniCardName}
+          style={!isAccepted ? { filter: "blur(6px)", userSelect: "none", pointerEvents: "none" } : {}}
+          title={!isAccepted ? "Accept request to view name" : name}
+        >
+          {name}
+        </p>
         <p className={styles.miniCardMeta}>
           {age ? `${age} yrs` : ""}
           {age && city ? " · " : ""}
@@ -85,12 +91,30 @@ function ProfileMiniCard({ profile, onView, onInterest }) {
 }
 
 /* ── Activity Item ── */
-function ActivityItem({ icon, text, time, color }) {
+// `name` / `before` / `after` / `isAccepted` support blurring just the person's name.
+// Falls back to plain `text` for items without a specific person (e.g. pending count).
+function ActivityItem({ icon, text, before, name, after, time, color, isAccepted }) {
   return (
     <div className={styles.activityItem}>
       <div className={styles.activityDot} style={{ background: color }}>{icon}</div>
       <div className={styles.activityContent}>
-        <p>{text}</p>
+        <p>
+          {name !== undefined ? (
+            <>
+              {before}
+              <span
+                style={
+                  !isAccepted
+                    ? { filter: "blur(5px)", userSelect: "none", display: "inline-block", pointerEvents: "none" }
+                    : {}
+                }
+              >
+                {name}
+              </span>
+              {after}
+            </>
+          ) : text}
+        </p>
         <span>{time}</span>
       </div>
     </div>
@@ -192,6 +216,15 @@ const Dashboard = () => {
   const contactReqSent     = contactReqs?.sent             || [];
   const contactPending     = contactReqReceived.filter(r => r.status === "pending").length;
   const photoReqPending    = photoReqs.received.filter(r => r.status === "pending").length;
+
+  /* ── Build set of profile IDs with an accepted request ── */
+  const getProfileId = (r) => (r?.userId || r?.profile || r)?._id;
+  const acceptedSet = new Set([
+    ...contactReqSent.filter(r => r.status === "accepted").map(getProfileId).filter(Boolean),
+    ...contactReqReceived.filter(r => r.status === "accepted").map(getProfileId).filter(Boolean),
+    ...interestSent.filter(r => r.status === "accepted").map(getProfileId).filter(Boolean),
+    ...interestReceived.filter(r => r.status === "accepted").map(getProfileId).filter(Boolean),
+  ]);
 
   /* recent activity (combine lists into timeline) */
   const recentVisitors = visitedList.slice(0, 3);
@@ -364,6 +397,7 @@ const Dashboard = () => {
                         key={p?._id || i}
                         profile={p}
                         onView={(id) => navigate(`/search/view/${id}`)}
+                        isAccepted={acceptedSet.has(p?._id)}
                       />
                     );
                   })
@@ -402,6 +436,7 @@ const Dashboard = () => {
                           key={p?._id || i}
                           profile={p}
                           onView={(id) => navigate(`/search/view/${id}`)}
+                          isAccepted={acceptedSet.has(p?._id)}
                         />
                       );
                     })
@@ -513,11 +548,15 @@ const Dashboard = () => {
                     {recentViewed.slice(0, 2).map((v, i) => {
                       const p = v?.userId || v?.profile || v;
                       const name = [p?.firstName, p?.lastName].filter(Boolean).join(" ") || "Someone";
+                      const accepted = acceptedSet.has(p?._id);
                       return (
                         <ActivityItem
                           key={"v" + i}
                           icon={<Eye size={10} />}
-                          text={`You viewed ${name}'s profile`}
+                          before="You viewed "
+                          name={name}
+                          after="'s profile"
+                          isAccepted={accepted}
                           time="Recently"
                           color="linear-gradient(135deg,#8b5cf6,#6d28d9)"
                         />
@@ -526,11 +565,15 @@ const Dashboard = () => {
                     {recentVisitors.slice(0, 2).map((v, i) => {
                       const p = v?.userId || v?.profile || v;
                       const name = [p?.firstName, p?.lastName].filter(Boolean).join(" ") || "Someone";
+                      const accepted = acceptedSet.has(p?._id);
                       return (
                         <ActivityItem
                           key={"vis" + i}
                           icon={<UserCheck size={10} />}
-                          text={`${name} visited your profile`}
+                          before=""
+                          name={name}
+                          after=" visited your profile"
+                          isAccepted={accepted}
                           time="Recently"
                           color="linear-gradient(135deg,#0ea5e9,#0284c7)"
                         />
@@ -571,6 +614,7 @@ const Dashboard = () => {
                     key={p?._id || i}
                     profile={p}
                     onView={(id) => navigate(`/search/view/${id}`)}
+                    isAccepted={acceptedSet.has(p?._id)}
                   />
                 );
               })}
