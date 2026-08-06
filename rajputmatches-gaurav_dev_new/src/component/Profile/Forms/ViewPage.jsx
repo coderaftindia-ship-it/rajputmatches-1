@@ -61,9 +61,73 @@ const getMediaUrl = (item) => {
   if (raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("data:") || raw.startsWith("blob:")) {
     return raw;
   }
+  // If it looks like a raw base64 string (very long, no /), prefix it as image/jpeg
+  if (raw.length > 100 && !raw.includes("/") && !raw.startsWith(".")) {
+    return `data:image/jpeg;base64,${raw}`;
+  }
   const cleanPath = raw.replace(/\\/g, "/");
   const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
   return `${BASE_URL}${formattedPath}`;
+};
+
+// Returns 'image' | 'pdf' | 'other' based on the data URL or file extension
+const getDocType = (item) => {
+  let raw = "";
+  if (typeof item === "string") raw = item;
+  else if (typeof item === "object") raw = item.url || item.path || item.secure_url || item.filename || "";
+  if (!raw) return "other";
+  if (raw.startsWith("data:image/")) return "image";
+  if (raw.startsWith("data:application/pdf")) return "pdf";
+  const lower = raw.toLowerCase();
+  if (lower.match(/\.(jpe?g|png|gif|webp|bmp)([?#]|$)/)) return "image";
+  if (lower.match(/\.pdf([?#]|$)/)) return "pdf";
+  // Raw base64 with no prefix — assume image
+  if (raw.length > 100 && !raw.includes("/") && !raw.startsWith(".")) return "image";
+  return "image"; // default fallback
+};
+
+// Smart document renderer: clean view without extra download buttons or toolbars
+const DocumentRenderer = ({ item, className, style, onClick }) => {
+  const url = getMediaUrl(item);
+  const docType = getDocType(item);
+
+  if (!url) return null;
+
+  if (docType === "pdf") {
+    const pdfUrl = url.includes("#") ? url : `${url}#toolbar=0&navpanes=0&scrollbar=0`;
+    return (
+      <iframe
+        src={pdfUrl}
+        title="Document"
+        className={className}
+        style={{
+          width: "100%",
+          height: "450px",
+          border: "none",
+          borderRadius: 8,
+          ...style,
+        }}
+        onClick={onClick}
+      />
+    );
+  }
+
+  // Default: simple image
+  return (
+    <img
+      src={url}
+      alt="Document"
+      className={className}
+      style={{
+        maxHeight: "500px",
+        objectFit: "contain",
+        width: "100%",
+        borderRadius: 8,
+        ...style,
+      }}
+      onClick={onClick}
+    />
+  );
 };
 
 // ─────────────────────────────────────────────────
@@ -1183,16 +1247,23 @@ const ViewPage = () => {
                                 setIsLightboxOpen(true);
                               }}>
                                 <AnimatePresence initial={false} mode="wait">
-                                  <motion.img
+                                  <motion.div
                                     key={currentIndexDoc}
-                                    src={getMediaUrl(documents[currentIndexDoc])}
-                                    alt="Document"
-                                    className={styles.docImg}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.3 }}
-                                  />
+                                    style={{ width: "100%", height: "100%" }}
+                                  >
+                                    <DocumentRenderer
+                                      item={documents[currentIndexDoc]}
+                                      className={styles.docImg}
+                                      onClick={() => {
+                                        setLightboxIndex(0);
+                                        setIsLightboxOpen(true);
+                                      }}
+                                    />
+                                  </motion.div>
                                 </AnimatePresence>
                                 {documents.length > 1 && (
                                   <>
