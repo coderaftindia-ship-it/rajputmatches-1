@@ -2,10 +2,12 @@ import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
-import logo from "../assets/images/logowhite.png";
+import logoFallback from "../assets/images/logowhite.png";
 import { authApi, isSuccessResponse } from "../api";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 function VerifyEmail() {
+  const { siteSettings } = useSiteSettings();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
@@ -47,9 +49,11 @@ function VerifyEmail() {
         <div className="forgot-password-container">
           <div className="title mt-0">
             <img
-              src={logo}
-              alt="Logo"
+              src={siteSettings.logo || logoFallback}
+              alt={siteSettings.companyName || "Logo"}
+              onError={(e) => { e.target.onerror = null; e.target.src = logoFallback; }}
               className="rounded-full border-4 border-white"
+              style={{ objectFit: "cover" }}
             />
           </div>
           <p className="subtitle">Welcome! Email is Verified</p>

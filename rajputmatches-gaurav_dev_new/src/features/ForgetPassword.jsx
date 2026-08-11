@@ -6,8 +6,11 @@ import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import { authApi, extractMessage, isSuccessResponse } from "../api";
 import { validateLoginUsername } from "../utils/authValidation";
 import { FaEnvelope, FaHeart, FaCrown } from "react-icons/fa";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 function ForgotPassword() {
+  const { siteSettings } = useSiteSettings();
+  const [logoError, setLogoError] = useState(false);
   const [formData, setFormData] = useState({ username: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -72,9 +75,18 @@ function ForgotPassword() {
           
           <div className="royal-auth-header">
             <div className="royal-crown-badge">
-              <FaCrown className="royal-crown-icon" />
+              {siteSettings.logo && !logoError ? (
+                <img
+                  src={siteSettings.logo}
+                  alt={siteSettings.companyName || "Logo"}
+                  onError={() => setLogoError(true)}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", padding: 0 }}
+                />
+              ) : (
+                <FaCrown className="royal-crown-icon" />
+              )}
             </div>
-            <h2 className="royal-auth-title">Begin Your Royal Journey</h2>
+            <h2 className="royal-auth-title">Rajput Alliances</h2>
             <p className="royal-auth-subtitle">Forgot Password</p>
             <div className="royal-divider">
               <span className="royal-divider-ornament">

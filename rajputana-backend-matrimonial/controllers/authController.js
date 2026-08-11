@@ -158,7 +158,7 @@ exports.login = async (req, res) => {
 
     if (user.role !== "admin" && !user.isApproved) {
       return res.status(403).json({
-        message: "Your profile is pending approval from Admin. You cannot log in yet.",
+        message: "Khama Ghani, Hukum! Thank you for registering with Rajput Alliances. We will verify your account and email you once it is approved, so you can log in and create your profile.",
         success: false
       });
     }
@@ -277,8 +277,8 @@ exports.sendVerification = async (req, res) => {
     let resp = await generateOTP(email);
 
     if (!resp?.success) {
-      return res.status(500).json({
-        message: "Something went wrong. Please try again.",
+      return res.status(400).json({
+        message: resp?.message || "Failed to send OTP. Please try again.",
         success: false,
       });
     }
@@ -287,7 +287,8 @@ exports.sendVerification = async (req, res) => {
       .status(200)
       .json({ message: "OTP sent successfully to your email.", success: true });
   } catch (error) {
-    res.status(500).json({ message: "Server error", success: false, error });
+    console.error("Error during sendVerification:", error);
+    res.status(500).json({ message: "Server error sending OTP", success: false, error: error.message });
   }
 };
 

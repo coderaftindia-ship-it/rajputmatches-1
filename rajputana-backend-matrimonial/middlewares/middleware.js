@@ -16,6 +16,11 @@ const otpRateLimit = new Map();
 
 const sendOtp = async (to, otp) => {
   try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.warn(`[OTP INFO] EMAIL_USER / EMAIL_PASS not configured in .env. OTP for ${to} is: ${otp}`);
+      return { success: true, info: { dev: true } };
+    }
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -25,16 +30,20 @@ const sendOtp = async (to, otp) => {
     });
 
     const mailOptions = {
-      from: `"StudyNotion" <${process.env.EMAIL_USER}>`,
+      from: `"Rajput Alliances" <${process.env.EMAIL_USER}>`,
       to: to,
-      subject: `Your OTP for Password Change`,
-      html: `<p>Your OTP for password reset is <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
+      subject: `Your Rajput Alliances Verification OTP`,
+      html: `<p>Your OTP for email verification is <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
     };
 
     const info = await transporter.sendMail(mailOptions);
     return { success: true, info };
   } catch (error) {
     console.error("Error sending OTP email:", error);
+    if (process.env.NODE_ENV !== "production" || process.env.DEV_BYPASS_VERIFY === "true" || !process.env.EMAIL_USER) {
+      console.log(`[DEV FALLBACK] OTP for ${to} is: ${otp}`);
+      return { success: true, info: { dev: true } };
+    }
     return { success: false, error: error.message };
   }
 };
@@ -163,7 +172,7 @@ const isAuth = async (req, res, next) => {
     }
 
     if (user.role !== "admin" && !user.isApproved) {
-      return res.status(403).json({ message: "Your profile is pending admin approval." });
+      return res.status(403).json({ message: "Khama Ghani, Hukum! Thank you for registering with Rajput Alliances. We will verify your account and email you once it is approved, so you can log in and create your profile." });
     }
 
     req.user = decoded;

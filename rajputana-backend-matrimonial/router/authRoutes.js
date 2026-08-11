@@ -811,7 +811,7 @@ router.get("/stories-cms", async (req, res) => {
 // GET /api/v1/auth/site-settings - Public endpoint to get Site Settings (Branding, Logo)
 router.get("/site-settings", async (req, res) => {
   try {
-    let settings = await SiteSettings.findOne();
+    let settings = await SiteSettings.findOne().lean();
     if (!settings) settings = await SiteSettings.create({});
     return res.status(200).json({ success: true, data: settings });
   } catch (error) {

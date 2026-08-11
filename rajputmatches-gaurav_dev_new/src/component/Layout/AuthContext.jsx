@@ -135,7 +135,7 @@ export const AuthProvider = ({ children }) => {
       const errorMessage =
         error.response?.data?.message || "An error occurred. Please try again.";
       setMessage(errorMessage);
-      toast.error(errorMessage, { position: "top-center", autoClose: 3000 });
+      toast.error(errorMessage, { position: "top-center", autoClose: 6000 });
       return { success: false, message: errorMessage };
     }
   };

@@ -5,9 +5,12 @@ import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import { useAuth } from "../component/Layout/AuthContext";
 import { authApi, isSuccessResponse } from "../api";
 import { FaEnvelope, FaHeart, FaCrown } from "react-icons/fa";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 import "./Login.css";
 
 function Verification() {
+  const { siteSettings } = useSiteSettings();
+  const [logoError, setLogoError] = useState(false);
   const { setEmail, email } = useAuth();
   const [timer, setTimer] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -80,9 +83,18 @@ function Verification() {
           
           <div className="royal-auth-header">
             <div className="royal-crown-badge">
-              <FaCrown className="royal-crown-icon" />
+              {siteSettings.logo && !logoError ? (
+                <img
+                  src={siteSettings.logo}
+                  alt={siteSettings.companyName || "Logo"}
+                  onError={() => setLogoError(true)}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", padding: 0 }}
+                />
+              ) : (
+                <FaCrown className="royal-crown-icon" />
+              )}
             </div>
-            <h2 className="royal-auth-title">Begin Your Royal Journey</h2>
+            <h2 className="royal-auth-title">Rajput Alliances</h2>
             <p className="royal-auth-subtitle">Verify Your Email</p>
             <div className="royal-divider">
               <span className="royal-divider-ornament">

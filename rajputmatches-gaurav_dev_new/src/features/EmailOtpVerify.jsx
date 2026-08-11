@@ -5,9 +5,12 @@ import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import { authApi } from "../api/auth.api";
 import { useAuth } from "../component/Layout/AuthContext";
 import { FaEnvelope, FaLock, FaHeart, FaCrown } from "react-icons/fa";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 import "./Login.css";
 
 export default function EmailOtpVerify() {
+  const { siteSettings } = useSiteSettings();
+  const [logoError, setLogoError] = useState(false);
   const { email } = useAuth();
   const [localEmail, setLocalEmail] = useState(email || "");
   const [otp, setOtp] = useState("");
@@ -88,9 +91,18 @@ export default function EmailOtpVerify() {
           
           <div className="royal-auth-header">
             <div className="royal-crown-badge">
-              <FaCrown className="royal-crown-icon" />
+              {siteSettings.logo && !logoError ? (
+                <img
+                  src={siteSettings.logo}
+                  alt={siteSettings.companyName || "Logo"}
+                  onError={() => setLogoError(true)}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", padding: 0 }}
+                />
+              ) : (
+                <FaCrown className="royal-crown-icon" />
+              )}
             </div>
-            <h2 className="royal-auth-title">Begin Your Royal Journey</h2>
+            <h2 className="royal-auth-title">Rajput Alliances</h2>
             <p className="royal-auth-subtitle">Verify Your OTP</p>
             <div className="royal-divider">
               <span className="royal-divider-ornament">

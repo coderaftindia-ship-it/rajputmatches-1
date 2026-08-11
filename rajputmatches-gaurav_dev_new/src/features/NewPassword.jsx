@@ -6,8 +6,11 @@ import "../App.css";
 import "./Login.css";
 import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import { authApi, isSuccessResponse } from "../api";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 function NewPassword() {
+  const { siteSettings } = useSiteSettings();
+  const [logoError, setLogoError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -104,9 +107,18 @@ function NewPassword() {
           
           <div className="royal-auth-header">
             <div className="royal-crown-badge">
-              <FaCrown className="royal-crown-icon" />
+              {siteSettings.logo && !logoError ? (
+                <img
+                  src={siteSettings.logo}
+                  alt={siteSettings.companyName || "Logo"}
+                  onError={() => setLogoError(true)}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", padding: 0 }}
+                />
+              ) : (
+                <FaCrown className="royal-crown-icon" />
+              )}
             </div>
-            <h2 className="royal-auth-title">Begin Your Royal Journey</h2>
+            <h2 className="royal-auth-title">Rajput Alliances</h2>
             <p className="royal-auth-subtitle">Create New Password</p>
             <div className="royal-divider">
               <span className="royal-divider-ornament">

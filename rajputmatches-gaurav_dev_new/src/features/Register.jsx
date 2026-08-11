@@ -14,6 +14,7 @@ import { authApi } from "../api/auth.api";
 import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import royalPlaceBg from "../assets/images/royalplacebg.jpg";
 import indiaStatesData from "./state";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 import "./Login.css";
 
 /* ─── 1. Storage Wrapper (iOS Safari Private Browsing Guard) ───── */
@@ -121,6 +122,8 @@ const INDIAN_STATES_LIST = Object.keys(formattedStateMap).filter(
 /* ─── 5. Main Register Component ───────────────────────────────── */
 function Register() {
   const { register, email: authEmail } = useAuth();
+  const { siteSettings } = useSiteSettings();
+  const [logoError, setLogoError] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -413,9 +416,18 @@ function Register() {
           
           <div className="royal-auth-header">
             <div className="royal-crown-badge">
-              <FaCrown className="royal-crown-icon" />
+              {siteSettings.logo && !logoError ? (
+                <img
+                  src={siteSettings.logo}
+                  alt={siteSettings.companyName || "Logo"}
+                  onError={() => setLogoError(true)}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", padding: 0 }}
+                />
+              ) : (
+                <FaCrown className="royal-crown-icon" />
+              )}
             </div>
-            <h2 className="royal-auth-title">Begin Your Royal Journey</h2>
+            <h2 className="royal-auth-title">Rajput Alliances</h2>
             <p className="royal-auth-subtitle">Join the Exclusive Rajput Network</p>
             <div className="royal-divider">
               <span className="royal-divider-ornament">

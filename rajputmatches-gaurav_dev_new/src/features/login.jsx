@@ -14,8 +14,11 @@ import {
 } from "react-icons/fa";
 import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import { validateLoginUsername } from "../utils/authValidation";
+import { useSiteSettings } from "../context/SiteSettingsContext";
 
 function Login() {
+  const { siteSettings } = useSiteSettings();
+  const [logoError, setLogoError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [formData, setFormData] = useState({
@@ -101,9 +104,18 @@ function Login() {
           
           <div className="royal-auth-header">
             <div className="royal-crown-badge">
-              <FaCrown className="royal-crown-icon" />
+              {siteSettings.logo && !logoError ? (
+                <img
+                  src={siteSettings.logo}
+                  alt={siteSettings.companyName || "Logo"}
+                  onError={() => setLogoError(true)}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", padding: 0 }}
+                />
+              ) : (
+                <FaCrown className="royal-crown-icon" />
+              )}
             </div>
-            <h2 className="royal-auth-title">Begin Your Royal Journey</h2>
+            <h2 className="royal-auth-title">Rajput Alliances</h2>
             <p className="royal-auth-subtitle">Connecting Rajputs Worldwide</p>
             <div className="royal-divider">
               <span className="royal-divider-ornament">
