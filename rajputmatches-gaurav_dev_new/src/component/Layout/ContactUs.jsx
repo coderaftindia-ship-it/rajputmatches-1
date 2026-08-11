@@ -83,7 +83,7 @@ function ContactUs() {
         {/* Maroon/Gold Theme Overlay */}
         <div style={{
           position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-          background: "linear-gradient(135deg, rgba(80, 0, 0, 0.7) 0%, rgba(20, 0, 0, 0.95) 100%)",
+          background: "linear-gradient(135deg, rgba(89, 18, 59, 0.85) 0%, rgba(63, 12, 42, 0.95) 100%)",
           zIndex: 1
         }}></div>
 

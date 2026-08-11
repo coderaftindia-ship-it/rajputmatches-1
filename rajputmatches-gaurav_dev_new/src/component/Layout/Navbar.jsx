@@ -93,12 +93,12 @@ const Navbar = ({ forceSolid = false }) => {
 
   return (
     <header
-      className={`${forceSolid ? "sticky-top" : "fixed-top"} ${isScrolled || forceSolid ? "navbar-scrolled" : "navbar-transparent"}`}
-      style={{ zIndex: 1000 }}
+      className={`sticky-top ${isScrolled || forceSolid ? "navbar-scrolled" : "navbar-transparent"}`}
+      style={{ zIndex: 1000, top: 0 }}
     >
       <div className="container-fluid px-3 px-xl-5 d-flex justify-content-between align-items-center">
         <div className="logo-container flex-shrink-0">
-          <Link to="/home" className="d-flex align-items-center text-decoration-none group gap-2">
+          <Link to="/home" className="d-flex align-items-center text-decoration-none group ">
             <img
               src={siteSettings.logo || Logo}
               alt={siteSettings.companyName || "Rajput Alliances Logo"}

@@ -153,7 +153,7 @@ function About() {
           style={{
             minHeight: "75vh",
             width: "100%",
-            background: "linear-gradient(135deg, #3B0000 0%, #600000 50%, #200000 100%)",
+            background: "linear-gradient(135deg, var(--royal-maroon-dark, #59123B) 0%, #3f0c2a 100%)",
             color: "#ffffff"
           }}
         >
@@ -595,7 +595,7 @@ function About() {
               <div
                 className="p-4 p-md-5 rounded-4 h-100 text-white position-relative overflow-hidden shadow-lg"
                 style={{
-                  background: "linear-gradient(135deg, #500000 0%, #2B0000 100%)",
+                  background: "linear-gradient(135deg, var(--royal-maroon-dark, #59123B) 0%, #3f0c2a 100%)",
                   border: "2px solid #D4AF37"
                 }}
               >
@@ -628,7 +628,7 @@ function About() {
               <div
                 className="p-4 p-md-5 rounded-4 h-100 text-white position-relative overflow-hidden shadow-lg"
                 style={{
-                  background: "linear-gradient(135deg, #2B0000 0%, #500000 100%)",
+                  background: "linear-gradient(135deg, var(--royal-maroon-dark, #59123B) 0%, #3f0c2a 100%)",
                   border: "2px solid #D4AF37"
                 }}
               >
@@ -736,7 +736,7 @@ function About() {
             <div
               className="rounded-4 p-4 p-md-5 text-center position-relative overflow-hidden shadow-lg"
               style={{
-                background: "linear-gradient(135deg, #500000 0%, #3B0000 50%, #1F0000 100%)",
+                background: "linear-gradient(135deg, var(--royal-maroon-dark, #59123B) 0%, #3f0c2a 100%)",
                 border: "2px solid #D4AF37"
               }}
             >
