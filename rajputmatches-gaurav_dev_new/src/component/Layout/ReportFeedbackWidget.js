@@ -292,6 +292,7 @@ export default function ReportFeedbackWidget() {
                   <div style={{ position: "relative" }}>
                     <select
                       name="category"
+                      aria-label="Report or Feedback Category"
                       value={form.category}
                       onChange={handleChange}
                       required

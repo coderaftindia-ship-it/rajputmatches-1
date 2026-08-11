@@ -14,7 +14,7 @@ import {
   FaLinkedin,
 } from "react-icons/fa";
 
-const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "http://localhost:5000/").replace(/\/$/, "");
+import { publicApi } from "../../api/public.api";
 
 function Footer() {
   const { logout } = useAuth();
@@ -22,9 +22,9 @@ function Footer() {
   const [links, setLinks] = useState({});
 
   useEffect(() => {
-    fetch(`${BASE_URL}/api/v1/auth/social-links`)
-      .then((res) => res.json())
-      .then((data) => {
+    publicApi.getSocialLinks()
+      .then((res) => {
+        const data = res?.data || res;
         if (data?.links) {
           setLinks(data.links);
         }
@@ -107,7 +107,7 @@ function Footer() {
             </Link>
 
             <p className="mb-2.5" style={{ color: "rgba(255, 255, 255, 0.75)", fontSize: "0.82rem", lineHeight: "1.45", maxWidth: "520px" }}>
-              India's premier Rajput matrimonial platform. Discover verified profiles from esteemed Rajput families across the globe, where heritage, trust, and shared values come together to create lifelong relationship
+             Global matrimonial platform created to help Rajput families connect, discover meaningful relationships, and find compatible life partners while honoring the traditions, values, and heritage that unite the Rajput community.
             </p>
 
             <div className="d-flex gap-2 flex-wrap mb-2">

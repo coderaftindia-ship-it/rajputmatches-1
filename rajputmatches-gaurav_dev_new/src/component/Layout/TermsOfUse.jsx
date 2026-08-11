@@ -318,8 +318,8 @@ export default function TermsOfUse() {
                     To resolve or report a complaint regarding the Website or members who use the Website, please write to our support email:
                   </p>
                   <h5 className="fw-bold mb-0">
-                    <a href="mailto:info@Rajput Alliances.com" style={{ color: "var(--royal-gold-light)", textDecoration: "none" }}>
-                      info@Rajput Alliances.com
+                    <a href="mailto:info.rajputalliances@gmail.com" style={{ color: "var(--royal-gold-light)", textDecoration: "none" }}>
+                      info.rajputalliances@gmail.com
                     </a>
                   </h5>
                 </div>

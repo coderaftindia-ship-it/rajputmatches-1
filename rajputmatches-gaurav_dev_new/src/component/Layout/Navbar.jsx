@@ -98,24 +98,28 @@ const Navbar = ({ forceSolid = false }) => {
     >
       <div className="container-fluid px-3 px-xl-5 d-flex justify-content-between align-items-center">
         <div className="logo-container flex-shrink-0">
-          <Link to="/home" className="d-flex align-items-center gap-2 gap-md-3 text-decoration-none group">
+          <Link to="/home" className="d-flex align-items-center text-decoration-none group">
             <img
               src={siteSettings.logo || Logo}
-              alt={siteSettings.companyName || "Logo"}
+              alt={siteSettings.companyName || "Rajput Alliances Logo"}
+              width="72"
+              height="72"
+              loading="eager"
+              decoding="async"
               onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
               style={{
-                height: "46px",
-                width: "auto",
-                maxHeight: "54px",
+                height: "72px",
+                width: "72px",
+                maxHeight: "80px",
                 objectFit: "contain",
-                filter: "drop-shadow(0px 2px 6px rgba(89, 18, 59, 0.25))",
+                filter: "drop-shadow(0px 3px 8px rgba(89, 18, 59, 0.3))",
                 transition: "transform 0.3s ease"
               }}
             />
             <div className="d-none d-sm-flex flex-column text-start" style={{ whiteSpace: "nowrap" }}>
               <span style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "1.2rem",
+                fontSize: "1.3rem",
                 fontWeight: "800",
                 color: "var(--royal-maroon, #59123B)",
                 letterSpacing: "1.2px",
@@ -125,7 +129,7 @@ const Navbar = ({ forceSolid = false }) => {
                 {siteSettings.companyName || "Rajput Alliances"}
               </span>
               <span style={{
-                fontSize: "0.6rem",
+                fontSize: "0.65rem",
                 color: "var(--royal-gold-dark, #CD9024)",
                 letterSpacing: "2.5px",
                 fontWeight: "600",
@@ -147,7 +151,7 @@ const Navbar = ({ forceSolid = false }) => {
             </li>
             <li style={{ flexShrink: 0 }}>
               <Link to="/about" className={navLinkClass("/about", "/about-us")}>
-                About
+                About Us
               </Link>
             </li>
             {/* <li style={{ flexShrink: 0 }}>
@@ -285,7 +289,7 @@ const Navbar = ({ forceSolid = false }) => {
       {/* Slide-out Mobile Menu Drawer */}
       <div className={`mobile-menu-drawer ${isDrawerOpen ? "active" : ""}`}>
         <div className="drawer-header">
-          <img src={Logo} alt="Logo" />
+          <img src={Logo} alt="Rajput Alliances Logo" width="40" height="40" loading="lazy" decoding="async" />
           <button
             className="drawer-close-btn d-flex align-items-center justify-content-center rounded-circle p-2"
             onClick={() => setIsDrawerOpen(false)}

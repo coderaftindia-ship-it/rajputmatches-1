@@ -28,12 +28,24 @@ const DEFAULT_CMS = {
 };
 
 function ContactUs() {
-  const [cms, setCms] = useState(DEFAULT_CMS);
+  const [cms, setCms] = useState(() => {
+    try {
+      const cached = localStorage.getItem("api_cache_contactCMS");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed?.data?.data) return { ...DEFAULT_CMS, ...parsed.data.data };
+      }
+    } catch (e) {}
+    return DEFAULT_CMS;
+  });
 
   useEffect(() => {
     publicApi.getContactCMS()
       .then((res) => {
-        if (res?.data?.data) setCms({ ...DEFAULT_CMS, ...res.data.data });
+        if (res?.data?.data) {
+          const updated = { ...DEFAULT_CMS, ...res.data.data };
+          setCms(updated);
+        }
       })
       .catch(() => {});
   }, []);
@@ -265,7 +277,7 @@ export function ContactForm() {
         <div className="col-md-6">
           <label className="fw-semibold mb-2" style={{ color: "#4a4a4a", fontSize: "0.9rem" }}>MOBILE NUMBER</label>
           <div className="input-group rounded-3 overflow-hidden shadow-none" style={{ border: "1px solid #e9ecef" }}>
-            <select className="form-select border-0 shadow-none" name="countryCode" value={formData.countryCode} onChange={handleChange} style={{ maxWidth: "110px", backgroundColor: "#f1f3f5", color: "#495057", fontWeight: "500" }}>
+            <select className="form-select border-0 shadow-none" name="countryCode" aria-label="Country Code" value={formData.countryCode} onChange={handleChange} style={{ maxWidth: "110px", backgroundColor: "#f1f3f5", color: "#495057", fontWeight: "500" }}>
               <option value="+91">IN (+91)</option>
               <option value="+1">US (+1)</option>
               <option value="+44">UK (+44)</option>

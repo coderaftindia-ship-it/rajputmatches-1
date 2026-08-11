@@ -245,7 +245,7 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
   min-height: 180px;
   padding: 20px 14px;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   cursor: pointer;
@@ -271,7 +271,7 @@
   border: 1px solid rgba(212, 175, 55, 0.12);
   border-radius: 8px;
   pointer-events: none;
-  transition: all 0.35s ease;
+  transition: transform 0.35s ease, border-color 0.35s ease;
 }
 
 .premiumFeatureCard:hover::before {

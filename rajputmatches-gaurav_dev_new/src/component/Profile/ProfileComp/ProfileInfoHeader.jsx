@@ -10,7 +10,36 @@ import maleDefault from "../../../assets/images/male_default.png";
 const ProfileInfoHeader = () => {
   const { fetchUserData, profile, fetchprofile, userData: authUserData } = useAuth();
   const profileDetails = useOptionalProfileDetails();
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState(() => {
+    const initial = profileDetails?.user || authUserData;
+    if (initial) {
+      return {
+        firstName: initial?.firstName || "",
+        middleName: initial?.middleName || "",
+        lastName: initial?.lastName || "",
+        dateOfBirth: initial?.dateOfBirth ? initial.dateOfBirth.split("T")[0] : "",
+        mobile: initial?.mobile || "",
+        email: initial?.email || "",
+        martrId: initial?.martrId || "",
+      };
+    }
+    try {
+      const cached = localStorage.getItem("user_data_cache");
+      if (cached) {
+        const d = JSON.parse(cached);
+        return {
+          firstName: d?.firstName || "",
+          middleName: d?.middleName || "",
+          lastName: d?.lastName || "",
+          dateOfBirth: d?.dateOfBirth ? d.dateOfBirth.split("T")[0] : "",
+          mobile: d?.mobile || "",
+          email: d?.email || "",
+          martrId: d?.martrId || "",
+        };
+      }
+    } catch (e) {}
+    return {};
+  });
   const [error, setError] = useState("");
 
   useEffect(() => {

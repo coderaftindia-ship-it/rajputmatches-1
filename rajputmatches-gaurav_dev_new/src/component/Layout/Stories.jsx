@@ -34,60 +34,79 @@ function Stories() {
   };
 
 
-  const [storyData, setStoryData] = useState([
-    {
-      id: 1,
-      image: SS1,
-      title: "Samrat & Rajeshwari",
-      description:
-        "When Veer, a brave and ambitious entrepreneur, and Rani, a compassionate teacher, joined our platform, little did they know they were about to embark on a journey of a lifetime.",
-    },
-    {
-      id: 2,
-      image: SS2,
-      title: "Raj & Siya",
-      description:
-        "A beautiful tale of destiny bringing two souls together. Their families connected through our platform, and it was love at first sight.",
-    },
-    {
-      id: 3,
-      image: SS1,
-      title: "Vikram & Anjali",
-      description:
-        "They lived in different cities but shared the same values. Our platform bridged the distance and helped them find true companionship.",
-    },
-    {
-      id: 4,
-      image: SS2,
-      title: "Aditya & Meera",
-      description:
-        "From casual conversations to deep connections, their journey is a testament to the fact that soulmates do exist.",
-    },
-    {
-      id: 5,
-      image: SS1,
-      title: "Karan & Neha",
-      description:
-        "A classic tale of opposites attract. Karan's adventurous spirit perfectly complemented Neha's calm demeanor.",
-    },
-    {
-      id: 6,
-      image: SS2,
-      title: "Rahul & Priya",
-      description:
-        "Their families initiated the conversation, but it was their shared love for travel that sealed the deal.",
-    },
-  ]);
+  const [storyData, setStoryData] = useState(() => {
+    try {
+      const cached = localStorage.getItem("api_cache_storiesData");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [
+      {
+        id: 1,
+        image: SS1,
+        title: "Samrat & Rajeshwari",
+        description:
+          "When Veer, a brave and ambitious entrepreneur, and Rani, a compassionate teacher, joined our platform, little did they know they were about to embark on a journey of a lifetime.",
+      },
+      {
+        id: 2,
+        image: SS2,
+        title: "Raj & Siya",
+        description:
+          "A beautiful tale of destiny bringing two souls together. Their families connected through our platform, and it was love at first sight.",
+      },
+      {
+        id: 3,
+        image: SS1,
+        title: "Vikram & Anjali",
+        description:
+          "They lived in different cities but shared the same values. Our platform bridged the distance and helped them find true companionship.",
+      },
+      {
+        id: 4,
+        image: SS2,
+        title: "Aditya & Meera",
+        description:
+          "From casual conversations to deep connections, their journey is a testament to the fact that soulmates do exist.",
+      },
+      {
+        id: 5,
+        image: SS1,
+        title: "Karan & Neha",
+        description:
+          "A classic tale of opposites attract. Karan's adventurous spirit perfectly complemented Neha's calm demeanor.",
+      },
+      {
+        id: 6,
+        image: SS2,
+        title: "Rahul & Priya",
+        description:
+          "Their families initiated the conversation, but it was their shared love for travel that sealed the deal.",
+      },
+    ];
+  });
   const [activeIndex, setActiveIndex] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [cmsData, setCmsData] = useState({
-    heroSupertitle: "Real Love Stories",
-    heroTitle: "Where Tradition Meets <br/> True Love.",
-    heroDescription: "Discover how our exclusive matchmaking has helped countless couples build a beautiful legacy together. Your forever begins right here.",
-    vvipTitle: "VVIP Services for Ultimate Discretion",
-    vvipDescription: "For those seeking an even more exclusive experience, our VVIP membership provides a personal matchmaking manager, access to non-listed profiles, and personalized introductions.",
-    vvipButtonText: "Join the Rajput Legacy"
+  const [cmsData, setCmsData] = useState(() => {
+    const defaultCms = {
+      heroSupertitle: "Real Love Stories",
+      heroTitle: "Where Tradition Meets <br/> True Love.",
+      heroDescription: "Discover how our exclusive matchmaking has helped countless couples build a beautiful legacy together. Your forever begins right here.",
+      vvipTitle: "VVIP Services for Ultimate Discretion",
+      vvipDescription: "For those seeking an even more exclusive experience, our VVIP membership provides a personal matchmaking manager, access to non-listed profiles, and personalized introductions.",
+      vvipButtonText: "Join the Rajput Legacy"
+    };
+    try {
+      const cached = localStorage.getItem("api_cache_storiesCMS_data");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed) return { ...defaultCms, ...parsed };
+      }
+    } catch (e) {}
+    return defaultCms;
   });
   
   // Hero Section Slideshow State
@@ -117,11 +136,13 @@ function Stories() {
         : (res?.stories || res?.user || res?.data || []);
       if (list && list.length > 0) {
         setStoryData(list);
+        try { localStorage.setItem("api_cache_storiesData", JSON.stringify(list)); } catch (e) {}
       }
 
       const cmsRes = await publicApi.getStoriesCMS();
       if (cmsRes?.data?.success && cmsRes?.data?.data) {
         setCmsData((prev) => ({ ...prev, ...cmsRes.data.data }));
+        try { localStorage.setItem("api_cache_storiesCMS_data", JSON.stringify(cmsRes.data.data)); } catch (e) {}
       }
     } catch (err) {
       console.error("Error fetching stories data:", err);

@@ -5,11 +5,17 @@ import { BASE_URL } from "../api/client";
 const SiteSettingsContext = createContext();
 
 export const SiteSettingsProvider = ({ children }) => {
-  const [siteSettings, setSiteSettings] = useState({
-    companyName: "Rajput Alliances",
-    tagline: "Royal Matrimonial",
-    logo: "",
-    copyrightText: "© 2025-26 Rajput Alliances Matrimony. All Rights Reserved.",
+  const [siteSettings, setSiteSettings] = useState(() => {
+    try {
+      const cached = localStorage.getItem("site_settings_cache");
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return {
+      companyName: "Rajput Alliances",
+      tagline: "Royal Matrimonial",
+      logo: "",
+      copyrightText: "© 2025-26 Rajput Alliances Matrimony. All Rights Reserved.",
+    };
   });
 
   const getLogoUrl = (logoPath) => {
@@ -33,15 +39,19 @@ export const SiteSettingsProvider = ({ children }) => {
       const res = await publicApi.getSiteSettings();
       if (res?.data?.success && res?.data?.data) {
         const d = res.data.data;
-        setSiteSettings({
+        const newSettings = {
           companyName: d.companyName || "Rajput Alliances",
           tagline: d.tagline || "Royal Matrimonial",
           logo: d.logo ? getLogoUrl(d.logo) : "",
           copyrightText: d.copyrightText || "© 2025-26 Rajput Alliances Matrimony. All Rights Reserved.",
-        });
+        };
+        setSiteSettings(newSettings);
+        try {
+          localStorage.setItem("site_settings_cache", JSON.stringify(newSettings));
+        } catch (e) {}
       }
     } catch (err) {
-      console.error("Error fetching site settings:", err);
+      // Silent fallback to default site settings
     }
   };
 

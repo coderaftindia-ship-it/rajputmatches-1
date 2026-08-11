@@ -3,18 +3,19 @@
   --royal-maroon: #59123B;
   --royal-maroon-dark: #3f0c2a;
   --royal-maroon-light: #821A56;
-  --royal-gold: #EDB139;
+  --royal-gold: #D6961C;
   --royal-gold-light: #F5C870;
-  --royal-gold-dark: #CD9024;
+  --royal-gold-dark: #A6700E;
+  --royal-gold-text: #966200;
   --royal-cream: #FCF5EA;
   --royal-cream-dark: #F0E5D3;
   --royal-dark: #1A1A1A;
   --royal-text: #3D232C;
-  --royal-text-light: #7A5C66;
+  --royal-text-light: #5A3C47;
 
   /* ── Fonts ── */
-  --font-heading: 'Playfair Display', serif;
-  --font-body: 'Poppins', sans-serif;
+  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* ── Typography Scale (Desktop) ── */
   --fs-h1: 2rem;        /* 32px */

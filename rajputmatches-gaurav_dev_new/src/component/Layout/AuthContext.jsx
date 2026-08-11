@@ -42,7 +42,13 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
   });
-  const [userData, setUserData] = useState();
+  const [userData, setUserData] = useState(() => {
+    try {
+      const cached = localStorage.getItem("user_data_cache");
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return null;
+  });
   const [loading, setLoading] = useState(false);
 
   const setToken = (token) => {
@@ -71,9 +77,9 @@ export const AuthProvider = ({ children }) => {
           // User must verify and log in manually.
           // token and user data are intentionally NOT stored here.
 
-          toast.success("Registration successful! Please log in to continue.", {
+          toast.success("Khama Ghani, Hukum! Thank you for registering with Rajput Alliances. We will verify your account and email you once it is approved, so you can log in and create your profile.", {
             position: "top-center",
-            autoClose: 3000,
+            autoClose: 6000,
           });
 
           return { success: true, message: responseMessage };
@@ -221,7 +227,10 @@ export const AuthProvider = ({ children }) => {
     if (isAuthenticated) {
       (async () => {
         const user = await fetchUserData("user");
-        setUserData(user || null);
+        if (user) {
+          setUserData(user);
+          try { localStorage.setItem("user_data_cache", JSON.stringify(user)); } catch (e) {}
+        }
       })();
     }
   }, [isAuthenticated]);

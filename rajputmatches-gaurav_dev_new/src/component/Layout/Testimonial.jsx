@@ -45,7 +45,7 @@ const Testimonial = () => {
         </div>
       </div>
       <div className="m-auto" style={{ marginTop: "3rem", width: "80%" }}>
-        <img className="w-100" src={border} alt="border" />
+        <img width="800" height="12" loading="lazy" decoding="async" className="w-100" src={border} alt="Decorative border" />
       </div>
     </div>
   );

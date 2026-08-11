@@ -113,7 +113,7 @@ exports.signup = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "User registered successfully. Pending admin approval.",
+      message: "Khama Ghani, Hukum!\n\nThank you for registering with Rajput Alliances. We will verify your account and email you once it is approved, so you can log in and create your profile.",
       user,
       success: true,
     });

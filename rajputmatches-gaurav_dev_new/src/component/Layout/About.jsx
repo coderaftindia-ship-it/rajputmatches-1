@@ -174,6 +174,7 @@ function About() {
               loop
               muted
               playsInline
+              preload="metadata"
               style={{
                 width: "100%",
                 height: "100%",
@@ -326,8 +327,7 @@ function About() {
                   className="display-5 fw-bold mb-3"
                   style={{ fontFamily: "var(--font-heading)", color: "#3B0000", lineHeight: 1.25 }}
                 >
-                  More Than Finding a Partner — <br className="d-none d-md-block" />
-                  <span style={{ color: "#800000" }}>It Is the Union of Two Families</span>
+                  More Than Finding a Partner  <br className="d-none d-md-block" />
                 </h2>
                 <div style={{ width: "80px", height: "3px", backgroundColor: "#D4AF37", margin: "0 auto" }}></div>
               </div>
@@ -343,7 +343,7 @@ function About() {
                   color: "#4A4A4A"
                 }}
               >
-                Marriage is more than finding a partner. It is the union of two families, two traditions, and two journeys. At Rajput Alliance, we help make that journey meaningful by connecting verified Rajput profiles from India and across the globe.
+                It is the union of two families, two traditions, and two journeys. At Rajput Alliance, we help make that journey meaningful by connecting verified Rajput profiles from India and across the globe.
               </p>
 
               {/* 3 Pillar Cards: Two Families, Two Traditions, Two Journeys */}
@@ -809,7 +809,7 @@ function About() {
                         e.currentTarget.style.boxShadow = "0 8px 25px rgba(212, 175, 55, 0.35)";
                       }}
                     >
-                      <span>{isAuthenticated ? "Find Matches Now" : "Register / Find Matches"}</span>
+                      <span>{isAuthenticated ? "Find Alliances Now" : "Register / Find Matches"}</span>
                       <ArrowRight size={20} />
                     </button>
                   </Link>

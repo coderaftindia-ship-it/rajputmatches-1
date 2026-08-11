@@ -445,7 +445,10 @@ const FilterLabel = ({ children }) => (
 /* ─── Filter select input ─── */
 const FilterSelect = ({ name, value, onChange, children }) => (
   <select
-    name={name} value={value} onChange={onChange}
+    name={name}
+    aria-label={name ? name.replace(/([A-Z])/g, ' $1') : "Filter selection"}
+    value={value}
+    onChange={onChange}
     style={{
       width:"100%", padding:"9px 14px", borderRadius:"10px",
       border:"1.5px solid rgba(89,18,59,0.13)", background:"#fff",

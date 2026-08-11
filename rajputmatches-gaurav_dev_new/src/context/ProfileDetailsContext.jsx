@@ -22,13 +22,19 @@ export function ProfileDetailsProvider({ children, enabled = true }) {
   const { fetchUserData } = useAuth();
   const { userData: authUserData } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({
-    user: authUserData || null,
-    horoscope: null,
-    family: null,
-    professional: null,
-    media: null,
-    extendedFamily: null,
+  const [data, setData] = useState(() => {
+    try {
+      const cached = localStorage.getItem("profile_details_cache");
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return {
+      user: authUserData || null,
+      horoscope: null,
+      family: null,
+      professional: null,
+      media: null,
+      extendedFamily: null,
+    };
   });
 
   const loadAll = useCallback(
@@ -42,8 +48,6 @@ export function ProfileDetailsProvider({ children, enabled = true }) {
       try {
         const [user, horoscope, family, professional, media, extendedFamily] =
           await Promise.all([
-            // Prefer already-available user data from AuthContext to avoid
-            // an extra network roundtrip immediately after registration.
             authUserData ? Promise.resolve(authUserData) : fetchUserData(SECTION_ROUTES.user),
             fetchUserData(SECTION_ROUTES.horoscope),
             fetchUserData(SECTION_ROUTES.family),
@@ -52,14 +56,16 @@ export function ProfileDetailsProvider({ children, enabled = true }) {
             fetchUserData(SECTION_ROUTES.extendedFamily),
           ]);
 
-        setData({
+        const nextData = {
           user,
           horoscope,
           family,
           professional,
           media,
           extendedFamily,
-        });
+        };
+        setData(nextData);
+        try { localStorage.setItem("profile_details_cache", JSON.stringify(nextData)); } catch (e) {}
       } finally {
         setLoading(false);
       }

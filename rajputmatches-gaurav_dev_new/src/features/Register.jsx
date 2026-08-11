@@ -150,6 +150,7 @@ function Register() {
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpMessage, setOtpMessage] = useState("");
   const [resendDisabled, setResendDisabled] = useState(false);
+  const [registrationComplete, setRegistrationComplete] = useState(false);
 
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
@@ -324,7 +325,7 @@ function Register() {
       try {
         let response = await register("signup", formData, navigate);
         if (response && response.success) {
-          navigate("/login");
+          setRegistrationComplete(true);
         }
       } catch (error) {
         console.error("Error during registration:", error);
@@ -442,7 +443,42 @@ function Register() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} noValidate>
+            {registrationComplete ? (
+              <div style={{ textAlign: "center", padding: "20px 10px", animation: "fadeIn 0.5s ease-in-out" }}>
+                <div 
+                  style={{
+                    backgroundColor: "rgba(139, 0, 0, 0.04)",
+                    border: "1.5px solid var(--royal-gold, #d4af37)",
+                    borderRadius: "16px",
+                    padding: "28px 24px",
+                    marginBottom: "24px",
+                    boxShadow: "0 6px 20px rgba(0,0,0,0.06)"
+                  }}
+                >
+                  <h3 style={{ color: "var(--royal-maroon, #8b0000)", fontFamily: "Cinzel, serif", fontWeight: "700", marginBottom: "14px", fontSize: "1.6rem" }}>
+                    Khama Ghani, Hukum!
+                  </h3>
+                  <div className="royal-divider" style={{ marginBottom: "18px" }}>
+                    <span className="royal-divider-ornament">
+                      <FaCrown style={{ fontSize: "0.8rem", verticalAlign: "middle" }} />
+                    </span>
+                  </div>
+                  <p style={{ color: "#333", fontSize: "1.05rem", lineHeight: "1.7", margin: "0 auto", fontWeight: "500" }}>
+                    Thank you for registering with <strong>Rajput Alliances</strong>. We will verify your account and email you once it is approved, so you can log in and create your profile.
+                  </p>
+                </div>
+
+                <button 
+                  type="button" 
+                  className="royal-submit-btn" 
+                  onClick={() => navigate("/login")}
+                  style={{ maxWidth: "260px", margin: "0 auto" }}
+                >
+                  Proceed to Login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} noValidate>
               {/* Row 1: First Name, Middle Name & Last Name / Sub-clan */}
               <div className="royal-form-grid-3">
                 <div className="royal-form-group">
@@ -769,6 +805,7 @@ function Register() {
                 Register Account
               </button>
             </form>
+            )}
 
             <p className="royal-footer-text mt-4">
               Already have an account?{" "}

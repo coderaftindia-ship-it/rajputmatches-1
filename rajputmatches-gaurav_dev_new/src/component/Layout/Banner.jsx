@@ -293,6 +293,7 @@ function Banner() {
                     </label>
                     <select
                       name="ageRange"
+                      aria-label="Age Range"
                       className="form-select rounded-3 w-100"
                       defaultValue="22-30"
                       style={{ height: "45px", background: "#fff", border: "1.5px solid rgba(89,18,59,0.15)", fontSize: "0.92rem", color: "var(--royal-text)" }}

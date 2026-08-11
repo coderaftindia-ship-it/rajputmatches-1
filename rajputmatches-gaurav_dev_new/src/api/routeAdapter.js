@@ -99,8 +99,12 @@ const GET_ROUTE_HANDLERS = {
   },
 
   "profile/reviews": async () => {
-    const response = await apiClient.get("/auth/profile/reviews");
-    return response.data?.user ?? response.data;
+    try {
+      const response = await apiClient.get("/auth/profile/reviews");
+      return response.data?.user ?? response.data;
+    } catch (e) {
+      return [];
+    }
   },
 
   "chat/status": async () => {

@@ -311,8 +311,8 @@ export default function PrivacyPolicy() {
                     If you have any questions or concerns regarding this Privacy Policy, please contact us at:
                   </p>
                   <h5 className="fw-bold mb-0">
-                    <a href="mailto:info@Rajput Alliances.com" style={{ color: "var(--royal-gold-light)", textDecoration: "none" }}>
-                      info@Rajput Alliances.com
+                    <a href="mailto:info.rajputalliances@gmail.com" style={{ color: "var(--royal-gold-light)", textDecoration: "none" }}>
+                      info.rajputalliances@gmail.com
                     </a>
                   </h5>
                 </div>

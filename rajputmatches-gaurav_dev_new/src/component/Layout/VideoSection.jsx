@@ -2,15 +2,34 @@ import React, { useRef, useState, useEffect } from "react";
 import home1Video from "../../assets/images/home1_video.mp4";
 
 const VideoSection = () => {
+  const sectionRef = useRef(null);
   const videoRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [shouldLoad, setShouldLoad] = useState(false);
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!shouldLoad) return;
     const video = videoRef.current;
     if (!video) return;
     video.muted = true;
     video.play().catch(() => {});
-  }, []);
+  }, [shouldLoad]);
 
   const toggleMute = () => {
     const video = videoRef.current;
@@ -21,29 +40,34 @@ const VideoSection = () => {
 
   return (
     <section
+      ref={sectionRef}
       style={{
         position: "relative",
         width: "100%",
         lineHeight: 0,
         overflow: "hidden",
         background: "#0a0006",
+        minHeight: "300px"
       }}
     >
       {/* Full-width video */}
-      <video
-        ref={videoRef}
-        src={home1Video}
-        autoPlay
-        loop
-        playsInline
-        muted
-        style={{
-          width: "100%",
-          height: "420px",
-          display: "block",
-          objectFit: "cover",
-        }}
-      />
+      {shouldLoad && (
+        <video
+          ref={videoRef}
+          src={home1Video}
+          autoPlay
+          loop
+          playsInline
+          muted
+          preload="metadata"
+          style={{
+            width: "100%",
+            height: "420px",
+            display: "block",
+            objectFit: "cover",
+          }}
+        />
+      )}
 
       {/* Subtle gradient overlay at bottom so mute button is visible */}
       <div

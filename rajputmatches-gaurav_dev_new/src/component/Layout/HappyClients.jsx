@@ -158,7 +158,7 @@ const HappyClients = () => {
           setDynamicStories(normalized);
         }
       } catch (err) {
-        console.error("Error fetching reviews for testimonial slider:", err);
+        // Silently fallback to default static testimonials when API is unavailable
       }
     };
     fetchReviews();

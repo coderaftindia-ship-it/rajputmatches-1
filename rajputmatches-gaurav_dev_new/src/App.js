@@ -1,44 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
-import Navbar from "./component/Layout/Navbar";
-import Banner from "./component/Layout/Banner";
-import Features from "./component/Layout/Features";
-import About from "./component/Layout/About";
-import Login from "./features/login";
-import Register from "./features/Register";
-import ForgotPassword from "./features/ForgetPassword";
-import Profile from "./component/Profile/ProfileComp/Profile";
-import Mydetails from "./component/Profile/BasicDetails/Mydetails";
+import Home from "./component/Layout/Home";
 import ProtectedRoute from "./component/Layout/ProtectedRoute";
 import { AuthProvider } from "./component/Layout/AuthContext";
 import { SiteSettingsProvider } from "./context/SiteSettingsContext";
-import Profilenavbar from "./component/Profile/ProfileComp/Profilenavbar";
-import Settings from "./component/Profile/ProfileComp/Settings";
-import SearchPage from "./component/Layout/SearchPage";
-import Home from "./component/Layout/Home";
-import NewPassword from "./features/NewPassword";
-import Stories from "./component/Layout/Stories";
-import ContactUs from "./component/Layout/ContactUs";
-import HowToUse from "./component/Layout/HowToUse";
-import NotFoundPage from "./component/Layout/NotFoundPage";
-import ChatApp from "./component/Layout/ChatApp";
-import Verification from "./features/Verification";
-import VerifyEmail from "./features/VerifyEmail";
-import EmailOtpVerify from "./features/EmailOtpVerify";
 import BottomNav from "./component/Layout/BottomNav";
-import PrivacyPolicy from "./component/Layout/PrivacyPolicy";
-import TermsOfUse from "./component/Layout/TermsOfUse";
 import ReportFeedbackWidget from "./component/Layout/ReportFeedbackWidget";
 
-import ViewImages from "./component/Profile/Forms/ViewImages";
-import ViewPage from "./component/Profile/Forms/ViewPage";
-import Dashboard from "./component/Layout/Dashboard";
+// Lazy-loaded routes for code splitting & fast initial page load
+const Login = lazy(() => import("./features/login"));
+const Register = lazy(() => import("./features/Register"));
+const ForgotPassword = lazy(() => import("./features/ForgetPassword"));
+const NewPassword = lazy(() => import("./features/NewPassword"));
+const Verification = lazy(() => import("./features/Verification"));
+const VerifyEmail = lazy(() => import("./features/VerifyEmail"));
+const EmailOtpVerify = lazy(() => import("./features/EmailOtpVerify"));
+const About = lazy(() => import("./component/Layout/About"));
+const Stories = lazy(() => import("./component/Layout/Stories"));
+const ContactUs = lazy(() => import("./component/Layout/ContactUs"));
+const HowToUse = lazy(() => import("./component/Layout/HowToUse"));
+const PrivacyPolicy = lazy(() => import("./component/Layout/PrivacyPolicy"));
+const TermsOfUse = lazy(() => import("./component/Layout/TermsOfUse"));
+const NotFoundPage = lazy(() => import("./component/Layout/NotFoundPage"));
+const Dashboard = lazy(() => import("./component/Layout/Dashboard"));
+const Profile = lazy(() => import("./component/Profile/ProfileComp/Profile"));
+const SearchPage = lazy(() => import("./component/Layout/SearchPage"));
+const ChatApp = lazy(() => import("./component/Layout/ChatApp"));
+const Settings = lazy(() => import("./component/Profile/ProfileComp/Settings"));
+const ViewPage = lazy(() => import("./component/Profile/Forms/ViewPage"));
+const ViewImages = lazy(() => import("./component/Profile/Forms/ViewImages"));
 
 import { ToastContainer } from "react-toastify";
 import { FaFacebook, FaInstagram, FaWhatsapp, FaTelegram, FaYoutube, FaTwitter, FaLinkedin, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 
 import "react-toastify/dist/ReactToastify.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const BASE_URL = (process.env.REACT_APP_BASE_URL || process.env.VITE_APP_BASE_URL || "http://localhost:5000/").replace(/\/$/, "");
 
@@ -75,13 +70,15 @@ const getSocialUrl = (linksObj, key) => {
   return str;
 };
 
+import { publicApi } from "./api/public.api";
+
 function FloatingSocial() {
   const [links, setLinks] = useState({});
 
   useEffect(() => {
-    fetch(`${BASE_URL}/api/v1/auth/social-links`)
-      .then((res) => res.json())
-      .then((data) => {
+    publicApi.getSocialLinks()
+      .then((res) => {
+        const data = res?.data || res;
         if (data?.links) {
           setLinks(data.links);
         }
@@ -187,108 +184,112 @@ function App() {
       <ScrollToTop />
       <FloatingSocial />
       <ReportFeedbackWidget />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="home" element={<Home />} />
-     <Route path="login" element={<Login />} />
-        <Route path="auth/emailverification" element={<Verification />} />
-        <Route path="auth/otp-verify" element={<EmailOtpVerify />} />
-         <Route path="signup" element={<Register />} />
+      <Suspense fallback={
+        <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div className="spinner-border text-warning" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      }>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="home" element={<Home />} />
+          <Route path="login" element={<Login />} />
+          <Route path="auth/emailverification" element={<Verification />} />
+          <Route path="auth/otp-verify" element={<EmailOtpVerify />} />
+          <Route path="signup" element={<Register />} />
 
-         <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="set-new-password" element={<NewPassword />} />
-        <Route path="reset-password" element={<NewPassword />} />
-        <Route path="verify-email" element={<VerifyEmail />} />   
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="set-new-password" element={<NewPassword />} />
+          <Route path="reset-password" element={<NewPassword />} />
+          <Route path="verify-email" element={<VerifyEmail />} />   
 
-        <Route path="about" element={<About />} />
-       <Route path="stories" element={<Stories />} />
-       <Route path="contact" element={<ContactUs />} />
-        <Route path="contact-us" element={<ContactUs />} />
-        <Route path="how-to-use" element={<HowToUse />} />
-        <Route path="privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="terms-of-use" element={<TermsOfUse />} /> 
+          <Route path="about" element={<About />} />
+          <Route path="stories" element={<Stories />} />
+          <Route path="contact" element={<ContactUs />} />
+          <Route path="contact-us" element={<ContactUs />} />
+          <Route path="how-to-use" element={<HowToUse />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="terms-of-use" element={<TermsOfUse />} /> 
 
-       
-        <Route path="*" element={<NotFoundPage />} />
+          <Route path="*" element={<NotFoundPage />} />
 
-      
-        <Route
-          path="dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        >
-          {/* <Route index element={<Mydetails />} /> */}
-        </Route>
-       <Route
-          path="search"
-          element={
-            <ProtectedRoute>
-              <SearchPage />
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="message"
-          element={
-            <ProtectedRoute>
-              <ChatApp />
-            </ProtectedRoute>
-          }
-        ></Route>
-        <Route
-          path="settings"
-          element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          }
-        /> 
-        <Route
-          path="profile/view/:profileId"
-          element={
-            <ProtectedRoute>
-              <ViewPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="search/view/:profileId"
-          element={
-            <ProtectedRoute>
-              <ViewPage />
-            </ProtectedRoute>
-          }
-        />
-         <Route
-          path="search/view/images/:profileId"
-          element={
-            <ProtectedRoute>
-              <ViewImages />
-            </ProtectedRoute>
-          }
-        /> 
-        <Route
-          path="profile/view/images/:profileId"
-          element={
-            <ProtectedRoute>
-              <ViewImages />
-            </ProtectedRoute>
-          }
-        />        
-      </Routes>
+          <Route
+            path="dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="search"
+            element={
+              <ProtectedRoute>
+                <SearchPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="message"
+            element={
+              <ProtectedRoute>
+                <ChatApp />
+              </ProtectedRoute>
+            }
+          ></Route>
+          <Route
+            path="settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          /> 
+          <Route
+            path="profile/view/:profileId"
+            element={
+              <ProtectedRoute>
+                <ViewPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="search/view/:profileId"
+            element={
+              <ProtectedRoute>
+                <ViewPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="search/view/images/:profileId"
+            element={
+              <ProtectedRoute>
+                <ViewImages />
+              </ProtectedRoute>
+            }
+          /> 
+          <Route
+            path="profile/view/images/:profileId"
+            element={
+              <ProtectedRoute>
+                <ViewImages />
+              </ProtectedRoute>
+            }
+          />        
+        </Routes>
+      </Suspense>
       <BottomNav />
     </AuthProvider>
     </SiteSettingsProvider>

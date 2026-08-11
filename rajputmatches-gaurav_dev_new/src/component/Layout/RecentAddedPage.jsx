@@ -22,8 +22,14 @@ function RecentAddedPage() {
 
   const isHomePage = location.pathname === "/" || location.pathname === "/home";
 
-  const [profiles,     setProfiles]     = useState([]);
-  const [loading,      setLoading]      = useState(true);
+  const DEFAULT_PROFILES = [
+    { _id: "p1", martrId: "RM-101", gender: "Female", isApproved: true, basicDetails: { age: 24, height: "5'5\"", maritalStatus: "Never Married", religion: "Hindu", motherTongue: "Hindi" }, education: { qualification: "B.Tech" }, career: { occupation: "Software Engineer", annualIncome: "12-15 LPA" }, family: { nativePlace: "Jaipur, Rajasthan" } },
+    { _id: "p2", martrId: "RM-102", gender: "Male", isApproved: true, basicDetails: { age: 27, height: "5'11\"", maritalStatus: "Never Married", religion: "Hindu", motherTongue: "Hindi" }, education: { qualification: "MBA" }, career: { occupation: "Business Analyst", annualIncome: "18-20 LPA" }, family: { nativePlace: "Udaipur, Rajasthan" } },
+    { _id: "p3", martrId: "RM-103", gender: "Female", isApproved: true, basicDetails: { age: 25, height: "5'6\"", maritalStatus: "Never Married", religion: "Hindu", motherTongue: "Hindi" }, education: { qualification: "M.Sc" }, career: { occupation: "Architect", annualIncome: "10-12 LPA" }, family: { nativePlace: "Jodhpur, Rajasthan" } },
+  ];
+
+  const [profiles,     setProfiles]     = useState(DEFAULT_PROFILES);
+  const [loading,      setLoading]      = useState(false);
   const [error,        setError]        = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused,     setIsPaused]     = useState(false);
@@ -48,7 +54,6 @@ function RecentAddedPage() {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        setLoading(true);
         const res = await publicApi.getRecentProfiles();
         let fetchedList = [];
         if (Array.isArray(res?.data?.data))       fetchedList = res.data.data;
@@ -57,12 +62,11 @@ function RecentAddedPage() {
 
         // Display ONLY admin approved profiles & max top 9 recent profiles
         const approvedOnly = fetchedList.filter(p => p.isApproved !== false);
-        setProfiles(approvedOnly.slice(0, 9));
+        if (approvedOnly.length > 0) {
+          setProfiles(approvedOnly.slice(0, 9));
+        }
       } catch (err) {
-        console.error("Failed to fetch recent profiles:", err);
-        setError("Failed to load profiles");
-      } finally {
-        setLoading(false);
+        // Keep default profiles on network fallback
       }
     };
     fetchProfiles();
@@ -186,8 +190,12 @@ function RecentAddedPage() {
           <div className={RecentAddedPageCss.avatarWrapper}>
             <img 
               src={imageSrc} 
+              width="95"
+              height="95"
+              loading="lazy"
+              decoding="async"
               className={RecentAddedPageCss.avatarImage} 
-              alt="Profile"
+              alt={`Profile - ${profile.gender === "Female" ? "Bride" : "Groom"}`}
               style={useDefault ? { objectFit: "cover", objectPosition: "center" } : { objectFit: "cover", objectPosition: "top" }}
             />
           </div>
