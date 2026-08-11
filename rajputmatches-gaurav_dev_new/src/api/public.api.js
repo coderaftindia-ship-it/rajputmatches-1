@@ -69,7 +69,7 @@ export const publicApi = {
     fetchCached("storiesCMS", () => apiClient.get("/auth/stories-cms"), 60000),
 
   getSiteSettings: () =>
-    fetchCached("siteSettings", () => apiClient.get("/auth/site-settings"), 60000),
+    apiClient.get("/auth/site-settings"),
 
   getSocialLinks: () =>
     fetchCached("socialLinks", () => apiClient.get("/auth/social-links"), 60000),

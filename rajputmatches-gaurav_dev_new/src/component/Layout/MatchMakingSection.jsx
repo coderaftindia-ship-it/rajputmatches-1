@@ -139,10 +139,21 @@ const MatchmakingSection = () => {
               </div>
 
               {/* Lower frame Cultural Accent Info */}
-              <div className="d-flex justify-content-center mt-3 gap-3 text-muted w-100 px-3" style={{ fontSize: "0.82rem", fontWeight: "600", letterSpacing: "1px" }}>
-                <span className="d-flex align-items-center gap-1.5"><FaCheckCircle color="var(--royal-gold-dark)" /> Verified Legacy</span>
-                <span style={{ color: "var(--royal-gold)" }}>•</span>
-                <span className="d-flex align-items-center gap-1.5"><FaShieldAlt color="var(--royal-gold-dark)" /> 100% Secure</span>
+              <div 
+                className="d-flex align-items-center justify-content-center mt-2 mt-md-3 gap-2 gap-md-3 text-muted w-100 px-1 px-md-3" 
+                style={{ 
+                  fontSize: "clamp(0.72rem, 2.8vw, 0.82rem)", 
+                  fontWeight: "600", 
+                  letterSpacing: "0.5px" 
+                }}
+              >
+                <span className="d-inline-flex align-items-center gap-1" style={{ whiteSpace: "nowrap", flexShrink: 0 }}>
+                  <FaCheckCircle color="var(--royal-gold-dark)" style={{ flexShrink: 0, fontSize: "0.9em" }} /> Verified Legacy
+                </span>
+                <span style={{ color: "var(--royal-gold)", flexShrink: 0 }}>•</span>
+                <span className="d-inline-flex align-items-center gap-1" style={{ whiteSpace: "nowrap", flexShrink: 0 }}>
+                  <FaShieldAlt color="var(--royal-gold-dark)" style={{ flexShrink: 0, fontSize: "0.9em" }} /> 100% Secure
+                </span>
               </div>
             </div>
           </div>

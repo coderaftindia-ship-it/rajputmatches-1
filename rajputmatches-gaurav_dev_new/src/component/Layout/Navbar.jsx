@@ -98,43 +98,41 @@ const Navbar = ({ forceSolid = false }) => {
     >
       <div className="container-fluid px-3 px-xl-5 d-flex justify-content-between align-items-center">
         <div className="logo-container flex-shrink-0">
-          <Link to="/home" className="d-flex align-items-center text-decoration-none group">
+          <Link to="/home" className="d-flex align-items-center text-decoration-none group gap-2">
             <img
               src={siteSettings.logo || Logo}
               alt={siteSettings.companyName || "Rajput Alliances Logo"}
-              width="72"
-              height="72"
               loading="eager"
               decoding="async"
               onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
               style={{
-                height: "72px",
-                width: "72px",
-                maxHeight: "80px",
+                height: "clamp(46px, 12vw, 68px)",
+                width: "clamp(46px, 12vw, 68px)",
+                maxHeight: "72px",
                 objectFit: "contain",
                 filter: "drop-shadow(0px 3px 8px rgba(89, 18, 59, 0.3))",
                 transition: "transform 0.3s ease"
               }}
             />
-            <div className="d-none d-sm-flex flex-column text-start" style={{ whiteSpace: "nowrap" }}>
+            <div className="d-flex flex-column text-start" style={{ whiteSpace: "nowrap" }}>
               <span style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "1.3rem",
+                fontSize: "clamp(0.92rem, 3.8vw, 1.3rem)",
                 fontWeight: "800",
                 color: "var(--royal-maroon, #59123B)",
-                letterSpacing: "1.2px",
+                letterSpacing: "1px",
                 lineHeight: "1.1",
                 textTransform: "uppercase"
               }}>
                 {siteSettings.companyName || "Rajput Alliances"}
               </span>
               <span style={{
-                fontSize: "0.65rem",
+                fontSize: "clamp(0.52rem, 2vw, 0.65rem)",
                 color: "var(--royal-gold-dark, #CD9024)",
-                letterSpacing: "2.5px",
+                letterSpacing: "2px",
                 fontWeight: "600",
                 textTransform: "uppercase",
-                marginTop: "2px"
+                marginTop: "1px"
               }}>
                 {siteSettings.tagline || "Royal Matrimonial"}
               </span>
@@ -289,7 +287,16 @@ const Navbar = ({ forceSolid = false }) => {
       {/* Slide-out Mobile Menu Drawer */}
       <div className={`mobile-menu-drawer ${isDrawerOpen ? "active" : ""}`}>
         <div className="drawer-header">
-          <img src={Logo} alt="Rajput Alliances Logo" width="40" height="40" loading="lazy" decoding="async" />
+          <img 
+            src={siteSettings.logo || Logo} 
+            alt={siteSettings.companyName || "Rajput Alliances Logo"} 
+            width="40" 
+            height="40" 
+            loading="lazy" 
+            decoding="async" 
+            onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
+            style={{ objectFit: "contain", maxHeight: "40px" }}
+          />
           <button
             className="drawer-close-btn d-flex align-items-center justify-content-center rounded-circle p-2"
             onClick={() => setIsDrawerOpen(false)}
