@@ -23,6 +23,7 @@ import maleDefault from "../../assets/images/male_default.png";
 import femaleDefault from "../../assets/images/female_default.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { calculateAge } from "../Profile/ProfileComp/ProfileInfoHeader";
+import ConfirmBlockModal from "./ConfirmBlockModal";
 import styles from "./RecentAddedPage.module.css";
 import { chatApi } from "../../api";
 
@@ -224,6 +225,16 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
     }
   };
 
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
+
+  const handleBlockClick = () => {
+    if (isBlocked) {
+      handleBlockToggle(profile._id);
+    } else {
+      setBlockModalOpen(true);
+    }
+  };
+
   const handleSendRequest = async (id) => {
     setConnStatus("pending");
     try {
@@ -419,7 +430,7 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
           <ConnBtn/>
           <button
             className={styles.squareButton}
-            onClick={() => handleBlockToggle(profile._id)}
+            onClick={handleBlockClick}
             title={isBlocked ? "Unblock Profile" : "Block Profile"}
             style={isBlocked
               ? { cursor: "pointer", color: "#dc3545", borderColor: "rgba(220,53,69,0.4)", background: "#fff5f5" }
@@ -428,6 +439,14 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
           >
             <MdBlock size={16}/>
           </button>
+          <ConfirmBlockModal
+            isOpen={blockModalOpen}
+            onClose={() => setBlockModalOpen(false)}
+            onConfirm={() => {
+              setBlockModalOpen(false);
+              handleBlockToggle(profile._id);
+            }}
+          />
         </div>
       </div>
     </div>
@@ -594,17 +613,34 @@ const SearchPage = () => {
     p?.height?.feet || p?.personaldetailsId?.height?.feet ||
     p?.basicdetailsId?.height?.feet || null;
 
-  // ── Client-side filter function (class + height) ──
+  // ── Client-side filter function (class + height + ID + Name) ──
   const applyClientFilters = (rawList, targetGender) => {
     const fd = formDataRef.current || {};
     const selectedClass = fd.class;
     const heightFrom = fd.HeightFeetfrom ? Number(fd.HeightFeetfrom) : null;
     const heightTo   = fd.HeightFeetto   ? Number(fd.HeightFeetto)   : null;
+    const searchId   = (fd.matrId || fd.searchId || "").trim();
+    const searchName = (fd.searchName || fd.name || "").trim().toLowerCase();
 
     return rawList.filter(p => {
       const isSelf     = p._id === userData?._id || p.userId === userData?._id;
       const isAdmin    = p.role === "admin";
       const matchesGender = !targetGender || p.gender === targetGender;
+
+      // Matrimony ID filter
+      let matchesId = true;
+      if (searchId) {
+        const cleanSearchId = searchId.replace(/^RA/i, "").toLowerCase();
+        const profileMartrId = String(p.martrId || p._id || "").toLowerCase();
+        matchesId = profileMartrId.includes(searchId.toLowerCase()) || profileMartrId.includes(cleanSearchId);
+      }
+
+      // Name filter
+      let matchesName = true;
+      if (searchName) {
+        const fullName = `${p.firstName || ""} ${p.middleName || ""} ${p.lastName || ""} ${p.name || ""}`.toLowerCase();
+        matchesName = fullName.includes(searchName);
+      }
 
       // Class filter
       const profileClass = getProfileClass(p);
@@ -619,7 +655,7 @@ const SearchPage = () => {
           (heightFrom === null || feet >= heightFrom) &&
           (heightTo   === null || feet <= heightTo));
 
-      return !isSelf && !isAdmin && matchesGender && matchesClass && matchesHeight;
+      return !isSelf && !isAdmin && matchesGender && matchesId && matchesName && matchesClass && matchesHeight;
     });
   };
 
@@ -677,7 +713,7 @@ const SearchPage = () => {
   }, [userData?.gender]);
 
   /* ── Count active filters ── */
-  const filterKeys = ["gender","minAge","maxAge","maritalStatus","clan","manglik","class","country","state","HeightFeetfrom","HeightFeetto"];
+  const filterKeys = ["gender","matrId","searchName","minAge","maxAge","maritalStatus","clan","manglik","class","country","state","HeightFeetfrom","HeightFeetto"];
   const activeFilterCount = filterKeys.filter(k => formData[k] && formData[k] !== "").length;
 
   /* ── Sidebar filter panel ── */
@@ -725,6 +761,46 @@ const SearchPage = () => {
            <option value="Female">Bride (Female)</option>
            <option value="Male">Groom (Male)</option>
          </FilterSelect>
+      </div>
+
+      {/* Matrimony ID Search */}
+      <div style={{ marginBottom:"18px" }}>
+        <FilterLabel>Matrimony ID (Direct Search)</FilterLabel>
+        <input
+          type="text"
+          name="matrId"
+          value={formData.matrId || ""}
+          onChange={handleChange}
+          placeholder="e.g. 1001 or RA1001"
+          style={{
+            width:"100%", padding:"9px 14px", borderRadius:"10px",
+            border:"1.5px solid rgba(89,18,59,0.13)", background:"#fff",
+            fontSize:"0.87rem", color:"var(--royal-maroon-dark)",
+            outline:"none", transition:"border-color .2s"
+          }}
+          onFocus={e => e.target.style.borderColor = "var(--royal-maroon)"}
+          onBlur={e => e.target.style.borderColor = "rgba(89,18,59,0.13)"}
+        />
+      </div>
+
+      {/* Name Search */}
+      <div style={{ marginBottom:"18px" }}>
+        <FilterLabel>Search by Name</FilterLabel>
+        <input
+          type="text"
+          name="searchName"
+          value={formData.searchName || ""}
+          onChange={handleChange}
+          placeholder="e.g. Gaurav or Singh"
+          style={{
+            width:"100%", padding:"9px 14px", borderRadius:"10px",
+            border:"1.5px solid rgba(89,18,59,0.13)", background:"#fff",
+            fontSize:"0.87rem", color:"var(--royal-maroon-dark)",
+            outline:"none", transition:"border-color .2s"
+          }}
+          onFocus={e => e.target.style.borderColor = "var(--royal-maroon)"}
+          onBlur={e => e.target.style.borderColor = "rgba(89,18,59,0.13)"}
+        />
       </div>
 
 

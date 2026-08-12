@@ -14,6 +14,7 @@ import { useAuth } from "./AuthContext";
 import maleDefault from "../../assets/images/male_default.png";
 import femaleDefault from "../../assets/images/female_default.png";
 import blurImage from "../../assets/images/blurimage.png";
+import ConfirmBlockModal from "./ConfirmBlockModal";
 
 function RecentAddedPage() {
   const { isAuthenticated, updateData } = useAuth();
@@ -34,6 +35,8 @@ function RecentAddedPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused,     setIsPaused]     = useState(false);
   const [windowWidth,  setWindowWidth]  = useState(window.innerWidth);
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [targetBlockId, setTargetBlockId] = useState(null);
 
   // Mobile swipe scroll ref
   const scrollRef = useRef(null);
@@ -116,12 +119,22 @@ function RecentAddedPage() {
     catch (e) { console.error(e); }
   };
 
-  const handleBlock = async (profileId) => {
+  const handleBlock = (profileId) => {
     if (!isAuthenticated) { navigate("/login"); return; }
+    setTargetBlockId(profileId);
+    setBlockModalOpen(true);
+  };
+
+  const handleConfirmBlock = async () => {
+    if (!targetBlockId) return;
     try {
-      await updateData("profile/block-toggle", profileId, true);
-      setProfiles(prev => prev.filter(p => p._id !== profileId));
+      await updateData("profile/block-toggle", targetBlockId, true);
+      setProfiles(prev => prev.filter(p => p._id !== targetBlockId));
     } catch (e) { console.error(e); }
+    finally {
+      setBlockModalOpen(false);
+      setTargetBlockId(null);
+    }
   };
 
   const handleSendInterest = async (profileId) => {
@@ -460,6 +473,11 @@ function RecentAddedPage() {
                 </button>
               </div>
             )}
+            <ConfirmBlockModal
+              isOpen={blockModalOpen}
+              onClose={() => { setBlockModalOpen(false); setTargetBlockId(null); }}
+              onConfirm={handleConfirmBlock}
+            />
           </div>
         )}
 

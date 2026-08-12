@@ -93,8 +93,8 @@ const Navbar = ({ forceSolid = false }) => {
 
   return (
     <header
-      className={`sticky-top ${isScrolled || forceSolid ? "navbar-scrolled" : "navbar-transparent"}`}
-      style={{ zIndex: 1000, top: 0 }}
+      className={`position-relative w-100 ${isScrolled || forceSolid ? "navbar-scrolled" : "navbar-transparent"}`}
+      style={{ zIndex: 1000 }}
     >
       <div className="container-fluid px-3 px-xl-5 d-flex justify-content-between align-items-center">
         <div className="logo-container flex-shrink-0">

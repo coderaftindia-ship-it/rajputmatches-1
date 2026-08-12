@@ -66,8 +66,15 @@ exports.signup = async (req, res) => {
         .json({ message: "Invalid mobile number format", success: false });
     }
 
+    const cleanEmail = email ? email.trim().toLowerCase() : "";
+    const safeEmailRegex = new RegExp(`^${cleanEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+
     const existingUser = await User.findOne({
-      $or: [{ email: email }, { mobile: mobile }],
+      $or: [
+        { email: safeEmailRegex },
+        { email: cleanEmail },
+        { mobile: mobile }
+      ],
     });
 
     if (existingUser) {
@@ -77,7 +84,9 @@ exports.signup = async (req, res) => {
       });
     }
 
-    const verifiedEmail = await VerifiedEmail.findOne({ email });
+    const verifiedEmail = await VerifiedEmail.findOne({
+      $or: [{ email: safeEmailRegex }, { email: cleanEmail }]
+    });
 
     if (!verifiedEmail || !verifiedEmail.isVerified) {
       return res.status(404).json({
@@ -97,7 +106,7 @@ exports.signup = async (req, res) => {
       lastName,
       countryCode,
       mobile,
-      email,
+      email: cleanEmail,
       dateOfBirth,
       gender,
       password: hashedPassword,
@@ -139,8 +148,15 @@ exports.login = async (req, res) => {
         .json({ message: "Username and password are required" });
     }
 
+    const cleanUsername = username.trim();
+    const safeUsernameRegex = new RegExp(`^${cleanUsername.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+
     const user = await User.findOne({
-      $or: [{ email: username }, { mobile: username }],
+      $or: [
+        { email: safeUsernameRegex },
+        { email: cleanUsername.toLowerCase() },
+        { mobile: cleanUsername }
+      ],
     });
 
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -302,7 +318,8 @@ exports.emailVerifyOtp = async (req, res) => {
         .json({ message: "Email and OTP are required", success: false });
     }
 
-    let resp = await verifyOTP(email, otp);
+    const cleanEmail = email.trim().toLowerCase();
+    let resp = await verifyOTP(cleanEmail, otp);
 
     if (!resp?.success) {
       return res
@@ -310,7 +327,12 @@ exports.emailVerifyOtp = async (req, res) => {
         .json({ message: "Invalid or Expired OTP", success: false });
     }
 
-    let existingRecord = await VerifiedEmail.findOne({ email });
+    let existingRecord = await VerifiedEmail.findOne({
+      $or: [
+        { email: cleanEmail },
+        { email: new RegExp(`^${cleanEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") }
+      ]
+    });
 
     if (existingRecord) {
       if (existingRecord.isVerified) {
@@ -321,7 +343,7 @@ exports.emailVerifyOtp = async (req, res) => {
       existingRecord.isVerified = true;
       await existingRecord.save();
     } else {
-      await VerifiedEmail.create({ email, isVerified: true });
+      await VerifiedEmail.create({ email: cleanEmail, isVerified: true });
     }
 
     return res
@@ -1847,6 +1869,9 @@ exports.getprofiles = async (req, res) => {
     const userId = req.user.id;
     const {
       name,
+      searchName,
+      matrId,
+      searchId,
       minAge,
       maxAge,
       gender,
@@ -1907,35 +1932,51 @@ exports.getprofiles = async (req, res) => {
         );
     }
 
-    if (name) {
-      if (!isNaN(name)) {
-        query.martrId = parseInt(name, 10);
+    const queryMatrId = matrId || searchId;
+    if (queryMatrId) {
+      const cleanId = String(queryMatrId).replace(/^RA/i, "").trim();
+      if (!isNaN(cleanId) && cleanId.length > 0) {
+        query.martrId = parseInt(cleanId, 10);
+      }
+    }
+
+    const queryName = name || searchName;
+    if (queryName) {
+      if (!isNaN(queryName)) {
+        query.martrId = parseInt(queryName, 10);
       } else {
-        const regex = new RegExp(name, "i");
-        query.$expr = {
-          $regexMatch: {
-            input: {
-              $trim: {
+        const regex = new RegExp(queryName.trim(), "i");
+        query.$or = [
+          { firstName: regex },
+          { lastName: regex },
+          { middleName: regex },
+          {
+            $expr: {
+              $regexMatch: {
                 input: {
-                  $concat: [
-                    "$firstName",
-                    " ",
-                    {
-                      $cond: {
-                        if: { $eq: ["$middleName", ""] },
-                        then: "",
-                        else: "$middleName",
-                      },
+                  $trim: {
+                    input: {
+                      $concat: [
+                        "$firstName",
+                        " ",
+                        {
+                          $cond: {
+                            if: { $eq: ["$middleName", ""] },
+                            then: "",
+                            else: "$middleName",
+                          },
+                        },
+                        " ",
+                        "$lastName",
+                      ],
                     },
-                    " ",
-                    "$lastName",
-                  ],
+                  },
                 },
+                regex: regex,
               },
             },
-            regex: regex,
           },
-        };
+        ];
       }
     }
 

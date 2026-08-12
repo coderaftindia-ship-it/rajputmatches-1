@@ -4,6 +4,7 @@ import ProfileCard from "./ProfileCard";
 import femaleDefault from "../../../assets/images/female_default.png";
 import maleDefault from "../../../assets/images/male_default.png";
 import { useAuth } from "../../Layout/AuthContext";
+import ConfirmBlockModal from "../../Layout/ConfirmBlockModal";
 
 export function RequestImageContainer({ profile }) {
   const isPrivate = profile?.filesId?.isPrivate && profile?.photoRequestStatus !== "accepted";
@@ -92,13 +93,24 @@ const ShortlistedProfile = () => {
     fetchData();
   };
 
-  const handleBlock = async (id) => {
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [targetBlockId, setTargetBlockId] = useState(null);
+
+  const requestBlock = (id) => {
+    setTargetBlockId(id);
+    setBlockModalOpen(true);
+  };
+
+  const handleConfirmBlock = async () => {
+    if (!targetBlockId) return;
     try {
-      await updateData("profile/block-toggle", id, true);
-      // Instantly filter out blocked profile from local state
-      setProfiles((prev) => prev.filter((p) => p?.profile?._id !== id));
+      await updateData("profile/block-toggle", targetBlockId, true);
+      setProfiles((prev) => prev.filter((p) => p?.profile?._id !== targetBlockId));
     } catch (err) {
       console.error("Block error:", err);
+    } finally {
+      setBlockModalOpen(false);
+      setTargetBlockId(null);
     }
   };
 
@@ -180,11 +192,16 @@ const ShortlistedProfile = () => {
           key={element._id}
           element={element}
           handleDelete={handleDelete}
-          handleBlock={handleBlock}
           ProfileImagerender={RequestImageContainer}
+          handleBlock={requestBlock}
           handleBookmark={handleBookmark}
         />
       ))}
+      <ConfirmBlockModal
+        isOpen={blockModalOpen}
+        onClose={() => { setBlockModalOpen(false); setTargetBlockId(null); }}
+        onConfirm={handleConfirmBlock}
+      />
     </div>
   );
 };

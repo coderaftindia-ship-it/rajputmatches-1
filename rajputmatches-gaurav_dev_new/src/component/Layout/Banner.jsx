@@ -94,13 +94,15 @@ function Banner() {
 
   return (
     <>
+      <Navbar />
       <div
         className="position-relative overflow-hidden banner-wrapper"
         style={{
-          minHeight: "100vh",
+          minHeight: "auto",
           display: "flex",
           flexDirection: "column",
-          overflowX: "hidden"
+          overflowX: "hidden",
+          paddingBottom: "1.5rem"
         }}
       >
         {/* Cinematic Ken Burns Background Zoom/Pan Effect */}
@@ -142,12 +144,8 @@ function Banner() {
           ))}
         </div>
 
-        <div style={{ zIndex: 10 }}>
-          <Navbar />
-        </div>
-
-        <div className="container d-flex flex-column justify-content-center flex-grow-1 position-relative" style={{ zIndex: 3 }}>
-          <div className="row align-items-center flex-grow-1 py-4 py-md-5 my-auto">
+        <div className="container d-flex flex-column position-relative" style={{ zIndex: 3, paddingTop: "0.25rem" }}>
+          <div className="row align-items-center py-2 py-md-4">
             {/* Left Column: Text & Badges */}
             <div className="col-12 col-lg-6 text-white pe-lg-5 mb-5 mb-lg-0">
               <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4" style={{ border: "1px solid rgba(237, 177, 57, 0.4)", background: "rgba(0,0,0,0.2)" }}>

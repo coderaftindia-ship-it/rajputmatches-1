@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { MdContactPhone, MdBlock } from "react-icons/md";
 import styles from "./ContactRequest.module.css";
+import ConfirmBlockModal from "../../Layout/ConfirmBlockModal";
 
 const TABS = [
   { key: "received", label: "Received" },
@@ -84,17 +85,28 @@ export default function ContactRequest() {
     }
   };
 
-  const handleBlock = async (profileId) => {
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [targetBlockId, setTargetBlockId] = useState(null);
+
+  const requestBlock = (profileId) => {
+    setTargetBlockId(profileId);
+    setBlockModalOpen(true);
+  };
+
+  const handleConfirmBlock = async () => {
+    if (!targetBlockId) return;
     try {
-      // Instantly remove from local lists
       setData(prev => ({
-        received: prev.received.filter(r => r.userId?._id !== profileId),
-        sent: prev.sent.filter(r => r.userId?._id !== profileId)
+        received: prev.received.filter(r => r.userId?._id !== targetBlockId),
+        sent: prev.sent.filter(r => r.userId?._id !== targetBlockId)
       }));
-      await updateData("profile/block-toggle", profileId, true);
+      await updateData("profile/block-toggle", targetBlockId, true);
       fetchData();
     } catch {
       showToast("Something went wrong. Please try again.", "error");
+    } finally {
+      setBlockModalOpen(false);
+      setTargetBlockId(null);
     }
   };
 
@@ -442,7 +454,7 @@ export default function ContactRequest() {
                         {/* Block Button */}
                         <button
                           title="Block User"
-                          onClick={() => handleBlock(user?._id)}
+                          onClick={() => requestBlock(user?._id)}
                           style={{
                             display: "flex", alignItems: "center", gap: "5px",
                             padding: "6px 12px", borderRadius: "20px",
@@ -501,6 +513,11 @@ export default function ContactRequest() {
           Showing {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, rawList.length)} of {rawList.length} requests
         </div>
       )}
+      <ConfirmBlockModal
+        isOpen={blockModalOpen}
+        onClose={() => { setBlockModalOpen(false); setTargetBlockId(null); }}
+        onConfirm={handleConfirmBlock}
+      />
     </div>
   );
 }

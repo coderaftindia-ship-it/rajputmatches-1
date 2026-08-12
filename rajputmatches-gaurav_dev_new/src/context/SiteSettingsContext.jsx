@@ -33,6 +33,27 @@ export const SiteSettingsProvider = ({ children }) => {
     fetchSettings();
   }, []);
 
+  // Dynamically update browser tab favicon & title
+  useEffect(() => {
+    if (siteSettings?.logo) {
+      try {
+        const iconLinks = document.querySelectorAll("link[rel*='icon']");
+        if (iconLinks.length > 0) {
+          iconLinks.forEach((link) => {
+            link.href = siteSettings.logo;
+          });
+        } else {
+          const newFavicon = document.createElement("link");
+          newFavicon.rel = "icon";
+          newFavicon.href = siteSettings.logo;
+          document.head.appendChild(newFavicon);
+        }
+      } catch (e) {
+        console.error("Error updating favicon:", e);
+      }
+    }
+  }, [siteSettings?.logo]);
+
   const fetchSettings = async () => {
     try {
       if (!publicApi || typeof publicApi.getSiteSettings !== "function") return;
