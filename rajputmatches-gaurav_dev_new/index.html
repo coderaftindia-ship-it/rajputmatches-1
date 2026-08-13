@@ -48,14 +48,9 @@
       media="print"
       onload="this.media='all'"
     />
-    <!-- Font Awesome CDN -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-      crossorigin="anonymous"
-      media="print"
-      onload="this.media='all'"
-    />
+    <!-- Preconnect to API server for LCP improvement -->
+    <link rel="preconnect" href="http://192.168.37.1:5000" />
+    <link rel="dns-prefetch" href="http://192.168.37.1:5000" />
     <title>Rajput Alliances</title>
   </head>
   <body>

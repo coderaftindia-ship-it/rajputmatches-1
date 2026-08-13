@@ -67,7 +67,7 @@ function Footer() {
           <div className="col-12 col-lg-6">
             <Link to="/" className="d-inline-flex align-items-center gap-2.5 mb-2 text-decoration-none">
               <img
-                src={Logo}
+                src={siteSettings.logo || Logo}
                 alt={siteSettings.companyName || "Logo"}
                 width="44"
                 height="44"

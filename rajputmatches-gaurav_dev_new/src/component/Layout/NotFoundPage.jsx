@@ -1,19 +1,20 @@
 import React, { useEffect } from "react";
-import lottie from "lottie-web";
 import { Link } from "react-router-dom";
 
 const NotFoundPage = () => {
   useEffect(() => {
-    const animation = lottie.loadAnimation({
-      container: document.querySelector(".lottie-animation"), // Target the container
-      renderer: "svg",
-      loop: true,
-      autoplay: true,
-      path: "https://lottie.host/d987597c-7676-4424-8817-7fca6dc1a33e/BVrFXsaeui.json", // Lottie animation URL
+    let animation;
+    import("lottie-web").then((lottie) => {
+      animation = lottie.default.loadAnimation({
+        container: document.querySelector(".lottie-animation"),
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: "https://lottie.host/d987597c-7676-4424-8817-7fca6dc1a33e/BVrFXsaeui.json",
+      });
     });
-
     return () => {
-      animation.destroy(); // Clean up animation on component unmount
+      if (animation) animation.destroy();
     };
   }, []);
 

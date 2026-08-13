@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from "react";
 import { Link } from "react-router-dom";
 import io from "socket.io-client";
 import { chatApi, BASE_URL } from "../../api";
-import EmojiPicker from "emoji-picker-react";
+const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
 import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
@@ -608,13 +608,15 @@ const ChatApp = () => {
                   {/* Emoji Picker Popup */}
                   {showEmojiPicker && (
                     <div className="chat-emoji-popup" ref={emojiPickerRef}>
-                      <EmojiPicker
-                        onEmojiClick={(emojiData) => {
-                          setMessage((prev) => prev + emojiData.emoji);
-                          setShowEmojiPicker(false);
-                          inputRef.current?.focus();
-                        }}
-                      />
+                      <Suspense fallback={<div style={{padding:'1rem'}}>Loading…</div>}>
+                        <EmojiPicker
+                          onEmojiClick={(emojiData) => {
+                            setMessage((prev) => prev + emojiData.emoji);
+                            setShowEmojiPicker(false);
+                            inputRef.current?.focus();
+                          }}
+                        />
+                      </Suspense>
                     </div>
                   )}
 

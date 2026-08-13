@@ -100,7 +100,7 @@ const Navbar = ({ forceSolid = false }) => {
         <div className="logo-container flex-shrink-0">
           <Link to="/home" className="d-flex align-items-center text-decoration-none group ">
             <img
-              src={Logo}
+              src={siteSettings.logo || Logo}
               alt={siteSettings.companyName || "Rajput Alliances Logo"}
               width="68"
               height="68"
@@ -291,7 +291,7 @@ const Navbar = ({ forceSolid = false }) => {
       <div className={`mobile-menu-drawer ${isDrawerOpen ? "active" : ""}`}>
         <div className="drawer-header">
           <img 
-            src={Logo} 
+            src={siteSettings.logo || Logo} 
             alt={siteSettings.companyName || "Rajput Alliances Logo"} 
             width="40" 
             height="40" 
