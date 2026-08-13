@@ -509,7 +509,8 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
 }
 
@@ -533,13 +534,14 @@
   border-radius: 50%;
   background: rgba(89, 18, 59, 0.15);
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  will-change: transform;
 }
 
 .dotActive {
-  width: 24px;
+  background: var(--royal-maroon);
   border-radius: 4px;
-  background: linear-gradient(90deg, var(--royal-maroon), var(--royal-gold-dark));
+  transform: scaleX(3);
 }
 
 /* ── Loading & Empty States ── */

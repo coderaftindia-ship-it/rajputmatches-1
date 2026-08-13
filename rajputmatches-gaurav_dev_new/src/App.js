@@ -1,13 +1,13 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
-import Home from "./component/Layout/Home";
 import ProtectedRoute from "./component/Layout/ProtectedRoute";
 import { AuthProvider } from "./component/Layout/AuthContext";
 import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import BottomNav from "./component/Layout/BottomNav";
-import ReportFeedbackWidget from "./component/Layout/ReportFeedbackWidget";
 
 // Lazy-loaded routes for code splitting & fast initial page load
+const Home = lazy(() => import("./component/Layout/Home"));
+const ReportFeedbackWidget = lazy(() => import("./component/Layout/ReportFeedbackWidget"));
 const Login = lazy(() => import("./features/login"));
 const Register = lazy(() => import("./features/Register"));
 const ForgotPassword = lazy(() => import("./features/ForgetPassword"));
@@ -90,12 +90,7 @@ function FloatingSocial() {
     { icon: <FaFacebook size={18} />, label: "Facebook", key: "facebook", color: "#1877F2" },
     { icon: <FaInstagram size={18} />, label: "Instagram", key: "instagram", color: "#E1306C" },
     { icon: <FaWhatsapp size={18} />, label: "WhatsApp", key: "whatsapp", color: "#25D366" },
-    { icon: <FaTelegram size={18} />, label: "Telegram", key: "telegram", color: "#0088cc" },
-    { icon: <FaYoutube size={18} />, label: "YouTube", key: "youtube", color: "#FF0000" },
-    { icon: <FaTwitter size={18} />, label: "Twitter / X", key: "twitter", color: "#1DA1F2" },
     { icon: <FaLinkedin size={18} />, label: "LinkedIn", key: "linkedin", color: "#0A66C2" },
-    { icon: <FaPhoneAlt size={16} />, label: "Support Phone", key: "supportPhone", color: "#28a745" },
-    { icon: <FaEnvelope size={16} />, label: "Support Email", key: "supportEmail", color: "#d97706" },
   ];
 
   const activeLinks = socialConfig
@@ -183,7 +178,6 @@ function App() {
 
       <ScrollToTop />
       <FloatingSocial />
-      <ReportFeedbackWidget />
       <Suspense fallback={
         <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div className="spinner-border text-warning" role="status">
@@ -191,6 +185,7 @@ function App() {
           </div>
         </div>
       }>
+        <ReportFeedbackWidget />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />

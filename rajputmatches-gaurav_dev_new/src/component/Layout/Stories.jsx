@@ -93,7 +93,7 @@ function Stories() {
   const [cmsData, setCmsData] = useState(() => {
     const defaultCms = {
       heroSupertitle: "Real Love Stories",
-      heroTitle: "Where Tradition Meets <br/> True Love.",
+      heroTitle: "Where Tradition Meets <br/> True Love",
       heroDescription: "Discover how our exclusive matchmaking has helped countless couples build a beautiful legacy together. Your forever begins right here.",
       vvipTitle: "VVIP Services for Ultimate Discretion",
       vvipDescription: "For those seeking an even more exclusive experience, our VVIP membership provides a personal matchmaking manager, access to non-listed profiles, and personalized introductions.",
@@ -239,7 +239,7 @@ function Stories() {
                 textShadow: "2px 2px 10px rgba(0,0,0,0.6)",
                 marginBottom: "1.5rem"
               }}
-              dangerouslySetInnerHTML={{ __html: cmsData.heroTitle }}
+              dangerouslySetInnerHTML={{ __html: (cmsData.heroTitle || "").replace(/True Love\./gi, "True Love").replace(/Love\./gi, "Love") }}
             />
             <p
               style={{

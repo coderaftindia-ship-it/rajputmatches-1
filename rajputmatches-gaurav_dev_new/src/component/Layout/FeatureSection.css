@@ -292,7 +292,8 @@
   align-items: center;
   border-radius: 50%;
   margin-bottom: 12px;
-  transition: all 0.35s ease;
+  transition: transform 0.35s ease, background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+  will-change: transform;
 }
 
 .premiumFeatureCard:hover .featureIconCircle {
@@ -310,7 +311,7 @@
   color: #1E0A0A;
   margin-bottom: 0;
   letter-spacing: 0.02em;
-  transition: all 0.35s ease;
+  transition: color 0.35s ease;
   text-transform: uppercase;
 }
 

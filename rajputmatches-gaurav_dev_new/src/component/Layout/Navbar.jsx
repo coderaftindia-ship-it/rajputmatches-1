@@ -100,9 +100,12 @@ const Navbar = ({ forceSolid = false }) => {
         <div className="logo-container flex-shrink-0">
           <Link to="/home" className="d-flex align-items-center text-decoration-none group ">
             <img
-              src={siteSettings.logo || Logo}
+              src={Logo}
               alt={siteSettings.companyName || "Rajput Alliances Logo"}
+              width="68"
+              height="68"
               loading="eager"
+              fetchPriority="high"
               decoding="async"
               onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
               style={{
@@ -288,7 +291,7 @@ const Navbar = ({ forceSolid = false }) => {
       <div className={`mobile-menu-drawer ${isDrawerOpen ? "active" : ""}`}>
         <div className="drawer-header">
           <img 
-            src={siteSettings.logo || Logo} 
+            src={Logo} 
             alt={siteSettings.companyName || "Rajput Alliances Logo"} 
             width="40" 
             height="40" 
@@ -353,6 +356,13 @@ const Navbar = ({ forceSolid = false }) => {
               <Link to="/settings" className={`drawer-link ${isActive("/settings") ? "active" : ""}`} onClick={() => setIsDrawerOpen(false)}>
                 Settings
               </Link>
+              <button
+                className="drawer-link text-danger d-flex align-items-center gap-2 w-100 bg-transparent border-0 text-start"
+                style={{ padding: "12px 16px", cursor: "pointer", fontWeight: "600", color: "#dc3545" }}
+                onClick={() => { setIsDrawerOpen(false); logout(); }}
+              >
+                <FaSignOutAlt size={16} /> Logout
+              </button>
             </>
           ) : null}
         </div>

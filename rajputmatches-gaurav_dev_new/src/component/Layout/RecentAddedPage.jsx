@@ -5,8 +5,6 @@ import {
   FaChevronLeft, FaChevronRight, FaGraduationCap, FaBriefcase,
   FaShieldAlt, FaRegHeart, FaMapMarkerAlt, FaCalendarAlt, FaUserTie,
 } from "react-icons/fa";
-import { MdBlock } from "react-icons/md";
-import { GiSwordClash } from "react-icons/gi";
 import RecentAddedPageCss from "./RecentAddedPage.module.css";
 import { publicApi } from "../../api";
 import { calculateAge } from "../Profile/ProfileComp/ProfileInfoHeader";
@@ -92,13 +90,23 @@ function RecentAddedPage() {
     if (currentIndex > maxIndex) setCurrentIndex(maxIndex);
   }, [maxIndex]);
 
-  // Sync dot indicator with mobile scroll position
+  // Sync dot indicator with mobile scroll position without forced reflow
   useEffect(() => {
     if (!isMobile || !scrollRef.current) return;
     const el = scrollRef.current;
+    let ticking = false;
     const onScroll = () => {
-      const idx = Math.round(el.scrollLeft / el.offsetWidth);
-      setCurrentIndex(idx);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          ticking = false;
+          if (el) {
+            const width = el.clientWidth || 1;
+            const idx = Math.round(el.scrollLeft / width);
+            setCurrentIndex((prev) => (prev !== idx ? idx : prev));
+          }
+        });
+        ticking = true;
+      }
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
@@ -177,7 +185,7 @@ function RecentAddedPage() {
     const isPrivate   = profile.filesId?.isPrivate;
 
     const details = [
-      { label: "Clan",            icon: <GiSwordClash />,    value: profile?.HoroscopicId?.clan },
+      { label: "Clan",            icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 13l2 2"/><path d="M9.5 6.5L21 18v3h-3L6.5 9.5"/><path d="M11 5L5 11"/><path d="M8 8L4 4"/><path d="M5 11L3 9"/></svg>, value: profile?.HoroscopicId?.clan },
       { label: "Age",             icon: <FaCalendarAlt />,   value: profile?.dateOfBirth ? `${calculateAge(profile.dateOfBirth)} yrs old` : null },
       { label: "Location",        icon: <FaMapMarkerAlt />,  value: profile?.address?.city && profile?.address?.state ? `${profile.address.city}, ${profile.address.state}` : (profile?.address?.city || profile?.address?.state || null) },
       { label: "High. Education", icon: <FaGraduationCap />, value: profile?.profdetailsId?.qualifications },
@@ -280,7 +288,7 @@ function RecentAddedPage() {
                 disabled={isHomePage}
                 style={isHomePage ? disabledOverlay : {}}
               >
-                <MdBlock />
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
               </button>
             </div>
 

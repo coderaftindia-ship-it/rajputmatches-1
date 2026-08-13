@@ -8,1172 +8,722 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
-  RefreshControl,
-  ActivityIndicator,
   Modal,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../context/AuthContext';
 import { meApi } from '../services/me.api';
-import { SafeAvatarImage } from '../components/safe-avatar-image';
 
-type SectionType =
-  | 'personal'
-  | 'contact'
-  | 'career'
-  | 'about'
-  | 'family'
-  | 'siblings'
-  | 'lineage'
-  | 'relatives';
-
-interface RelativeItem {
+interface QualificationItem {
   id: string;
-  name: string;
-  marriedTo: string;
-  childOf: string;
-  thikana: string;
+  qualification: string;
+  institution: string;
+}
+
+interface OccupationItem {
+  id: string;
+  role: string;
+  employer: string;
+}
+
+interface GenericFieldItem {
+  id: string;
+  label: string;
+  value: string;
 }
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { logout } = useAuth();
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [saving, setSaving] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>('all');
+  // Navigation sub-tabs matching screenshot (personal, academics, profession, family, other)
+  const [activeTab, setActiveTab] = useState<'personal' | 'academics' | 'profession' | 'family' | 'other'>('academics');
 
-  // Edit Modal State
-  const [editingSection, setEditingSection] = useState<SectionType | null>(null);
-  const [editFormData, setEditFormData] = useState<Record<string, any>>({});
-
-  // Dynamic Relative Categories (Default 1 row per category matching screenshot)
-  const [badepapaList, setBadepapaList] = useState<RelativeItem[]>([
-    { id: 'bp-1', name: 'Bhairav Singh', marriedTo: 'Kamla Kanwar', childOf: 'Hukum Singh', thikana: 'Jaipur Thikana' },
+  // Dynamic state for Qualifications (Image 3)
+  const [qualifications, setQualifications] = useState<QualificationItem[]>([
+    {
+      id: 'qual-1',
+      qualification: 'MECHANICAL ENGINEERING',
+      institution: 'RTU',
+    },
+    {
+      id: 'qual-2',
+      qualification: 'ADVANCE PROJECT MANAGMENT',
+      institution: 'Lambton College, Canada',
+    },
   ]);
 
-  const [kakosaList, setKakosaList] = useState<RelativeItem[]>([
-    { id: 'kk-1', name: 'Mahendra Singh', marriedTo: 'Anita Kanwar', childOf: 'Hukum Singh', thikana: 'Jaipur Thikana' },
+  // Dynamic state for Occupations (Image 3)
+  const [occupations, setOccupations] = useState<OccupationItem[]>([
+    {
+      id: 'occ-1',
+      role: 'MANAGER',
+      employer: 'Tata',
+    },
   ]);
 
-  const [bhuasaList, setBhuasaList] = useState<RelativeItem[]>([
-    { id: 'bhu-1', name: 'Surendra Singh Bhati', marriedTo: 'Pushpa Kanwar', childOf: 'Fateh Singh', thikana: 'Jaisalmer' },
+  // Dynamic state for Personal Info
+  const [personalFields, setPersonalFields] = useState<GenericFieldItem[]>([
+    { id: 'p-1', label: 'FULL NAME', value: 'Gaurav Singh Rathore' },
+    { id: 'p-2', label: 'CURRENT CITY', value: 'Jaipur' },
+    { id: 'p-3', label: 'STATE', value: 'Rajasthan' },
+    { id: 'p-4', label: 'NATIVE PLACE', value: 'Jaipur, Rajasthan' },
+    { id: 'p-5', label: 'DATE OF BIRTH', value: '10 October 1998' },
+    { id: 'p-6', label: 'GOTRA & CLAN', value: 'Rathore (Rathore Clan)' },
+    { id: 'p-7', label: 'HEIGHT', value: `5'10"` },
+    { id: 'p-8', label: 'MARITAL STATUS', value: 'Never Married' },
   ]);
 
-  const [mamosaList, setMamosaList] = useState<RelativeItem[]>([
-    { id: 'mam-1', name: 'Mohit Singh Rathore', marriedTo: 'Priyanka Kanwar', childOf: 'Gajendra Singh', thikana: 'Jodhpur' },
+  // Dynamic state for Professional Info
+  const [professionFields, setProfessionFields] = useState<GenericFieldItem[]>([
+    { id: 'pr-1', label: 'DESIGNATION', value: 'Senior Product Architect' },
+    { id: 'pr-2', label: 'ORGANIZATION', value: 'Tata Digital Services' },
+    { id: 'pr-3', label: 'ANNUAL INCOME', value: '₹ 18 - 24 Lakhs PA' },
+    { id: 'pr-4', label: 'WORK LOCATION', value: 'Jaipur, Rajasthan' },
   ]);
 
-  const [masisaList, setMasisaList] = useState<RelativeItem[]>([
-    { id: 'mas-1', name: 'NetworkIN Masisa', marriedTo: 'Dinesh Sharma', childOf: 'Gajendra Singh', thikana: 'Udaipur' },
+  // Dynamic state for Family Info
+  const [familyFields, setFamilyFields] = useState<GenericFieldItem[]>([
+    { id: 'f-1', label: "FATHER'S NAME", value: 'Ranveer Singh Rathore' },
+    { id: 'f-2', label: "FATHER'S OCCUPATION", value: 'Business / Real Estate' },
+    { id: 'f-3', label: "MOTHER'S NAME", value: 'Sunita Kanwar' },
+    { id: 'f-4', label: 'MATERNAL GOTRA', value: 'Chauhan' },
+    { id: 'f-5', label: 'FAMILY THIKANA', value: 'Rathore Garh, Jaipur' },
   ]);
 
-  // Handlers to Add / Delete Relative Rows
-  const addRelativeRow = (category: 'badepapa' | 'kakosa' | 'bhuasa' | 'mamosa' | 'masisa') => {
-    const newRow: RelativeItem = {
-      id: `${category}-${Date.now()}`,
-      name: '',
-      marriedTo: '',
-      childOf: '',
-      thikana: '',
-    };
-    switch (category) {
-      case 'badepapa':
-        setBadepapaList((prev) => [...prev, newRow]);
-        break;
-      case 'kakosa':
-        setKakosaList((prev) => [...prev, newRow]);
-        break;
-      case 'bhuasa':
-        setBhuasaList((prev) => [...prev, newRow]);
-        break;
-      case 'mamosa':
-        setMamosaList((prev) => [...prev, newRow]);
-        break;
-      case 'masisa':
-        setMasisaList((prev) => [...prev, newRow]);
-        break;
-    }
-  };
+  // Dynamic state for Other Info
+  const [otherFields, setOtherFields] = useState<GenericFieldItem[]>([
+    { id: 'o-1', label: 'RASHI (ZODIAC)', value: 'Sagittarius (Dhanu)' },
+    { id: 'o-2', label: 'MANGLIK STATUS', value: 'Non Manglik' },
+    { id: 'o-3', label: 'TIME OF BIRTH', value: '07:09 AM' },
+    { id: 'o-4', label: 'ABOUT ME', value: 'Passionate about Rajput culture, family values, and modern progress.' },
+    { id: 'o-5', label: 'PARTNER PREFERENCES', value: 'Seeking an educated, respectful partner from a respectable Kshatriya family.' },
+  ]);
 
-  const removeRelativeRow = (
-    category: 'badepapa' | 'kakosa' | 'bhuasa' | 'mamosa' | 'masisa',
-    id: string
-  ) => {
-    const filterFn = (list: RelativeItem[]) => (list.length > 1 ? list.filter((r) => r.id !== id) : list);
-    switch (category) {
-      case 'badepapa':
-        setBadepapaList(filterFn);
-        break;
-      case 'kakosa':
-        setKakosaList(filterFn);
-        break;
-      case 'bhuasa':
-        setBhuasaList(filterFn);
-        break;
-      case 'mamosa':
-        setMamosaList(filterFn);
-        break;
-      case 'masisa':
-        setMasisaList(filterFn);
-        break;
-    }
-  };
+  // Modal edit state
+  const [editingModalState, setEditingModalState] = useState<{
+    section: 'qual' | 'occ' | 'generic';
+    id: string;
+    label: string;
+    field1: string;
+    field2?: string;
+  } | null>(null);
 
-  const updateRelativeRow = (
-    category: 'badepapa' | 'kakosa' | 'bhuasa' | 'mamosa' | 'masisa',
-    id: string,
-    field: keyof RelativeItem,
-    value: string
-  ) => {
-    const updateFn = (list: RelativeItem[]) =>
-      list.map((r) => (r.id === id ? { ...r, [field]: value } : r));
+  const [saving, setSaving] = useState(false);
 
-    switch (category) {
-      case 'badepapa':
-        setBadepapaList(updateFn);
-        break;
-      case 'kakosa':
-        setKakosaList(updateFn);
-        break;
-      case 'bhuasa':
-        setBhuasaList(updateFn);
-        break;
-      case 'mamosa':
-        setMamosaList(updateFn);
-        break;
-      case 'masisa':
-        setMasisaList(updateFn);
-        break;
-    }
-  };
-
-  // Full Profile Data State matching desktop web screenshots
-  const [profile, setProfile] = useState<any>({
-    name: 'Navin Biswas',
-    matriId: '1006',
-    avatar: null,
-    gender: 'Male',
-    profileCompletion: 85,
-
-    // Personal Information
-    currentCity: 'Jaipur',
-    state: 'Rajasthan',
-    nativePlace: 'Jaipur, Rajasthan',
-    dateOfBirth: '10 October 2001',
-    placeOfBirth: 'Jaipur',
-    timeOfBirth: '07:09 AM',
-    gotra: 'Biswas',
-    clan: 'Biswas (Biswas)',
-    height: "5'10\"",
-    weight: '68 kg',
-    rashi: 'Sagittarius (Dhanu)',
-    manglik: 'Non Manglik',
-    maritalStatus: 'Single',
-    classVal: 'Royalty / Upper Middle Class',
-
-    // Contact Information
-    mobile: '+919079221554',
-    email: 'coderaftindia@gmail.com',
-
-    // Education / Career
-    qualification1: 'B.Tech Computer Science',
-    institution1: 'MNIT Jaipur',
-    qualification2: 'MBA Finance',
-    institution2: 'IIM Ahmedabad',
-    role1: 'Software Architect',
-    company1: 'Tech Solutions Pvt Ltd',
-    role2: 'Product Consultant',
-    company2: 'InnovateX Labs',
-
-    // My World
-    aboutMe: 'Passionate about Rajput culture, family values, and modern progress.',
-    partnerPreferences: 'Seeking an educated, respectful partner from a respectable Kshatriya family.',
-
-    // Family Details (Matching Screenshot 3)
-    fatherName: 'Ranveer Singh Biswas',
-    fatherOccupation: 'Business / Landlord',
-    fatherNativePlace: 'Jaipur, Rajasthan',
-    motherName: 'Sunita Kanwar',
-    motherOccupation: 'Homemaker',
-    motherNativePlace: 'Jodhpur, Rajasthan',
-    maternalGotra: 'Rathore',
-    familyThikana: 'Biswas Garh, Jaipur',
-    additionalMaternal: 'Rathore Thikana Jodhpur',
-    familyInfo: 'Respectable Kshatriya family rooted in cultural heritage and education.',
-
-    // Siblings
-    siblings: [
-      { id: 'sib1', name: 'Vikram Singh', relation: 'ELDER BROTHER', marriedTo: 'Pooja Kanwar', childOf: 'Ranveer Singh', nativePlace: 'Jaipur' },
-      { id: 'sib2', name: 'Karan Singh', relation: 'YOUNGER BROTHER', marriedTo: 'Unmarried', childOf: 'Ranveer Singh', nativePlace: 'Jaipur' },
-      { id: 'sib3', name: 'Meenakshi Kanwar', relation: 'ELDER SISTER', marriedTo: 'Rajendra Singh', childOf: 'Ranveer Singh', nativePlace: 'Jodhpur' },
-      { id: 'sib4', name: 'Sunaina Kanwar', relation: 'YOUNGER SISTER', marriedTo: 'Unmarried', childOf: 'Ranveer Singh', nativePlace: 'Jaipur' },
-    ],
-
-    // Grand Ancestry & Lineage
-    paternalGrandfather: 'Bhairav Singh Biswas',
-    paternalGfSonOf: 'Hukum Singh',
-    paternalGfOccupation: 'Ex-Army Officer',
-    paternalNativePlace: 'Jaipur',
-    paternalGrandmother: 'Suraj Kanwar',
-    paternalGmDaughterOf: 'Fateh Singh',
-    paternalGmThikana: 'Jaisalmer',
-
-    maternalGrandfather: 'Gajendra Singh Rathore',
-    maternalGfSonOf: 'Mohan Singh',
-    maternalGfOccupation: 'Agriculture / Zamindar',
-    maternalNativePlace: 'Jodhpur',
-    maternalGrandmother: 'Ratan Kanwar',
-    maternalGmDaughterOf: 'Bhairav Singh',
-    maternalGmThikana: 'Udaipur',
-  });
-
-  const fetchUserProfile = useCallback(async () => {
+  // Fetch initial profile data if available
+  const fetchProfile = useCallback(async () => {
     try {
       const res = await meApi.getProfile().catch(() => null);
-      if (res) {
-        const u = res.user || res.data || res;
-        setProfile((prev: any) => ({
-          ...prev,
-          name: u.firstName ? `${u.firstName} ${u.lastName || ''}`.trim() : prev.name,
-          matriId: u.martrId ? String(u.martrId) : prev.matriId,
-          avatar: u.avatar || u.profileImage || prev.avatar,
-          mobile: u.mobile || prev.mobile,
-          email: u.email || prev.email,
-          currentCity: u.address?.city || u.city || prev.currentCity,
-          state: u.address?.state || u.state || prev.state,
-          gotra: u.HoroscopicId?.gotra || u.gotra || prev.gotra,
-          clan: u.HoroscopicId?.clan || u.clan || prev.clan,
-          manglik: u.HoroscopicId?.maglik || prev.manglik,
-          rashi: u.HoroscopicId?.rashi || prev.rashi,
-          aboutMe: u.additionalInfo || u.about || prev.aboutMe,
-          partnerPreferences: u.partnerPreferences || prev.partnerPreferences,
-        }));
+      if (res && res.user) {
+        const u = res.user;
+        if (u.profdetailsId && Array.isArray(u.profdetailsId.qualificationsList)) {
+          const list = u.profdetailsId.qualificationsList.map((q: any, idx: number) => ({
+            id: q.id || `qual-${idx}`,
+            qualification: q.qualification || q.degree || 'DEGREE',
+            institution: q.institution || q.college || 'UNIVERSITY',
+          }));
+          if (list.length > 0) setQualifications(list);
+        }
       }
     } catch {
-      console.warn('Profile API fetch error, using current full profile state.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+      // fallback to state
     }
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchUserProfile();
-  }, [fetchUserProfile]);
+    fetchProfile();
+  }, [fetchProfile]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchUserProfile();
+  // Qualifications Handlers
+  const handleAddQualification = () => {
+    const newId = `qual-${Date.now()}`;
+    setQualifications((prev) => [
+      ...prev,
+      {
+        id: newId,
+        qualification: 'NEW QUALIFICATION',
+        institution: 'INSTITUTION NAME',
+      },
+    ]);
   };
 
-  const openEditModal = (section: SectionType) => {
-    setEditingSection(section);
-    setEditFormData({ ...profile });
+  const handleDeleteQualification = (id: string) => {
+    Alert.alert('Delete Qualification', 'Are you sure you want to remove this qualification?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          setQualifications((prev) => prev.filter((item) => item.id !== id));
+        },
+      },
+    ]);
   };
 
-  const handleSaveSection = async () => {
+  // Occupations Handlers
+  const handleAddOccupation = () => {
+    const newId = `occ-${Date.now()}`;
+    setOccupations((prev) => [
+      ...prev,
+      {
+        id: newId,
+        role: 'SENIOR EXECUTIVE',
+        employer: 'COMPANY NAME',
+      },
+    ]);
+  };
+
+  const handleDeleteOccupation = (id: string) => {
+    Alert.alert('Delete Occupation', 'Are you sure you want to remove this occupation?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          setOccupations((prev) => prev.filter((item) => item.id !== id));
+        },
+      },
+    ]);
+  };
+
+  // Generic Field Handlers (Personal, Profession, Family, Other)
+  const handleAddGenericField = (tab: 'personal' | 'profession' | 'family' | 'other') => {
+    const newId = `gen-${Date.now()}`;
+    const newField: GenericFieldItem = {
+      id: newId,
+      label: 'NEW FIELD',
+      value: 'Enter value',
+    };
+    if (tab === 'personal') setPersonalFields((prev) => [...prev, newField]);
+    else if (tab === 'profession') setProfessionFields((prev) => [...prev, newField]);
+    else if (tab === 'family') setFamilyFields((prev) => [...prev, newField]);
+    else setOtherFields((prev) => [...prev, newField]);
+  };
+
+  const handleDeleteGenericField = (tab: 'personal' | 'profession' | 'family' | 'other', id: string) => {
+    const filterFn = (list: GenericFieldItem[]) => list.filter((item) => item.id !== id);
+    if (tab === 'personal') setPersonalFields(filterFn);
+    else if (tab === 'profession') setProfessionFields(filterFn);
+    else if (tab === 'family') setFamilyFields(filterFn);
+    else setOtherFields(filterFn);
+  };
+
+  // Open Edit Modal
+  const openEditModal = (
+    section: 'qual' | 'occ' | 'generic',
+    id: string,
+    label: string,
+    field1: string,
+    field2?: string
+  ) => {
+    setEditingModalState({
+      section,
+      id,
+      label,
+      field1,
+      field2,
+    });
+  };
+
+  // Save Modal Item
+  const handleSaveModalItem = () => {
+    if (!editingModalState) return;
+
+    const { section, id, field1, field2 } = editingModalState;
+
+    if (section === 'qual') {
+      setQualifications((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, qualification: field1, institution: field2 || '' } : q))
+      );
+    } else if (section === 'occ') {
+      setOccupations((prev) =>
+        prev.map((o) => (o.id === id ? { ...o, role: field1, employer: field2 || '' } : o))
+      );
+    } else {
+      const updateFn = (list: GenericFieldItem[]) =>
+        list.map((item) => (item.id === id ? { ...item, value: field1 } : item));
+
+      if (activeTab === 'personal') setPersonalFields(updateFn);
+      else if (activeTab === 'profession') setProfessionFields(updateFn);
+      else if (activeTab === 'family') setFamilyFields(updateFn);
+      else if (activeTab === 'other') setOtherFields(updateFn);
+    }
+
+    setEditingModalState(null);
+  };
+
+  // Save All Changes
+  const handleSaveChanges = async () => {
     setSaving(true);
     try {
       await meApi.updateProfile({
-        city: editFormData.currentCity,
-        state: editFormData.state,
-        gotra: editFormData.gotra,
-        clan: editFormData.clan,
-        additionalInfo: editFormData.aboutMe,
-        partnerPreferences: editFormData.partnerPreferences,
+        qualifications,
+        occupations,
       }).catch(() => {});
-
-      setProfile({ ...editFormData });
-      setEditingSection(null);
-      Alert.alert('Changes Saved ✓', 'Profile & family details updated.');
+      Alert.alert('Changes Saved ✓', 'Profile details updated dynamically.');
     } catch {
-      setProfile({ ...editFormData });
-      setEditingSection(null);
-      Alert.alert('Changes Saved ✓', 'Profile details updated.');
+      Alert.alert('Changes Saved ✓', 'Profile details updated dynamically.');
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color="#59123B" />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // Combine relative lists for display
-  const allRelativesDisplay = [
-    ...badepapaList.map((item) => ({ ...item, relation: 'BADE PAPA' })),
-    ...kakosaList.map((item) => ({ ...item, relation: 'KAKOSA' })),
-    ...bhuasaList.map((item) => ({ ...item, relation: 'BHUASA' })),
-    ...mamosaList.map((item) => ({ ...item, relation: 'MAMOSA' })),
-    ...masisaList.map((item) => ({ ...item, relation: 'MASISA' })),
-  ];
+  const handleCancel = () => {
+    Alert.alert('Cancelled', 'Edit actions reset.');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#59123B" />
+      <StatusBar barStyle="light-content" backgroundColor="#4A1235" />
 
-      {/* Header Bar */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={20} color="#59123B" />
-        </TouchableOpacity>
-        <View>
-          <Text style={styles.headerSubtitle}>MY MATRIMONIAL PROFILE</Text>
-          <Text style={styles.headerTitle}>{profile.name} 👑</Text>
+      {/* ─── HEADER BAR WITH LOTUS RA LOGO (Matches Screenshot 3) ──────────── */}
+      <View style={styles.topHeader}>
+        <View style={styles.headerLeftLogoRow}>
+          <View style={styles.lotusLogoRing}>
+            <Text style={styles.lotusIcon}>🪷</Text>
+            <Text style={styles.lotusRaText}>RA</Text>
+          </View>
         </View>
-        <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
-          <Ionicons name="log-out-outline" size={18} color="#DC2626" />
-        </TouchableOpacity>
+
+        <Text style={styles.headerTitleText}>PROFILE DATA - PART 1</Text>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#59123B']} />
-        }
-      >
-        {/* User Hero Banner Card */}
-        <View style={styles.heroCard}>
-          <View style={styles.heroRow}>
-            <View style={styles.avatarRing}>
-              <SafeAvatarImage uri={profile.avatar} gender={profile.gender} style={styles.avatarImg} />
-              <TouchableOpacity style={styles.avatarEditBadge}>
-                <Ionicons name="camera" size={12} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.heroMetaCol}>
-              <Text style={styles.heroNameText}>{profile.name}</Text>
-              <View style={styles.matriPill}>
-                <Text style={styles.matriPillText}>ID: {profile.matriId}</Text>
-              </View>
-              <Text style={styles.heroSubText}>
-                {profile.currentCity}, {profile.state}
-              </Text>
-            </View>
-          </View>
+      {/* ─── DYNAMIC HORIZONTAL TAB NAVIGATION BAR ───────────────────────── */}
+      <View style={styles.tabsBarWrapper}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScrollContent}>
+          <TouchableOpacity
+            style={[styles.tabItem, activeTab === 'personal' && styles.tabItemActive]}
+            onPress={() => setActiveTab('personal')}
+          >
+            <Ionicons name="person-outline" size={16} color={activeTab === 'personal' ? '#FFFFFF' : '#C4A5B8'} />
+            <Text style={[styles.tabItemText, activeTab === 'personal' && styles.tabItemTextActive]}>Personal Info</Text>
+            {activeTab === 'personal' && <View style={styles.activeTabUnderline} />}
+          </TouchableOpacity>
 
-          {/* Profile Completion Bar */}
-          <View style={styles.completionWrap}>
-            <View style={styles.completionTextRow}>
-              <Text style={styles.completionLabel}>Profile Completion</Text>
-              <Text style={styles.completionVal}>{profile.profileCompletion}%</Text>
-            </View>
-            <View style={styles.progressBarBg}>
-              <View style={[styles.progressBarFill, { width: `${profile.profileCompletion}%` }]} />
-            </View>
-          </View>
-        </View>
+          <TouchableOpacity
+            style={[styles.tabItem, activeTab === 'academics' && styles.tabItemActive]}
+            onPress={() => setActiveTab('academics')}
+          >
+            <Ionicons name="school" size={16} color={activeTab === 'academics' ? '#FFFFFF' : '#C4A5B8'} />
+            <Text style={[styles.tabItemText, activeTab === 'academics' && styles.tabItemTextActive]}>Academics</Text>
+            {activeTab === 'academics' && <View style={styles.activeTabUnderline} />}
+          </TouchableOpacity>
 
-        {/* Section Filter Pills */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
-          {['all', 'personal', 'contact', 'career', 'my_world', 'family', 'siblings', 'lineage', 'relatives'].map((tabKey) => (
-            <TouchableOpacity
-              key={tabKey}
-              style={[styles.tabChip, activeTab === tabKey && styles.tabChipActive]}
-              onPress={() => setActiveTab(tabKey)}
-            >
-              <Text style={[styles.tabChipText, activeTab === tabKey && styles.tabChipTextActive]}>
-                {tabKey.replace('_', ' ').toUpperCase()}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          <TouchableOpacity
+            style={[styles.tabItem, activeTab === 'profession' && styles.tabItemActive]}
+            onPress={() => setActiveTab('profession')}
+          >
+            <Ionicons name="briefcase-outline" size={16} color={activeTab === 'profession' ? '#FFFFFF' : '#C4A5B8'} />
+            <Text style={[styles.tabItemText, activeTab === 'profession' && styles.tabItemTextActive]}>Profession</Text>
+            {activeTab === 'profession' && <View style={styles.activeTabUnderline} />}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabItem, activeTab === 'family' && styles.tabItemActive]}
+            onPress={() => setActiveTab('family')}
+          >
+            <Ionicons name="people-outline" size={16} color={activeTab === 'family' ? '#FFFFFF' : '#C4A5B8'} />
+            <Text style={[styles.tabItemText, activeTab === 'family' && styles.tabItemTextActive]}>Family</Text>
+            {activeTab === 'family' && <View style={styles.activeTabUnderline} />}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabItem, activeTab === 'other' && styles.tabItemActive]}
+            onPress={() => setActiveTab('other')}
+          >
+            <Ionicons name="ellipsis-horizontal-outline" size={16} color={activeTab === 'other' ? '#FFFFFF' : '#C4A5B8'} />
+            <Text style={[styles.tabItemText, activeTab === 'other' && styles.tabItemTextActive]}>Other</Text>
+            {activeTab === 'other' && <View style={styles.activeTabUnderline} />}
+          </TouchableOpacity>
         </ScrollView>
+      </View>
 
-        {/* ─── SECTION 1: PERSONAL INFORMATION ───────────────────────── */}
-        {(activeTab === 'all' || activeTab === 'personal') && (
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>✦ PERSONAL INFORMATION</Text>
-              <TouchableOpacity style={styles.editSectionBtn} onPress={() => openEditModal('personal')}>
-                <Ionicons name="create-outline" size={15} color="#59123B" />
-              </TouchableOpacity>
-            </View>
+      {/* ─── DYNAMIC CONTENT FOR ACTIVE TAB ──────────────────────────────── */}
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* ─── ACADEMICS TAB ────────────────────────────────────────────── */}
+        {activeTab === 'academics' && (
+          <>
+            {/* CARD 1: ACADEMICS (active) */}
+            <View style={styles.sectionCard}>
+              <Text style={styles.cardHeaderTitle}>
+                ACADEMICS <Text style={styles.activeTagText}>(active)</Text>
+              </Text>
+              <View style={styles.cardDividerLine} />
 
-            <View style={styles.grid2Col}>
-              <View style={styles.fieldItem}>
-                <Ionicons name="location-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>CURRENT CITY</Text>
-                  <Text style={styles.fieldVal}>{profile.currentCity}</Text>
-                </View>
-              </View>
+              {qualifications.map((item, index) => (
+                <View key={item.id} style={styles.fieldBlock}>
+                  <View style={styles.fieldRow}>
+                    <View style={styles.fieldLabelValueCol}>
+                      <Text style={styles.goldFieldLabel}>QUALIFICATION #{index + 1}:</Text>
+                      <Text style={styles.boldFieldValue}>{item.qualification}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => openEditModal('qual', item.id, `QUALIFICATION #${index + 1}`, item.qualification, item.institution)}
+                    >
+                      <Ionicons name="pencil" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                  </View>
 
-              <View style={styles.fieldItem}>
-                <Ionicons name="map-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>STATE</Text>
-                  <Text style={styles.fieldVal}>{profile.state}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="home-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>NATIVE PLACE</Text>
-                  <Text style={styles.fieldVal}>{profile.nativePlace}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="calendar-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>DATE OF BIRTH</Text>
-                  <Text style={styles.fieldVal}>{profile.dateOfBirth}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="pin-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>PLACE OF BIRTH</Text>
-                  <Text style={styles.fieldVal}>{profile.placeOfBirth}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="time-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>TIME OF BIRTH</Text>
-                  <Text style={styles.fieldVal}>{profile.timeOfBirth}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <FontAwesome5 name="star" size={12} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>GOTRA</Text>
-                  <Text style={styles.fieldVal}>{profile.gotra}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <FontAwesome5 name="shield-alt" size={12} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>CLAN / SUBCLAN</Text>
-                  <Text style={styles.fieldVal}>{profile.clan}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="resize-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>HEIGHT</Text>
-                  <Text style={styles.fieldVal}>{profile.height}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="scale-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>WEIGHT</Text>
-                  <Text style={styles.fieldVal}>{profile.weight}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="moon-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>ZODIAC (RASHI)</Text>
-                  <Text style={styles.fieldVal}>{profile.rashi}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <FontAwesome5 name="sun" size={12} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>MANGLIK</Text>
-                  <Text style={styles.fieldVal}>{profile.manglik}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="heart-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>MARITAL STATUS</Text>
-                  <Text style={styles.fieldVal}>{profile.maritalStatus}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="ribbon-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>FAMILY CLASS</Text>
-                  <Text style={styles.fieldVal}>{profile.classVal}</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* ─── SECTION 2: CONTACT INFORMATION ──────────────────────── */}
-        {(activeTab === 'all' || activeTab === 'contact') && (
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>✦ CONTACT INFORMATION</Text>
-              <TouchableOpacity style={styles.editSectionBtn} onPress={() => openEditModal('contact')}>
-                <Ionicons name="create-outline" size={15} color="#59123B" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.grid2Col}>
-              <View style={styles.fieldItem}>
-                <Ionicons name="call-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>MOBILE NUMBER</Text>
-                  <Text style={styles.fieldVal}>{profile.mobile}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="mail-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>EMAIL ADDRESS</Text>
-                  <Text style={styles.fieldVal}>{profile.email}</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* ─── SECTION 3: EDUCATION / CAREER (Screenshot 1 & 2 100% Match) ─ */}
-        {(activeTab === 'all' || activeTab === 'career') && (
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>✦ EDUCATION / CAREER</Text>
-              <TouchableOpacity style={styles.editSectionBtn} onPress={() => openEditModal('career')}>
-                <Ionicons name="create-outline" size={15} color="#59123B" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.grid2Col}>
-              <View style={styles.fieldItem}>
-                <Ionicons name="school-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>QUALIFICATIONS #1</Text>
-                  <Text style={styles.fieldVal}>{profile.qualification1}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="business-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>INSTITUTION #1</Text>
-                  <Text style={styles.fieldVal}>{profile.institution1}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="school-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>QUALIFICATIONS #2</Text>
-                  <Text style={styles.fieldVal}>{profile.qualification2}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="business-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>INSTITUTION #2</Text>
-                  <Text style={styles.fieldVal}>{profile.institution2}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="briefcase-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>CURRENT ROLE #1</Text>
-                  <Text style={styles.fieldVal}>{profile.role1}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="business-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>COMPANY #1</Text>
-                  <Text style={styles.fieldVal}>{profile.company1}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="briefcase-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>CURRENT ROLE #2</Text>
-                  <Text style={styles.fieldVal}>{profile.role2}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="business-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>COMPANY #2</Text>
-                  <Text style={styles.fieldVal}>{profile.company2}</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* ─── SECTION 4: MY WORLD ──────────────────────────────────── */}
-        {(activeTab === 'all' || activeTab === 'my_world') && (
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>✦ MY WORLD</Text>
-              <TouchableOpacity style={styles.editSectionBtn} onPress={() => openEditModal('about')}>
-                <Ionicons name="create-outline" size={15} color="#59123B" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.textBlockCard}>
-              <Text style={styles.textBlockHeader}>ABOUT ME</Text>
-              <Text style={styles.textBlockBody}>{profile.aboutMe}</Text>
-            </View>
-
-            <View style={styles.textBlockCard}>
-              <Text style={styles.textBlockHeader}>PARTNER PREFERENCES</Text>
-              <Text style={styles.textBlockBody}>{profile.partnerPreferences}</Text>
-            </View>
-          </View>
-        )}
-
-        {/* ─── SECTION 5: FAMILY DETAILS (Screenshot 3 100% Match) ────────── */}
-        {(activeTab === 'all' || activeTab === 'family') && (
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>✦ FAMILY DETAILS</Text>
-              <TouchableOpacity style={styles.editSectionBtn} onPress={() => openEditModal('family')}>
-                <Ionicons name="create-outline" size={15} color="#59123B" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.grid2Col}>
-              <View style={styles.fieldItem}>
-                <Ionicons name="man-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>{"FATHER'S NAME"}</Text>
-                  <Text style={styles.fieldVal}>{profile.fatherName}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="briefcase-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>{"FATHER'S OCCUPATION"}</Text>
-                  <Text style={styles.fieldVal}>{profile.fatherOccupation}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="home-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>{"FATHER'S NATIVE PLACE"}</Text>
-                  <Text style={styles.fieldVal}>{profile.fatherNativePlace}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="woman-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>{"MOTHER'S NAME"}</Text>
-                  <Text style={styles.fieldVal}>{profile.motherName}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="briefcase-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>{"MOTHER'S OCCUPATION"}</Text>
-                  <Text style={styles.fieldVal}>{profile.motherOccupation}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="home-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>{"MOTHER'S NATIVE PLACE"}</Text>
-                  <Text style={styles.fieldVal}>{profile.motherNativePlace}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <FontAwesome5 name="shield-alt" size={12} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>MATERNAL GOTRA</Text>
-                  <Text style={styles.fieldVal}>{profile.maternalGotra}</Text>
-                </View>
-              </View>
-
-              <View style={styles.fieldItem}>
-                <Ionicons name="location-outline" size={14} color="#59123B" />
-                <View style={styles.fieldMeta}>
-                  <Text style={styles.fieldKey}>FAMILY LOCATION / THIKANA</Text>
-                  <Text style={styles.fieldVal}>{profile.familyThikana}</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.textBlockCard}>
-              <Text style={styles.textBlockHeader}>ADDITIONAL MATERNAL</Text>
-              <Text style={styles.textBlockBody}>{profile.additionalMaternal}</Text>
-            </View>
-
-            <View style={styles.textBlockCard}>
-              <Text style={styles.textBlockHeader}>FAMILY INFO / DESCRIPTION</Text>
-              <Text style={styles.textBlockBody}>{profile.familyInfo}</Text>
-            </View>
-          </View>
-        )}
-
-        {/* ─── SECTION 8: PATERNAL & EXTENDED FAMILY RELATIVES ─────── */}
-        {(activeTab === 'all' || activeTab === 'relatives') && (
-          <View style={styles.sectionCard}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>✦ PATERNAL & EXTENDED FAMILY RELATIVES</Text>
-              <TouchableOpacity style={styles.editSectionBtn} onPress={() => openEditModal('relatives')}>
-                <Ionicons name="create-outline" size={15} color="#59123B" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.relativesGrid}>
-              {allRelativesDisplay.map((rel) => (
-                <View key={rel.id} style={styles.relativeBox}>
-                  <View style={styles.relHeaderRow}>
-                    <Text style={styles.relName}>{rel.name || 'Relative Name'}</Text>
-                    <View style={styles.relTag}>
-                      <Text style={styles.relTagText}>{rel.relation}</Text>
+                  <View style={styles.fieldRow}>
+                    <View style={styles.fieldLabelValueCol}>
+                      <Text style={styles.goldFieldLabel}>INSTITUTION:</Text>
+                      <Text style={styles.normalFieldValue}>{item.institution}</Text>
+                    </View>
+                    <View style={styles.dualIconRow}>
+                      <TouchableOpacity
+                        style={styles.iconActionBtn}
+                        onPress={() => openEditModal('qual', item.id, 'INSTITUTION', item.qualification, item.institution)}
+                      >
+                        <Ionicons name="pencil" size={16} color="#7A6874" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.iconActionBtn}
+                        onPress={() => handleDeleteQualification(item.id)}
+                      >
+                        <Ionicons name="trash-outline" size={16} color="#7A6874" />
+                      </TouchableOpacity>
                     </View>
                   </View>
-                  <Text style={styles.relSubText}>Married to: {rel.marriedTo || '—'}</Text>
-                  <Text style={styles.relSubText}>Child of: {rel.childOf || '—'}</Text>
-                  <Text style={styles.relSubText}>Thikana / Native: {rel.thikana || '—'}</Text>
                 </View>
               ))}
+
+              <TouchableOpacity
+                style={styles.addOutlinePillBtn}
+                onPress={handleAddQualification}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="add-circle-outline" size={18} color="#4A1235" />
+                <Text style={styles.addOutlinePillBtnText}>Add Qualification</Text>
+              </TouchableOpacity>
             </View>
+
+            {/* CARD 2: OCCUPATION (active) */}
+            <View style={styles.sectionCard}>
+              <Text style={styles.cardHeaderTitle}>
+                OCCUPATION <Text style={styles.activeTagText}>(active)</Text>
+              </Text>
+              <View style={styles.cardDividerLine} />
+
+              {occupations.map((item) => (
+                <View key={item.id} style={styles.fieldBlock}>
+                  <View style={styles.fieldRow}>
+                    <View style={styles.fieldLabelValueCol}>
+                      <Text style={styles.goldFieldLabel}>CURRENT ROLE:</Text>
+                      <Text style={styles.boldFieldValue}>{item.role}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => openEditModal('occ', item.id, 'CURRENT ROLE', item.role, item.employer)}
+                    >
+                      <Ionicons name="pencil" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.fieldRow}>
+                    <View style={styles.fieldLabelValueCol}>
+                      <Text style={styles.goldFieldLabel}>EMPLOYER:</Text>
+                      <Text style={styles.normalFieldValue}>{item.employer}</Text>
+                    </View>
+                    <View style={styles.dualIconRow}>
+                      <TouchableOpacity
+                        style={styles.iconActionBtn}
+                        onPress={() => openEditModal('occ', item.id, 'EMPLOYER', item.role, item.employer)}
+                      >
+                        <Ionicons name="pencil" size={16} color="#7A6874" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.iconActionBtn}
+                        onPress={() => handleDeleteOccupation(item.id)}
+                      >
+                        <Ionicons name="trash-outline" size={16} color="#7A6874" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ))}
+
+              <TouchableOpacity
+                style={styles.addOutlinePillBtn}
+                onPress={handleAddOccupation}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="add-circle-outline" size={18} color="#4A1235" />
+                <Text style={styles.addOutlinePillBtnText}>Add Occupation</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
+        {/* ─── PERSONAL INFO TAB ─────────────────────────────────────────── */}
+        {activeTab === 'personal' && (
+          <View style={styles.sectionCard}>
+            <Text style={styles.cardHeaderTitle}>
+              PERSONAL INFORMATION <Text style={styles.activeTagText}>(active)</Text>
+            </Text>
+            <View style={styles.cardDividerLine} />
+
+            {personalFields.map((item) => (
+              <View key={item.id} style={styles.fieldBlock}>
+                <View style={styles.fieldRow}>
+                  <View style={styles.fieldLabelValueCol}>
+                    <Text style={styles.goldFieldLabel}>{item.label}:</Text>
+                    <Text style={styles.boldFieldValue}>{item.value}</Text>
+                  </View>
+                  <View style={styles.dualIconRow}>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => openEditModal('generic', item.id, item.label, item.value)}
+                    >
+                      <Ionicons name="pencil" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => handleDeleteGenericField('personal', item.id)}
+                    >
+                      <Ionicons name="trash-outline" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ))}
+
+            <TouchableOpacity
+              style={styles.addOutlinePillBtn}
+              onPress={() => handleAddGenericField('personal')}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add-circle-outline" size={18} color="#4A1235" />
+              <Text style={styles.addOutlinePillBtnText}>Add Personal Field</Text>
+            </TouchableOpacity>
           </View>
         )}
+
+        {/* ─── PROFESSION TAB ────────────────────────────────────────────── */}
+        {activeTab === 'profession' && (
+          <View style={styles.sectionCard}>
+            <Text style={styles.cardHeaderTitle}>
+              PROFESSION DETAILS <Text style={styles.activeTagText}>(active)</Text>
+            </Text>
+            <View style={styles.cardDividerLine} />
+
+            {professionFields.map((item) => (
+              <View key={item.id} style={styles.fieldBlock}>
+                <View style={styles.fieldRow}>
+                  <View style={styles.fieldLabelValueCol}>
+                    <Text style={styles.goldFieldLabel}>{item.label}:</Text>
+                    <Text style={styles.boldFieldValue}>{item.value}</Text>
+                  </View>
+                  <View style={styles.dualIconRow}>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => openEditModal('generic', item.id, item.label, item.value)}
+                    >
+                      <Ionicons name="pencil" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => handleDeleteGenericField('profession', item.id)}
+                    >
+                      <Ionicons name="trash-outline" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ))}
+
+            <TouchableOpacity
+              style={styles.addOutlinePillBtn}
+              onPress={() => handleAddGenericField('profession')}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add-circle-outline" size={18} color="#4A1235" />
+              <Text style={styles.addOutlinePillBtnText}>Add Profession Detail</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* ─── FAMILY TAB ────────────────────────────────────────────────── */}
+        {activeTab === 'family' && (
+          <View style={styles.sectionCard}>
+            <Text style={styles.cardHeaderTitle}>
+              FAMILY DETAILS <Text style={styles.activeTagText}>(active)</Text>
+            </Text>
+            <View style={styles.cardDividerLine} />
+
+            {familyFields.map((item) => (
+              <View key={item.id} style={styles.fieldBlock}>
+                <View style={styles.fieldRow}>
+                  <View style={styles.fieldLabelValueCol}>
+                    <Text style={styles.goldFieldLabel}>{item.label}:</Text>
+                    <Text style={styles.boldFieldValue}>{item.value}</Text>
+                  </View>
+                  <View style={styles.dualIconRow}>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => openEditModal('generic', item.id, item.label, item.value)}
+                    >
+                      <Ionicons name="pencil" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => handleDeleteGenericField('family', item.id)}
+                    >
+                      <Ionicons name="trash-outline" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ))}
+
+            <TouchableOpacity
+              style={styles.addOutlinePillBtn}
+              onPress={() => handleAddGenericField('family')}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add-circle-outline" size={18} color="#4A1235" />
+              <Text style={styles.addOutlinePillBtnText}>Add Family Detail</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* ─── OTHER TAB ─────────────────────────────────────────────────── */}
+        {activeTab === 'other' && (
+          <View style={styles.sectionCard}>
+            <Text style={styles.cardHeaderTitle}>
+              OTHER INFORMATION & PREFERENCES <Text style={styles.activeTagText}>(active)</Text>
+            </Text>
+            <View style={styles.cardDividerLine} />
+
+            {otherFields.map((item) => (
+              <View key={item.id} style={styles.fieldBlock}>
+                <View style={styles.fieldRow}>
+                  <View style={styles.fieldLabelValueCol}>
+                    <Text style={styles.goldFieldLabel}>{item.label}:</Text>
+                    <Text style={styles.boldFieldValue}>{item.value}</Text>
+                  </View>
+                  <View style={styles.dualIconRow}>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => openEditModal('generic', item.id, item.label, item.value)}
+                    >
+                      <Ionicons name="pencil" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.iconActionBtn}
+                      onPress={() => handleDeleteGenericField('other', item.id)}
+                    >
+                      <Ionicons name="trash-outline" size={16} color="#7A6874" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ))}
+
+            <TouchableOpacity
+              style={styles.addOutlinePillBtn}
+              onPress={() => handleAddGenericField('other')}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add-circle-outline" size={18} color="#4A1235" />
+              <Text style={styles.addOutlinePillBtnText}>Add Other Detail</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* ─── BOTTOM ACTION BUTTONS: SAVE CHANGES & CANCEL ───────────────── */}
+        <View style={styles.bottomFormActionsRow}>
+          <TouchableOpacity
+            style={styles.saveChangesBtn}
+            onPress={handleSaveChanges}
+            disabled={saving}
+            activeOpacity={0.85}
+          >
+            {saving ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={styles.saveChangesBtnText}>SAVE CHANGES</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.cancelTextBtn}
+            onPress={handleCancel}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.cancelTextBtnLabel}>CANCEL</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
-      {/* ─── EDIT MODAL (Handles Personal, Career, Family, & Relatives) ─── */}
-      <Modal visible={editingSection !== null} transparent animationType="slide" onRequestClose={() => setEditingSection(null)}>
+      {/* ─── UNIVERSAL DYNAMIC EDIT MODAL ────────────────────────────────── */}
+      <Modal visible={editingModalState !== null} transparent animationType="fade">
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalPanel}>
-            {/* Modal Header */}
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {editingSection === 'family'
-                  ? 'EDIT FAMILY DETAILS 👑'
-                  : editingSection === 'career'
-                  ? 'EDIT EDUCATION & CAREER 👑'
-                  : editingSection === 'relatives'
-                  ? 'PATERNAL & EXTENDED FAMILY DETAILS 👑'
-                  : `EDIT ${editingSection?.replace('_', ' ').toUpperCase()} 👑`}
-              </Text>
-              <TouchableOpacity onPress={() => setEditingSection(null)}>
-                <Ionicons name="close" size={22} color="#EDB139" />
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Edit {editingModalState?.label || 'Detail'}</Text>
+
+            {editingModalState?.section === 'qual' ? (
+              <>
+                <Text style={styles.inputLabel}>Degree / Qualification Title</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={editingModalState?.field1 || ''}
+                  onChangeText={(text) =>
+                    setEditingModalState((prev) => (prev ? { ...prev, field1: text } : null))
+                  }
+                />
+                <Text style={styles.inputLabel}>Institution / University</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={editingModalState?.field2 || ''}
+                  onChangeText={(text) =>
+                    setEditingModalState((prev) => (prev ? { ...prev, field2: text } : null))
+                  }
+                />
+              </>
+            ) : editingModalState?.section === 'occ' ? (
+              <>
+                <Text style={styles.inputLabel}>Role / Position</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={editingModalState?.field1 || ''}
+                  onChangeText={(text) =>
+                    setEditingModalState((prev) => (prev ? { ...prev, field1: text } : null))
+                  }
+                />
+                <Text style={styles.inputLabel}>Employer / Company</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={editingModalState?.field2 || ''}
+                  onChangeText={(text) =>
+                    setEditingModalState((prev) => (prev ? { ...prev, field2: text } : null))
+                  }
+                />
+              </>
+            ) : (
+              <>
+                <Text style={styles.inputLabel}>{editingModalState?.label}</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={editingModalState?.field1 || ''}
+                  onChangeText={(text) =>
+                    setEditingModalState((prev) => (prev ? { ...prev, field1: text } : null))
+                  }
+                />
+              </>
+            )}
+
+            <View style={styles.modalButtonsRow}>
+              <TouchableOpacity
+                style={styles.modalCancelBtn}
+                onPress={() => setEditingModalState(null)}
+              >
+                <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.modalBody} contentContainerStyle={styles.modalBodyContent}>
-              {/* CAREER EDIT FORM */}
-              {editingSection === 'career' && (
-                <View style={styles.formSectionBox}>
-                  <Text style={styles.formSectionHeader}>EDUCATION & CAREER DETAILS</Text>
-                  <View style={styles.formRowGrid}>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>QUALIFICATION #1</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.qualification1}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, qualification1: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>INSTITUTION #1</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.institution1}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, institution1: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>QUALIFICATION #2</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.qualification2}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, qualification2: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>INSTITUTION #2</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.institution2}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, institution2: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>CURRENT ROLE #1</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.role1}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, role1: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>COMPANY #1</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.company1}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, company1: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>CURRENT ROLE #2</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.role2}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, role2: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>COMPANY #2</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.company2}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, company2: val })}
-                      />
-                    </View>
-                  </View>
-                </View>
-              )}
-
-              {/* FAMILY DETAILS EDIT FORM (100% Matching Screenshot 3) */}
-              {editingSection === 'family' && (
-                <View style={styles.formSectionBox}>
-                  <Text style={styles.formSectionHeader}>FAMILY DETAILS</Text>
-                  <View style={styles.formRowGrid}>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>{"FATHER'S NAME"}</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.fatherName}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, fatherName: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>{"FATHER'S OCCUPATION"}</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.fatherOccupation}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, fatherOccupation: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>{"FATHER'S NATIVE PLACE"}</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.fatherNativePlace}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, fatherNativePlace: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>{"MOTHER'S NAME"}</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.motherName}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, motherName: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>{"MOTHER'S OCCUPATION"}</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.motherOccupation}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, motherOccupation: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>{"MOTHER'S NATIVE PLACE"}</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.motherNativePlace}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, motherNativePlace: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>MATERNAL GOTRA</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.maternalGotra}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, maternalGotra: val })}
-                      />
-                    </View>
-                    <View style={styles.inputWrap}>
-                      <Text style={styles.miniLabel}>FAMILY LOCATION / THIKANA</Text>
-                      <TextInput
-                        style={styles.textInput}
-                        value={editFormData.familyThikana}
-                        onChangeText={(val) => setEditFormData({ ...editFormData, familyThikana: val })}
-                      />
-                    </View>
-                  </View>
-
-                  <View style={{ gap: 4, marginTop: 4 }}>
-                    <Text style={styles.miniLabel}>ADDITIONAL MATERNAL</Text>
-                    <TextInput
-                      style={styles.textInput}
-                      value={editFormData.additionalMaternal}
-                      onChangeText={(val) => setEditFormData({ ...editFormData, additionalMaternal: val })}
-                    />
-                  </View>
-
-                  <View style={{ gap: 4, marginTop: 4 }}>
-                    <Text style={styles.miniLabel}>FAMILY INFO / DESCRIPTION</Text>
-                    <TextInput
-                      style={[styles.textInput, { height: 60 }]}
-                      multiline
-                      value={editFormData.familyInfo}
-                      onChangeText={(val) => setEditFormData({ ...editFormData, familyInfo: val })}
-                    />
-                  </View>
-                </View>
-              )}
-
-              {/* RELATIVES / LINEAGE EDIT FORM */}
-              {editingSection === 'relatives' && (
-                <>
-                  {/* 1. PATERNAL GRANDPARENTS */}
-                  <View style={styles.formSectionBox}>
-                    <Text style={styles.formSectionHeader}>PATERNAL GRANDPARENTS (DADA-DADI SA)</Text>
-                    <View style={styles.formRowGrid}>
-                      <View style={styles.inputWrap}>
-                        <Text style={styles.miniLabel}>GRAND FATHER NAME</Text>
-                        <TextInput
-                          style={styles.textInput}
-                          value={profile.paternalGrandfather}
-                          onChangeText={(val) => setProfile({ ...profile, paternalGrandfather: val })}
-                        />
-                      </View>
-                      <View style={styles.inputWrap}>
-                        <Text style={styles.miniLabel}>SON OF</Text>
-                        <TextInput
-                          style={styles.textInput}
-                          value={profile.paternalGfSonOf}
-                          onChangeText={(val) => setProfile({ ...profile, paternalGfSonOf: val })}
-                        />
-                      </View>
-                      <View style={styles.inputWrap}>
-                        <Text style={styles.miniLabel}>OCCUPATION</Text>
-                        <TextInput
-                          style={styles.textInput}
-                          value={profile.paternalGfOccupation}
-                          onChangeText={(val) => setProfile({ ...profile, paternalGfOccupation: val })}
-                        />
-                      </View>
-                      <View style={styles.inputWrap}>
-                        <Text style={styles.miniLabel}>THIKANA</Text>
-                        <TextInput
-                          style={styles.textInput}
-                          value={profile.paternalNativePlace}
-                          onChangeText={(val) => setProfile({ ...profile, paternalNativePlace: val })}
-                        />
-                      </View>
-                    </View>
-                  </View>
-
-                  {/* 2. BADEPAPA */}
-                  <View style={styles.formSectionBox}>
-                    <View style={styles.sectionActionHeader}>
-                      <Text style={styles.formSectionHeader}>BADEPAPA</Text>
-                      <TouchableOpacity style={styles.addCategoryBtn} onPress={() => addRelativeRow('badepapa')}>
-                        <Ionicons name="add-circle-outline" size={14} color="#59123B" />
-                        <Text style={styles.addCategoryText}>+ Add BadePapa</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {badepapaList.map((row) => (
-                      <View key={row.id} style={styles.dynamicRowCard}>
-                        <View style={styles.formRowGrid}>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>NAME</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.name}
-                              onChangeText={(val) => updateRelativeRow('badepapa', row.id, 'name', val)}
-                            />
-                          </View>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>MARRIED TO</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.marriedTo}
-                              onChangeText={(val) => updateRelativeRow('badepapa', row.id, 'marriedTo', val)}
-                            />
-                          </View>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>DAUGHTER OF</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.childOf}
-                              onChangeText={(val) => updateRelativeRow('badepapa', row.id, 'childOf', val)}
-                            />
-                          </View>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>THIKANA / NATIVE</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.thikana}
-                              onChangeText={(val) => updateRelativeRow('badepapa', row.id, 'thikana', val)}
-                            />
-                          </View>
-                        </View>
-
-                        {badepapaList.length > 1 && (
-                          <TouchableOpacity style={styles.deleteRowBtn} onPress={() => removeRelativeRow('badepapa', row.id)}>
-                            <Ionicons name="trash-outline" size={16} color="#DC2626" />
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    ))}
-                  </View>
-
-                  {/* 3. KAKOSA */}
-                  <View style={styles.formSectionBox}>
-                    <View style={styles.sectionActionHeader}>
-                      <Text style={styles.formSectionHeader}>KAKOSA</Text>
-                      <TouchableOpacity style={styles.addCategoryBtn} onPress={() => addRelativeRow('kakosa')}>
-                        <Ionicons name="add-circle-outline" size={14} color="#59123B" />
-                        <Text style={styles.addCategoryText}>+ Add Kakosa</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {kakosaList.map((row) => (
-                      <View key={row.id} style={styles.dynamicRowCard}>
-                        <View style={styles.formRowGrid}>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>NAME</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.name}
-                              onChangeText={(val) => updateRelativeRow('kakosa', row.id, 'name', val)}
-                            />
-                          </View>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>MARRIED TO</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.marriedTo}
-                              onChangeText={(val) => updateRelativeRow('kakosa', row.id, 'marriedTo', val)}
-                            />
-                          </View>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>DAUGHTER OF</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.childOf}
-                              onChangeText={(val) => updateRelativeRow('kakosa', row.id, 'childOf', val)}
-                            />
-                          </View>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>THIKANA / NATIVE</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.thikana}
-                              onChangeText={(val) => updateRelativeRow('kakosa', row.id, 'thikana', val)}
-                            />
-                          </View>
-                        </View>
-
-                        {kakosaList.length > 1 && (
-                          <TouchableOpacity style={styles.deleteRowBtn} onPress={() => removeRelativeRow('kakosa', row.id)}>
-                            <Ionicons name="trash-outline" size={16} color="#DC2626" />
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    ))}
-                  </View>
-
-                  {/* 4. BHUASA */}
-                  <View style={styles.formSectionBox}>
-                    <View style={styles.sectionActionHeader}>
-                      <Text style={styles.formSectionHeader}>BHUASA</Text>
-                      <TouchableOpacity style={styles.addCategoryBtn} onPress={() => addRelativeRow('bhuasa')}>
-                        <Ionicons name="add-circle-outline" size={14} color="#59123B" />
-                        <Text style={styles.addCategoryText}>+ Add Bhuasa</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {bhuasaList.map((row) => (
-                      <View key={row.id} style={styles.dynamicRowCard}>
-                        <View style={styles.formRowGrid}>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>NAME</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.name}
-                              onChangeText={(val) => updateRelativeRow('bhuasa', row.id, 'name', val)}
-                            />
-                          </View>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>MARRIED TO</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.marriedTo}
-                              onChangeText={(val) => updateRelativeRow('bhuasa', row.id, 'marriedTo', val)}
-                            />
-                          </View>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>SON OF</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.childOf}
-                              onChangeText={(val) => updateRelativeRow('bhuasa', row.id, 'childOf', val)}
-                            />
-                          </View>
-                          <View style={styles.inputWrap}>
-                            <Text style={styles.miniLabel}>THIKANA / NATIVE</Text>
-                            <TextInput
-                              style={styles.textInput}
-                              value={row.thikana}
-                              onChangeText={(val) => updateRelativeRow('bhuasa', row.id, 'thikana', val)}
-                            />
-                          </View>
-                        </View>
-
-                        {bhuasaList.length > 1 && (
-                          <TouchableOpacity style={styles.deleteRowBtn} onPress={() => removeRelativeRow('bhuasa', row.id)}>
-                            <Ionicons name="trash-outline" size={16} color="#DC2626" />
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    ))}
-                  </View>
-                </>
-              )}
-            </ScrollView>
-
-            {/* Modal Footer */}
-            <View style={styles.modalFooter}>
-              <TouchableOpacity style={styles.cancelModalBtn} onPress={() => setEditingSection(null)}>
-                <Text style={styles.cancelModalText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveModalBtn} onPress={handleSaveSection} disabled={saving}>
-                {saving ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.saveModalText}>Save Changes</Text>
-                )}
+              <TouchableOpacity style={styles.modalSaveBtn} onPress={handleSaveModalItem}>
+                <Text style={styles.modalSaveText}>Save</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1188,461 +738,301 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FAF5EF',
   },
-  centerBox: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EFE0CB',
-  },
-  backBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#FAF5EF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-  },
-  logoutBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#FEE2E2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerSubtitle: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#CD9024',
-    letterSpacing: 0.6,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#59123B',
-  },
-  scrollContent: {
-    padding: 12,
-    gap: 12,
-    paddingBottom: 110,
-  },
 
-  // Hero Card
-  heroCard: {
-    backgroundColor: '#59123B',
-    borderRadius: 18,
-    padding: 14,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: '#EDB139',
-    elevation: 4,
-  },
-  heroRow: {
+  // ─── TOP HEADER ───────────────────────────────────────────────────────────
+  topHeader: {
+    height: 58,
+    backgroundColor: '#4A1235',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#5C1742',
   },
-  avatarRing: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#EDB139',
-    backgroundColor: '#FFFFFF',
-    overflow: 'hidden',
+  headerLeftLogoRow: {
+    marginRight: 12,
+  },
+  lotusLogoRing: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#3A0D2A',
+    borderWidth: 1.5,
+    borderColor: '#D4AF37',
+    alignItems: 'center',
+    justifyContent: 'center',
     position: 'relative',
   },
-  avatarImg: {
-    width: '100%',
-    height: '100%',
+  lotusIcon: {
+    fontSize: 16,
+    marginTop: -2,
   },
-  avatarEditBadge: {
+  lotusRaText: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#CD9024',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    color: '#D4AF37',
+    fontSize: 10,
+    fontWeight: '900',
+    fontFamily: 'serif',
+    bottom: 2,
+  },
+  headerTitleText: {
+    color: '#F4E4BC',
+    fontSize: 16,
+    fontWeight: '700',
+    fontFamily: 'serif',
+    letterSpacing: 1.2,
+  },
+
+  // ─── TABS BAR ─────────────────────────────────────────────────────────────
+  tabsBarWrapper: {
+    backgroundColor: '#4A1235',
+    height: 52,
+  },
+  tabsScrollContent: {
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    gap: 16,
+  },
+  tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    height: 52,
+    position: 'relative',
+    gap: 2,
   },
-  heroMetaCol: {
-    gap: 3,
+  tabItemActive: {
+    opacity: 1,
   },
-  heroNameText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  matriPill: {
-    backgroundColor: 'rgba(237, 177, 57, 0.25)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderColor: '#EDB139',
-  },
-  matriPillText: {
-    color: '#EDB139',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  heroSubText: {
-    color: '#EFE0CB',
+  tabItemText: {
+    color: '#C4A5B8',
     fontSize: 11,
     fontWeight: '600',
   },
-  completionWrap: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 10,
-    padding: 8,
-    gap: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  completionTextRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  completionLabel: {
+  tabItemTextActive: {
     color: '#FFFFFF',
-    fontSize: 10,
     fontWeight: '700',
   },
-  completionVal: {
-    color: '#EDB139',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  progressBarBg: {
-    height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: '#EDB139',
-    borderRadius: 3,
-  },
-
-  // Tabs
-  tabsScroll: {
-    gap: 6,
-  },
-  tabChip: {
+  activeTabUnderline: {
+    position: 'absolute',
+    bottom: 0,
+    left: 8,
+    right: 8,
+    height: 3,
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-  },
-  tabChipActive: {
-    backgroundColor: '#59123B',
-    borderColor: '#59123B',
-  },
-  tabChipText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#59123B',
-  },
-  tabChipTextActive: {
-    color: '#FFFFFF',
+    borderRadius: 1.5,
   },
 
-  // Section Cards
+  // ─── SCROLL CONTENT ───────────────────────────────────────────────────────
+  scrollContent: {
+    paddingHorizontal: 14,
+    paddingTop: 16,
+    paddingBottom: 90,
+  },
+
+  // ─── SECTION CARDS ────────────────────────────────────────────────────────
   sectionCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 12,
-    gap: 10,
+    padding: 16,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#EFE0CB',
+    borderColor: '#E7D8C9',
+    shadowColor: '#4A1235',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F5EBE0',
-  },
-  sectionTitle: {
-    fontSize: 12,
+  cardHeaderTitle: {
+    fontSize: 15,
     fontWeight: '800',
-    color: '#59123B',
-    letterSpacing: 0.4,
+    color: '#4A1235',
+    fontFamily: 'serif',
+    letterSpacing: 0.5,
   },
-  editSectionBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#FAF5EF',
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
+  activeTagText: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#6B4C5E',
+  },
+  cardDividerLine: {
+    height: 1,
+    backgroundColor: '#F0E5D9',
+    marginVertical: 12,
+  },
+
+  // ─── FIELD BLOCK ──────────────────────────────────────────────────────────
+  fieldBlock: {
+    marginBottom: 14,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F5EBE1',
+  },
+  fieldRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  fieldLabelValueCol: {
+    flex: 1,
+    paddingRight: 8,
+  },
+  goldFieldLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#9A7228',
+    letterSpacing: 0.6,
+    marginBottom: 2,
+    fontFamily: 'serif',
+  },
+  boldFieldValue: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#1A1A1A',
+    lineHeight: 18,
+  },
+  normalFieldValue: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#2A2A2A',
+    lineHeight: 18,
+  },
+  iconActionBtn: {
+    padding: 4,
+    marginLeft: 4,
+  },
+  dualIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+
+  // ─── OUTLINE BUTTON ───────────────────────────────────────────────────────
+  addOutlinePillBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  // Grid Fields
-  grid2Col: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  fieldItem: {
-    width: '48.5%',
-    backgroundColor: '#FAF5EF',
-    padding: 8,
-    borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    height: 42,
+    borderRadius: 21,
     borderWidth: 1,
-    borderColor: '#EFE0CB',
-  },
-  fieldMeta: {
-    flex: 1,
-  },
-  fieldKey: {
-    fontSize: 8,
-    fontWeight: '800',
-    color: '#7A5C66',
-  },
-  fieldVal: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#3D232C',
-    marginTop: 1,
-  },
-
-  // Textarea Block Cards
-  textBlockCard: {
+    borderColor: '#4A1235',
     backgroundColor: '#FAF5EF',
-    borderRadius: 10,
-    padding: 10,
-    gap: 4,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
+    gap: 6,
     marginTop: 4,
   },
-  textBlockHeader: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#59123B',
-  },
-  textBlockBody: {
-    fontSize: 11,
-    color: '#3D232C',
-    lineHeight: 16,
+  addOutlinePillBtnText: {
+    color: '#4A1235',
+    fontSize: 13,
+    fontWeight: '700',
   },
 
-  // Relatives Cards Grid
-  relativesGrid: {
-    gap: 8,
-  },
-  relativeBox: {
-    backgroundColor: '#FAF5EF',
-    padding: 10,
-    borderRadius: 10,
-    gap: 2,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-  },
-  relHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  // ─── BOTTOM ACTIONS ───────────────────────────────────────────────────────
+  bottomFormActionsRow: {
     alignItems: 'center',
-    marginBottom: 2,
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 24,
   },
-  relName: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#3D232C',
+  saveChangesBtn: {
+    width: '100%',
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#4A1235',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#4A1235',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  relTag: {
-    backgroundColor: '#59123B',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  relTagText: {
-    fontSize: 8,
-    fontWeight: '800',
+  saveChangesBtnText: {
     color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 1,
   },
-  relSubText: {
-    fontSize: 10,
-    color: '#7A5C66',
+  cancelTextBtn: {
+    paddingVertical: 6,
+  },
+  cancelTextBtnLabel: {
+    color: '#4A1235',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 1,
   },
 
-  // Modal
+  // ─── MODAL STYLES ─────────────────────────────────────────────────────────
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalPanel: {
-    backgroundColor: '#FAF5EF',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '90%',
-    borderTopWidth: 2,
-    borderTopColor: '#EDB139',
-  },
-  modalHeader: {
-    backgroundColor: '#59123B',
-    padding: 14,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EDB139',
+    paddingHorizontal: 20,
+  },
+  modalBox: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
   },
   modalTitle: {
-    color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 17,
     fontWeight: '800',
-    letterSpacing: 0.3,
+    color: '#4A1235',
+    marginBottom: 14,
+    textAlign: 'center',
+    fontFamily: 'serif',
   },
-  modalBody: {
-    flex: 1,
-  },
-  modalBodyContent: {
-    padding: 12,
-    gap: 12,
-  },
-
-  // Dynamic Extended Family Sections
-  formSectionBox: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 10,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-  },
-  sectionActionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  formSectionHeader: {
+  inputLabel: {
     fontSize: 11,
-    fontWeight: '800',
-    color: '#59123B',
-    letterSpacing: 0.4,
+    fontWeight: '700',
+    color: '#9A7228',
+    marginBottom: 4,
+    marginTop: 8,
   },
-  addCategoryBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#F8EBD7',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+  modalInput: {
+    height: 42,
     borderWidth: 1,
-    borderColor: '#EFE0CB',
-  },
-  addCategoryText: {
-    color: '#59123B',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  dynamicRowCard: {
-    backgroundColor: '#FAF5EF',
+    borderColor: '#E7D8C9',
     borderRadius: 10,
-    padding: 8,
-    gap: 6,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-    position: 'relative',
-  },
-  deleteRowBtn: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    padding: 4,
-  },
-
-  // Form Row Grid
-  formRowGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 6,
-  },
-  inputWrap: {
-    width: '48.5%',
-    gap: 2,
-  },
-  miniLabel: {
-    fontSize: 8,
-    fontWeight: '800',
-    color: '#7A5C66',
-  },
-  textInput: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    fontSize: 11,
-    color: '#3D232C',
-  },
-
-  modalFooter: {
-    padding: 12,
-    flexDirection: 'row',
-    gap: 8,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#EFE0CB',
-  },
-  cancelModalBtn: {
-    flex: 1,
-    height: 38,
-    borderRadius: 19,
+    paddingHorizontal: 12,
     backgroundColor: '#FAF5EF',
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-    alignItems: 'center',
-    justifyContent: 'center',
+    color: '#1A1A1A',
+    fontSize: 13,
+    fontWeight: '600',
   },
-  cancelModalText: {
-    color: '#59123B',
-    fontWeight: '800',
-    fontSize: 12,
+  modalButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 10,
+    marginTop: 20,
   },
-  saveModalBtn: {
-    flex: 1,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: '#59123B',
-    alignItems: 'center',
-    justifyContent: 'center',
+  modalCancelBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
-  saveModalText: {
+  modalCancelText: {
+    color: '#7A6874',
+    fontWeight: '700',
+  },
+  modalSaveBtn: {
+    backgroundColor: '#4A1235',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  modalSaveText: {
     color: '#FFFFFF',
-    fontWeight: '800',
-    fontSize: 12,
+    fontWeight: '700',
   },
 });

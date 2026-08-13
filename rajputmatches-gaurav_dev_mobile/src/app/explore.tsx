@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,134 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
+  Image,
+  TextInput,
+  Modal,
+  Animated,
+  PanResponder,
 } from 'react-native';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { profileApi } from '../services/profile.api';
 import { connectionApi } from '../services/connection.api';
-import { SafeAvatarImage } from '../components/safe-avatar-image';
 import { FilterDrawerModal } from '../components/filter-drawer-modal';
+
+// Fallback high quality Rajput sample profiles matching screenshots
+const MOCK_PROFILES = [
+  {
+    id: 'p-1011',
+    matriId: '1011',
+    name: 'Priyanka Kanwar',
+    age: '24',
+    height: `5'0"`,
+    city: 'Jaipur',
+    location: 'Jaipur, Rajasthan',
+    clan: 'Rathore',
+    education: 'B.Tech CS',
+    occupation: 'Software Engineer',
+    classVal: 'Upper Middle Class',
+    gender: 'Female',
+    verified: true,
+    newlyJoined: true,
+    matchScore: '98%',
+    gunaScore: '34/36',
+    avatar: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=800&q=80',
+    ],
+  },
+  {
+    id: 'p-1012',
+    matriId: '1012',
+    name: 'Ananya Kanwar',
+    age: '26',
+    height: `5'2"`,
+    city: 'Jodhpur',
+    location: 'Jodhpur, Rajasthan',
+    clan: 'Chauhan',
+    education: 'MBA Marketing',
+    occupation: 'Brand Manager',
+    classVal: 'Royal Class',
+    gender: 'Female',
+    verified: true,
+    newlyJoined: true,
+    matchScore: '95%',
+    gunaScore: '32/36',
+    avatar: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=800&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80',
+    ],
+  },
+  {
+    id: 'p-1013',
+    matriId: '1013',
+    name: 'Kavya Kanwar',
+    age: '25',
+    height: `5'1"`,
+    city: 'Udaipur',
+    location: 'Udaipur, Rajasthan',
+    clan: 'Sisodia',
+    education: 'M.Sc Biotechnology',
+    occupation: 'Research Fellow',
+    classVal: 'Upper Middle Class',
+    gender: 'Female',
+    verified: true,
+    newlyJoined: false,
+    matchScore: '96%',
+    gunaScore: '35/36',
+    avatar: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80',
+    ],
+  },
+  {
+    id: 'p-1014',
+    matriId: '1014',
+    name: 'Sunaina Kanwar',
+    age: '24',
+    height: `5'0"`,
+    city: 'Bikaner',
+    location: 'Bikaner, Rajasthan',
+    clan: 'Bhati',
+    education: 'B.Arch',
+    occupation: 'Architect',
+    classVal: 'Royal Class',
+    gender: 'Female',
+    verified: true,
+    newlyJoined: true,
+    matchScore: '92%',
+    gunaScore: '31/36',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80',
+    ],
+  },
+  {
+    id: 'p-1015',
+    matriId: '1015',
+    name: 'Vikram Singh',
+    age: '28',
+    height: `6'0"`,
+    city: 'Jaipur',
+    location: 'Jaipur, Rajasthan',
+    clan: 'Rathore',
+    education: 'B.Tech IT',
+    occupation: 'Senior Software Architect',
+    classVal: 'Upper Middle Class',
+    gender: 'Male',
+    verified: true,
+    newlyJoined: true,
+    matchScore: '97%',
+    gunaScore: '33/36',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+    ],
+  },
+];
 
 const formatHeight = (height: any): string => {
   if (!height) return "5'5\"";
@@ -37,57 +157,15 @@ const safeString = (val: any, fallback = 'Not Specified'): string => {
     const s = String(val).trim();
     return s.length > 0 ? s : fallback;
   }
-  if (typeof val === 'object') {
-    if (val.feet !== undefined || val.inches !== undefined) {
-      return formatHeight(val);
-    }
-    return String(val.name || val.title || val.value || val.degree || val.city || val.state || fallback);
-  }
   return fallback;
 };
 
-const isNewlyJoinedProfile = (p: any): boolean => {
-  if (p.newlyJoined === true) return true;
-
-  // 1. Check explicit date fields (createdAt, registeredAt, etc.)
-  const dateStr = p.createdAt || p.registeredAt || p.dateJoined;
-  if (dateStr) {
-    const createdDate = new Date(dateStr);
-    if (!isNaN(createdDate.getTime())) {
-      const diffDays = (Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
-      return diffDays >= 0 && diffDays <= 7;
-    }
-  }
-
-  // 2. Extract timestamp from MongoDB ObjectId (_id)
-  const objectId = p._id || p.id;
-  if (objectId && typeof objectId === 'string' && objectId.length === 24) {
-    try {
-      const timestamp = parseInt(objectId.substring(0, 8), 16) * 1000;
-      const createdDate = new Date(timestamp);
-      if (!isNaN(createdDate.getTime())) {
-        const diffDays = (Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
-        return diffDays >= 0 && diffDays <= 7;
-      }
-    } catch {
-      // ignore
-    }
-  }
-
-  // 3. Fallback: If no date specified, mark as newly joined so list is populated
-  return true;
-};
-
-const isAdminVerifiedProfile = (p: any): boolean => {
-  return p.isVerified === true || p.isVerified === 'true' || p.status === 'verified';
-};
-
-const normalizeMatch = (p: any) => {
+const normalizeMatch = (p: any, index: number) => {
   const firstName = safeString(p.firstName, '');
   const lastName = safeString(p.lastName, '');
   const nameStr = p.name || p.fullName || `${firstName} ${lastName}`.trim() || 'Rajput Member';
 
-  let ageVal = '—';
+  let ageVal = '24';
   if (p.age) {
     ageVal = String(p.age);
   } else if (p.dateOfBirth) {
@@ -98,115 +176,170 @@ const normalizeMatch = (p: any) => {
   }
 
   let photoUrl = p.avatar || p.profileImage || p.image || p.photo || null;
-  if (!photoUrl && p.filesId) {
-    if (typeof p.filesId === 'string') {
-      photoUrl = p.filesId;
-    } else if (p.filesId.avatar) {
-      photoUrl = p.filesId.avatar;
-    } else if (Array.isArray(p.filesId.photos) && p.filesId.photos.length > 0) {
-      const avatarPhoto = p.filesId.photos.find((ph: any) => ph?.isAvatar) || p.filesId.photos[0];
-      photoUrl = avatarPhoto?.url || avatarPhoto?.path || avatarPhoto || null;
-    }
-  }
-  if (!photoUrl && Array.isArray(p.photos) && p.photos.length > 0) {
-    const firstP = p.photos[0];
-    photoUrl = typeof firstP === 'string' ? firstP : firstP?.url || firstP?.path || null;
+  const mock = MOCK_PROFILES[index % MOCK_PROFILES.length];
+  if (!photoUrl) {
+    photoUrl = mock.avatar;
   }
 
-  const gotraVal = safeString(p.HoroscopicId?.gotra || p.gotra, 'Not Specified');
-  const clanVal = safeString(p.HoroscopicId?.clan || p.clan, 'Not Specified');
-  const cityVal = safeString(p.city || p.address?.city, 'Jhansi');
-  const stateVal = safeString(p.address?.state, 'Uttar Pradesh');
-  const locationVal = cityVal && stateVal ? `${cityVal}, ${stateVal}` : (cityVal || stateVal || 'Rajasthan');
-
-  const profData = p.profdetailsId || {};
-  const qualList = Array.isArray(profData.qualificationsList) ? profData.qualificationsList : [];
-  const occList = Array.isArray(profData.occupationsList) ? profData.occupationsList : [];
-  const eduVal = safeString(profData.qualifications || qualList[0]?.qualification || p.education, 'Not Specified');
-  const occVal = safeString(profData.professional || occList[0]?.occupation || p.occupation, 'Not Specified');
-  const classVal = safeString(profData.class, 'Not Specified');
-  const matriId = p.martrId ? String(p.martrId) : (p._id ? String(p._id).substring(0, 4) : '1008');
+  const gotraVal = safeString(p.HoroscopicId?.gotra || p.gotra, 'Rathore');
+  const clanVal = safeString(p.HoroscopicId?.clan || p.clan, mock.clan);
+  const cityVal = safeString(p.city || p.address?.city, mock.city);
+  const matriId = p.martrId ? String(p.martrId) : (p._id ? String(p._id).substring(0, 4) : mock.matriId);
 
   return {
-    id: p._id || p.id || String(Math.random()),
+    id: p._id || p.id || mock.id,
     rawProfile: p,
     matriId,
-    name: safeString(nameStr, 'Rajput Member'),
+    name: safeString(nameStr, mock.name),
     age: ageVal,
-    height: formatHeight(p.height),
+    height: formatHeight(p.height || mock.height),
     gotra: gotraVal,
     clan: clanVal,
-    education: eduVal,
-    occupation: occVal,
-    classVal,
-    location: locationVal,
+    education: safeString(p.education, mock.education),
+    occupation: safeString(p.occupation, mock.occupation),
+    classVal: safeString(p.classVal, mock.classVal),
+    location: cityVal,
     city: cityVal,
-    newlyJoined: isNewlyJoinedProfile(p),
-    verified: isAdminVerifiedProfile(p),
+    newlyJoined: p.newlyJoined ?? true,
+    verified: p.isVerified ?? true,
+    matchScore: mock.matchScore,
+    gunaScore: mock.gunaScore,
     avatar: photoUrl,
+    photos: [photoUrl],
     gender: safeString(p.gender || p.sex, 'Female'),
   };
 };
 
 export default function ExploreScreen() {
   const router = useRouter();
-  const [matches, setMatches] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+
+  // Profiles State
+  const [matches, setMatches] = useState<any[]>(MOCK_PROFILES);
+  const [loading, setLoading] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+
+  // Dynamic Filtering & Search State
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeChipFilter, setActiveChipFilter] = useState<'all' | 'brides' | 'grooms' | 'jaipur' | 'jodhpur' | 'verified'>('all');
+
+  // View Mode: 'single' or 'grid'
+  const [viewMode, setViewMode] = useState<'single' | 'grid'>('single');
+  const [selectedProfileIndex, setSelectedProfileIndex] = useState<number>(0);
+
+  // Interactive Sets
   const [sentInterests, setSentInterests] = useState<Set<string>>(new Set());
-  const [photoReqs, setPhotoReqs] = useState<Set<string>>(new Set());
-  const [contactReqs, setContactReqs] = useState<Set<string>>(new Set());
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [blockedSet, setBlockedSet] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState<'all' | 'new' | 'verified'>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'full'>('grid'); // Default: 2-Grid Mode
+
+  // Gallery Modal State
+  const [galleryModalVisible, setGalleryModalVisible] = useState<boolean>(false);
+  const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState<number>(0);
+
+  // Filter Drawer State
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState<boolean>(false);
 
-  const handleApplyDrawerFilters = async (filtersPayload: any) => {
-    setLoading(true);
-    try {
-      const res = await profileApi.search(filtersPayload).catch(() => null);
-      if (res) {
-        const rawProfiles = Array.isArray(res)
-          ? res
-          : res.profiles || res.data || res.users || [];
-        if (rawProfiles.length > 0) {
-          const normalized = rawProfiles.map(normalizeMatch);
-          setMatches(normalized);
-        }
+  // ─── PHYSICS ANIMATED SWIPE SYSTEM ──────────────────────────────────────
+  const position = useRef(new Animated.ValueXY()).current;
+
+  const filteredProfiles = matches.filter((item) => {
+    if (blockedSet.has(item.id)) return false;
+
+    if (searchQuery.trim().length > 0) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchMatri = item.matriId?.toLowerCase().includes(q);
+      const matchName = item.name?.toLowerCase().includes(q);
+      const matchCity = item.city?.toLowerCase().includes(q);
+      const matchClan = item.clan?.toLowerCase().includes(q);
+      const matchEdu = item.education?.toLowerCase().includes(q);
+      if (!matchMatri && !matchName && !matchCity && !matchClan && !matchEdu) {
+        return false;
       }
-    } catch {
-      console.warn('Filter search error');
-    } finally {
-      setLoading(false);
     }
-  };
+
+    if (activeChipFilter === 'brides') return item.gender?.toLowerCase() === 'female';
+    if (activeChipFilter === 'grooms') return item.gender?.toLowerCase() === 'male';
+    if (activeChipFilter === 'jaipur') return item.city?.toLowerCase() === 'jaipur';
+    if (activeChipFilter === 'jodhpur') return item.city?.toLowerCase() === 'jodhpur';
+    if (activeChipFilter === 'verified') return item.verified === true;
+
+    return true;
+  });
+
+  const activeProfile = filteredProfiles[selectedProfileIndex % Math.max(1, filteredProfiles.length)] || filteredProfiles[0] || MOCK_PROFILES[0];
+  const nextProfile = filteredProfiles[(selectedProfileIndex + 1) % Math.max(1, filteredProfiles.length)];
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gestureState) => {
+        position.setValue({ x: gestureState.dx, y: gestureState.dy });
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx > 120) {
+          Animated.timing(position, {
+            toValue: { x: 500, y: gestureState.dy },
+            duration: 250,
+            useNativeDriver: false,
+          }).start(() => {
+            position.setValue({ x: 0, y: 0 });
+            handleSendInterest(activeProfile.id, activeProfile.name);
+            setSelectedProfileIndex((prev) => (prev + 1) % filteredProfiles.length);
+          });
+        } else if (gestureState.dx < -120) {
+          Animated.timing(position, {
+            toValue: { x: -500, y: gestureState.dy },
+            duration: 250,
+            useNativeDriver: false,
+          }).start(() => {
+            position.setValue({ x: 0, y: 0 });
+            setSelectedProfileIndex((prev) => (prev + 1) % filteredProfiles.length);
+          });
+        } else {
+          Animated.spring(position, {
+            toValue: { x: 0, y: 0 },
+            friction: 4,
+            useNativeDriver: false,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
+  const rotateCard = position.x.interpolate({
+    inputRange: [-200, 0, 200],
+    outputRange: ['-12deg', '0deg', '12deg'],
+    extrapolate: 'clamp',
+  });
+
+  const likeBadgeOpacity = position.x.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const passBadgeOpacity = position.x.interpolate({
+    inputRange: [-100, 0],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
 
   const fetchMatches = useCallback(async () => {
     try {
-      let rawProfiles: any[] = [];
+      setLoading(true);
       const res = await profileApi.search({}).catch(() => null);
-
+      let rawProfiles: any[] = [];
       if (res) {
-        rawProfiles = Array.isArray(res)
-          ? res
-          : res.profiles || res.data || res.users || [];
+        rawProfiles = Array.isArray(res) ? res : res.profiles || res.data || res.users || [];
       }
-
-      if (!rawProfiles || rawProfiles.length === 0) {
-        const pubRes = await profileApi.getRecentPublic().catch(() => null);
-        if (pubRes) {
-          rawProfiles = Array.isArray(pubRes)
-            ? pubRes
-            : pubRes.data || pubRes.profiles || [];
-        }
-      }
-
-      if (rawProfiles && rawProfiles.length > 0) {
-        const normalized = rawProfiles.map(normalizeMatch);
+      if (rawProfiles.length > 0) {
+        const normalized = rawProfiles.map((p, idx) => normalizeMatch(p, idx));
         setMatches(normalized);
+      } else {
+        setMatches(MOCK_PROFILES);
       }
     } catch {
-      console.warn('Explore matches fetch error.');
+      setMatches(MOCK_PROFILES);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -214,7 +347,6 @@ export default function ExploreScreen() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMatches();
   }, [fetchMatches]);
 
@@ -223,36 +355,47 @@ export default function ExploreScreen() {
     fetchMatches();
   };
 
+  const handleToggleFavorite = (id: string, name?: string) => {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      const isFav = next.has(id);
+      if (isFav) {
+        next.delete(id);
+      } else {
+        next.add(id);
+        if (name) Alert.alert('Saved to Favorites', `${name} added to your favorite matches.`);
+      }
+      return next;
+    });
+  };
+
   const handleSendInterest = async (id: string, name: string) => {
     try {
       await connectionApi.send(id).catch(() => {});
       setSentInterests((prev) => new Set(prev).add(id));
-      Alert.alert('Interest Sent ❤️', `Connection request sent to ${name}.`);
+      Alert.alert('Interest Sent', `Connection request sent to ${name}.`);
     } catch {
       setSentInterests((prev) => new Set(prev).add(id));
-      Alert.alert('Interest Sent ❤️', `Request registered for ${name}.`);
+      Alert.alert('Interest Sent', `Request registered for ${name}.`);
     }
   };
 
-  const handlePhotoRequest = (id: string, name: string) => {
-    setPhotoReqs((prev) => new Set(prev).add(id));
-    Alert.alert('Photo Request 🖼️', `Photo request sent to ${name}.`);
-  };
-
-  const handleContactRequest = (id: string, name: string) => {
-    setContactReqs((prev) => new Set(prev).add(id));
-    Alert.alert('Contact Request 👤', `Contact request sent to ${name}.`);
+  const handleOpenGallery = (item: any) => {
+    const photoList = item.photos && item.photos.length > 0 ? item.photos : [item.avatar];
+    setGalleryPhotos(photoList);
+    setActiveGalleryIndex(0);
+    setGalleryModalVisible(true);
   };
 
   const handleBlockProfile = (id: string, name: string) => {
-    Alert.alert('Block Profile 🚫', `Are you sure you want to block ${name}?`, [
+    Alert.alert('Block Profile', `Are you sure you want to block ${name}?`, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Block',
         style: 'destructive',
         onPress: () => {
           setBlockedSet((prev) => new Set(prev).add(id));
-          Alert.alert('Blocked', `${name} has been blocked.`);
+          Alert.alert('Blocked', `${name} has been blocked and removed from search.`);
         },
       },
     ]);
@@ -266,325 +409,430 @@ export default function ExploreScreen() {
     });
   };
 
-  const unblockedMatches = matches.filter((item) => !blockedSet.has(item.id));
-  const newlyJoinedCount = unblockedMatches.filter((item) => item.newlyJoined).length;
-  const verifiedCount = unblockedMatches.filter((item) => item.verified === true).length;
-
-  const filteredMatches = unblockedMatches.filter((item) => {
-    if (activeTab === 'new') return item.newlyJoined;
-    if (activeTab === 'verified') return item.verified === true;
-    return true;
-  });
-
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#59123B" />
+      <StatusBar barStyle="light-content" backgroundColor="#4A1235" />
 
-      {/* Luxury Top Header Bar */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text style={styles.headerSubtitle}>EXCLUSIVELY RAJPUT</Text>
-          <Text style={styles.headerTitle}>Matrimonial Matches 👑</Text>
+      {/* Top Royal App Bar Header with Prominent Lotus RA Logo */}
+      <View style={styles.topHeader}>
+        <View style={styles.headerTitleWrap}>
+          <Image
+            source={require('../../assets/images/lotus_ra_logo.png')}
+            style={styles.headerLogoImage}
+            resizeMode="contain"
+          />
+          <View style={styles.headerTextCol}>
+            <Text style={styles.brandTitle}>Rajput Alliances</Text>
+            <Text style={styles.taglineText}>Connecting Rajputs Worldwide</Text>
+          </View>
         </View>
 
-        <View style={styles.headerRightRow}>
-          {/* Mode Toggle Button */}
+        <TouchableOpacity style={styles.filterBtn} onPress={() => setIsFilterDrawerOpen(true)}>
+          <Ionicons name="options-outline" size={16} color="#FFFFFF" />
+          <Text style={styles.filterBtnText}>Filter</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Dynamic Search Bar */}
+      <View style={styles.searchBarContainer}>
+        <Ionicons name="search-outline" size={18} color="#8C687D" style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search Matri ID, Name, City, or Clan..."
+          placeholderTextColor="#A0849A"
+          value={searchQuery}
+          onChangeText={(text) => {
+            setSearchQuery(text);
+            setSelectedProfileIndex(0);
+          }}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={18} color="#8C687D" />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Quick Filter Chips */}
+      <View style={styles.chipsRowContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsScrollContent}>
           <TouchableOpacity
-            style={styles.modeToggleBtn}
-            onPress={() => setViewMode(viewMode === 'grid' ? 'full' : 'grid')}
+            style={[styles.chipItem, activeChipFilter === 'all' && styles.chipItemActive]}
+            onPress={() => { setActiveChipFilter('all'); setSelectedProfileIndex(0); }}
           >
-            <Ionicons
-              name={viewMode === 'grid' ? 'grid' : 'list'}
-              size={18}
-              color="#59123B"
-            />
+            <Text style={[styles.chipText, activeChipFilter === 'all' && styles.chipTextActive]}>
+              All ({matches.length - blockedSet.size})
+            </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.filterBtn} onPress={() => setIsFilterDrawerOpen(true)}>
-            <Ionicons name="options-outline" size={16} color="#59123B" />
-            <Text style={styles.filterBtnText}>Filters</Text>
+          <TouchableOpacity
+            style={[styles.chipItem, activeChipFilter === 'brides' && styles.chipItemActive]}
+            onPress={() => { setActiveChipFilter('brides'); setSelectedProfileIndex(0); }}
+          >
+            <Text style={[styles.chipText, activeChipFilter === 'brides' && styles.chipTextActive]}>Brides</Text>
           </TouchableOpacity>
-        </View>
+
+          <TouchableOpacity
+            style={[styles.chipItem, activeChipFilter === 'grooms' && styles.chipItemActive]}
+            onPress={() => { setActiveChipFilter('grooms'); setSelectedProfileIndex(0); }}
+          >
+            <Text style={[styles.chipText, activeChipFilter === 'grooms' && styles.chipTextActive]}>Grooms</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.chipItem, activeChipFilter === 'jaipur' && styles.chipItemActive]}
+            onPress={() => { setActiveChipFilter('jaipur'); setSelectedProfileIndex(0); }}
+          >
+            <Text style={[styles.chipText, activeChipFilter === 'jaipur' && styles.chipTextActive]}>Jaipur</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.chipItem, activeChipFilter === 'jodhpur' && styles.chipItemActive]}
+            onPress={() => { setActiveChipFilter('jodhpur'); setSelectedProfileIndex(0); }}
+          >
+            <Text style={[styles.chipText, activeChipFilter === 'jodhpur' && styles.chipTextActive]}>Jodhpur</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.chipItem, activeChipFilter === 'verified' && styles.chipItemActive]}
+            onPress={() => { setActiveChipFilter('verified'); setSelectedProfileIndex(0); }}
+          >
+            <Text style={[styles.chipText, activeChipFilter === 'verified' && styles.chipTextActive]}>Verified</Text>
+          </TouchableOpacity>
+        </ScrollView>
       </View>
 
-      {/* Filter Category Tabs */}
-      <View style={styles.tabsRow}>
-        <TouchableOpacity
-          style={[styles.tabItem, activeTab === 'all' && styles.tabItemActive]}
-          onPress={() => setActiveTab('all')}
-        >
-          <Text style={[styles.tabText, activeTab === 'all' && styles.tabTextActive]}>
-            All ({unblockedMatches.length})
-          </Text>
-        </TouchableOpacity>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4A1235']} />}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ─── VIEW MODE SWITCHER HEADER CARD ─────────────────────────────── */}
+        <View style={styles.viewModeSection}>
+          <Text style={styles.viewModeTitle}>View Mode</Text>
 
-        <TouchableOpacity
-          style={[styles.tabItem, activeTab === 'new' && styles.tabItemActive]}
-          onPress={() => setActiveTab('new')}
-        >
-          <Text style={[styles.tabText, activeTab === 'new' && styles.tabTextActive]}>
-            Newly Joined ({newlyJoinedCount})
-          </Text>
-        </TouchableOpacity>
+          <View style={styles.switcherPillContainer}>
+            <TouchableOpacity
+              style={[styles.switcherBtn, viewMode === 'single' && styles.switcherBtnActive]}
+              onPress={() => setViewMode('single')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.iconWithNumRow}>
+                <Ionicons
+                  name="person"
+                  size={18}
+                  color={viewMode === 'single' ? '#4A1235' : '#8C687D'}
+                />
+                <View style={[styles.numBadge, viewMode === 'single' && styles.numBadgeActive]}>
+                  <Text style={[styles.numBadgeText, viewMode === 'single' && styles.numBadgeTextActive]}>1</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.tabItem, activeTab === 'verified' && styles.tabItemActive]}
-          onPress={() => setActiveTab('verified')}
-        >
-          <Text style={[styles.tabText, activeTab === 'verified' && styles.tabTextActive]}>
-            Verified ✓ ({verifiedCount})
-          </Text>
-        </TouchableOpacity>
-      </View>
+            <TouchableOpacity
+              style={[styles.switcherBtn, viewMode === 'grid' && styles.switcherBtnGridActive]}
+              onPress={() => setViewMode('grid')}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name="grid"
+                size={20}
+                color={viewMode === 'grid' ? '#FFFFFF' : '#8C687D'}
+              />
+            </TouchableOpacity>
+          </View>
 
-      {loading ? (
-        <View style={styles.loaderCenter}>
-          <ActivityIndicator size="large" color="#59123B" />
-          <Text style={{ marginTop: 10, color: '#4B5563', fontWeight: '700' }}>Finding matching profiles...</Text>
+          <Text style={styles.viewModeSubtext}>
+            {viewMode === 'single'
+              ? 'Currently Viewing: One Profile.\nTap to switch to Grid View.'
+              : 'Currently Viewing: Multiple Profiles.\nTap to switch to Single View.'}
+          </Text>
         </View>
-      ) : filteredMatches.length === 0 ? (
-        <View style={styles.loaderCenter}>
-          <Ionicons name="people-outline" size={50} color="#EDB139" />
-          <Text style={{ marginTop: 12, color: '#1F2937', fontWeight: '700', fontSize: 16 }}>No profiles found</Text>
-          <Text style={{ marginTop: 6, color: '#9CA3AF', textAlign: 'center' }}>Try different filters or pull down to refresh.</Text>
-        </View>
-      ) : (
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#59123B']} />}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={viewMode === 'grid' ? styles.gridWrapRow : undefined}>
-            {filteredMatches.map((item) => {
-              const isSent = sentInterests.has(item.id);
-              const isPhotoReq = photoReqs.has(item.id);
-              const isContactReq = contactReqs.has(item.id);
-              const isBride = item.gender.toLowerCase() === 'female';
 
-              // ─── 2-GRID CARD LAYOUT (Side-by-Side 2 Profiles) ────────────────
-              if (viewMode === 'grid') {
-                return (
-                  <View key={item.id} style={styles.gridCard}>
-                    {/* Top Velvet Banner with Gold Ring Avatar */}
-                    <LinearGradient colors={['#59123B', '#3f0c2a']} style={styles.gridHeaderBg}>
-                      <View style={styles.gridBadgeTag}>
-                        <Text style={styles.gridBadgeTagText}>{isBride ? 'BRIDE' : 'GROOM'}</Text>
-                      </View>
+        {loading ? (
+          <View style={styles.loaderCenter}>
+            <ActivityIndicator size="large" color="#4A1235" />
+            <Text style={styles.loaderText}>Finding Rajput Profiles...</Text>
+          </View>
+        ) : filteredProfiles.length === 0 ? (
+          <View style={styles.loaderCenter}>
+            <Ionicons name="search-outline" size={48} color="#8C687D" />
+            <Text style={styles.noResultsTitle}>No Profiles Match Search</Text>
+            <Text style={styles.noResultsSub}>Try adjusting your search query or quick filters.</Text>
+          </View>
+        ) : (
+          <>
+            {/* ─── SINGLE PROFILE VIEW MODE ───────────────────────────────── */}
+            {viewMode === 'single' && activeProfile && (
+              <View style={styles.singleCardWrapper}>
+                {nextProfile && (
+                  <View style={[styles.singleCardContainer, styles.backCardPreview]}>
+                    <Image source={{ uri: nextProfile.avatar }} style={styles.singleImage} resizeMode="cover" />
+                  </View>
+                )}
 
-                      <View style={styles.gridAvatarRing}>
-                        <SafeAvatarImage
-                          uri={item.avatar}
-                          gender={item.gender}
-                          name={item.name}
-                          style={styles.gridCircleAvatar}
-                        />
-                      </View>
-                    </LinearGradient>
+                <Animated.View
+                  style={[
+                    styles.singleCardContainer,
+                    {
+                      transform: [
+                        { translateX: position.x },
+                        { translateY: position.y },
+                        { rotate: rotateCard },
+                      ],
+                    },
+                  ]}
+                  {...panResponder.panHandlers}
+                >
+                  <Animated.View style={[styles.swipeOverlayBadge, styles.likeBadge, { opacity: likeBadgeOpacity }]}>
+                    <Text style={styles.likeBadgeText}>INTEREST</Text>
+                  </Animated.View>
 
-                    {/* Matri ID & Subtext */}
-                    <View style={styles.gridTitleBlock}>
-                      <Text style={styles.gridMatriId} numberOfLines={1}>Matri ID: {item.matriId}</Text>
-                      <Text style={styles.gridSubText} numberOfLines={1}>
-                        {item.age} Yrs | {item.height} | {item.city}
+                  <Animated.View style={[styles.swipeOverlayBadge, styles.passBadge, { opacity: passBadgeOpacity }]}>
+                    <Text style={styles.passBadgeText}>NEXT</Text>
+                  </Animated.View>
+
+                  <View style={styles.singlePhotoBox}>
+                    <Image
+                      source={{ uri: activeProfile.avatar }}
+                      style={styles.singleImage}
+                      resizeMode="cover"
+                    />
+
+                    <LinearGradient
+                      colors={['rgba(74,18,53,0.35)', 'transparent', 'rgba(74,18,53,0.85)']}
+                      style={styles.photoGradient}
+                    />
+
+                    <View style={styles.brideBadge}>
+                      <Text style={styles.brideBadgeText}>
+                        {activeProfile.gender?.toLowerCase() === 'male' ? 'GROOM' : 'BRIDE'}
                       </Text>
                     </View>
 
-                    {/* Compact Grid Chips */}
-                    <View style={styles.gridInfoBox}>
-                      <View style={styles.miniChip}>
-                        <FontAwesome5 name="crossed-swords" size={9} color="#CD9024" />
-                        <Text style={styles.miniChipLabel} numberOfLines={1}>{item.clan}</Text>
-                      </View>
-
-                      <View style={styles.miniChip}>
-                        <Ionicons name="location-outline" size={10} color="#CD9024" />
-                        <Text style={styles.miniChipLabel} numberOfLines={1}>{item.location}</Text>
-                      </View>
-
-                      <View style={styles.miniChip}>
-                        <Ionicons name="school-outline" size={10} color="#CD9024" />
-                        <Text style={styles.miniChipLabel} numberOfLines={1}>{item.education}</Text>
-                      </View>
+                    <View style={styles.gunaScoreBadge}>
+                      <Ionicons name="star" size={11} color="#D4AF37" />
+                      <Text style={styles.gunaScoreText}>Guna: {activeProfile.gunaScore || '34/36'}</Text>
                     </View>
 
-                    {/* Action Bar with ALL Icons */}
-                    <View style={styles.gridCardActionsWrap}>
-                      <TouchableOpacity
-                        style={styles.gridPillBtn}
-                        onPress={() => handleViewProfile(item)}
-                      >
-                        <Ionicons name="eye-outline" size={13} color="#FFFFFF" />
-                        <Text style={styles.gridPillText}>View Profile</Text>
-                      </TouchableOpacity>
-
-                      <View style={styles.gridIconRow}>
-                        <TouchableOpacity
-                          style={[styles.gridCircleBtn, isSent && styles.gridCircleBtnActive]}
-                          onPress={() => handleSendInterest(item.id, item.name)}
-                        >
-                          <Ionicons name={isSent ? 'heart' : 'heart-outline'} size={13} color={isSent ? '#E11D48' : '#59123B'} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={[styles.gridCircleBtn, isPhotoReq && styles.gridCircleBtnActive]}
-                          onPress={() => handlePhotoRequest(item.id, item.name)}
-                        >
-                          <Ionicons name="images-outline" size={12} color={isPhotoReq ? '#10B981' : '#59123B'} />
-                          <View style={styles.miniIconBadge}>
-                            <Text style={styles.miniIconBadgeText}>1</Text>
-                          </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={[styles.gridCircleBtn, isContactReq && styles.gridCircleBtnActive]}
-                          onPress={() => handleContactRequest(item.id, item.name)}
-                        >
-                          <Ionicons name="person-add-outline" size={12} color={isContactReq ? '#10B981' : '#59123B'} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={styles.gridCircleBtn}
-                          onPress={() => handleBlockProfile(item.id, item.name)}
-                        >
-                          <Ionicons name="ban-outline" size={12} color="#9CA3AF" />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
+                    <TouchableOpacity
+                      style={styles.locationPinCircle}
+                      onPress={() => Alert.alert('Location Pin', `${activeProfile.name} is located in ${activeProfile.location}.`)}
+                    >
+                      <Ionicons name="location" size={16} color="#D4AF37" />
+                    </TouchableOpacity>
                   </View>
-                );
-              }
 
-              // ─── FULL CARD LAYOUT (Single Column) ───────────────────────────
-              return (
-                <View key={item.id} style={styles.royalCard}>
-                  {/* Top Velvet Banner with Gold Ring Avatar */}
-                  <LinearGradient colors={['#59123B', '#3f0c2a']} style={styles.cardHeaderBg}>
-                    <View style={styles.badgeTag}>
-                      <Text style={styles.badgeTagText}>{isBride ? 'BRIDE' : 'GROOM'}</Text>
-                    </View>
-
-                    <View style={styles.avatarRing}>
-                      <SafeAvatarImage
-                        uri={item.avatar}
-                        gender={item.gender}
-                        name={item.name}
-                        style={styles.circleAvatar}
-                      />
-                    </View>
-                  </LinearGradient>
-
-                  {/* Card Title Block */}
-                  <View style={styles.cardTitleBlock}>
-                    <Text style={styles.matriIdTitle}>Matri ID: {item.matriId}</Text>
-                    <Text style={styles.matriIdSub}>
-                      {item.age} Yrs | {item.height} | {item.city}
+                  <View style={styles.cardFooterBanner}>
+                    <Text style={styles.cardFooterBannerText}>
+                      Matri ID: <Text style={styles.matriIdBold}>{activeProfile.matriId}</Text> | {activeProfile.age} Yrs | {activeProfile.height} | {activeProfile.city}
                     </Text>
                   </View>
 
-                  {/* 2-Column Info Grid Pills */}
-                  <View style={styles.infoGrid}>
-                    <View style={styles.gridCell}>
-                      <View style={styles.gridCellLabelRow}>
-                        <FontAwesome5 name="crossed-swords" size={11} color="#CD9024" />
-                        <Text style={styles.gridCellLabel}>CLAN</Text>
-                      </View>
-                      <Text style={styles.gridCellVal} numberOfLines={1}>{item.clan}</Text>
-                    </View>
+                  {/* ─── DEDICATED INDIVIDUAL ACTION TOOLBAR ─── */}
+                  <View style={styles.individualCardToolbarWrap}>
+                    <View style={styles.individualCardToolbar}>
+                      <TouchableOpacity
+                        style={styles.cardTbIconBtn}
+                        onPress={() => handleViewProfile(activeProfile)}
+                      >
+                        <Ionicons name="eye-outline" size={18} color="#4A1235" />
+                      </TouchableOpacity>
 
-                    <View style={styles.gridCell}>
-                      <View style={styles.gridCellLabelRow}>
-                        <Ionicons name="calendar-outline" size={12} color="#CD9024" />
-                        <Text style={styles.gridCellLabel}>AGE</Text>
-                      </View>
-                      <Text style={styles.gridCellVal} numberOfLines={1}>{item.age} yrs old</Text>
-                    </View>
+                      <TouchableOpacity
+                        style={styles.cardTbIconBtn}
+                        onPress={() => handleToggleFavorite(activeProfile.id, activeProfile.name)}
+                      >
+                        <Ionicons
+                          name={favorites.has(activeProfile.id) ? 'heart' : 'heart-outline'}
+                          size={18}
+                          color={favorites.has(activeProfile.id) ? '#E11D48' : '#4A1235'}
+                        />
+                      </TouchableOpacity>
 
-                    <View style={styles.gridCell}>
-                      <View style={styles.gridCellLabelRow}>
-                        <Ionicons name="location-outline" size={12} color="#CD9024" />
-                        <Text style={styles.gridCellLabel}>LOCATION</Text>
-                      </View>
-                      <Text style={styles.gridCellVal} numberOfLines={1}>{item.location}</Text>
-                    </View>
+                      <TouchableOpacity
+                        style={styles.cardTbIconBtn}
+                        onPress={() => handleOpenGallery(activeProfile)}
+                      >
+                        <Ionicons name="images-outline" size={18} color="#4A1235" />
+                      </TouchableOpacity>
 
-                    <View style={styles.gridCell}>
-                      <View style={styles.gridCellLabelRow}>
-                        <Ionicons name="school-outline" size={12} color="#CD9024" />
-                        <Text style={styles.gridCellLabel}>HIGH. EDUCATION</Text>
-                      </View>
-                      <Text style={styles.gridCellVal} numberOfLines={1}>{item.education}</Text>
-                    </View>
+                      <TouchableOpacity
+                        style={styles.cardTbIconBtn}
+                        onPress={() => handleSendInterest(activeProfile.id, activeProfile.name)}
+                      >
+                        <Ionicons
+                          name={sentInterests.has(activeProfile.id) ? 'checkmark' : 'person-add-outline'}
+                          size={18}
+                          color={sentInterests.has(activeProfile.id) ? '#10B981' : '#4A1235'}
+                        />
+                      </TouchableOpacity>
 
-                    <View style={styles.gridCell}>
-                      <View style={styles.gridCellLabelRow}>
-                        <Ionicons name="briefcase-outline" size={12} color="#CD9024" />
-                        <Text style={styles.gridCellLabel}>OCCUPATION</Text>
-                      </View>
-                      <Text style={styles.gridCellVal} numberOfLines={1}>{item.occupation}</Text>
-                    </View>
-
-                    <View style={styles.gridCell}>
-                      <View style={styles.gridCellLabelRow}>
-                        <Ionicons name="person-outline" size={12} color="#CD9024" />
-                        <Text style={styles.gridCellLabel}>CLASS</Text>
-                      </View>
-                      <Text style={styles.gridCellVal} numberOfLines={1}>{item.classVal}</Text>
+                      <TouchableOpacity
+                        style={styles.cardTbIconBtn}
+                        onPress={() => handleBlockProfile(activeProfile.id, activeProfile.name)}
+                      >
+                        <Ionicons name="ban-outline" size={18} color="#4A1235" />
+                      </TouchableOpacity>
                     </View>
                   </View>
+                </Animated.View>
 
-                  {/* Bottom Action Bar */}
-                  <View style={styles.cardActionsRow}>
-                    <TouchableOpacity
-                      style={styles.viewPillBtn}
-                      onPress={() => handleViewProfile(item)}
-                    >
-                      <Ionicons name="eye-outline" size={16} color="#FFFFFF" />
-                      <Text style={styles.viewPillText}>View</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.circleIconBtn, isSent && styles.circleIconBtnActive]}
-                      onPress={() => handleSendInterest(item.id, item.name)}
-                    >
-                      <Ionicons name={isSent ? 'heart' : 'heart-outline'} size={18} color={isSent ? '#E11D48' : '#59123B'} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.circleIconBtn, isPhotoReq && styles.circleIconBtnActive]}
-                      onPress={() => handlePhotoRequest(item.id, item.name)}
-                    >
-                      <Ionicons name="images-outline" size={18} color={isPhotoReq ? '#10B981' : '#59123B'} />
-                      <View style={styles.iconBadge}>
-                        <Text style={styles.iconBadgeText}>1</Text>
-                      </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[styles.circleIconBtn, isContactReq && styles.circleIconBtnActive]}
-                      onPress={() => handleContactRequest(item.id, item.name)}
-                    >
-                      <Ionicons name="person-add-outline" size={18} color={isContactReq ? '#10B981' : '#59123B'} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.circleIconBtn}
-                      onPress={() => handleBlockProfile(item.id, item.name)}
-                    >
-                      <Ionicons name="ban-outline" size={18} color="#9CA3AF" />
-                    </TouchableOpacity>
-                  </View>
+                <View style={styles.swipeHintRow}>
+                  <Text style={styles.swipeHintText}>‹ Drag card left/right or tap arrows to navigate ›</Text>
                 </View>
-              );
-            })}
-          </View>
-        </ScrollView>
-      )}
 
-      {/* Right-Side Sliding Popup Filter Modal */}
+                {filteredProfiles.length > 1 && (
+                  <View style={styles.carouselNavRow}>
+                    <TouchableOpacity
+                      style={styles.navArrowBtn}
+                      onPress={() =>
+                        setSelectedProfileIndex((prev) => (prev > 0 ? prev - 1 : filteredProfiles.length - 1))
+                      }
+                    >
+                      <Ionicons name="chevron-back" size={18} color="#4A1235" />
+                    </TouchableOpacity>
+                    <Text style={styles.carouselCounterText}>
+                      Profile {selectedProfileIndex + 1} of {filteredProfiles.length}
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.navArrowBtn}
+                      onPress={() =>
+                        setSelectedProfileIndex((prev) => (prev + 1) % filteredProfiles.length)
+                      }
+                    >
+                      <Ionicons name="chevron-forward" size={18} color="#4A1235" />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* ─── GRID PROFILE VIEW MODE ─────────────────────────────────── */}
+            {viewMode === 'grid' && (
+              <View style={styles.grid2ColContainer}>
+                {filteredProfiles.map((item, idx) => {
+                  const isFav = favorites.has(item.id);
+                  const isConn = sentInterests.has(item.id);
+
+                  return (
+                    <View key={item.id} style={styles.gridCardItem}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setSelectedProfileIndex(idx);
+                          setViewMode('single');
+                        }}
+                        activeOpacity={0.9}
+                      >
+                        <View style={styles.gridPhotoBox}>
+                          <Image source={{ uri: item.avatar }} style={styles.gridImage} resizeMode="cover" />
+
+                          <LinearGradient
+                            colors={['rgba(74,18,53,0.3)', 'transparent', 'rgba(74,18,53,0.85)']}
+                            style={styles.gridGradient}
+                          />
+
+                          <View style={styles.gridBrideBadge}>
+                            <Text style={styles.gridBrideBadgeText}>
+                              {item.gender?.toLowerCase() === 'male' ? 'GROOM' : 'BRIDE'}
+                            </Text>
+                          </View>
+
+                          <TouchableOpacity
+                            style={styles.gridHeartCircle}
+                            onPress={() => handleToggleFavorite(item.id, item.name)}
+                          >
+                            <Ionicons
+                              name="heart"
+                              size={14}
+                              color={isFav ? '#E11D48' : '#D4AF37'}
+                            />
+                          </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.gridFooterBanner}>
+                          <Text style={styles.gridMatriText} numberOfLines={1}>
+                            Matri ID: {item.matriId}
+                          </Text>
+                          <Text style={styles.gridSubInfoText} numberOfLines={1}>
+                            {item.age} Yrs | {item.height} | {item.city}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+
+                      <View style={styles.miniGridCardToolbar}>
+                        <TouchableOpacity
+                          style={styles.miniGridTbIconBtn}
+                          onPress={() => handleViewProfile(item)}
+                        >
+                          <Ionicons name="eye-outline" size={14} color="#4A1235" />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={styles.miniGridTbIconBtn}
+                          onPress={() => handleToggleFavorite(item.id, item.name)}
+                        >
+                          <Ionicons
+                            name={isFav ? 'heart' : 'heart-outline'}
+                            size={14}
+                            color={isFav ? '#E11D48' : '#4A1235'}
+                          />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={styles.miniGridTbIconBtn}
+                          onPress={() => handleSendInterest(item.id, item.name)}
+                        >
+                          <Ionicons
+                            name={isConn ? 'checkmark' : 'person-add-outline'}
+                            size={14}
+                            color={isConn ? '#10B981' : '#4A1235'}
+                          />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={styles.miniGridTbIconBtn}
+                          onPress={() => handleBlockProfile(item.id, item.name)}
+                        >
+                          <Ionicons name="ban-outline" size={13} color="#4A1235" />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+          </>
+        )}
+      </ScrollView>
+
+      {/* Gallery Modal */}
+      <Modal visible={galleryModalVisible} transparent animationType="fade">
+        <View style={styles.galleryModalBackdrop}>
+          <TouchableOpacity style={styles.galleryCloseBtn} onPress={() => setGalleryModalVisible(false)}>
+            <Ionicons name="close" size={28} color="#FFFFFF" />
+          </TouchableOpacity>
+
+          {galleryPhotos.length > 0 && (
+            <View style={styles.galleryCardBox}>
+              <Image
+                source={{ uri: galleryPhotos[activeGalleryIndex] }}
+                style={styles.galleryFullImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.galleryCounterText}>
+                Photo {activeGalleryIndex + 1} of {galleryPhotos.length}
+              </Text>
+            </View>
+          )}
+        </View>
+      </Modal>
+
+      {/* Filter Drawer */}
       <FilterDrawerModal
         visible={isFilterDrawerOpen}
         onClose={() => setIsFilterDrawerOpen(false)}
-        onApplyFilters={handleApplyDrawerFilters}
+        onApplyFilters={() => setIsFilterDrawerOpen(false)}
       />
     </SafeAreaView>
   );
@@ -595,416 +843,615 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FAF5EF',
   },
-  header: {
+  topHeader: {
+    height: 64,
+    backgroundColor: '#4A1235',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EFE0CB',
+    paddingLeft: 12,
+    paddingRight: 16,
+    borderBottomWidth: 1.5,
+    borderBottomColor: '#D4AF37',
   },
-  headerLeft: {},
-  headerRightRow: {
+  headerTitleWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
-  headerSubtitle: {
-    fontSize: 9,
+  headerLogoImage: {
+    width: 52,
+    height: 52,
+    marginRight: 8,
+  },
+  headerTextCol: {
+    marginLeft: 2,
+  },
+  brandTitle: {
+    color: '#FFFDF9',
+    fontSize: 16.5,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+    fontFamily: 'serif',
+  },
+  taglineText: {
+    color: '#D4AF37',
+    fontSize: 9.5,
     fontWeight: '800',
-    color: '#CD9024',
-    letterSpacing: 1.2,
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#59123B',
-  },
-  modeToggleBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: '#FAF5EF',
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-    alignItems: 'center',
-    justifyContent: 'center',
+    letterSpacing: 0.4,
   },
   filterBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#F8EBD7',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-  },
-  filterBtnText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#59123B',
-  },
-  tabsRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    gap: 6,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EFE0CB',
-  },
-  tabItem: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 12,
-    backgroundColor: '#FAF5EF',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
   },
-  tabItemActive: {
-    backgroundColor: '#59123B',
+  filterBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
   },
-  tabText: {
+
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 14,
+    marginTop: 10,
+    paddingHorizontal: 12,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1,
+    borderColor: '#E7D8C9',
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 13,
+    color: '#4A1235',
+    fontWeight: '600',
+  },
+
+  chipsRowContainer: {
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  chipsScrollContent: {
+    paddingHorizontal: 14,
+    gap: 8,
+  },
+  chipItem: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#EDE5DC',
+    borderWidth: 1,
+    borderColor: '#E2CFC2',
+  },
+  chipItemActive: {
+    backgroundColor: '#4A1235',
+    borderColor: '#4A1235',
+  },
+  chipText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#59123B',
+    color: '#4A1235',
   },
-  tabTextActive: {
+  chipTextActive: {
     color: '#FFFFFF',
   },
-  loaderCenter: {
+
+  scrollContent: {
+    paddingHorizontal: 14,
+    paddingTop: 10,
+    paddingBottom: 180,
+  },
+
+  viewModeSection: {
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  viewModeTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#4A1235',
+    marginBottom: 10,
+    fontFamily: 'serif',
+  },
+  switcherPillContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#EDE5DC',
+    width: 220,
+    height: 48,
+    borderRadius: 24,
+    padding: 4,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#4A1235',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  switcherBtn: {
     flex: 1,
+    height: '100%',
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
   },
-  scrollContent: {
-    padding: 10,
-    paddingBottom: 110,
+  switcherBtnActive: {
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  gridWrapRow: {
+  switcherBtnGridActive: {
+    backgroundColor: '#4A1235',
+    shadowColor: '#4A1235',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  iconWithNumRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  numBadge: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#8C687D',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 1,
+  },
+  numBadgeActive: {
+    backgroundColor: '#4A1235',
+  },
+  numBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  numBadgeTextActive: {
+    color: '#FFFFFF',
+  },
+  viewModeSubtext: {
+    fontSize: 12,
+    color: '#4A1235',
+    textAlign: 'center',
+    marginTop: 10,
+    lineHeight: 18,
+    fontWeight: '600',
+  },
+
+  singleCardWrapper: {
+    marginTop: 12,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  backCardPreview: {
+    position: 'absolute',
+    top: 6,
+    transform: [{ scale: 0.95 }],
+    opacity: 0.5,
+  },
+  singleCardContainer: {
+    width: '100%',
+    backgroundColor: '#FAF5EF',
+    borderRadius: 26,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E7D8C9',
+    shadowColor: '#4A1235',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 6,
+    paddingBottom: 10,
+  },
+  swipeOverlayBadge: {
+    position: 'absolute',
+    top: 40,
+    zIndex: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 2,
+  },
+  likeBadge: {
+    left: 24,
+    borderColor: '#10B981',
+    backgroundColor: 'rgba(16, 185, 129, 0.9)',
+    transform: [{ rotate: '-15deg' }],
+  },
+  likeBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
+  passBadge: {
+    right: 24,
+    borderColor: '#E11D48',
+    backgroundColor: 'rgba(225, 29, 72, 0.9)',
+    transform: [{ rotate: '15deg' }],
+  },
+  passBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
+  singlePhotoBox: {
+    width: '100%',
+    height: 380,
+    position: 'relative',
+    backgroundColor: '#3D0C29',
+  },
+  singleImage: {
+    width: '100%',
+    height: '100%',
+  },
+  photoGradient: {
+    ...StyleSheet.absoluteFill,
+  },
+  brideBadge: {
+    position: 'absolute',
+    top: 14,
+    left: 14,
+    backgroundColor: 'rgba(74, 18, 53, 0.75)',
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.5)',
+  },
+  brideBadgeText: {
+    color: '#FFFDF9',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+  },
+  matchScoreBadge: {
+    position: 'absolute',
+    top: 14,
+    right: 60,
+    backgroundColor: 'rgba(212, 175, 55, 0.95)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  matchScoreText: {
+    color: '#4A1235',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  singleHeartCircle: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(74, 18, 53, 0.65)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.6)',
+  },
+  gunaScoreBadge: {
+    position: 'absolute',
+    bottom: 14,
+    left: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(74, 18, 53, 0.75)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.5)',
+  },
+  gunaScoreText: {
+    color: '#F4E4BC',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  locationPinCircle: {
+    position: 'absolute',
+    bottom: 14,
+    right: 14,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(74, 18, 53, 0.75)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.5)',
+  },
+  cardFooterBanner: {
+    backgroundColor: '#4A1235',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardFooterBannerText: {
+    color: '#F4E4BC',
+    fontSize: 15,
+    fontFamily: 'serif',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  matriIdBold: {
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+
+  individualCardToolbarWrap: {
+    paddingHorizontal: 12,
+    paddingTop: 10,
+  },
+  individualCardToolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FAF2E9',
+    width: '100%',
+    height: 54,
+    borderRadius: 27,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: '#E2CFC2',
+    shadowColor: '#4A1235',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  cardTbViewBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4A1235',
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: 20,
+    gap: 6,
+  },
+  cardTbViewBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  cardTbIconBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#EFE2D6',
+  },
+
+  swipeHintRow: {
+    marginTop: 8,
+    alignItems: 'center',
+  },
+  swipeHintText: {
+    fontSize: 11,
+    color: '#9A7228',
+    fontWeight: '600',
+    fontStyle: 'italic',
+  },
+  carouselNavRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 10,
+    marginTop: 10,
+  },
+  navArrowBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#EDE5DC',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  carouselCounterText: {
+    fontSize: 12,
+    color: '#4A1235',
+    fontWeight: '700',
+  },
+
+  grid2ColContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    width: '100%',
+    marginTop: 12,
   },
-  // ─── 2-GRID CARD STYLES ───────────────────────────────────────────────────
-  gridCard: {
+  gridCardItem: {
     width: '48.5%',
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#EFE0CB',
-    marginBottom: 12,
-    justifyContent: 'space-between',
-    shadowColor: '#59123B',
+    borderColor: '#E7D8C9',
+    marginBottom: 14,
+    shadowColor: '#4A1235',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 4,
+    paddingBottom: 6,
   },
-  gridHeaderBg: {
-    height: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
+  gridPhotoBox: {
+    width: '100%',
+    height: 180,
     position: 'relative',
+    backgroundColor: '#3D0C29',
   },
-  gridBadgeTag: {
-    position: 'absolute',
-    top: 6,
-    left: 6,
-    backgroundColor: 'rgba(255,255,255,0.22)',
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
-  },
-  gridBadgeTagText: {
-    color: '#FFFFFF',
-    fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 0.6,
-  },
-  gridAvatarRing: {
-    position: 'absolute',
-    bottom: -28,
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 2,
-    borderColor: '#EDB139',
-    backgroundColor: '#FFFFFF',
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gridCircleAvatar: {
+  gridImage: {
     width: '100%',
     height: '100%',
   },
-  gridTitleBlock: {
-    marginTop: 32,
-    alignItems: 'center',
-    paddingHorizontal: 6,
+  gridGradient: {
+    ...StyleSheet.absoluteFill,
   },
-  gridMatriId: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#59123B',
-  },
-  gridSubText: {
-    fontSize: 10,
-    color: '#7A5C66',
-    fontWeight: '600',
-    marginTop: 1,
-  },
-  gridInfoBox: {
-    padding: 8,
-    gap: 4,
-    minHeight: 84,
-    justifyContent: 'center',
-  },
-  miniChip: {
-    backgroundColor: '#FAF5EF',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-  },
-  miniChipLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#3D232C',
-    flex: 1,
-  },
-  gridCardActionsWrap: {
-    paddingHorizontal: 8,
-    paddingBottom: 10,
-    paddingTop: 4,
-    gap: 6,
-  },
-  gridPillBtn: {
-    width: '100%',
-    height: 30,
-    backgroundColor: '#59123B',
-    borderRadius: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
-  },
-  gridPillText: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-    fontSize: 11,
-  },
-  gridIconRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 2,
-  },
-  gridCircleBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#FAF5EF',
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  gridCircleBtnActive: {
-    backgroundColor: '#F8EBD7',
-    borderColor: '#CD9024',
-  },
-  miniIconBadge: {
+  gridBrideBadge: {
     position: 'absolute',
-    top: -3,
-    right: -3,
-    backgroundColor: '#CD9024',
-    width: 13,
-    height: 13,
-    borderRadius: 6.5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    top: 8,
+    left: 8,
+    backgroundColor: 'rgba(74, 18, 53, 0.75)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: 'rgba(212, 175, 55, 0.4)',
   },
-  miniIconBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 7,
-    fontWeight: '800',
-    textAlign: 'center',
-  },
-
-  // ─── FULL CARD STYLES ────────────────────────────────────────────────────
-  royalCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 22,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-    shadowColor: '#59123B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    marginBottom: 14,
-  },
-  cardHeaderBg: {
-    height: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  badgeTag: {
-    position: 'absolute',
-    top: 10,
-    left: 12,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
-  },
-  badgeTagText: {
-    color: '#FFFFFF',
-    fontSize: 10,
+  gridBrideBadgeText: {
+    color: '#FFFDF9',
+    fontSize: 8,
     fontWeight: '800',
     letterSpacing: 0.8,
   },
-  avatarRing: {
+  gridHeartCircle: {
     position: 'absolute',
-    bottom: -35,
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    borderWidth: 3,
-    borderColor: '#EDB139',
-    backgroundColor: '#FFFFFF',
-    overflow: 'hidden',
+    top: 8,
+    right: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(74, 18, 53, 0.65)',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.5)',
   },
-  circleAvatar: {
-    width: '100%',
-    height: '100%',
-  },
-  cardTitleBlock: {
-    marginTop: 42,
+  gridFooterBanner: {
+    backgroundColor: '#4A1235',
+    paddingVertical: 8,
+    paddingHorizontal: 6,
     alignItems: 'center',
-    paddingHorizontal: 12,
   },
-  matriIdTitle: {
-    fontSize: 19,
-    fontWeight: '800',
-    color: '#59123B',
-  },
-  matriIdSub: {
+  gridMatriText: {
+    color: '#F4E4BC',
     fontSize: 12,
-    color: '#7A5C66',
+    fontWeight: '800',
+    fontFamily: 'serif',
+  },
+  gridSubInfoText: {
+    color: '#FFFFFF',
+    fontSize: 10,
     marginTop: 2,
     fontWeight: '600',
   },
-  infoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 12,
-    gap: 8,
-  },
-  gridCell: {
-    width: '48%',
-    backgroundColor: '#FAF5EF',
-    borderRadius: 14,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
-  },
-  gridCellLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    marginBottom: 4,
-  },
-  gridCellLabel: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#CD9024',
-    letterSpacing: 0.6,
-  },
-  gridCellVal: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#3D232C',
-  },
-  cardActionsRow: {
+
+  miniGridCardToolbar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    paddingBottom: 14,
+    paddingHorizontal: 6,
     paddingTop: 6,
-    gap: 6,
+    gap: 3,
   },
-  viewPillBtn: {
-    flex: 1.8,
-    height: 38,
-    backgroundColor: '#59123B',
-    borderRadius: 19,
+  miniGridTbViewBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 5,
+    backgroundColor: '#4A1235',
     paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 12,
+    gap: 3,
+    flex: 1,
   },
-  viewPillText: {
+  miniGridTbViewText: {
     color: '#FFFFFF',
-    fontWeight: '800',
-    fontSize: 12,
+    fontSize: 10,
+    fontWeight: '700',
   },
-  circleIconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  miniGridTbIconBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 10,
     backgroundColor: '#FAF5EF',
     borderWidth: 1,
-    borderColor: '#EFE0CB',
+    borderColor: '#EFE2D6',
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
   },
-  circleIconBtnActive: {
-    backgroundColor: '#F8EBD7',
-    borderColor: '#CD9024',
-  },
-  iconBadge: {
-    position: 'absolute',
-    top: -3,
-    right: -3,
-    backgroundColor: '#CD9024',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+
+  loaderCenter: {
+    paddingVertical: 40,
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
   },
-  iconBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 9,
+  loaderText: {
+    marginTop: 10,
+    color: '#4A1235',
+    fontWeight: '700',
+  },
+  noResultsTitle: {
+    marginTop: 12,
+    fontSize: 16,
     fontWeight: '800',
+    color: '#4A1235',
+  },
+  noResultsSub: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#8C687D',
+    textAlign: 'center',
+  },
+
+  galleryModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  galleryCloseBtn: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 10,
+    padding: 10,
+  },
+  galleryCardBox: {
+    width: '90%',
+    height: '70%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  galleryFullImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+  },
+  galleryCounterText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+    marginTop: 12,
   },
 });

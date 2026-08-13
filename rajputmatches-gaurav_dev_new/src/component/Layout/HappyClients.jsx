@@ -255,6 +255,10 @@ const HappyClients = () => {
                     <img 
                       src={getImageSrc(t.image)} 
                       alt={t.name} 
+                      width="50"
+                      height="50"
+                      loading="lazy"
+                      decoding="async"
                       className="hc-avatar" 
                       onError={(e) => {
                         e.target.onerror = null;

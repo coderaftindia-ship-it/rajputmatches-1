@@ -36,9 +36,6 @@ function Footer() {
     { icon: <FaFacebook size={14} color="var(--royal-gold)" />, label: "Facebook", key: "facebook" },
     { icon: <FaInstagram size={14} color="var(--royal-gold)" />, label: "Instagram", key: "instagram" },
     { icon: <FaWhatsapp size={14} color="var(--royal-gold)" />, label: "WhatsApp", key: "whatsapp" },
-    { icon: <FaTelegram size={14} color="var(--royal-gold)" />, label: "Telegram", key: "telegram" },
-    { icon: <FaYoutube size={14} color="var(--royal-gold)" />, label: "YouTube", key: "youtube" },
-    { icon: <FaTwitter size={14} color="var(--royal-gold)" />, label: "Twitter", key: "twitter" },
     { icon: <FaLinkedin size={14} color="var(--royal-gold)" />, label: "LinkedIn", key: "linkedin" },
   ];
 
@@ -70,12 +67,16 @@ function Footer() {
           <div className="col-12 col-lg-6">
             <Link to="/" className="d-inline-flex align-items-center gap-2.5 mb-2 text-decoration-none">
               <img
-                src={siteSettings.logo || Logo}
+                src={Logo}
                 alt={siteSettings.companyName || "Logo"}
+                width="44"
+                height="44"
+                loading="lazy"
+                decoding="async"
                 onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
                 style={{
                   height: "44px",
-                  width: "auto",
+                  width: "44px",
                   maxHeight: "44px",
                   objectFit: "contain",
                   filter: "drop-shadow(0px 2px 8px rgba(237, 177, 57, 0.4))",

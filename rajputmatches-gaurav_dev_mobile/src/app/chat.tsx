@@ -151,7 +151,7 @@ export default function ChatScreen() {
         )}
 
         <Text style={styles.headerTitle}>
-          {activeThread ? activeThread.name : 'Rajput Chat Room 💬'}
+          {activeThread ? activeThread.name : 'Rajput Chat Room'}
         </Text>
       </View>
 

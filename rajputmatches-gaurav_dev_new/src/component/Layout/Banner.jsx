@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Home.css";
 import Navbar from "./Navbar";
-import { LiaSearchSolid } from "react-icons/lia";
-import { FaCrown, FaCheckCircle, FaUsers, FaStar, FaRegBuilding, FaVenus, FaMars, FaRegHeart, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCrown, FaCheckCircle, FaUsers, FaStar, FaRegBuilding, FaVenus, FaMars, FaRegHeart, FaMapMarkerAlt, FaSearch } from "react-icons/fa";
 import Features from "./Features";
 import { useAuth } from "./AuthContext";
 import Bannerbg from "../../assets/images/bannerbg.png";
@@ -105,6 +104,9 @@ function Banner() {
           paddingBottom: "1.5rem"
         }}
       >
+        {/* High-priority preloader for LCP Hero background image */}
+        <img src={bannerBg} alt="Hero Banner" fetchPriority="high" decoding="async" style={{ display: "none" }} />
+        
         {/* Cinematic Ken Burns Background Zoom/Pan Effect */}
         <div
           className="position-absolute top-0 start-0 w-100 h-100"
@@ -184,7 +186,7 @@ function Banner() {
                   style={{ padding: "12px 24px", background: "rgba(0,0,0,0.3)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: "8px" }}
                   onClick={() => setRedirectPath(isAuthenticated ? "/search" : "/login")}
                 >
-                  <LiaSearchSolid size={20} /> {cms.heroCTA2Text}
+                  <FaSearch size={18} /> {cms.heroCTA2Text}
                 </button>
               </div>
 
@@ -344,7 +346,7 @@ function Banner() {
                   className="btn w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 text-white mt-2 royal-button"
                   style={{ height: "48px", fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", fontSize: "0.95rem" }}
                 >
-                  <LiaSearchSolid size={20} /> Search Matches
+                  <FaSearch size={18} /> Search Matches
                 </button>
                 <div className="text-center mt-3">
                   <span style={{ fontSize: "0.75rem", color: "var(--royal-text-light)" }}>{cms.heroFooterNote}</span>

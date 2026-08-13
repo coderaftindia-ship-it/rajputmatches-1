@@ -56,9 +56,9 @@ export default defineConfig(({ mode }) => {
         'react-dom',
         'react-router-dom',
         'axios',
-        'react-toastify'
+        'react-toastify',
+        'lucide-react'
       ],
-      exclude: ['react-icons', 'lucide-react'],
       esbuildOptions: {
         loader: {
           '.js': 'jsx',
@@ -74,7 +74,7 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       sourcemap: true,
       target: ['es2015', 'safari12'],
-      chunkSizeWarningLimit: 1500,
+      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
           manualChunks(id) {
@@ -82,8 +82,14 @@ export default defineConfig(({ mode }) => {
               if (id.includes('country-state-city')) {
                 return 'vendor-location';
               }
-              if (id.includes('framer-motion') || id.includes('lottie-web')) {
-                return 'vendor-animation';
+              if (id.includes('lottie-web')) {
+                return 'vendor-lottie';
+              }
+              if (id.includes('framer-motion')) {
+                return 'vendor-framer-motion';
+              }
+              if (id.includes('socket.io-client') || id.includes('engine.io-client')) {
+                return 'vendor-socket';
               }
               if (id.includes('emoji-picker-react')) {
                 return 'vendor-emoji';
