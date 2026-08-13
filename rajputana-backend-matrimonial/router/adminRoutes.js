@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const { generateToken } = require('../utils/utility');
+const { optimizeImage } = require('../utils/imageOptimizer');
 const {
   getStories,
   editstory,
@@ -901,7 +902,9 @@ router.post("/home-cms", isAuth, (req, res) => {
       const imageFields = ["bannerBgImage", "matchmakingImage"];
       imageFields.forEach((field) => {
         if (req.files && req.files[field] && req.files[field][0]) {
+          const filePath = req.files[field][0].path;
           home[field] = `/uploads/avatar/${req.files[field][0].filename}`;
+          optimizeImage(filePath, { maxWidth: field === "bannerBgImage" ? 1920 : 800 });
         }
       });
 
@@ -1038,7 +1041,9 @@ router.post("/site-settings", isAuth, (req, res) => {
       });
 
       if (req.files && req.files["logo"] && req.files["logo"][0]) {
-        settings.logo = `/uploads/avatar/${req.files["logo"][0].filename}`;
+        const logoFile = req.files["logo"][0];
+        settings.logo = `/uploads/avatar/${logoFile.filename}`;
+        optimizeImage(logoFile.path, { maxWidth: 300 });
       }
 
       await settings.save();

@@ -77,13 +77,21 @@ app.use(
   })
 );
 
+const staticOptions = {
+  maxAge: "30d",
+  setHeaders: (res, filePath) => {
+    res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
+  },
+};
+
 app.use(
   "/uploads/avatar",
   express.static(
-    path.join(__dirname, process.env.UPLOADS_PATH || "uploads/avatar")
+    path.join(__dirname, process.env.UPLOADS_PATH || "uploads/avatar"),
+    staticOptions
   )
 );
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads"), staticOptions));
 
 const io = socketIo(server, {
   cors: {
