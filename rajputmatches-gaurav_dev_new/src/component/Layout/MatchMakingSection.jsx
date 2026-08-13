@@ -1,36 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import herobg from "../../assets/images/matchmakingbg.jpeg";
 import border from "../../assets/images/border.png";
 import { Link } from "react-router-dom";
 import { FaCrown, FaCheckCircle, FaStar, FaShieldAlt } from "react-icons/fa";
 import { useAuth } from "./AuthContext";
-import { publicApi } from "../../api";
 import { BASE_URL } from "../../api";
+import { useHomeCMS } from "../../context/HomeCMSContext";
 
-const DEFAULT_CMS = {
-  matchBadgeText: "Heritage & Rajput Legacy Matrimony",
-  matchHeading: "Connecting Rajput Families with Trust Tradition & Lasting bonds",
-  matchDescription:
-    "Step into an exclusive, highly-trusted network designed for noble families. Here, every single profile is strictly verified, connections are deeply meaningful, and matches carry the potential for a lasting royal legacy.",
-  matchBullet1Title: "Strict Verification",
-  matchBullet1Desc: "100% ID & family check",
-  matchBullet2Title: "Royal Custom Filters",
-  matchBullet2Desc: "Match by heritage & values",
-  matchCTAText: "Find Your Royal Match",
-  matchmakingImage: "",
-};
+
 
 const MatchmakingSection = () => {
   const { isAuthenticated } = useAuth();
-  const [cms, setCms] = useState(DEFAULT_CMS);
-
-  useEffect(() => {
-    publicApi.getHomeCMS()
-      .then((res) => {
-        if (res?.data?.data) setCms({ ...DEFAULT_CMS, ...res.data.data });
-      })
-      .catch(() => {});
-  }, []);
+  const { cms } = useHomeCMS();
 
   const matchImg = cms.matchmakingImage
     ? (cms.matchmakingImage.startsWith("/uploads/") ? `${BASE_URL}${cms.matchmakingImage}` : cms.matchmakingImage)

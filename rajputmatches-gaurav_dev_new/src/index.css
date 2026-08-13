@@ -162,7 +162,8 @@ input, select, textarea, button {
   padding: 10px 24px;
   border-radius: 30px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  /* Use only compositable properties to avoid non-composited animation Lighthouse warning */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, opacity 0.3s ease;
   box-shadow: 0 4px 10px rgba(128, 0, 0, 0.2);
 }
 
@@ -180,7 +181,8 @@ input, select, textarea, button {
   padding: 10px 24px;
   border-radius: 30px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  /* Use only compositable properties */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, opacity 0.3s ease;
 }
 
 .royal-button-outline:hover {

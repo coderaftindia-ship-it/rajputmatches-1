@@ -4,6 +4,7 @@ import ProtectedRoute from "./component/Layout/ProtectedRoute";
 import { AuthProvider } from "./component/Layout/AuthContext";
 import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import BottomNav from "./component/Layout/BottomNav";
+import { HomeCMSProvider } from "./context/HomeCMSContext";
 
 // Lazy-loaded routes for code splitting & fast initial page load
 const Home = lazy(() => import("./component/Layout/Home"));
@@ -72,19 +73,32 @@ const getSocialUrl = (linksObj, key) => {
 
 import { publicApi } from "./api/public.api";
 
+// FloatingSocial: deferred until page is idle to avoid blocking LCP
 function FloatingSocial() {
+  const [mounted, setMounted] = useState(false);
   const [links, setLinks] = useState({});
 
   useEffect(() => {
+    // Only render after the browser is idle — doesn't block LCP
+    const idle = window.requestIdleCallback
+      ? window.requestIdleCallback(() => setMounted(true), { timeout: 3000 })
+      : setTimeout(() => setMounted(true), 2000);
+    return () => {
+      window.cancelIdleCallback ? window.cancelIdleCallback(idle) : clearTimeout(idle);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     publicApi.getSocialLinks()
       .then((res) => {
         const data = res?.data || res;
-        if (data?.links) {
-          setLinks(data.links);
-        }
+        if (data?.links) setLinks(data.links);
       })
       .catch(() => {});
-  }, []);
+  }, [mounted]);
+
+  if (!mounted) return null;
 
   const socialConfig = [
     { icon: <FaFacebook size={18} />, label: "Facebook", key: "facebook", color: "#1877F2" },
@@ -162,6 +176,7 @@ function ScrollToTop() {
 
 function App() {
   return (
+    <HomeCMSProvider>
     <SiteSettingsProvider>
       <AuthProvider>
       {/* ToastContainer for displaying toast notifications */}
@@ -178,6 +193,9 @@ function App() {
 
       <ScrollToTop />
       <FloatingSocial />
+      <Suspense fallback={null}>
+        <ReportFeedbackWidget />
+      </Suspense>
       <Suspense fallback={
         <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div className="spinner-border text-warning" role="status">
@@ -185,7 +203,6 @@ function App() {
           </div>
         </div>
       }>
-        <ReportFeedbackWidget />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -288,6 +305,7 @@ function App() {
       <BottomNav />
     </AuthProvider>
     </SiteSettingsProvider>
+    </HomeCMSProvider>
   );
 }
 

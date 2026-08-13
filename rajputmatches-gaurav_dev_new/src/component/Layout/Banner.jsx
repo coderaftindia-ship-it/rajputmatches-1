@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Home.css";
 import Navbar from "./Navbar";
 import { FaCrown, FaCheckCircle, FaUsers, FaStar, FaRegBuilding, FaVenus, FaMars, FaRegHeart, FaMapMarkerAlt, FaSearch } from "react-icons/fa";
@@ -6,36 +6,15 @@ import Features from "./Features";
 import { useAuth } from "./AuthContext";
 import Bannerbg from "../../assets/images/bannerbg.png";
 import { Navigate } from "react-router-dom";
-import { publicApi, BASE_URL } from "../../api";
+import { BASE_URL } from "../../api";
+import { useHomeCMS } from "../../context/HomeCMSContext";
 
-const DEFAULT_CMS = {
-  heroBadgeText: "Trusted Since 2009",
-  heroTitleLine1: "Where Royalty",
-  heroTitleLine2: "Meets Destiny",
-  heroDescription:
-    "India's premium royal matrimonial service. Discover verified, dignified matches from distinguished families — crafted for unions that honour tradition and celebrate love.",
-  heroCTA1Text: "Begin Your Journey",
-  heroCTA2Text: "Explore Matches",
-  heroFooterNote: "Free registration • No hidden charges",
-  stat1Value: "100%", stat1Label: "Verified",
-  stat2Value: "25,000+", stat2Label: "Members",
-  stat3Value: "4.9", stat3Label: "Rating",
-  stat4Value: "All", stat4Label: "Communities",
-};
+
 
 function Banner() {
   const { isAuthenticated, setFormData, formData, userData } = useAuth();
   const [redirectPath, setRedirectPath] = useState(null);
-  const [cms, setCms] = useState(DEFAULT_CMS);
-
-  // Fetch CMS data
-  useEffect(() => {
-    publicApi.getHomeCMS()
-      .then((res) => {
-        if (res?.data?.data) setCms({ ...DEFAULT_CMS, ...res.data.data });
-      })
-      .catch(() => {});
-  }, []);
+  const { cms } = useHomeCMS();
 
   // Auto-enforce opposite gender search based on user profile gender
   useEffect(() => {
@@ -74,6 +53,14 @@ function Banner() {
     ? (cms.bannerBgImage.startsWith("/uploads/") ? `${BASE_URL}${cms.bannerBgImage}` : cms.bannerBgImage)
     : Bannerbg;
 
+  // Defer Ken Burns animation until after first paint to reduce TBT
+  const bgRef = useRef(null);
+  useEffect(() => {
+    if (bgRef.current) {
+      bgRef.current.style.animation = "kenBurns 30s ease-in-out infinite";
+    }
+  }, []);
+
   const particleStyles = [
     { left: "10%", animationDelay: "0s", animationDuration: "14s" },
     { left: "25%", animationDelay: "3s", animationDuration: "18s" },
@@ -104,23 +91,34 @@ function Banner() {
           paddingBottom: "1.5rem"
         }}
       >
-        {/* High-priority preloader for LCP Hero background image */}
-        <img src={bannerBg} alt="Hero Banner" fetchPriority="high" decoding="async" style={{ display: "none" }} />
-        
-        {/* Cinematic Ken Burns Background Zoom/Pan Effect */}
-        <div
-          className="position-absolute top-0 start-0 w-100 h-100"
+        {/*
+          LCP Fix: Use a real <img> instead of CSS background-image.
+          Real images are discoverable by the browser preload scanner,
+          can receive fetchPriority="high", and benefit from the <link rel=preload> in index.html.
+          The img is positioned absolutely to mimic background-image behaviour.
+        */}
+        <img
+          ref={bgRef}
+          src={bannerBg}
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          loading="eager"
+          decoding="sync"
+          width="1920"
+          height="1080"
           style={{
-            backgroundImage: `url(${bannerBg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
             zIndex: 0,
-            animation: "kenBurns 30s ease-in-out infinite",
             transformOrigin: "center center",
             willChange: "transform",
-            WebkitTransform: "translateZ(0)"
           }}
-        ></div>
+        />
 
         {/* Premium Dark Royal Overlay with Maroon and Dark Vignette */}
         <div

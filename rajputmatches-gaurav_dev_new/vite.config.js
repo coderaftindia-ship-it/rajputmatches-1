@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 const safeDecodeUriPlugin = () => ({
   name: 'safe-decode-uri',
@@ -32,7 +33,18 @@ const safeDecodeUriPlugin = () => ({
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
-    plugins: [react(), safeDecodeUriPlugin()],
+    plugins: [
+      react(),
+      safeDecodeUriPlugin(),
+      ViteImageOptimizer({
+        png: { quality: 80 },
+        jpeg: { quality: 75 },
+        jpg: { quality: 75 },
+        webp: { lossless: false, quality: 80 },
+        avif: { lossless: false, quality: 70 },
+        cache: true,
+      }),
+    ],
     server: {
       host: true,
       port: 5173,
@@ -72,13 +84,21 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'build',
       emptyOutDir: true,
-      sourcemap: true,
+      sourcemap: false, // Disabled in prod — reduces bundle size and TBT
       target: ['es2015', 'safari12'],
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
+              // React core — tiny, stable, cached separately
+              if (id.includes('react-dom') || id.includes('react/') || id.includes('react-is')) {
+                return 'vendor-react';
+              }
+              // Router — small, independent
+              if (id.includes('react-router-dom') || id.includes('react-router/') || id.includes('@remix-run')) {
+                return 'vendor-router';
+              }
               if (id.includes('country-state-city')) {
                 return 'vendor-location';
               }
