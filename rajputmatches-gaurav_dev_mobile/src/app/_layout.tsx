@@ -85,15 +85,19 @@ export default function TabLayout() {
         <Tabs.Screen
           name="upgrade"
           options={{
-            title: 'Upgrade',
-            tabBarIcon: ({ color }) => (
-              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <FontAwesome5 name="crown" size={17} color={color} />
-              </View>
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: 'Profile',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons name={focused ? 'person' : 'person-outline'} size={21} color={color} />
             ),
           }}
         />
-        {/* Hide welcome and profile from tab bar */}
+        {/* Hide welcome from tab bar */}
         <Tabs.Screen
           name="welcome"
           options={{
@@ -101,10 +105,6 @@ export default function TabLayout() {
             tabBarStyle: { display: 'none' },
             headerShown: false,
           }}
-        />
-        <Tabs.Screen
-          name="profile"
-          options={{ href: null }}
         />
         <Tabs.Screen
           name="view-profile"

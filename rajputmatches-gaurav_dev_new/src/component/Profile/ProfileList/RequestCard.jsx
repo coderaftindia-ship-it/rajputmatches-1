@@ -188,7 +188,24 @@ const ActionButtons = ({
             handleAction("view", profile._id);
           },
         },
-        { icon: <BsBell />, label: "Reminder" },
+        {
+          icon: <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "inherit" }}>✓</span>,
+          label: "Accept",
+          onClick: () => {
+            handleAction("accept", profile._id);
+            if (handlecheck) handlecheck(profile._id);
+          },
+          style: { color: "#fff", backgroundColor: "#1a7a45" },
+        },
+        {
+          icon: <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "inherit" }}>✕</span>,
+          label: "Reject",
+          onClick: () => {
+            handleAction("reject", profile._id);
+            if (handlecheck) handlecheck(profile._id);
+          },
+          style: { color: "#fff", backgroundColor: "#991c1c" },
+        },
         {
           icon: <TiMessages />,
           label: "Message",
@@ -362,7 +379,7 @@ const ActionButtons = ({
 
   return (
     <div className="d-flex w-100 bg-white" style={{ borderTop: "2px solid rgba(212, 175, 55, 0.2)" }}>
-      {buttonConfig[status]?.map(({ icon, label, onClick }, index) => (
+      {buttonConfig[status]?.map(({ icon, label, onClick, style: btnStyle }, index) => (
         <div
           key={index}
           className="py-3 d-flex flex-column align-items-center justify-content-center flex-grow-1"
@@ -370,15 +387,20 @@ const ActionButtons = ({
             borderLeft: index > 0 ? "1px solid rgba(212, 175, 55, 0.15)" : "none",
             cursor: "pointer",
             transition: "all 0.2s ease-in-out",
-            color: "var(--royal-maroon)",
+            color: btnStyle?.color || "var(--royal-maroon)",
+            backgroundColor: btnStyle?.backgroundColor || "transparent",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "rgba(128, 0, 0, 0.05)";
-            e.currentTarget.style.color = "var(--royal-maroon-dark)";
+            if (!btnStyle) {
+              e.currentTarget.style.backgroundColor = "rgba(128, 0, 0, 0.05)";
+              e.currentTarget.style.color = "var(--royal-maroon-dark)";
+            }
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "transparent";
-            e.currentTarget.style.color = "var(--royal-maroon)";
+            if (!btnStyle) {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "var(--royal-maroon)";
+            }
           }}
           onClick={onClick}
         >

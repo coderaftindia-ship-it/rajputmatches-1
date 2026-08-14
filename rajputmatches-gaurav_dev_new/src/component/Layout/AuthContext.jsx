@@ -77,9 +77,9 @@ export const AuthProvider = ({ children }) => {
           // User must verify and log in manually.
           // token and user data are intentionally NOT stored here.
 
-          toast.success("Khama Ghani, Hukum! Thank you for registering with Rajput Alliances. We will verify your account and email you once it is approved, so you can log in and create your profile.", {
+          toast.success("Khama Ghani, Hukum! Thank you for choosing Rajput Alliances. We have received your registration and will verify your profile. You will be contacted by email once approved.", {
             position: "top-center",
-            autoClose: 6000,
+            autoClose: 8000,
           });
 
           return { success: true, message: responseMessage };

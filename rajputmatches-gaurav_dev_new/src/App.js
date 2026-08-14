@@ -6,8 +6,7 @@ import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import BottomNav from "./component/Layout/BottomNav";
 import { HomeCMSProvider } from "./context/HomeCMSContext";
 
-// Lazy-loaded routes for code splitting & fast initial page load
-const Home = lazy(() => import("./component/Layout/Home"));
+import Home from "./component/Layout/Home";
 const ReportFeedbackWidget = lazy(() => import("./component/Layout/ReportFeedbackWidget"));
 const Login = lazy(() => import("./features/login"));
 const Register = lazy(() => import("./features/Register"));

@@ -10,12 +10,15 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { connectionApi } from '../services/connection.api';
 import { profileApi } from '../services/profile.api';
 import { SafeAvatarImage } from '../components/safe-avatar-image';
+
+const { width } = Dimensions.get('window');
 
 type TabCategory =
   | 'received'
@@ -43,13 +46,24 @@ interface ActivityProfile {
   rawItem?: any;
 }
 
+const NAV_TABS: { key: TabCategory; label: string; icon: string }[] = [
+  { key: 'received',    label: 'Received',        icon: 'heart' },
+  { key: 'sent',        label: 'Sent',            icon: 'paper-plane' },
+  { key: 'shortlisted', label: 'Shortlisted',     icon: 'star' },
+  { key: 'viewed',      label: 'Viewed',          icon: 'eye' },
+  { key: 'visitors',    label: 'Visitors',        icon: 'people' },
+  { key: 'photo_req',   label: 'Photo Requests',  icon: 'images' },
+  { key: 'doc_req',     label: 'Doc Requests',    icon: 'document-text' },
+  { key: 'contact_req', label: 'Contact Requests',icon: 'call' },
+  { key: 'blocked',     label: 'Blocked',         icon: 'ban' },
+];
+
 export default function InterestsScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabCategory>('received');
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
-  // Profile and Data states
   const [myProfile, setMyProfile] = useState<any>(null);
   const [receivedList, setReceivedList] = useState<ActivityProfile[]>([]);
   const [sentList, setSentList] = useState<ActivityProfile[]>([]);
@@ -61,91 +75,14 @@ export default function InterestsScreen() {
   const [contactReqList, setContactReqList] = useState<ActivityProfile[]>([]);
   const [blockedList, setBlockedList] = useState<ActivityProfile[]>([]);
 
-  // Sample data fallback generator to match screenshot values if DB arrays are short
-  const buildSampleList = (
-    prefix: string,
-    count: number,
-    status = 'pending'
-  ): ActivityProfile[] => {
+  const buildSampleList = (prefix: string, count: number, status = 'pending'): ActivityProfile[] => {
     const samples: ActivityProfile[] = [
-      {
-        id: `${prefix}-1012`,
-        name: 'Radhika Singh Chauhan',
-        matriId: '1012',
-        age: '34 Yrs | 5\'0"',
-        gotra: 'Sandilya',
-        location: 'Indore, MP',
-        profession: 'Software Engineer',
-        sentOn: 'Today, 2:30 PM',
-        status,
-        avatar: null,
-        gender: 'Female',
-      },
-      {
-        id: `${prefix}-1014`,
-        name: 'Kavita Solanki',
-        matriId: '1014',
-        age: '34 Yrs | 5\'8"',
-        gotra: 'Solanki',
-        location: 'Toronto, Ontario',
-        profession: 'Architect',
-        sentOn: 'Yesterday',
-        status,
-        avatar: null,
-        gender: 'Female',
-      },
-      {
-        id: `${prefix}-1006`,
-        name: 'Navin Biswas',
-        matriId: '1006',
-        age: '28 Yrs | 5\'11"',
-        gotra: 'Biswas',
-        location: 'Jaipur, Rajasthan',
-        profession: 'Agriculture',
-        sentOn: '3 days ago',
-        status,
-        avatar: null,
-        gender: 'Male',
-      },
-      {
-        id: `${prefix}-1008`,
-        name: 'Neha Singh Rathore',
-        matriId: '1008',
-        age: '34 Yrs | 5\'9"',
-        gotra: 'Rathore',
-        location: 'Jhansi, UP',
-        profession: 'Government Service',
-        sentOn: '5 days ago',
-        status,
-        avatar: null,
-        gender: 'Female',
-      },
-      {
-        id: `${prefix}-1011`,
-        name: 'Yasika Kumari Sharma',
-        matriId: '1011',
-        age: '25 Yrs | 5\'0"',
-        gotra: 'Sharma',
-        location: 'Jaipur, Rajasthan',
-        profession: 'Teacher',
-        sentOn: '1 week ago',
-        status,
-        avatar: null,
-        gender: 'Female',
-      },
-      {
-        id: `${prefix}-1015`,
-        name: 'Vikram Singh Bhati',
-        matriId: '1015',
-        age: '30 Yrs | 6\'0"',
-        gotra: 'Bhati',
-        location: 'Jodhpur, Rajasthan',
-        profession: 'Business Executive',
-        sentOn: '2 weeks ago',
-        status,
-        avatar: null,
-        gender: 'Male',
-      },
+      { id: `${prefix}-1012`, name: 'Radhika Singh Chauhan', matriId: '1012', age: "34 Yrs | 5'0\"", gotra: 'Sandilya', location: 'Indore, MP', profession: 'Software Engineer', sentOn: 'Today, 2:30 PM', status, avatar: null, gender: 'Female' },
+      { id: `${prefix}-1014`, name: 'Kavita Solanki', matriId: '1014', age: "34 Yrs | 5'8\"", gotra: 'Solanki', location: 'Toronto, Ontario', profession: 'Architect', sentOn: 'Yesterday', status, avatar: null, gender: 'Female' },
+      { id: `${prefix}-1006`, name: 'Navin Biswas', matriId: '1006', age: "28 Yrs | 5'11\"", gotra: 'Biswas', location: 'Jaipur, Rajasthan', profession: 'Agriculture', sentOn: '3 days ago', status, avatar: null, gender: 'Male' },
+      { id: `${prefix}-1008`, name: 'Neha Singh Rathore', matriId: '1008', age: "34 Yrs | 5'9\"", gotra: 'Rathore', location: 'Jhansi, UP', profession: 'Government Service', sentOn: '5 days ago', status, avatar: null, gender: 'Female' },
+      { id: `${prefix}-1011`, name: 'Yasika Kumari Sharma', matriId: '1011', age: "25 Yrs | 5'0\"", gotra: 'Sharma', location: 'Jaipur, Rajasthan', profession: 'Teacher', sentOn: '1 week ago', status, avatar: null, gender: 'Female' },
+      { id: `${prefix}-1015`, name: 'Vikram Singh Bhati', matriId: '1015', age: "30 Yrs | 6'0\"", gotra: 'Bhati', location: 'Jodhpur, Rajasthan', profession: 'Business Executive', sentOn: '2 weeks ago', status, avatar: null, gender: 'Male' },
     ];
     return samples.slice(0, count);
   };
@@ -167,73 +104,27 @@ export default function InterestsScreen() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      // 1. Fetch Logged in User Profile
       const profRes = await profileApi.getProfile().catch(() => null);
       if (profRes) {
         const u = profRes.user || profRes.data || profRes;
         setMyProfile(u);
-
-        // Calculate lists from user profile arrays
-        if (Array.isArray(u.viewedBy) && u.viewedBy.length > 0) {
-          setVisitorsList(u.viewedBy.map((item: any) => normalizeItem(item, 'visitor')));
-        } else {
-          setVisitorsList(buildSampleList('vis', 3));
-        }
-
-        if (Array.isArray(u.visitedAt) && u.visitedAt.length > 0) {
-          setViewedList(u.visitedAt.map((item: any) => normalizeItem(item, 'viewed')));
-        } else {
-          setViewedList(buildSampleList('view', 6));
-        }
-
-        if (Array.isArray(u.photoReqReceived) && u.photoReqReceived.length > 0) {
-          setPhotoReqList(u.photoReqReceived.map((item: any) => normalizeItem(item, 'photo')));
-        } else {
-          setPhotoReqList(buildSampleList('photo', 1));
-        }
-
-        if (Array.isArray(u.documentReqReceived) && u.documentReqReceived.length > 0) {
-          setDocReqList(u.documentReqReceived.map((item: any) => normalizeItem(item, 'doc')));
-        } else {
-          setDocReqList(buildSampleList('doc', 0));
-        }
-
-        if (Array.isArray(u.contactReqReceived) && u.contactReqReceived.length > 0) {
-          setContactReqList(u.contactReqReceived.map((item: any) => normalizeItem(item, 'contact')));
-        } else {
-          setContactReqList(buildSampleList('contact', 0));
-        }
-
-        if (Array.isArray(u.shortlisted) && u.shortlisted.length > 0) {
-          setShortlistedList(u.shortlisted.map((item: any) => normalizeItem(item, 'shortlisted')));
-        } else {
-          setShortlistedList(buildSampleList('short', 0));
-        }
-
-        if (Array.isArray(u.blocked) && u.blocked.length > 0) {
-          setBlockedList(u.blocked.map((item: any) => normalizeItem(item, 'blocked')));
-        } else {
-          setBlockedList(buildSampleList('block', 0));
-        }
+        setVisitorsList(Array.isArray(u.viewedBy) && u.viewedBy.length > 0 ? u.viewedBy.map((i: any) => normalizeItem(i, 'visitor')) : buildSampleList('vis', 3));
+        setViewedList(Array.isArray(u.visitedAt) && u.visitedAt.length > 0 ? u.visitedAt.map((i: any) => normalizeItem(i, 'viewed')) : buildSampleList('view', 6));
+        setPhotoReqList(Array.isArray(u.photoReqReceived) && u.photoReqReceived.length > 0 ? u.photoReqReceived.map((i: any) => normalizeItem(i, 'photo')) : buildSampleList('photo', 1));
+        setDocReqList(Array.isArray(u.documentReqReceived) && u.documentReqReceived.length > 0 ? u.documentReqReceived.map((i: any) => normalizeItem(i, 'doc')) : buildSampleList('doc', 0));
+        setContactReqList(Array.isArray(u.contactReqReceived) && u.contactReqReceived.length > 0 ? u.contactReqReceived.map((i: any) => normalizeItem(i, 'contact')) : buildSampleList('contact', 0));
+        setShortlistedList(Array.isArray(u.shortlisted) && u.shortlisted.length > 0 ? u.shortlisted.map((i: any) => normalizeItem(i, 'shortlisted')) : buildSampleList('short', 0));
+        setBlockedList(Array.isArray(u.blocked) && u.blocked.length > 0 ? u.blocked.map((i: any) => normalizeItem(i, 'blocked')) : buildSampleList('block', 0));
       } else {
-        // Fallback default sample lists matching web dashboard
         setViewedList(buildSampleList('view', 6));
         setVisitorsList(buildSampleList('vis', 3));
         setPhotoReqList(buildSampleList('photo', 1));
-        setShortlistedList(buildSampleList('short', 0));
-        setBlockedList(buildSampleList('block', 0));
       }
 
-      // 2. Fetch Connection Requests (Received & Sent)
       const data = await connectionApi.list().catch(() => null);
       if (data) {
-        const received: any[] = Array.isArray(data)
-          ? data.filter((r: any) => r.type === 'received' || !r.type)
-          : data.received || data.requests || data.data?.received || [];
-        const sent: any[] = Array.isArray(data)
-          ? data.filter((r: any) => r.type === 'sent')
-          : data.sent || data.data?.sent || [];
-
+        const received: any[] = Array.isArray(data) ? data.filter((r: any) => r.type === 'received' || !r.type) : data.received || data.requests || data.data?.received || [];
+        const sent: any[] = Array.isArray(data) ? data.filter((r: any) => r.type === 'sent') : data.sent || data.data?.sent || [];
         setReceivedList(received.length > 0 ? received.map((i: any) => normalizeItem(i, 'received')) : buildSampleList('rec', 1));
         setSentList(sent.length > 0 ? sent.map((i: any) => normalizeItem(i, 'sent')) : buildSampleList('sent', 4));
       } else {
@@ -248,22 +139,14 @@ export default function InterestsScreen() {
     }
   }, []);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchDashboardData();
-  }, [fetchDashboardData]);
+  useEffect(() => { fetchDashboardData(); }, [fetchDashboardData]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchDashboardData();
-  };
+  const onRefresh = () => { setRefreshing(true); fetchDashboardData(); };
 
   const handleAcceptRequest = async (id: string, name: string) => {
     try {
       await connectionApi.accept(id).catch(() => {});
-      setReceivedList((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, status: 'accepted' } : item))
-      );
+      setReceivedList((prev) => prev.map((item) => (item.id === id ? { ...item, status: 'accepted' } : item)));
       Alert.alert('Request Accepted 🎉', `Connected with ${name}!`);
     } catch {
       Alert.alert('Connected', `Request accepted for ${name}`);
@@ -274,334 +157,263 @@ export default function InterestsScreen() {
     try {
       await connectionApi.reject(id).catch(() => {});
       setReceivedList((prev) => prev.filter((item) => item.id !== id));
-      Alert.alert('Request Declined', 'Interest request removed.');
+      Alert.alert('Declined', 'Interest request removed.');
     } catch {
       setReceivedList((prev) => prev.filter((item) => item.id !== id));
     }
   };
 
   const handleViewProfile = (item: ActivityProfile) => {
-    router.push({
-      pathname: '/view-profile',
-      params: { id: item.id, data: JSON.stringify(item.rawItem || item) },
-    });
+    router.push({ pathname: '/view-profile', params: { id: item.id, data: JSON.stringify(item.rawItem || item) } });
   };
 
-  // Get active list to render
-  const getActiveList = (): ActivityProfile[] => {
-    switch (activeTab) {
-      case 'received':
-        return receivedList;
-      case 'sent':
-        return sentList;
-      case 'shortlisted':
-        return shortlistedList;
-      case 'viewed':
-        return viewedList;
-      case 'visitors':
-        return visitorsList;
-      case 'photo_req':
-        return photoReqList;
-      case 'doc_req':
-        return docReqList;
-      case 'contact_req':
-        return contactReqList;
-      case 'blocked':
-        return blockedList;
-      default:
-        return receivedList;
+  const getListForTab = (tab: TabCategory): ActivityProfile[] => {
+    switch (tab) {
+      case 'received':    return receivedList;
+      case 'sent':        return sentList;
+      case 'shortlisted': return shortlistedList;
+      case 'viewed':      return viewedList;
+      case 'visitors':    return visitorsList;
+      case 'photo_req':   return photoReqList;
+      case 'doc_req':     return docReqList;
+      case 'contact_req': return contactReqList;
+      case 'blocked':     return blockedList;
+      default:            return receivedList;
     }
   };
 
-  const currentList = getActiveList();
-  const userName = myProfile?.firstName ? `${myProfile.firstName} ${myProfile.lastName || ''}` : 'Navin Biswas';
+  const currentList = getListForTab(activeTab);
+  const userName = myProfile?.firstName ? `${myProfile.firstName} ${myProfile.lastName || ''}`.trim() : 'Navin Biswas';
   const userMatriId = myProfile?.martrId ? String(myProfile.martrId) : '1006';
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#59123B" />
+      <StatusBar barStyle="light-content" backgroundColor="#2C071E" />
 
-      {/* Top Header */}
+      {/* ── ROYAL TOP HEADER (matches Profile page style) ── */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.headerSubtitle}>MATRIMONIAL DASHBOARD</Text>
-          <Text style={styles.headerTitle}>Activity & Requests 👑</Text>
+        <View style={styles.headerLeft}>
+          <View style={styles.headerLogoRing}>
+            <FontAwesome5 name="crown" size={14} color="#D4AF37" />
+          </View>
+          <View>
+            <Text style={styles.headerKicker}>MATRIMONIAL DASHBOARD</Text>
+            <Text style={styles.headerTitle}>Activity & Requests 👑</Text>
+          </View>
         </View>
-        <TouchableOpacity style={styles.searchLinkBtn} onPress={() => router.push('/explore')}>
-          <Ionicons name="search-outline" size={16} color="#59123B" />
-          <Text style={styles.searchLinkText}>Explore</Text>
+        <TouchableOpacity style={styles.explorePill} onPress={() => router.push('/explore')}>
+          <Ionicons name="search-outline" size={13} color="#F5E4C3" />
+          <Text style={styles.explorePillText}>Explore</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* ── SUBTAB-STYLE NAV BAR (matches Profile fiveSubTabsBar) ── */}
+      <View style={styles.subTabBar}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.subTabScroll}
+        >
+          {NAV_TABS.map((tab) => {
+            const count = getListForTab(tab.key).length;
+            const isActive = activeTab === tab.key;
+            return (
+              <TouchableOpacity
+                key={tab.key}
+                style={[styles.subTabItem, isActive && styles.subTabItemActive]}
+                onPress={() => setActiveTab(tab.key)}
+                activeOpacity={0.75}
+              >
+                <Ionicons
+                  name={tab.icon as any}
+                  size={15}
+                  color={isActive ? '#F5E4C3' : 'rgba(255,255,255,0.55)'}
+                />
+                <Text style={[styles.subTabLabel, isActive && styles.subTabLabelActive]} numberOfLines={1}>
+                  {tab.label}
+                </Text>
+                {count > 0 && (
+                  <View style={[styles.subTabBadge, isActive && styles.subTabBadgeActive]}>
+                    <Text style={[styles.subTabBadgeText, isActive && styles.subTabBadgeTextActive]}>
+                      {count}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#59123B']} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#59123B']} />}
       >
-        {/* User Hero Profile Banner Card (Matching Web Dashboard Header) */}
-        <View style={styles.userHeroCard}>
-          <View style={styles.userHeroRow}>
-            <View style={styles.avatarRing}>
+        {/* ── HERO PROFILE BANNER ── */}
+        <View style={styles.heroCard}>
+          {/* Gold corner decoration */}
+          <View style={styles.heroTopAccent} />
+
+          <View style={styles.heroUserRow}>
+            <View style={styles.heroAvatarRing}>
               <SafeAvatarImage
                 uri={myProfile?.avatar || myProfile?.profileImage}
                 gender={myProfile?.gender || 'Male'}
-                style={styles.avatarImg}
+                style={styles.heroAvatarImg}
               />
             </View>
-            <View style={styles.userInfoCol}>
-              <Text style={styles.userNameText}>{userName}</Text>
-              <View style={styles.matriBadge}>
-                <Text style={styles.matriBadgeText}>ID: {userMatriId}</Text>
+            <View style={styles.heroUserInfo}>
+              <Text style={styles.heroUserName}>{userName}</Text>
+              <View style={styles.heroMatriChip}>
+                <Text style={styles.heroMatriChipText}>ID: {userMatriId}</Text>
               </View>
             </View>
           </View>
 
-          {/* Quick Stats Grid */}
-          <View style={styles.quickStatsRow}>
-            <TouchableOpacity style={styles.statBox} onPress={() => setActiveTab('viewed')}>
-              <Text style={styles.statNum}>{viewedList.length}</Text>
-              <Text style={styles.statLabel}>Viewed</Text>
-            </TouchableOpacity>
-            <View style={styles.statDivider} />
-            <TouchableOpacity style={styles.statBox} onPress={() => setActiveTab('visitors')}>
-              <Text style={styles.statNum}>{visitorsList.length}</Text>
-              <Text style={styles.statLabel}>Visitors</Text>
-            </TouchableOpacity>
-            <View style={styles.statDivider} />
-            <TouchableOpacity style={styles.statBox} onPress={() => setActiveTab('received')}>
-              <Text style={styles.statNum}>{receivedList.length}</Text>
-              <Text style={styles.statLabel}>Requests</Text>
-            </TouchableOpacity>
-            <View style={styles.statDivider} />
-            <TouchableOpacity style={styles.statBox} onPress={() => setActiveTab('photo_req')}>
-              <Text style={styles.statNum}>{photoReqList.length}</Text>
-              <Text style={styles.statLabel}>Photo Reqs</Text>
-            </TouchableOpacity>
+          {/* Quick Stats Row */}
+          <View style={styles.statsRow}>
+            {[
+              { label: 'Viewed', value: viewedList.length, tab: 'viewed' as TabCategory },
+              { label: 'Visitors', value: visitorsList.length, tab: 'visitors' as TabCategory },
+              { label: 'Requests', value: receivedList.length, tab: 'received' as TabCategory },
+              { label: 'Photo Reqs', value: photoReqList.length, tab: 'photo_req' as TabCategory },
+            ].map((stat, i, arr) => (
+              <React.Fragment key={stat.tab}>
+                <TouchableOpacity style={styles.statCell} onPress={() => setActiveTab(stat.tab)}>
+                  <Text style={styles.statValue}>{stat.value}</Text>
+                  <Text style={styles.statCaption}>{stat.label}</Text>
+                </TouchableOpacity>
+                {i < arr.length - 1 && <View style={styles.statSep} />}
+              </React.Fragment>
+            ))}
           </View>
         </View>
 
-        {/* Scrollable Navigation Chips (Matching Web Sidebar Navigation) */}
-        <Text style={styles.sectionHeading}>NAVIGATION CATEGORIES</Text>
+        {/* ── NAVIGATION CATEGORIES LABEL + SCROLL PILLS ── */}
+        <Text style={styles.sectionLabel}>NAVIGATION CATEGORIES</Text>
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.navChipsScroll}
+          contentContainerStyle={styles.navScrollContent}
         >
-          <TouchableOpacity
-            style={[styles.navChip, activeTab === 'received' && styles.navChipActive]}
-            onPress={() => setActiveTab('received')}
-          >
-            <Ionicons name="heart" size={13} color={activeTab === 'received' ? '#FFFFFF' : '#59123B'} />
-            <Text style={[styles.navChipText, activeTab === 'received' && styles.navChipTextActive]}>
-              Received
-            </Text>
-            <View style={[styles.countBadge, activeTab === 'received' && styles.countBadgeActive]}>
-              <Text style={[styles.countBadgeText, activeTab === 'received' && styles.countBadgeTextActive]}>
-                {receivedList.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.navChip, activeTab === 'sent' && styles.navChipActive]}
-            onPress={() => setActiveTab('sent')}
-          >
-            <Ionicons name="paper-plane" size={13} color={activeTab === 'sent' ? '#FFFFFF' : '#59123B'} />
-            <Text style={[styles.navChipText, activeTab === 'sent' && styles.navChipTextActive]}>
-              Sent
-            </Text>
-            <View style={[styles.countBadge, activeTab === 'sent' && styles.countBadgeActive]}>
-              <Text style={[styles.countBadgeText, activeTab === 'sent' && styles.countBadgeTextActive]}>
-                {sentList.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.navChip, activeTab === 'shortlisted' && styles.navChipActive]}
-            onPress={() => setActiveTab('shortlisted')}
-          >
-            <Ionicons name="star" size={13} color={activeTab === 'shortlisted' ? '#FFFFFF' : '#59123B'} />
-            <Text style={[styles.navChipText, activeTab === 'shortlisted' && styles.navChipTextActive]}>
-              Shortlisted
-            </Text>
-            <View style={[styles.countBadge, activeTab === 'shortlisted' && styles.countBadgeActive]}>
-              <Text style={[styles.countBadgeText, activeTab === 'shortlisted' && styles.countBadgeTextActive]}>
-                {shortlistedList.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.navChip, activeTab === 'viewed' && styles.navChipActive]}
-            onPress={() => setActiveTab('viewed')}
-          >
-            <Ionicons name="eye" size={13} color={activeTab === 'viewed' ? '#FFFFFF' : '#59123B'} />
-            <Text style={[styles.navChipText, activeTab === 'viewed' && styles.navChipTextActive]}>
-              Viewed Profiles
-            </Text>
-            <View style={[styles.countBadge, activeTab === 'viewed' && styles.countBadgeActive]}>
-              <Text style={[styles.countBadgeText, activeTab === 'viewed' && styles.countBadgeTextActive]}>
-                {viewedList.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.navChip, activeTab === 'visitors' && styles.navChipActive]}
-            onPress={() => setActiveTab('visitors')}
-          >
-            <Ionicons name="people" size={13} color={activeTab === 'visitors' ? '#FFFFFF' : '#59123B'} />
-            <Text style={[styles.navChipText, activeTab === 'visitors' && styles.navChipTextActive]}>
-              Profile Visitors
-            </Text>
-            <View style={[styles.countBadge, activeTab === 'visitors' && styles.countBadgeActive]}>
-              <Text style={[styles.countBadgeText, activeTab === 'visitors' && styles.countBadgeTextActive]}>
-                {visitorsList.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.navChip, activeTab === 'photo_req' && styles.navChipActive]}
-            onPress={() => setActiveTab('photo_req')}
-          >
-            <Ionicons name="images" size={13} color={activeTab === 'photo_req' ? '#FFFFFF' : '#59123B'} />
-            <Text style={[styles.navChipText, activeTab === 'photo_req' && styles.navChipTextActive]}>
-              Photo Requests
-            </Text>
-            <View style={[styles.countBadge, activeTab === 'photo_req' && styles.countBadgeActive]}>
-              <Text style={[styles.countBadgeText, activeTab === 'photo_req' && styles.countBadgeTextActive]}>
-                {photoReqList.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.navChip, activeTab === 'doc_req' && styles.navChipActive]}
-            onPress={() => setActiveTab('doc_req')}
-          >
-            <Ionicons name="document-text" size={13} color={activeTab === 'doc_req' ? '#FFFFFF' : '#59123B'} />
-            <Text style={[styles.navChipText, activeTab === 'doc_req' && styles.navChipTextActive]}>
-              Doc Requests
-            </Text>
-            <View style={[styles.countBadge, activeTab === 'doc_req' && styles.countBadgeActive]}>
-              <Text style={[styles.countBadgeText, activeTab === 'doc_req' && styles.countBadgeTextActive]}>
-                {docReqList.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.navChip, activeTab === 'contact_req' && styles.navChipActive]}
-            onPress={() => setActiveTab('contact_req')}
-          >
-            <Ionicons name="call" size={13} color={activeTab === 'contact_req' ? '#FFFFFF' : '#59123B'} />
-            <Text style={[styles.navChipText, activeTab === 'contact_req' && styles.navChipTextActive]}>
-              Contact Requests
-            </Text>
-            <View style={[styles.countBadge, activeTab === 'contact_req' && styles.countBadgeActive]}>
-              <Text style={[styles.countBadgeText, activeTab === 'contact_req' && styles.countBadgeTextActive]}>
-                {contactReqList.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.navChip, activeTab === 'blocked' && styles.navChipActive]}
-            onPress={() => setActiveTab('blocked')}
-          >
-            <Ionicons name="ban" size={13} color={activeTab === 'blocked' ? '#FFFFFF' : '#59123B'} />
-            <Text style={[styles.navChipText, activeTab === 'blocked' && styles.navChipTextActive]}>
-              Blocked
-            </Text>
-            <View style={[styles.countBadge, activeTab === 'blocked' && styles.countBadgeActive]}>
-              <Text style={[styles.countBadgeText, activeTab === 'blocked' && styles.countBadgeTextActive]}>
-                {blockedList.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
+          {NAV_TABS.map((tab) => {
+            const count = getListForTab(tab.key).length;
+            const isActive = activeTab === tab.key;
+            return (
+              <TouchableOpacity
+                key={tab.key}
+                style={[styles.navChip, isActive && styles.navChipActive]}
+                onPress={() => setActiveTab(tab.key)}
+                activeOpacity={0.75}
+              >
+                <Ionicons
+                  name={tab.icon as any}
+                  size={13}
+                  color={isActive ? '#FFFFFF' : '#59123B'}
+                />
+                <Text style={[styles.navChipLabel, isActive && styles.navChipLabelActive]}>
+                  {tab.label}
+                </Text>
+                <View style={[styles.countBubble, isActive && styles.countBubbleActive]}>
+                  <Text style={[styles.countBubbleText, isActive && styles.countBubbleTextActive]}>
+                    {count}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
-        {/* Content List */}
+        {/* ── CONTENT AREA ── */}
         {loading ? (
           <View style={styles.centerBox}>
             <ActivityIndicator size="large" color="#59123B" />
+            <Text style={styles.loadingText}>Loading...</Text>
           </View>
         ) : currentList.length === 0 ? (
           <View style={styles.emptyCard}>
-            <Ionicons name="briefcase-outline" size={44} color="#C4A8B3" />
+            <View style={styles.emptyIconCircle}>
+              <Ionicons name="heart-dislike-outline" size={32} color="#C4A8B3" />
+            </View>
             <Text style={styles.emptyTitle}>No Records Found</Text>
             <Text style={styles.emptySubText}>
               There are no profiles under this category right now.
             </Text>
-            <TouchableOpacity style={styles.exploreBtn} onPress={() => router.push('/explore')}>
-              <Text style={styles.exploreBtnText}>Explore Matches</Text>
+            <TouchableOpacity style={styles.emptyExploreBtn} onPress={() => router.push('/explore')}>
+              <Ionicons name="search" size={13} color="#FFFFFF" />
+              <Text style={styles.emptyExploreBtnText}>Explore Matches</Text>
             </TouchableOpacity>
           </View>
         ) : (
-          <View style={styles.profileListWrap}>
+          <View style={styles.listWrap}>
             {currentList.map((item) => (
               <View key={item.id} style={styles.profileCard}>
-                <View style={styles.cardHeaderRow}>
+                {/* Profile card header */}
+                <View style={styles.cardTopRow}>
                   <View style={styles.cardAvatarRing}>
-                    <SafeAvatarImage uri={item.avatar} gender={item.gender} style={styles.cardAvatar} />
+                    <SafeAvatarImage uri={item.avatar} gender={item.gender} style={styles.cardAvatarImg} />
                   </View>
-                  <View style={styles.cardMainCol}>
-                    <View style={styles.nameMatriRow}>
-                      <Text style={styles.profileName}>{item.name}</Text>
-                      <View style={styles.matriPill}>
-                        <Text style={styles.matriPillText}>ID: {item.matriId}</Text>
+
+                  <View style={styles.cardInfoCol}>
+                    <View style={styles.cardNameRow}>
+                      <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
+                      <View style={styles.cardIdChip}>
+                        <Text style={styles.cardIdChipText}>ID: {item.matriId}</Text>
                       </View>
                     </View>
-                    <Text style={styles.profileAgeText}>{item.age}</Text>
 
-                    <View style={styles.infoTagsRow}>
-                      <View style={styles.tagPill}>
-                        <FontAwesome5 name="shield-alt" size={9} color="#59123B" />
-                        <Text style={styles.tagText}>{item.gotra}</Text>
+                    <Text style={styles.cardAge}>{item.age}</Text>
+
+                    <View style={styles.cardTagsRow}>
+                      <View style={styles.cardTag}>
+                        <FontAwesome5 name="shield-alt" size={8} color="#59123B" />
+                        <Text style={styles.cardTagText}>{item.gotra}</Text>
                       </View>
-                      <View style={styles.tagPill}>
-                        <Ionicons name="location-outline" size={10} color="#59123B" />
-                        <Text style={styles.tagText}>{item.location}</Text>
+                      <View style={styles.cardTag}>
+                        <Ionicons name="location-outline" size={9} color="#59123B" />
+                        <Text style={styles.cardTagText}>{item.location}</Text>
                       </View>
                     </View>
                   </View>
                 </View>
 
-                {/* Card Action Buttons */}
+                {/* Divider */}
+                <View style={styles.cardDivider} />
+
+                {/* Card Actions */}
                 <View style={styles.cardActionsRow}>
                   <TouchableOpacity style={styles.viewProfileBtn} onPress={() => handleViewProfile(item)}>
-                    <Ionicons name="eye-outline" size={14} color="#59123B" />
+                    <Ionicons name="eye-outline" size={13} color="#59123B" />
                     <Text style={styles.viewProfileText}>View Profile</Text>
                   </TouchableOpacity>
 
                   {activeTab === 'received' && (
-                    <View style={styles.acceptDeclineRow}>
-                      <TouchableOpacity
-                        style={styles.declineBtn}
-                        onPress={() => handleDeclineRequest(item.id)}
-                      >
-                        <Ionicons name="close-circle-outline" size={14} color="#DC2626" />
-                        <Text style={styles.declineText}>Decline</Text>
+                    <View style={styles.acceptDeclineGroup}>
+                      <TouchableOpacity style={styles.declineBtn} onPress={() => handleDeclineRequest(item.id)} activeOpacity={0.8}>
+                        <Ionicons name="close-circle-outline" size={13} color="#DC2626" />
+                        <Text style={styles.declineBtnText}>Decline</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.acceptBtn}
-                        onPress={() => handleAcceptRequest(item.id, item.name)}
-                      >
-                        <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />
-                        <Text style={styles.acceptText}>Accept</Text>
+                      <TouchableOpacity style={styles.acceptBtn} onPress={() => handleAcceptRequest(item.id, item.name)} activeOpacity={0.8}>
+                        <Ionicons name="checkmark-circle" size={13} color="#FFFFFF" />
+                        <Text style={styles.acceptBtnText}>Accept</Text>
                       </TouchableOpacity>
                     </View>
                   )}
 
                   {activeTab === 'sent' && (
-                    <View style={styles.statusPill}>
-                      <Ionicons name="time-outline" size={12} color="#CD9024" />
-                      <Text style={styles.statusText}>Pending Response</Text>
+                    <View style={styles.pendingChip}>
+                      <Ionicons name="time-outline" size={11} color="#CD9024" />
+                      <Text style={styles.pendingChipText}>Pending Response</Text>
                     </View>
+                  )}
+
+                  {activeTab === 'shortlisted' && (
+                    <TouchableOpacity style={styles.removeBtn} onPress={() => setShortlistedList((prev) => prev.filter((p) => p.id !== item.id))}>
+                      <Ionicons name="star" size={11} color="#CD9024" />
+                      <Text style={styles.removeBtnText}>Remove</Text>
+                    </TouchableOpacity>
                   )}
                 </View>
               </View>
@@ -616,381 +428,603 @@ export default function InterestsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAF5EF',
+    backgroundColor: '#F4EDE8',
   },
+
+  // ── ROYAL DARK TOP HEADER (matches Profile page) ──
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#2C071E',
     borderBottomWidth: 1,
-    borderBottomColor: '#EFE0CB',
+    borderBottomColor: '#4A1235',
+    shadowColor: '#2C071E',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  headerSubtitle: {
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  headerLogoRing: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#4A1235',
+    borderWidth: 1.5,
+    borderColor: '#D4AF37',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerKicker: {
     fontSize: 9,
     fontWeight: '800',
-    color: '#CD9024',
-    letterSpacing: 0.6,
+    color: '#D4AF37',
+    letterSpacing: 1.2,
+    marginBottom: 1,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#59123B',
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#F5E4C3',
+    letterSpacing: 0.3,
   },
-  searchLinkBtn: {
+  explorePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#F8EBD7',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
+    gap: 5,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#EFE0CB',
+    borderColor: 'rgba(245,228,195,0.3)',
   },
-  searchLinkText: {
-    fontSize: 11,
+  explorePillText: {
+    fontSize: 11.5,
     fontWeight: '800',
-    color: '#59123B',
-  },
-  scrollContent: {
-    padding: 12,
-    gap: 12,
-    paddingBottom: 100,
+    color: '#F5E4C3',
   },
 
-  // User Hero Profile Card
-  userHeroCard: {
-    backgroundColor: '#59123B',
-    borderRadius: 18,
-    padding: 14,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: '#EDB139',
-    shadowColor: '#59123B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
+  // ── SUBTAB BAR (matches Profile fiveSubTabsBar style) ──
+  subTabBar: {
+    backgroundColor: '#3A0F28',
+    borderBottomWidth: 1,
+    borderBottomColor: '#5A1A40',
+    paddingVertical: 0,
   },
-  userHeroRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  avatarRing: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 2,
-    borderColor: '#EDB139',
-    backgroundColor: '#FFFFFF',
-    overflow: 'hidden',
-  },
-  avatarImg: {
-    width: '100%',
-    height: '100%',
-  },
-  userInfoCol: {
-    gap: 2,
-  },
-  userNameText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  matriBadge: {
-    backgroundColor: 'rgba(237, 177, 57, 0.25)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderColor: '#EDB139',
-  },
-  matriBadgeText: {
-    color: '#EDB139',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  quickStatsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 12,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  statBox: {
-    alignItems: 'center',
+  subTabScroll: {
     paddingHorizontal: 6,
+    gap: 0,
   },
-  statNum: {
-    color: '#EDB139',
-    fontSize: 14,
-    fontWeight: '800',
+  subTabItem: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    gap: 3,
+    borderBottomWidth: 2.5,
+    borderBottomColor: 'transparent',
+    minWidth: 64,
+    position: 'relative',
   },
-  statLabel: {
-    color: '#FFFFFF',
+  subTabItemActive: {
+    borderBottomColor: '#D4AF37',
+  },
+  subTabLabel: {
     fontSize: 9,
-    fontWeight: '600',
-    marginTop: 1,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.55)',
+    textAlign: 'center',
   },
-  statDivider: {
-    width: 1,
-    height: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  subTabLabelActive: {
+    color: '#F5E4C3',
+    fontWeight: '900',
+  },
+  subTabBadge: {
+    position: 'absolute',
+    top: 5,
+    right: 4,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 8,
+    minWidth: 16,
+    alignItems: 'center',
+  },
+  subTabBadgeActive: {
+    backgroundColor: '#D4AF37',
+  },
+  subTabBadgeText: {
+    fontSize: 8,
+    fontWeight: '900',
+    color: 'rgba(255,255,255,0.8)',
+  },
+  subTabBadgeTextActive: {
+    color: '#2C071E',
   },
 
-  // Category Nav Chips
-  sectionHeading: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#7A5C66',
-    letterSpacing: 0.8,
-    marginTop: 2,
+  // ── SECTION LABEL ──
+  sectionLabel: {
+    fontSize: 9.5,
+    fontWeight: '900',
+    color: '#6B4A56',
+    letterSpacing: 1.4,
+    marginBottom: -4,
   },
-  navChipsScroll: {
+
+  // ── NAV PILLS (matching screenshot 1: filled active, outline inactive) ──
+  navScrollContent: {
     gap: 8,
-    paddingRight: 10,
+    paddingRight: 14,
+    paddingBottom: 4,
   },
   navChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: '#EFE0CB',
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: '#E8D9CF',
+    shadowColor: '#59123B',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 1,
   },
   navChipActive: {
     backgroundColor: '#59123B',
     borderColor: '#59123B',
+    shadowOpacity: 0.22,
+    elevation: 4,
   },
-  navChipText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#59123B',
-  },
-  navChipTextActive: {
-    color: '#FFFFFF',
-  },
-  countBadge: {
-    backgroundColor: '#F8EBD7',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  countBadgeActive: {
-    backgroundColor: '#CD9024',
-  },
-  countBadgeText: {
-    fontSize: 9,
+  navChipLabel: {
+    fontSize: 12,
     fontWeight: '800',
     color: '#59123B',
   },
-  countBadgeTextActive: {
+  navChipLabelActive: {
+    color: '#FFFFFF',
+  },
+  countBubble: {
+    backgroundColor: '#F5EAE0',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 10,
+    minWidth: 20,
+    alignItems: 'center',
+  },
+  countBubbleActive: {
+    backgroundColor: '#D4AF37',
+  },
+  countBubbleText: {
+    fontSize: 9.5,
+    fontWeight: '900',
+    color: '#59123B',
+  },
+  countBubbleTextActive: {
+    color: '#FFFFFF',
+  },
+  heroCard: {
+    backgroundColor: '#59123B',
+    borderRadius: 20,
+    padding: 16,
+    gap: 14,
+    borderWidth: 1,
+    borderColor: '#8B2A5A',
+    shadowColor: '#59123B',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 6,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  heroTopAccent: {
+    position: 'absolute',
+    top: -20,
+    right: -20,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(237, 177, 57, 0.12)',
+  },
+  heroUserRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  heroAvatarRing: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 2.5,
+    borderColor: '#EDB139',
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    shadowColor: '#EDB139',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  heroAvatarImg: {
+    width: '100%',
+    height: '100%',
+  },
+  heroUserInfo: {
+    gap: 5,
+  },
+  heroUserName: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 0.2,
+  },
+  heroMatriChip: {
+    backgroundColor: 'rgba(237, 177, 57, 0.2)',
+    borderWidth: 1,
+    borderColor: '#EDB139',
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  heroMatriChipText: {
+    color: '#EDB139',
+    fontSize: 10.5,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
+
+  // Stats Row
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  statCell: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statValue: {
+    color: '#EDB139',
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  statCaption: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 9,
+    fontWeight: '600',
+    marginTop: 1,
+  },
+  statSep: {
+    width: 1,
+    height: 22,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+  },
+
+  // ── SECTION LABEL ──
+  sectionLabel: {
+    fontSize: 9.5,
+    fontWeight: '900',
+    color: '#7A5C66',
+    letterSpacing: 1.2,
+  },
+
+  // ── NAV CHIPS ──
+  navScrollContent: {
+    gap: 8,
+    paddingRight: 14,
+  },
+  navChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 13,
+    paddingVertical: 9,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: '#EFE0CB',
+    shadowColor: '#59123B',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  navChipActive: {
+    backgroundColor: '#59123B',
+    borderColor: '#59123B',
+    shadowOpacity: 0.2,
+    elevation: 3,
+  },
+  navChipLabel: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#59123B',
+  },
+  navChipLabelActive: {
+    color: '#FFFFFF',
+  },
+  countBubble: {
+    backgroundColor: '#FAF0E7',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    minWidth: 18,
+    alignItems: 'center',
+  },
+  countBubbleActive: {
+    backgroundColor: '#CD9024',
+  },
+  countBubbleText: {
+    fontSize: 9.5,
+    fontWeight: '900',
+    color: '#59123B',
+  },
+  countBubbleTextActive: {
     color: '#FFFFFF',
   },
 
-  // Profile List & Cards
+  // ── LOADING / EMPTY ──
   centerBox: {
-    padding: 30,
+    paddingVertical: 40,
     alignItems: 'center',
+    gap: 10,
+  },
+  loadingText: {
+    color: '#7A5C66',
+    fontSize: 12,
+    fontWeight: '600',
   },
   emptyCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 24,
+    borderRadius: 20,
+    padding: 28,
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
     borderWidth: 1,
     borderColor: '#EFE0CB',
-    marginTop: 10,
+    marginTop: 4,
+  },
+  emptyIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FBF4ED',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   emptyTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '900',
     color: '#59123B',
   },
   emptySubText: {
-    fontSize: 11,
+    fontSize: 11.5,
     color: '#7A5C66',
     textAlign: 'center',
+    lineHeight: 17,
   },
-  exploreBtn: {
+  emptyExploreBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     backgroundColor: '#59123B',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: 20,
     marginTop: 4,
   },
-  exploreBtnText: {
+  emptyExploreBtnText: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 11.5,
     fontWeight: '800',
   },
 
-  profileListWrap: {
+  // ── PROFILE CARDS ──
+  listWrap: {
     gap: 10,
   },
   profileCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 12,
-    gap: 10,
+    borderRadius: 18,
+    padding: 14,
     borderWidth: 1,
     borderColor: '#EFE0CB',
     shadowColor: '#59123B',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
     elevation: 2,
-  },
-  cardHeaderRow: {
-    flexDirection: 'row',
     gap: 10,
+  },
+  cardTopRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
   },
   cardAvatarRing: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1.5,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    borderWidth: 2,
     borderColor: '#EDB139',
     overflow: 'hidden',
     backgroundColor: '#FAF5EF',
   },
-  cardAvatar: {
+  cardAvatarImg: {
     width: '100%',
     height: '100%',
   },
-  cardMainCol: {
+  cardInfoCol: {
     flex: 1,
-    gap: 2,
+    gap: 3,
   },
-  nameMatriRow: {
+  cardNameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 8,
+    flexWrap: 'wrap',
   },
-  profileName: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#3D232C',
+  cardName: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#1A0A12',
+    flex: 1,
   },
-  matriPill: {
-    backgroundColor: '#FAF5EF',
+  cardIdChip: {
+    backgroundColor: '#FAF0E7',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#EFE0CB',
   },
-  matriPillText: {
+  cardIdChipText: {
     fontSize: 9,
     fontWeight: '800',
     color: '#59123B',
   },
-  profileAgeText: {
-    fontSize: 10,
+  cardAge: {
+    fontSize: 10.5,
     color: '#7A5C66',
     fontWeight: '600',
   },
-  infoTagsRow: {
+  cardTagsRow: {
     flexDirection: 'row',
     gap: 6,
     marginTop: 2,
+    flexWrap: 'wrap',
   },
-  tagPill: {
-    backgroundColor: '#FAF5EF',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 6,
+  cardTag: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
+    backgroundColor: '#FAF5EF',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#EFE0CB',
   },
-  tagText: {
-    fontSize: 9,
+  cardTagText: {
+    fontSize: 9.5,
     fontWeight: '700',
     color: '#3D232C',
   },
+  cardDivider: {
+    height: 1,
+    backgroundColor: '#F5EBE0',
+  },
+
+  // Card Actions
   cardActionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#F5EBE0',
   },
   viewProfileBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
     backgroundColor: '#FAF5EF',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#EFE0CB',
   },
   viewProfileText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
     color: '#59123B',
   },
-  acceptDeclineRow: {
+  acceptDeclineGroup: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 8,
   },
   declineBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    backgroundColor: '#FEE2E2',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
+    gap: 4,
+    backgroundColor: '#FFF0F0',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 14,
   },
-  declineText: {
-    fontSize: 10,
+  declineBtnText: {
+    fontSize: 11,
     fontWeight: '800',
     color: '#DC2626',
   },
   acceptBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
+    gap: 4,
     backgroundColor: '#59123B',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 14,
+    shadowColor: '#59123B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  acceptText: {
-    fontSize: 10,
+  acceptBtnText: {
+    fontSize: 11,
     fontWeight: '800',
     color: '#FFFFFF',
   },
-  statusPill: {
+  pendingChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#FEF3CD',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+  },
+  pendingChipText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#CD9024',
+  },
+  removeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#F8EBD7',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    backgroundColor: '#FEF3CD',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
   },
-  statusText: {
-    fontSize: 9,
+  removeBtnText: {
+    fontSize: 10,
     fontWeight: '800',
     color: '#CD9024',
   },

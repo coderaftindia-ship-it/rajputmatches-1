@@ -475,8 +475,20 @@ function Register() {
                       <FaCrown style={{ fontSize: "0.8rem", verticalAlign: "middle" }} />
                     </span>
                   </div>
-                  <p style={{ color: "#333", fontSize: "1.05rem", lineHeight: "1.7", margin: "0 auto", fontWeight: "500" }}>
-                    Thank you for registering with <strong>Rajput Alliances</strong>. We will verify your account and email you once it is approved, so you can log in and create your profile.
+                  <p style={{ color: "#333", fontSize: "1rem", lineHeight: "1.8", margin: "0 auto", fontWeight: "400", textAlign: "center" }}>
+                    Thank you for choosing <strong>Rajput Alliances</strong> and taking the first step toward a meaningful connection within our community.
+                  </p>
+                  <p style={{ color: "#333", fontSize: "1rem", lineHeight: "1.8", margin: "14px auto 0", fontWeight: "400", textAlign: "center" }}>
+                    We have received your registration and sincerely appreciate the trust you have placed in us. As part of our commitment to maintaining the dignity, authenticity, and integrity of Rajput Alliances, your profile will undergo a verification process in accordance with our Terms of Use &amp; Privacy Policy.
+                  </p>
+                  <p style={{ color: "#333", fontSize: "1rem", lineHeight: "1.8", margin: "14px auto 0", fontWeight: "400", textAlign: "center" }}>
+                    To help us complete your verification, we invite you to follow us on <strong>Facebook</strong> and <strong>Instagram</strong>. Alternatively, a member of our team may contact you by email should we require any additional information.
+                  </p>
+                  <p style={{ color: "#333", fontSize: "1rem", lineHeight: "1.8", margin: "14px auto 0", fontWeight: "400", textAlign: "center" }}>
+                    Once your profile has been successfully verified, we will approve your registration and welcome you to the <strong>Rajput Alliances</strong> platform, where tradition meets trust and families come together with purpose.
+                  </p>
+                  <p style={{ color: "var(--royal-maroon, #8b0000)", fontSize: "1rem", lineHeight: "1.8", margin: "14px auto 0", fontWeight: "600", textAlign: "center" }}>
+                    Thank you for becoming a part of Rajput Alliances.
                   </p>
                 </div>
 

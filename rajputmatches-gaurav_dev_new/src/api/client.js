@@ -21,7 +21,7 @@ const API_PREFIX = "/api/v1";
 export const apiClient = axios.create({
   baseURL: `${BASE_URL}${API_PREFIX}`,
   withCredentials: true,
-  timeout: 4000,
+  timeout: 30000,
 });
 
 apiClient.interceptors.request.use((config) => {

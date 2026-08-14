@@ -57,20 +57,20 @@ export const publicApi = {
     fetchCached("recentProfiles", () => apiClient.get("/auth/public/recent-profiles"), 30000),
 
   getAbout: () =>
-    fetchCached("about", () => apiClient.get("/auth/about"), 60000),
+    fetchCached("about", () => apiClient.get("/auth/about"), 600000),
 
   getHomeCMS: () =>
-    fetchCached("homeCMS", () => apiClient.get("/auth/home-cms"), 60000),
+    fetchCached("homeCMS", () => apiClient.get("/auth/home-cms"), 600000),
 
   getContactCMS: () =>
-    fetchCached("contactCMS", () => apiClient.get("/auth/contact-cms"), 60000),
+    fetchCached("contactCMS", () => apiClient.get("/auth/contact-cms"), 600000),
 
   getStoriesCMS: () =>
-    fetchCached("storiesCMS", () => apiClient.get("/auth/stories-cms"), 60000),
+    fetchCached("storiesCMS", () => apiClient.get("/auth/stories-cms"), 600000),
 
   getSiteSettings: () =>
-    apiClient.get("/auth/site-settings"),
+    fetchCached("siteSettings", () => apiClient.get("/auth/site-settings"), 600000),
 
   getSocialLinks: () =>
-    fetchCached("socialLinks", () => apiClient.get("/auth/social-links"), 60000),
+    fetchCached("socialLinks", () => apiClient.get("/auth/social-links"), 600000),
 };

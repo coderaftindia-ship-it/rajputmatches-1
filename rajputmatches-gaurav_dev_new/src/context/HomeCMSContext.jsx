@@ -36,11 +36,28 @@ const DEFAULT_CMS = {
   matchmakingImage: "",
 };
 
+const LS_KEY = "api_cache_homeCMS";
+
 const HomeCMSContext = createContext({ cms: DEFAULT_CMS, isLoaded: false });
 
+// Try to read cached CMS from localStorage synchronously
+const getCachedCMS = () => {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.data?.data && Date.now() < parsed.expiry) {
+        return parsed.data.data;
+      }
+    }
+  } catch (e) {}
+  return null;
+};
+
 export const HomeCMSProvider = ({ children }) => {
-  const [cms, setCms] = useState(DEFAULT_CMS);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const cachedCMS = getCachedCMS();
+  const [cms, setCms] = useState(cachedCMS ? { ...DEFAULT_CMS, ...cachedCMS } : DEFAULT_CMS);
+  const [isLoaded, setIsLoaded] = useState(!!cachedCMS);
 
   useEffect(() => {
     publicApi.getHomeCMS()

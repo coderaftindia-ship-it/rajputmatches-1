@@ -116,6 +116,14 @@ const GET_ROUTE_HANDLERS = {
     const response = await apiClient.get("/auth/profile/clans");
     return response.data;
   },
+
+  "chat/list": async () => {
+    const response = await apiClient.get("/auth/message/chat");
+    const data = response.data?.data !== undefined ? response.data.data : response.data;
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(response?.data)) return response.data;
+    return [];
+  },
 };
 
 /**
@@ -222,30 +230,113 @@ const WRITE_ROUTE_HANDLERS = {
     apiClient.post("/public/contact", { data }),
 };
 
+const cache = new Map();
+const pendingPromises = new Map();
+
+export function clearRouteCache() {
+  cache.clear();
+  pendingPromises.clear();
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith("route_cache_") || key.startsWith("api_cache_"))) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch (e) {}
+}
+
+// Global window event listener to clear cache when other tabs logout or update
+try {
+  window.addEventListener("unauthorized-logout", clearRouteCache);
+  window.addEventListener("profileUpdate", clearRouteCache);
+} catch (e) {}
+
+const fetchCachedRoute = (route, fetcher, ttlMs = 15000) => {
+  const cacheKey = `route_cache_${route.replace(/\//g, "_")}`;
+  const now = Date.now();
+
+  if (cache.has(route)) {
+    const { data, expiry } = cache.get(route);
+    if (now < expiry) return Promise.resolve(data);
+  } else {
+    try {
+      const local = localStorage.getItem(cacheKey);
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (now < parsed.expiry) {
+          cache.set(route, parsed);
+          // Silent background update to keep it fresh
+          fetcher().then((res) => {
+            cache.set(route, { data: res, expiry: Date.now() + ttlMs });
+            try { localStorage.setItem(cacheKey, JSON.stringify({ data: res, expiry: Date.now() + ttlMs })); } catch (e) {}
+          }).catch(() => {});
+          return Promise.resolve(parsed.data);
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (pendingPromises.has(route)) {
+    return pendingPromises.get(route);
+  }
+
+  const promise = fetcher()
+    .then((res) => {
+      const cacheObj = { data: res, expiry: Date.now() + ttlMs };
+      cache.set(route, cacheObj);
+      try { localStorage.setItem(cacheKey, JSON.stringify(cacheObj)); } catch (e) {}
+      pendingPromises.delete(route);
+      return res;
+    })
+    .catch((err) => {
+      pendingPromises.delete(route);
+      throw err;
+    });
+
+  pendingPromises.set(route, promise);
+  return promise;
+};
+
 export async function fetchByRoute(route) {
-  if (route.startsWith("profile/view/images/")) {
-    const profileId = route.split("/").pop();
-    const response = await apiClient.get(`/auth/profile/view/images/${profileId}`);
-    return response.data?.user ?? extractData(response);
+  // Determine TTL based on the route type
+  let ttl = 15000;
+  if (route === "profile" || route === "user" || route.includes("get-") || route.includes("details")) {
+    ttl = 30000; // 30 seconds for stable profile/user details
+  } else if (route.includes("stories") || route.includes("clans") || route.includes("reviews")) {
+    ttl = 60000; // 60 seconds for CMS/reviews/clans
+  } else if (route.includes("viewed") || route.includes("visited") || route.includes("requests") || route.includes("chat")) {
+    ttl = 8000;  // 8 seconds for dynamic activity logs and chat lists
   }
 
-  if (route.startsWith("profile/view/")) {
-    const profileId = route.replace("profile/view/", "");
-    const response = await apiClient.get(`/auth/profile/view/${profileId}`);
-    return response.data?.user ?? extractData(response);
-  }
+  return fetchCachedRoute(route, async () => {
+    if (route.startsWith("profile/view/images/")) {
+      const profileId = route.split("/").pop();
+      const response = await apiClient.get(`/auth/profile/view/images/${profileId}`);
+      return response.data?.user ?? extractData(response);
+    }
 
-  const handler = GET_ROUTE_HANDLERS[route];
+    if (route.startsWith("profile/view/")) {
+      const profileId = route.replace("profile/view/", "");
+      const response = await apiClient.get(`/auth/profile/view/${profileId}`);
+      return response.data?.user ?? extractData(response);
+    }
 
-  if (handler) {
-    return handler();
-  }
+    const handler = GET_ROUTE_HANDLERS[route];
 
-  const response = await apiClient.get(`/${route}`);
-  return response.data?.user ?? response.data;
+    if (handler) {
+      return handler();
+    }
+
+    const response = await apiClient.get(`/${route}`);
+    return response.data?.user ?? response.data;
+  }, ttl);
 }
 
 export async function updateByRoute(route, data) {
+  // Invalidate all route caches on write operations
+  clearRouteCache();
+
   const handler = WRITE_ROUTE_HANDLERS[route];
 
   if (handler) {

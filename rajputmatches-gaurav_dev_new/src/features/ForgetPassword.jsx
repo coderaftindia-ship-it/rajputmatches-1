@@ -99,15 +99,15 @@ function ForgotPassword() {
             <form onSubmit={handleSubmit}>
               <div className="royal-form-group">
                 <label htmlFor="username" className="royal-input-label">
-                  Email Address / Mobile Number
+                  Email Address
                 </label>
                 <div className="royal-input-wrapper">
                   <FaEnvelope className="royal-input-icon" />
                   <input
                     id="username"
                     name="username"
-                    type="text"
-                    placeholder="Enter email / mobile"
+                    type="email"
+                    placeholder="Enter your email address"
                     value={formData.username}
                     onChange={handleChange}
                     className="royal-input"

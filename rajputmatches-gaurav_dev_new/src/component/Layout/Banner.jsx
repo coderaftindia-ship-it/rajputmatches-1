@@ -44,6 +44,14 @@ function Banner() {
     }
   };
 
+  // Defer Ken Burns animation until after first paint to reduce TBT
+  const bgRef = useRef(null);
+  useEffect(() => {
+    if (bgRef.current) {
+      bgRef.current.style.animation = "kenBurns 30s ease-in-out infinite";
+    }
+  }, []);
+
   if (redirectPath) {
     return <Navigate to={redirectPath} replace />;
   }
@@ -52,14 +60,6 @@ function Banner() {
   const bannerBg = cms.bannerBgImage
     ? (cms.bannerBgImage.startsWith("/uploads/") ? `${BASE_URL}${cms.bannerBgImage}` : cms.bannerBgImage)
     : Bannerbg;
-
-  // Defer Ken Burns animation until after first paint to reduce TBT
-  const bgRef = useRef(null);
-  useEffect(() => {
-    if (bgRef.current) {
-      bgRef.current.style.animation = "kenBurns 30s ease-in-out infinite";
-    }
-  }, []);
 
   const particleStyles = [
     { left: "10%", animationDelay: "0s", animationDuration: "14s" },

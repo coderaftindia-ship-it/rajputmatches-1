@@ -1,4 +1,5 @@
 import { apiClient, extractData } from "./client";
+import { fetchByRoute } from "./routeAdapter";
 
 /** Legacy chat handlers return a raw array; v1 may wrap in { data }. */
 function unwrapList(response) {
@@ -9,7 +10,7 @@ function unwrapList(response) {
 }
 
 export const chatApi = {
-  listChats: async () => unwrapList(await apiClient.get("/auth/message/chat")),
+  listChats: async () => fetchByRoute("chat/list"),
 
   listPending: async () => unwrapList(await apiClient.get("/auth/chat/status")),
 

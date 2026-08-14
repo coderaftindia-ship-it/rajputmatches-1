@@ -1,3 +1,6 @@
+// ⚡ Preload: fire critical public APIs BEFORE React mounts
+import "./api/preload";
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -5,15 +8,25 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import ReactGA from "react-ga4";
 
-// Initialize Google Analytics safely for iOS Safari & Private Browsing
-try {
-  ReactGA.initialize("G-67MK5R8PVM");
-  ReactGA.send({
-    hitType: "pageview",
-    page: window.location.pathname + window.location.search,
-  });
-} catch (e) {
-  console.warn("Google Analytics initialization bypassed:", e);
+// Defer Google Analytics initialization until after initial page load (interactive) to reduce TBT
+const initGA = () => {
+  try {
+    ReactGA.initialize("G-67MK5R8PVM");
+    ReactGA.send({
+      hitType: "pageview",
+      page: window.location.pathname + window.location.search,
+    });
+  } catch (e) {
+    console.warn("Google Analytics initialization bypassed:", e);
+  }
+};
+
+if (typeof window !== "undefined") {
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(() => setTimeout(initGA, 1000), { timeout: 3500 });
+  } else {
+    setTimeout(initGA, 3500);
+  }
 }
 
 class ErrorBoundary extends React.Component {

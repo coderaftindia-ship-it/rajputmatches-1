@@ -106,15 +106,18 @@ const Navbar = ({ forceSolid = false }) => {
               height="68"
               loading="eager"
               fetchPriority="high"
-              decoding="async"
+              decoding="sync"
               onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
               style={{
                 height: "clamp(46px, 12vw, 68px)",
                 width: "clamp(46px, 12vw, 68px)",
+                minWidth: "46px",
+                minHeight: "46px",
                 maxHeight: "72px",
                 objectFit: "contain",
                 filter: "drop-shadow(0px 3px 8px rgba(89, 18, 59, 0.3))",
-                transition: "transform 0.3s ease"
+                transition: "transform 0.3s ease",
+                aspectRatio: "1 / 1",
               }}
             />
             <div className="d-flex flex-column text-start" style={{ whiteSpace: "nowrap" }}>

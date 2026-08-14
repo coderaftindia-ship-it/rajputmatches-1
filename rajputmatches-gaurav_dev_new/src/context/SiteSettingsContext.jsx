@@ -58,8 +58,11 @@ export const SiteSettingsProvider = ({ children }) => {
     try {
       if (!publicApi || typeof publicApi.getSiteSettings !== "function") return;
       const res = await publicApi.getSiteSettings();
-      if (res?.data?.success && res?.data?.data) {
-        const d = res.data.data;
+      // cached fetchCached returns raw axios response; handle both shapes
+      const apiData = res?.data?.data ?? res?.data ?? res;
+      const isSuccess = res?.data?.success ?? (apiData && typeof apiData === "object");
+      if (isSuccess && apiData) {
+        const d = apiData;
         const newSettings = {
           companyName: d.companyName || "Rajput Alliances",
           tagline: d.tagline || "Royal Matrimonial",
