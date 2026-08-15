@@ -141,7 +141,12 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
   const [isBlocked, setIsBlocked] = useState(!!profile?.isBlocked);
   useEffect(() => { setIsBlocked(!!profile?.isBlocked); }, [profile?._id, profile?.isBlocked]);
 
+  const isHiddenRestricted = profile?.isVisible === false && connStatus !== "accepted";
+
   const getImg = () => {
+    if (isHiddenRestricted) {
+      return profile?.gender === "Female" ? femaleDefault : maleDefault;
+    }
     if (profile?.filesId?.photos?.length > 0 && (!profile?.filesId?.isPrivate || photoReqStatus === "accepted")) {
       return profile.filesId.photos[0].url;
     }
@@ -156,7 +161,8 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
   };
 
   const isDefaultImg = () => {
-    if (profile?.filesId?.photos?.length > 0) return false;
+    if (isHiddenRestricted) return true;
+    if (profile?.filesId?.photos?.length > 0 && (!profile?.filesId?.isPrivate || photoReqStatus === "accepted")) return false;
     if (profile?.filesId?.isPrivate && photoReqStatus !== "accepted") return false;
     const img = getImg();
     if (!img) return true;
@@ -339,7 +345,7 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
           alt="Profile"
           style={useDefault ? { objectFit: "cover", objectPosition: "center" } : { objectFit: "cover", objectPosition: "top" }}
         />
-        {isPrivate && photoReqStatus !== "accepted" && (
+        {isPrivate && !isHiddenRestricted && photoReqStatus !== "accepted" && (
           <div className={styles.privateOverlay} style={{ flexDirection: "column", gap: "3px", padding: "4px" }}>
             <span style={{ fontSize: "0.55rem", lineHeight: "1" }}>Photo on Request</span>
             {photoReqStatus === "pending" ? (
@@ -407,36 +413,39 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
         </div>
         <div className={styles.actionsRow}>
           {(() => {
-            const isViewDisabledByVisibility = profile?.isVisible === false && connStatus !== "accepted";
             return (
-              <button
-                className={styles.viewButton}
-                disabled={isViewDisabledByVisibility}
-                style={isViewDisabledByVisibility ? { border: "none", ...disabledBtnStyle } : { border: "none", cursor: "pointer" }}
-                onClick={() => !isViewDisabledByVisibility && handleView(profile._id)}
-                title={!isViewDisabledByVisibility ? "View Profile" : "View disabled until request is accepted"}
-              >
-                <IoEyeOutline className="me-2"/>View
-              </button>
+              <>
+                <button
+                  className={styles.viewButton}
+                  disabled={isHiddenRestricted}
+                  style={isHiddenRestricted ? { border: "none", ...disabledBtnStyle } : { border: "none", cursor: "pointer" }}
+                  onClick={() => !isHiddenRestricted && handleView(profile._id)}
+                  title={!isHiddenRestricted ? "View Profile" : "View disabled until connection request is accepted"}
+                >
+                  <IoEyeOutline className="me-2"/>View
+                </button>
+                <button
+                  className={styles.squareButton}
+                  disabled={isHiddenRestricted}
+                  onClick={() => !isHiddenRestricted && handleShortlist(profile._id)}
+                  title={!isHiddenRestricted ? (isShortlisted ? "Remove Shortlist" : "Shortlist Profile") : "Shortlist disabled until connection request is accepted"}
+                  style={isHiddenRestricted ? disabledBtnStyle : { cursor: "pointer", color: isShortlisted ? "#dc3545" : "inherit" }}
+                >
+                  {isShortlisted ? <FaHeart size={16} color="#dc3545"/> : <FaRegHeart size={16}/>}
+                </button>
+                <button
+                  className={styles.squareButton}
+                  disabled={isHiddenRestricted}
+                  style={isHiddenRestricted ? disabledBtnStyle : { cursor: "pointer" }}
+                  onClick={() => !isHiddenRestricted && handleViewimage(profile._id)}
+                  title={!isHiddenRestricted ? "View Photos" : "Photos disabled until connection request is accepted"}
+                >
+                  <IoImageSharp/>
+                  {totalPhotos>0 && <span className={styles.photoCount}>{totalPhotos}</span>}
+                </button>
+              </>
             );
           })()}
-          <button
-            className={styles.squareButton}
-            onClick={() => handleShortlist(profile._id)}
-            title={isShortlisted ? "Remove Shortlist" : "Shortlist Profile"}
-            style={{ cursor: "pointer", color: isShortlisted ? "#dc3545" : "inherit" }}
-          >
-            {isShortlisted ? <FaHeart size={16} color="#dc3545"/> : <FaRegHeart size={16}/>}
-          </button>
-          <span
-            className={styles.squareButton}
-            style={{ cursor: "pointer" }}
-            onClick={() => handleViewimage(profile._id)}
-            title="View Photos"
-          >
-            <IoImageSharp/>
-            {totalPhotos>0 && <span className={styles.photoCount}>{totalPhotos}</span>}
-          </span>
           <ConnBtn/>
           <button
             className={styles.squareButton}
@@ -545,21 +554,158 @@ const SearchPage = () => {
     return currentViews >= allowedViews;
   };
 
-  const [countries, setCountries] = useState([
-    { name: "India", isoCode: "IN" },
-    { name: "United States", isoCode: "US" },
-    { name: "United Arab Emirates", isoCode: "AE" },
-    { name: "United Kingdom", isoCode: "GB" },
-    { name: "Canada", isoCode: "CA" },
-    { name: "Australia", isoCode: "AU" },
-    { name: "Saudi Arabia", isoCode: "SA" },
-    { name: "Singapore", isoCode: "SG" },
-    { name: "Kuwait", isoCode: "KW" },
-    { name: "Qatar", isoCode: "QA" },
-    { name: "Oman", isoCode: "OM" },
-    { name: "Germany", isoCode: "DE" },
-    { name: "France", isoCode: "FR" }
-  ]);
+  /* ─── Static Country & State data ─── */
+  const COUNTRY_STATES_MAP = {
+    "India": [
+      "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa",
+      "Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala",
+      "Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland",
+      "Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana",
+      "Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Delhi","Chandigarh",
+      "Jammu & Kashmir","Ladakh","Puducherry","Andaman & Nicobar Islands","Lakshadweep","Dadra & Nagar Haveli"
+    ],
+    "United States": [
+      "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut",
+      "Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa",
+      "Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan",
+      "Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire",
+      "New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma",
+      "Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee",
+      "Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"
+    ],
+    "United Arab Emirates": [
+      "Abu Dhabi","Dubai","Sharjah","Ajman","Umm Al Quwain","Ras Al Khaimah","Fujairah"
+    ],
+    "United Kingdom": [
+      "England","Scotland","Wales","Northern Ireland"
+    ],
+    "Canada": [
+      "Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador",
+      "Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan",
+      "Northwest Territories","Nunavut","Yukon"
+    ],
+    "Australia": [
+      "New South Wales","Victoria","Queensland","South Australia","Western Australia",
+      "Tasmania","Australian Capital Territory","Northern Territory"
+    ],
+    "Saudi Arabia": [
+      "Riyadh","Makkah","Madinah","Al Qassim","Eastern Province","Asir","Tabuk",
+      "Hail","Northern Borders","Jazan","Najran","Al Bahah","Al Jawf"
+    ],
+    "Singapore": ["Singapore"],
+    "Kuwait": [
+      "Al Asimah","Hawalli","Farwaniya","Ahmadi","Jahra","Mubarak Al-Kabeer"
+    ],
+    "Qatar": [
+      "Doha","Al Rayyan","Al Wakrah","Al Khor","Al Shamal","Al Daayen","Madinat ash Shamal","Umm Salal"
+    ],
+    "Oman": [
+      "Muscat","Dhofar","Musandam","Al Buraymi","Al Dakhiliyah","Al Batinah North",
+      "Al Batinah South","Al Sharqiyah North","Al Sharqiyah South","Al Dhahirah","Al Wusta"
+    ],
+    "Germany": [
+      "Baden-Württemberg","Bavaria","Berlin","Brandenburg","Bremen","Hamburg","Hesse",
+      "Lower Saxony","Mecklenburg-Vorpommern","North Rhine-Westphalia","Rhineland-Palatinate",
+      "Saarland","Saxony","Saxony-Anhalt","Schleswig-Holstein","Thuringia"
+    ],
+    "France": [
+      "Auvergne-Rhône-Alpes","Bourgogne-Franche-Comté","Brittany","Centre-Val de Loire",
+      "Corsica","Grand Est","Hauts-de-France","Île-de-France","Normandy",
+      "Nouvelle-Aquitaine","Occitanie","Pays de la Loire","Provence-Alpes-Côte d'Azur"
+    ],
+    "Italy": [
+      "Abruzzo","Basilicata","Calabria","Campania","Emilia-Romagna","Friuli-Venezia Giulia",
+      "Lazio","Liguria","Lombardy","Marche","Molise","Piedmont","Apulia","Sardinia",
+      "Sicily","Tuscany","Trentino-Alto Adige","Umbria","Aosta Valley","Veneto"
+    ],
+    "Spain": [
+      "Andalusia","Aragon","Asturias","Balearic Islands","Basque Country","Canary Islands",
+      "Cantabria","Castile and León","Castilla-La Mancha","Catalonia","Extremadura",
+      "Galicia","La Rioja","Community of Madrid","Murcia","Navarre","Valencia"
+    ],
+    "Japan": [
+      "Hokkaido","Aomori","Iwate","Miyagi","Akita","Yamagata","Fukushima","Ibaraki",
+      "Tochigi","Gunma","Saitama","Chiba","Tokyo","Kanagawa","Niigata","Toyama",
+      "Ishikawa","Fukui","Yamanashi","Nagano","Shizuoka","Aichi","Mie","Shiga",
+      "Kyoto","Osaka","Hyogo","Nara","Wakayama","Tottori","Shimane","Okayama",
+      "Hiroshima","Yamaguchi","Tokushima","Kagawa","Ehime","Kochi","Fukuoka",
+      "Saga","Nagasaki","Kumamoto","Oita","Miyazaki","Kagoshima","Okinawa"
+    ],
+    "New Zealand": [
+      "Auckland","Wellington","Canterbury","Waikato","Bay of Plenty","Manawatu-Whanganui",
+      "Northland","Otago","Hawke's Bay","Taranaki","Southland","Nelson","Marlborough",
+      "Gisborne","Tasman","West Coast"
+    ],
+    "Malaysia": [
+      "Johor","Kedah","Kelantan","Malacca","Negeri Sembilan","Pahang","Penang",
+      "Perak","Perlis","Sabah","Sarawak","Selangor","Terengganu",
+      "Kuala Lumpur","Labuan","Putrajaya"
+    ],
+    "Pakistan": [
+      "Punjab","Sindh","Khyber Pakhtunkhwa","Balochistan","Gilgit-Baltistan",
+      "Azad Kashmir","Islamabad Capital Territory"
+    ],
+    "Nepal": [
+      "Koshi","Madhesh","Bagmati","Gandaki","Lumbini","Karnali","Sudurpashchim"
+    ],
+    "Sri Lanka": [
+      "Western","Central","Southern","Northern","Eastern","North Western",
+      "North Central","Uva","Sabaragamuwa"
+    ],
+    "Bangladesh": [
+      "Dhaka","Chittagong","Rajshahi","Khulna","Barisal","Sylhet","Rangpur","Mymensingh"
+    ],
+    "South Africa": [
+      "Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo",
+      "Mpumalanga","North West","Northern Cape","Western Cape"
+    ],
+    "Netherlands": [
+      "Drenthe","Flevoland","Friesland","Gelderland","Groningen","Limburg",
+      "North Brabant","North Holland","Overijssel","South Holland","Utrecht","Zeeland"
+    ],
+    "Sweden": [
+      "Blekinge","Dalarna","Gävleborg","Gotland","Halland","Jämtland","Jönköping",
+      "Kalmar","Kronoberg","Norrbotten","Örebro","Östergötland","Skåne","Södermanland",
+      "Stockholm","Uppsala","Värmland","Västerbotten","Västernorrland","Västmanland"
+    ],
+    "Switzerland": [
+      "Aargau","Appenzell Ausserrhoden","Appenzell Innerrhoden","Basel-Landschaft",
+      "Basel-Stadt","Bern","Fribourg","Geneva","Glarus","Graubünden","Jura","Lucerne",
+      "Nidwalden","Obwalden","Schaffhausen","Schwyz","Solothurn","St. Gallen",
+      "Thurgau","Ticino","Uri","Valais","Vaud","Zug","Zurich"
+    ],
+    "Norway": [
+      "Agder","Innlandet","Møre og Romsdal","Nordland","Oslo","Rogaland",
+      "Troms og Finnmark","Trøndelag","Vestfold og Telemark","Vestland","Viken"
+    ],
+    "Denmark": [
+      "Capital Region","Central Denmark","North Denmark","Region Zealand","Southern Denmark"
+    ],
+    "Ireland": [
+      "Carlow","Cavan","Clare","Cork","Donegal","Dublin","Galway","Kerry","Kildare",
+      "Kilkenny","Laois","Leitrim","Limerick","Longford","Louth","Mayo","Meath",
+      "Monaghan","Offaly","Roscommon","Sligo","Tipperary","Waterford","Westmeath",
+      "Wexford","Wicklow"
+    ],
+    "Bahrain": [
+      "Capital Governorate","Muharraq Governorate","Northern Governorate","Southern Governorate"
+    ],
+    "China": [
+      "Anhui","Beijing","Chongqing","Fujian","Gansu","Guangdong","Guangxi","Guizhou",
+      "Hainan","Hebei","Heilongjiang","Henan","Hubei","Hunan","Inner Mongolia",
+      "Jiangsu","Jiangxi","Jilin","Liaoning","Ningxia","Qinghai","Shaanxi",
+      "Shandong","Shanghai","Shanxi","Sichuan","Tianjin","Tibet","Xinjiang","Yunnan","Zhejiang"
+    ]
+  };
+
+  const COUNTRY_LIST = [
+    "India","United States","United Arab Emirates","United Kingdom","Canada","Australia",
+    "Saudi Arabia","Singapore","Kuwait","Qatar","Oman","Germany","France","Italy","Spain",
+    "Japan","China","Pakistan","Nepal","Sri Lanka","Bangladesh","Malaysia","New Zealand",
+    "South Africa","Netherlands","Sweden","Switzerland","Norway","Denmark","Ireland","Bahrain"
+  ];
+
+  const [countries] = useState(COUNTRY_LIST);
   const [states, setStates] = useState([]);
   const [clanOptions, setClanOptions] = useState({ clans: [], subclans: [], combined: [] });
   const [clanLoading, setClanLoading] = useState(false);
@@ -584,17 +730,8 @@ const SearchPage = () => {
     loadClans();
   }, [fetchUserData]);
   useEffect(() => {
-    if (formData.country === "India" || !formData.country) {
-      setStates([
-        "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa",
-        "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
-        "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
-        "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana",
-        "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Chandigarh"
-      ]);
-    } else {
-      setStates([]);
-    }
+    const stateList = formData.country ? (COUNTRY_STATES_MAP[formData.country] || []) : COUNTRY_STATES_MAP["India"];
+    setStates(stateList);
   }, [formData.country]);
 
   const handleChange = (e) => {
@@ -899,7 +1036,7 @@ const SearchPage = () => {
         <FilterLabel>Country</FilterLabel>
         <FilterSelect name="country" value={formData.country||""} onChange={handleChange}>
           <option value="">Select Country</option>
-          {countries.map(c => <option key={c.isoCode} value={c.name}>{c.name}</option>)}
+          {countries.map(c => <option key={c} value={c}>{c}</option>)}
         </FilterSelect>
       </div>
 
@@ -908,7 +1045,7 @@ const SearchPage = () => {
         <FilterLabel>State</FilterLabel>
         <FilterSelect name="state" value={formData.state||""} onChange={handleChange} disabled={!formData.country}>
           <option value="">Select State</option>
-          {states.map(s => <option key={s.isoCode} value={s.name}>{s.name}</option>)}
+          {states.map(s => <option key={s} value={s}>{s}</option>)}
         </FilterSelect>
       </div>
 

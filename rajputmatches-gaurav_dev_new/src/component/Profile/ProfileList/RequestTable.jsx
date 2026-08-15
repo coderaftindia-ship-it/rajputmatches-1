@@ -43,6 +43,8 @@ const RequestTable = ({ profiles, status, activeTab, fetchData, handlecheck, isS
   };
 
   const getProfileImage = (profile) => {
+    const isHidden = profile?.isVisible === false && profile?.connectionStatus !== "accepted";
+    if (isHidden) return profile?.gender === "Female" ? femaleDefault : maleDefault;
     const totalPhotos = profile?.filesId?.totalPhotos || 0;
     const isPrivate = profile?.filesId?.isPrivate && profile?.photoRequestStatus !== "accepted";
     if (totalPhotos > 0 && !isPrivate && profile?.filesId?.photos?.length > 0) {
@@ -79,6 +81,7 @@ const RequestTable = ({ profiles, status, activeTab, fetchData, handlecheck, isS
                     {(() => {
                       const imgSrc = getProfileImage(profile);
                       const isDefaultImg = (() => {
+                        if (profile?.isVisible === false && profile?.connectionStatus !== "accepted") return true;
                         if (profile?.filesId?.photos?.length > 0) return false;
                         if (profile?.filesId?.isPrivate && profile?.photoRequestStatus !== "accepted") return false;
                         const url = profile?.imageUrl;

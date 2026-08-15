@@ -4,7 +4,6 @@ import Navbar from "./Navbar";
 import { FaCrown, FaCheckCircle, FaUsers, FaStar, FaRegBuilding, FaVenus, FaMars, FaRegHeart, FaMapMarkerAlt, FaSearch } from "react-icons/fa";
 import Features from "./Features";
 import { useAuth } from "./AuthContext";
-import Bannerbg from "../../assets/images/bannerbg.png";
 import { Navigate } from "react-router-dom";
 import { BASE_URL } from "../../api";
 import { useHomeCMS } from "../../context/HomeCMSContext";
@@ -56,10 +55,10 @@ function Banner() {
     return <Navigate to={redirectPath} replace />;
   }
 
-  // Resolve banner background image
+  // Resolve banner background image (dynamic from CMS if provided)
   const bannerBg = cms.bannerBgImage
     ? (cms.bannerBgImage.startsWith("/uploads/") ? `${BASE_URL}${cms.bannerBgImage}` : cms.bannerBgImage)
-    : Bannerbg;
+    : null;
 
   const particleStyles = [
     { left: "10%", animationDelay: "0s", animationDuration: "14s" },
@@ -88,37 +87,35 @@ function Banner() {
           display: "flex",
           flexDirection: "column",
           overflowX: "hidden",
-          paddingBottom: "1.5rem"
+          paddingBottom: "1.5rem",
+          background: "radial-gradient(ellipse at 50% 30%, #59123B 0%, #350A22 50%, #1A0410 100%)"
         }}
       >
-        {/*
-          LCP Fix: Use a real <img> instead of CSS background-image.
-          Real images are discoverable by the browser preload scanner,
-          can receive fetchPriority="high", and benefit from the <link rel=preload> in index.html.
-          The img is positioned absolutely to mimic background-image behaviour.
-        */}
-        <img
-          ref={bgRef}
-          src={bannerBg}
-          alt=""
-          aria-hidden="true"
-          fetchPriority="high"
-          loading="eager"
-          decoding="sync"
-          width="1920"
-          height="1080"
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center",
-            zIndex: 0,
-            transformOrigin: "center center",
-            willChange: "transform",
-          }}
-        />
+        {/* Render CMS image if provided dynamically */}
+        {bannerBg && (
+          <img
+            ref={bgRef}
+            src={bannerBg}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
+            width="1920"
+            height="1080"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              zIndex: 0,
+              transformOrigin: "center center",
+              willChange: "transform",
+            }}
+          />
+        )}
 
         {/* Premium Dark Royal Overlay with Maroon and Dark Vignette */}
         <div

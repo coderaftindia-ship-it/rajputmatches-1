@@ -152,6 +152,9 @@ function RecentAddedPage() {
   };
 
   const getProfileImage = (prof) => {
+    if (prof?.isVisible === false && prof?.connectionStatus !== "accepted") {
+      return prof?.gender === "Female" ? femaleDefault : maleDefault;
+    }
     if (prof?.filesId?.photos?.length > 0 && (!prof?.filesId?.isPrivate || prof?.photoRequestStatus === "accepted")) {
       return prof.filesId.photos[0].url;
     }
@@ -166,6 +169,7 @@ function RecentAddedPage() {
   };
 
   const isDefaultAvatar = (prof) => {
+    if (prof?.isVisible === false && prof?.connectionStatus !== "accepted") return true;
     if (prof?.filesId?.photos?.length > 0 && (!prof?.filesId?.isPrivate || prof?.photoRequestStatus === "accepted")) return false;
     return true;
   };

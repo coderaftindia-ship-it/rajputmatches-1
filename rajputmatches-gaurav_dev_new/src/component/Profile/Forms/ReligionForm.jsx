@@ -2,6 +2,7 @@ import React from "react";
 import style from "./Form.module.css";
 import { MdOutlineCancelPresentation } from "react-icons/md";
 import indiaStatesData from "../../../features/state";
+import { Country, State } from "country-state-city";
 
 const POPULAR_COUNTRIES = [
   "India", "United States", "United Arab Emirates", "United Kingdom", "Canada", "Australia",
@@ -37,10 +38,17 @@ const ReligionForm = ({
   setFormData,
 }) => {
   const states = React.useMemo(() => {
-    if (formData.birthCountry === "India" || !formData.birthCountry) {
+    if (!formData.birthCountry) {
       return INDIAN_STATES_LIST;
     }
-    return [];
+    const countryObj = Country.getAllCountries().find(
+      (c) => c.name.toLowerCase() === formData.birthCountry.trim().toLowerCase()
+    );
+    if (countryObj) {
+      const fetched = State.getStatesOfCountry(countryObj.isoCode).map((s) => s.name);
+      return fetched.length > 0 ? fetched : (formData.birthCountry === "India" ? INDIAN_STATES_LIST : []);
+    }
+    return formData.birthCountry === "India" ? INDIAN_STATES_LIST : [];
   }, [formData.birthCountry]);
 
   const cities = React.useMemo(() => {

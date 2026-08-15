@@ -80,9 +80,11 @@ const ProfileImageContainer = ({
     </div>
   );
 
-  if (photos.length === 0) {
+  const isHidden = profile?.isVisible === false && profile?.connectionStatus !== "accepted";
+
+  if (isHidden || photos.length === 0) {
     return renderEmptyState(
-      onAction ? (
+      onAction && !isHidden ? (
         <button
           className={styles.ctaButton}
           onClick={() => onAction(profile._id)}

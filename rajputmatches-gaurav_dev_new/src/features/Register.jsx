@@ -15,6 +15,7 @@ import Profilenavbar from "../component/Profile/ProfileComp/Profilenavbar";
 import royalPlaceBg from "../assets/images/royalplacebg.jpg";
 import indiaStatesData from "./state";
 import { useSiteSettings } from "../context/SiteSettingsContext";
+import { Country, State } from "country-state-city";
 import "./Login.css";
 
 /* ─── 1. Storage Wrapper (iOS Safari Private Browsing Guard) ───── */
@@ -161,10 +162,17 @@ function Register() {
 
   // Compute available states based on selected country (Zero call stack overhead)
   const availableStates = useMemo(() => {
-    if (formData.country === "India") {
+    if (!formData.country) {
       return INDIAN_STATES_LIST;
     }
-    return [];
+    const countryObj = Country.getAllCountries().find(
+      (c) => c.name.toLowerCase() === formData.country.trim().toLowerCase()
+    );
+    if (countryObj) {
+      const fetched = State.getStatesOfCountry(countryObj.isoCode).map((s) => s.name);
+      return fetched.length > 0 ? fetched : (formData.country === "India" ? INDIAN_STATES_LIST : []);
+    }
+    return formData.country === "India" ? INDIAN_STATES_LIST : [];
   }, [formData.country]);
 
   // Compute available cities based on selected state (Zero call stack overhead)
