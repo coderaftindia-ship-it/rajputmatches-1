@@ -804,17 +804,20 @@ exports.sendRequest = async (req, res) => {
       }
     }
 
-    // Add request to the profile if not already sent
-    const isFirstTime = !user.reqSent.some((req) => req.userId.equals(profileId));
-
-    if (!profile.reqReceived.some((req) => req.userId.equals(userId))) {
-      profile.reqReceived.push({ userId: userId, status: "pending" });
+    // Update status to pending if previously sent/rejected, or add new request
+    const sentIdx = user.reqSent.findIndex((req) => req.userId.equals(profileId));
+    if (sentIdx > -1) {
+      user.reqSent[sentIdx].status = "pending";
+    } else {
+      user.reqSent.push({ userId: profileId, status: "pending" });
+      user.reqSentCount = (user.reqSentCount || 0) + 1;
     }
 
-    if (isFirstTime) {
-      user.reqSent.push({ userId: profileId, status: "pending" });
-      // Only count new (first-time) requests toward the limit
-      user.reqSentCount++;
+    const receivedIdx = profile.reqReceived.findIndex((req) => req.userId.equals(userId));
+    if (receivedIdx > -1) {
+      profile.reqReceived[receivedIdx].status = "pending";
+    } else {
+      profile.reqReceived.push({ userId: userId, status: "pending" });
     }
 
     await user.save();
@@ -866,17 +869,21 @@ exports.sendphotoRequest = async (req, res) => {
       return res.status(400).json({ message: "Invalid user or profile ID." });
     }
 
-    const hasSentRequest = user.photoReqSent.some(
+    const sentPhotoIdx = user.photoReqSent.findIndex(
       (req) => req.userId?.toString() === profileId.toString()
     );
-    const hasReceivedRequest = profile.photoReqReceived.some(
-      (req) => req.userId?.toString() === userId.toString()
-    );
-
-    if (!hasSentRequest) {
+    if (sentPhotoIdx > -1) {
+      user.photoReqSent[sentPhotoIdx].status = "pending";
+    } else {
       user.photoReqSent.push({ userId: profileId, status: "pending" });
     }
-    if (!hasReceivedRequest) {
+
+    const recPhotoIdx = profile.photoReqReceived.findIndex(
+      (req) => req.userId?.toString() === userId.toString()
+    );
+    if (recPhotoIdx > -1) {
+      profile.photoReqReceived[recPhotoIdx].status = "pending";
+    } else {
       profile.photoReqReceived.push({ userId: userId, status: "pending" });
     }
 
@@ -1418,15 +1425,23 @@ exports.sendDocumentRequest = async (req, res) => {
     user.documentReqSent = user.documentReqSent || [];
     profile.documentReqReceived = profile.documentReqReceived || [];
 
-    const alreadySent = user.documentReqSent.some(
+    const sentDocIdx = user.documentReqSent.findIndex(
       (r) => r.userId?.toString() === profileId.toString()
     );
-    const alreadyReceived = profile.documentReqReceived.some(
+    if (sentDocIdx > -1) {
+      user.documentReqSent[sentDocIdx].status = "pending";
+    } else {
+      user.documentReqSent.push({ userId: profileId, status: "pending" });
+    }
+
+    const recDocIdx = profile.documentReqReceived.findIndex(
       (r) => r.userId?.toString() === userId.toString()
     );
-
-    if (!alreadySent) user.documentReqSent.push({ userId: profileId, status: "pending" });
-    if (!alreadyReceived) profile.documentReqReceived.push({ userId: userId, status: "pending" });
+    if (recDocIdx > -1) {
+      profile.documentReqReceived[recDocIdx].status = "pending";
+    } else {
+      profile.documentReqReceived.push({ userId: userId, status: "pending" });
+    }
 
     await user.save();
     await profile.save();
