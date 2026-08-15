@@ -510,24 +510,50 @@ const ViewPage = () => {
   }
 
   if (error) {
-    const isLimitError = error.response?.status === 403 || error.response?.data?.limitExceeded;
+    const status = error.response?.status;
     const limitDetails = error.response?.data || {};
+    const isHiddenProfile = status === 403 && !limitDetails.limitExceeded;
+    const isLimitError = status === 403 && limitDetails.limitExceeded;
 
+    // ── Hidden profile: connection request not yet accepted ──
+    if (isHiddenProfile) {
+      return (
+        <>
+          <Profilenavbar />
+          <div className={styles.centerState} style={{ padding: "40px 20px", maxWidth: "520px", margin: "60px auto", textAlign: "center" }}>
+            <div style={{
+              width: "80px", height: "80px", borderRadius: "50%",
+              background: "rgba(123, 26, 26, 0.1)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 24px", color: "#7B1A1A"
+            }}>
+              <FaLock style={{ fontSize: "2.2rem" }} />
+            </div>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", color: "#7B1A1A", fontWeight: "700", marginBottom: "12px" }}>
+              Profile is Hidden
+            </h3>
+            <p style={{ color: "#555", fontSize: "1rem", lineHeight: "1.6", marginBottom: "28px" }}>
+              {limitDetails.message || "This profile is hidden. Send a connection request to view full details."}
+            </p>
+            <button className={styles.backBtn} onClick={handleGoBack} style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <FaArrowLeft /> Go Back
+            </button>
+          </div>
+        </>
+      );
+    }
+
+    // ── View limit exceeded ──
     if (isLimitError) {
       return (
-        <>s
+        <>
           <Profilenavbar />
           <div className={styles.centerState} style={{ padding: "40px 20px", maxWidth: "600px", margin: "40px auto" }}>
             <div style={{
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
+              width: "80px", height: "80px", borderRadius: "50%",
               background: "rgba(123, 26, 26, 0.1)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 24px",
-              color: "#7B1A1A"
+              display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 24px", color: "#7B1A1A"
             }}>
               <i className="fas fa-lock" style={{ fontSize: "2.5rem" }}></i>
             </div>
@@ -539,27 +565,29 @@ const ViewPage = () => {
             </p>
 
             <div style={{
-              background: "#FDF8F8",
-              border: "1px solid #F3E1E1",
-              borderRadius: "12px",
-              padding: "20px",
-              marginBottom: "30px",
-              textAlign: "left"
+              background: "#FDF8F8", border: "1px solid #F3E1E1",
+              borderRadius: "12px", padding: "20px", marginBottom: "30px", textAlign: "left"
             }}>
               <h5 style={{ fontWeight: "700", color: "#7B1A1A", marginBottom: "12px", fontSize: "0.95rem", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                 Your View Usage
               </h5>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
                 <span style={{ color: "#666" }}>Allowed Views:</span>
-                <span style={{ fontWeight: "600", color: "#333" }}>{limitDetails.limitCount} profiles</span>
+                <span style={{ fontWeight: "600", color: "#333" }}>
+                  {limitDetails.limitCount != null ? `${limitDetails.limitCount} profiles` : "—"}
+                </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
                 <span style={{ color: "#666" }}>Views Used:</span>
-                <span style={{ fontWeight: "600", color: "#333" }}>{limitDetails.currentViews} profiles</span>
+                <span style={{ fontWeight: "600", color: "#333" }}>
+                  {limitDetails.currentViews != null ? `${limitDetails.currentViews} profiles` : "—"}
+                </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "#666" }}>Quota Reset:</span>
-                <span style={{ fontWeight: "600", color: "#7B1A1A", textTransform: "capitalize" }}>{limitDetails.periodType} period</span>
+                <span style={{ fontWeight: "600", color: "#7B1A1A", textTransform: "capitalize" }}>
+                  {limitDetails.periodType || "—"}
+                </span>
               </div>
             </div>
 

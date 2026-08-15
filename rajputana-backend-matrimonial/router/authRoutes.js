@@ -820,5 +820,22 @@ router.get("/site-settings", async (req, res) => {
   }
 });
 
+// ── Logout ────────────────────────────────────────────────────────────
+// Clears session (if any) and returns 200. JWT is stateless so actual
+// token invalidation is handled client-side (token removal).
+router.post("/logout", (req, res) => {
+  try {
+    if (req.session) {
+      req.session.destroy((err) => {
+        if (err) console.error("Session destroy error:", err);
+      });
+    }
+    return res.status(200).json({ success: true, message: "Logged out successfully." });
+  } catch (err) {
+    console.error("Logout error:", err);
+    return res.status(200).json({ success: true, message: "Logged out." });
+  }
+});
+
 module.exports = router;
 
