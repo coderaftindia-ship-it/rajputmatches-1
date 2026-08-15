@@ -145,7 +145,7 @@ function Login() {
             <form onSubmit={handleSubmit}>
               <div className="royal-form-group">
                 <label htmlFor="email" className="royal-input-label">
-                  Email
+                  Email / Mobile Number
                 </label>
                 <div className="royal-input-wrapper">
                   <FaEnvelope className="royal-input-icon" />
@@ -155,7 +155,7 @@ function Login() {
                     value={formData.username}
                     name="username"
                     onChange={handleChange}
-                    placeholder="you@example.com"
+                    placeholder="Email or Mobile Number"
                     className="royal-input"
                   />
                 </div>

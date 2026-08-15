@@ -3589,7 +3589,7 @@ exports.viewDetails = async (req, res) => {
     }
 
     const [user, profile, contactReqDoc] = await Promise.all([
-      User.findById(userId).select("photoReqSent documentReqSent reqSent visitedAt isSubscribed role"),
+      User.findById(userId).select("photoReqSent photoReqReceived documentReqSent documentReqReceived reqSent reqReceived contactReqSent contactReqReceived visitedAt isSubscribed role"),
       User.findById(profileId)
         .populate("filesId")
         .populate("HoroscopicId")
@@ -3609,12 +3609,34 @@ exports.viewDetails = async (req, res) => {
       return res.status(404).json({ message: "Profile not found" });
     }
 
-    if (
-      profile.isVisible === false &&
-      contactReqDoc?.status !== "accepted" &&
-      userId.toString() !== profileId.toString() &&
-      user.role !== "admin"
-    ) {
+    // Check if there is any connection/contact request relationship between user and profile
+    const hasConnectionRequest = 
+      Boolean(contactReqDoc) ||
+      user.reqSent?.some((r) => r.userId?.toString() === profileId.toString()) ||
+      user.reqReceived?.some((r) => r.userId?.toString() === profileId.toString()) ||
+      user.contactReqSent?.some((r) => r.userId?.toString() === profileId.toString()) ||
+      user.contactReqReceived?.some((r) => r.userId?.toString() === profileId.toString()) ||
+      profile.reqSent?.some((r) => r.userId?.toString() === userId.toString()) ||
+      profile.reqReceived?.some((r) => r.userId?.toString() === userId.toString()) ||
+      profile.contactReqSent?.some((r) => r.userId?.toString() === userId.toString()) ||
+      profile.contactReqReceived?.some((r) => r.userId?.toString() === userId.toString());
+
+    const isAcceptedConnection = 
+      contactReqDoc?.status === "accepted" ||
+      user.reqSent?.some((r) => r.userId?.toString() === profileId.toString() && r.status === "accepted") ||
+      user.reqReceived?.some((r) => r.userId?.toString() === profileId.toString() && r.status === "accepted") ||
+      user.contactReqSent?.some((r) => r.userId?.toString() === profileId.toString() && r.status === "accepted") ||
+      user.contactReqReceived?.some((r) => r.userId?.toString() === profileId.toString() && r.status === "accepted") ||
+      profile.reqSent?.some((r) => r.userId?.toString() === userId.toString() && r.status === "accepted") ||
+      profile.reqReceived?.some((r) => r.userId?.toString() === userId.toString() && r.status === "accepted");
+
+    const isAuthorizedToViewHidden =
+      userId.toString() === profileId.toString() ||
+      user.role === "admin" ||
+      isAcceptedConnection ||
+      hasConnectionRequest;
+
+    if (profile.isVisible === false && !isAuthorizedToViewHidden) {
       return res.status(403).json({
         message: "This profile is hidden until connection request is accepted.",
       });
