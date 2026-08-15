@@ -91,17 +91,28 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
 
   // ── Local optimistic connection status ──
   const getEffectiveConnectionStatus = (profile) => {
-    const status = String(profile?.connectionStatus || profile?.contactRequestStatus || profile?.status || "").trim().toLowerCase();
+    const status = String(profile?.connectionStatus || profile?.contactRequestStatus || "").trim().toLowerCase();
     if (["accepted", "pending", "rejected"].includes(status)) return status;
 
     const currentUserId = String(userData?._id || "").trim();
+    const targetProfileId = String(profile?._id || "").trim();
+
+    // Check logged-in user's own sent requests
+    if (Array.isArray(userData?.reqSent)) {
+      const match = userData.reqSent.find(item => {
+        const pId = String(item?.userId?._id || item?.userId || item?._id || item?.profile?._id || item?.profile || "").trim();
+        return pId === targetProfileId;
+      });
+      if (match?.status) return String(match.status).trim().toLowerCase();
+    }
+
     const getParticipantId = (item) => {
       return String(item?.userId?._id || item?.userId || item?._id || item?.profile?._id || item?.profile || item?.to?._id || item?.to || "").trim();
     };
     const acceptedArray = (arr) => Array.isArray(arr) && arr.some((item) => {
       const s = String(item?.status || "").trim().toLowerCase();
       if (s !== "accepted") return false;
-      if (!currentUserId) return true; // if no auth info, fallback to truthy accepted
+      if (!currentUserId) return true;
       return getParticipantId(item) === currentUserId;
     });
 
@@ -116,7 +127,7 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
   const [connStatus, setConnStatus] = useState(getEffectiveConnectionStatus(profile));
   useEffect(() => {
     setConnStatus(getEffectiveConnectionStatus(profile));
-  }, [profile?._id, profile?.connectionStatus, profile?.contactRequestStatus, profile?.status, profile?.reqSent, profile?.reqReceived, profile?.contactReqSent, profile?.contactReqReceived]);
+  }, [profile?._id, profile?.connectionStatus, profile?.contactRequestStatus, profile?.reqSent, profile?.reqReceived, profile?.contactReqSent, profile?.contactReqReceived, userData?.reqSent]);
 
   // ── Local optimistic photo request status ──
   const [photoReqStatus, setPhotoReqStatus] = useState(profile?.photoRequestStatus || null);
@@ -411,18 +422,17 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
           })()}
           <button
             className={styles.squareButton}
-            disabled={connStatus !== "accepted"}
-            onClick={() => connStatus === "accepted" && handleShortlist(profile._id)}
-            title={connStatus === "accepted" ? (isShortlisted ? "Remove Shortlist" : "Shortlist Profile") : "Shortlist disabled until request is accepted"}
-            style={connStatus !== "accepted" ? disabledBtnStyle : { cursor: "pointer", color: isShortlisted ? "#dc3545" : "inherit" }}
+            onClick={() => handleShortlist(profile._id)}
+            title={isShortlisted ? "Remove Shortlist" : "Shortlist Profile"}
+            style={{ cursor: "pointer", color: isShortlisted ? "#dc3545" : "inherit" }}
           >
             {isShortlisted ? <FaHeart size={16} color="#dc3545"/> : <FaRegHeart size={16}/>}
           </button>
           <span
             className={styles.squareButton}
-            style={connStatus !== "accepted" ? disabledBtnStyle : { cursor: "pointer" }}
-            onClick={() => connStatus === "accepted" && handleViewimage(profile._id)}
-            title={connStatus === "accepted" ? "View Photos" : "Photos disabled until request is accepted"}
+            style={{ cursor: "pointer" }}
+            onClick={() => handleViewimage(profile._id)}
+            title="View Photos"
           >
             <IoImageSharp/>
             {totalPhotos>0 && <span className={styles.photoCount}>{totalPhotos}</span>}

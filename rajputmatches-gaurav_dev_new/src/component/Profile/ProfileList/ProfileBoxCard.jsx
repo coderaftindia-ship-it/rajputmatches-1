@@ -8,6 +8,8 @@ import { useAuth } from "../../Layout/AuthContext";
 const ProfileBoxCard = ({ profile, handleCheck, ProfileImagerender, fetchData }) => {
   const { updateData } = useAuth();
 
+  if (!profile || !profile._id) return null;
+
   const handleBlockToggle = async () => {
     try {
       if (handleCheck) handleCheck(profile._id);

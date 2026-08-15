@@ -603,7 +603,7 @@ const ViewPage = () => {
       .trim() || `Matri ID: ${Data.martrId || "N/A"}`;
   // Use same effective connection detection as SearchPage to keep behavior consistent
   const getEffectiveConnectionStatus = (profile) => {
-    const status = String(profile?.connectionStatus || profile?.contactRequestStatus || profile?.status || "").trim().toLowerCase();
+    const status = String(profile?.connectionStatus || profile?.contactRequestStatus || "").trim().toLowerCase();
     if (["accepted", "pending", "rejected"].includes(status)) return status;
 
     const currentUserId = String(authUserData?._id || "").trim();

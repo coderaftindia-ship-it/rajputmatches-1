@@ -143,23 +143,34 @@ function DocumentRequest() {
       if (status === "pending") {
         return renderPlaceholderWithActions(
           <button
-            className={styles.ctaButton}
+            className="btn btn-outline-danger btn-sm"
+            style={{ 
+              fontSize: "12px", 
+              fontWeight: "600",
+              padding: "6px 12px",
+              borderRadius: "6px"
+            }}
             onClick={() => handleWithdraw(profile._id)}
           >
-            Withdraw Request
+            Cancel Request
           </button>
         );
       } else if (status === "rejected") {
         return renderPlaceholderWithActions(
-          <div style={{ textAlign: "center" }}>
-            <p
-              className="m-0 mb-1 text-white fw-bold"
-              style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.8)", fontSize: "14px" }}
-            >
+          <div style={{ textAlign: "center", width: "90%", margin: "0 auto" }}>
+            <p className="m-0 mb-2 text-dark fw-bold" style={{ fontSize: "13px" }}>
               Request Rejected
             </p>
             <button
-              className={styles.ctaButton}
+              className="btn btn-primary btn-sm w-100"
+              style={{ 
+                backgroundColor: "var(--royal-maroon)",
+                borderColor: "var(--royal-maroon)",
+                fontSize: "12px", 
+                fontWeight: "600",
+                padding: "6px 12px",
+                borderRadius: "6px"
+              }}
               onClick={() => updateData("profile/documentRequest", profile._id, true).then(refreshData)}
             >
               Resend Request
@@ -168,10 +179,7 @@ function DocumentRequest() {
         );
       } else if (status === "accepted") {
         return renderPlaceholderWithActions(
-          <p
-            className="m-0 text-white fw-bold"
-            style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.8)", fontSize: "14px" }}
-          >
+          <p className="m-0 text-dark fw-bold" style={{ fontSize: "13px" }}>
             ✅ Access Granted
           </p>
         );
@@ -182,29 +190,46 @@ function DocumentRequest() {
     if (activeButton === "requestReceived") {
       if (status === "pending") {
         return renderPlaceholderWithActions(
-          <div style={{ display: "flex", justifyContent: "center", gap: "6px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "85%", margin: "0 auto" }}>
             <button
-              className={`${styles.ctaButton} w-50`}
-              style={{ backgroundColor: "green", color: "white" }}
+              className="btn btn-success btn-sm w-100"
+              style={{ 
+                backgroundColor: "rgba(26, 122, 69, 0.95)", 
+                borderColor: "rgba(26, 122, 69, 0.95)",
+                color: "white", 
+                fontSize: "11px", 
+                fontWeight: "700",
+                padding: "6px 10px",
+                borderRadius: "6px",
+                letterSpacing: "0.3px",
+                textTransform: "uppercase"
+              }}
               onClick={() => handleAction("accept", profile._id)}
             >
               Accept
             </button>
             <button
-              className={`${styles.ctaButton} w-50`}
-              style={{ backgroundColor: "#991c1c", color: "white" }}
+              className="btn btn-danger btn-sm w-100"
+              style={{ 
+                backgroundColor: "rgba(153, 28, 28, 0.95)", 
+                borderColor: "rgba(153, 28, 28, 0.95)",
+                color: "white", 
+                fontSize: "11px", 
+                fontWeight: "700",
+                padding: "6px 10px",
+                borderRadius: "6px",
+                letterSpacing: "0.3px",
+                textTransform: "uppercase"
+              }}
               onClick={() => handleAction("reject", profile._id)}
             >
-              Reject
+              Decline
             </button>
           </div>
         );
       } else if (status === "rejected") {
         return renderPlaceholderWithActions(
-          <p
-            className="m-0 text-white fw-bold"
-            style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.8)", fontSize: "14px" }}
-          >
+          <p className="m-0 text-dark fw-bold" style={{ fontSize: "13px" }}>
             Declined
           </p>
         );

@@ -29,6 +29,7 @@ const RequestCard = ({
   fetchData,
 }) => {
   const navigate = useNavigate();
+  if (!profile || !profile._id) return null;
   const openMessageCard = async (message, profile) => {
     try {
       await chatApi.validateParticipant(profile);

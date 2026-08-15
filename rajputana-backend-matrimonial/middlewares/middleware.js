@@ -74,7 +74,7 @@ const generateOTP = async (identifier) => {
       return { success: false, message: "Exceeded maximum OTP requests. Try again later." };
     }
 
-    const otpCode = crypto.randomInt(1000, 9999).toString();
+    const otpCode = crypto.randomInt(100000, 1000000).toString();
     const isEmail = identifier.includes("@");
     const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiration
 

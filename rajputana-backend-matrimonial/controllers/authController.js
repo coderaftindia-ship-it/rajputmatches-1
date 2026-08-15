@@ -214,9 +214,9 @@ exports.forgotPassword = async (req, res) => {
     }
 
     const resetToken = generateToken(user._id);
-    let frontendUrl = process.env.FRONTEND_URL;
-    if (!frontendUrl || frontendUrl.includes("localhost:3000")) {
-      frontendUrl = process.env.NODE_ENV === "production" ? "https://Rajput Alliances.com" : "http://localhost:5173";
+    let frontendUrl = process.env.FRONTEND_URL || "https://rajputalliances.com";
+    if (frontendUrl.includes("localhost")) {
+      frontendUrl = "https://rajputalliances.com";
     }
     frontendUrl = frontendUrl.replace(/\/$/, "");
     const resetLink = `${frontendUrl}/set-new-password?token=${resetToken}&userid=${user._id}`;
@@ -421,7 +421,7 @@ exports.getshortlistedData = async (req, res) => {
         {
           path: "shortlisted.profile",
           select:
-            "firstName middleName lastName height dateOfBirth gender martrId",
+            "firstName middleName lastName height dateOfBirth gender martrId isEnable isbloacked",
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
@@ -449,7 +449,16 @@ exports.getshortlistedData = async (req, res) => {
 
     // Modify shortlisted profiles while keeping structure same
     user.shortlisted = (user.shortlisted || [])
-      .filter((entry) => entry && entry.profile && !blockedIds.has((entry.profile._id || entry.profile).toString()))
+      .filter((entry) => {
+        const p = entry && entry.profile;
+        return (
+          p &&
+          p._id &&
+          p.isEnable !== false &&
+          p.isbloacked !== true &&
+          !blockedIds.has((p._id || p).toString())
+        );
+      })
       .map((entry) => {
         if (!entry.profile || !entry.profile.filesId) return entry; // Return unchanged if no filesId exists
 
@@ -476,7 +485,7 @@ exports.getshortlistedData = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("Error fetching shortlisted data:", error);
+    console.error("Error fetching shortlisted profiles:", error);
     return res.status(500).json({ message: "Server error", error });
   }
 };
@@ -492,7 +501,7 @@ exports.getviewedData = async (req, res) => {
         {
           path: "visitedAt",
           select:
-            "firstName lastName height gender dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId photoReqReceived",
+            "firstName lastName height gender dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId photoReqReceived isEnable isbloacked",
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
@@ -520,7 +529,14 @@ exports.getviewedData = async (req, res) => {
     );
 
     user.visitedAt = (user.visitedAt || [])
-      .filter((profile) => profile && profile._id && !blockedIds.has(profile._id.toString()))
+      .filter(
+        (profile) =>
+          profile &&
+          profile._id &&
+          profile.isEnable !== false &&
+          profile.isbloacked !== true &&
+          !blockedIds.has(profile._id.toString())
+      )
       .map((profile) => {
         const isAccepted = acceptedPhotoReqs.has(profile._id.toString());
 
@@ -558,7 +574,7 @@ exports.getviewedData = async (req, res) => {
 
     return res.status(200).json({ user });
   } catch (error) {
-    console.error("Error fetching viewed data:", error);
+    console.error("Error fetching visited profiles:", error);
     return res.status(500).json({ message: "Server error", error });
   }
 };
@@ -575,7 +591,7 @@ exports.getvisitedData = async (req, res) => {
         {
           path: "viewedBy",
           select:
-            "firstName lastName height gender dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId photoReqReceived",
+            "firstName lastName height gender dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId photoReqReceived isEnable isbloacked",
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
@@ -603,7 +619,14 @@ exports.getvisitedData = async (req, res) => {
 
     // Modify the `viewedBy` array
     user.viewedBy = (user.viewedBy || [])
-      .filter((profile) => profile && profile._id && !blockedIds.has(profile._id.toString()))
+      .filter(
+        (profile) =>
+          profile &&
+          profile._id &&
+          profile.isEnable !== false &&
+          profile.isbloacked !== true &&
+          !blockedIds.has(profile._id.toString())
+      )
       .map((profile) => {
       const isAccepted = acceptedPhotoReqs.has(profile._id.toString());
 
@@ -1229,7 +1252,7 @@ exports.getphotoRequests = async (req, res) => {
         {
           path: "photoReqSent.userId",
           select:
-            "dateOfBirth gender martrId address HoroscopicId filesId profdetailsId familydetailsId",
+            "dateOfBirth gender martrId address HoroscopicId filesId profdetailsId familydetailsId isEnable isbloacked",
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
@@ -1240,7 +1263,7 @@ exports.getphotoRequests = async (req, res) => {
         {
           path: "photoReqReceived.userId",
           select:
-            "dateOfBirth gender martrId address HoroscopicId filesId profdetailsId familydetailsId",
+            "dateOfBirth gender martrId address HoroscopicId filesId profdetailsId familydetailsId isEnable isbloacked",
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
@@ -1256,7 +1279,16 @@ exports.getphotoRequests = async (req, res) => {
     }
 
     user.photoReqSent = (user.photoReqSent || [])
-      .filter((profile) => profile && profile.userId && !blockedIds.has((profile.userId._id || profile.userId).toString()))
+      .filter((profile) => {
+        const p = profile && profile.userId;
+        return (
+          p &&
+          p._id &&
+          p.isEnable !== false &&
+          p.isbloacked !== true &&
+          !blockedIds.has((p._id || p).toString())
+        );
+      })
       .map((profile) => {
         const photos = profile.userId?.filesId?.photos || [];
         const isPrivate = profile.userId?.filesId?.isPrivate ?? false;
@@ -1279,7 +1311,16 @@ exports.getphotoRequests = async (req, res) => {
       });
 
     user.photoReqReceived = (user.photoReqReceived || [])
-      .filter((profile) => profile && profile.userId && !blockedIds.has((profile.userId._id || profile.userId).toString()))
+      .filter((profile) => {
+        const p = profile && profile.userId;
+        return (
+          p &&
+          p._id &&
+          p.isEnable !== false &&
+          p.isbloacked !== true &&
+          !blockedIds.has((p._id || p).toString())
+        );
+      })
       .map((profile) => {
         const photos = profile.userId?.filesId?.photos || [];
         const isPrivate = profile.userId?.filesId?.isPrivate ?? false;
@@ -1317,7 +1358,7 @@ exports.getDocumentRequests = async (req, res) => {
       .populate([
         {
           path: "documentReqSent.userId",
-          select: "firstName middleName lastName dateOfBirth gender martrId address HoroscopicId filesId profdetailsId",
+          select: "firstName middleName lastName dateOfBirth gender martrId address HoroscopicId filesId profdetailsId isEnable isbloacked",
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate documents isDocPrivate" },
@@ -1326,7 +1367,7 @@ exports.getDocumentRequests = async (req, res) => {
         },
         {
           path: "documentReqReceived.userId",
-          select: "firstName middleName lastName dateOfBirth gender martrId address HoroscopicId filesId profdetailsId",
+          select: "firstName middleName lastName dateOfBirth gender martrId address HoroscopicId filesId profdetailsId isEnable isbloacked",
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate documents isDocPrivate" },
@@ -1339,9 +1380,16 @@ exports.getDocumentRequests = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const filterValid = (arr) =>
-      (arr || []).filter(
-        (e) => e && e.userId && !blockedIds.has((e.userId._id || e.userId).toString())
-      );
+      (arr || []).filter((e) => {
+        const p = e && e.userId;
+        return (
+          p &&
+          p._id &&
+          p.isEnable !== false &&
+          p.isbloacked !== true &&
+          !blockedIds.has((p._id || p).toString())
+        );
+      });
 
     return res.status(200).json({
       documentReqSent: filterValid(user.documentReqSent),
@@ -1471,7 +1519,7 @@ exports.getRequests = async (req, res) => {
         {
           path: "reqSent.userId",
           select:
-            "dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId gender",
+            "dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId gender isEnable isbloacked",
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
@@ -1482,7 +1530,7 @@ exports.getRequests = async (req, res) => {
         {
           path: "reqReceived.userId",
           select:
-            "dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId gender",
+            "dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId gender isEnable isbloacked",
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
@@ -1515,7 +1563,16 @@ exports.getRequests = async (req, res) => {
     };
 
     user.reqSent = (user.reqSent || [])
-      .filter((profile) => profile && profile.userId && !blockedIds.has((profile.userId._id || profile.userId).toString()))
+      .filter((profile) => {
+        const p = profile && profile.userId;
+        return (
+          p &&
+          p._id &&
+          p.isEnable !== false &&
+          p.isbloacked !== true &&
+          !blockedIds.has((p._id || p).toString())
+        );
+      })
       .map((profile) => {
         const photoRequestStatus = getPhotoReqStatus(profile.userId?._id);
         const photos = profile.userId?.filesId?.photos || [];
@@ -1541,7 +1598,16 @@ exports.getRequests = async (req, res) => {
       });
 
     user.reqReceived = (user.reqReceived || [])
-      .filter((profile) => profile && profile.userId && !blockedIds.has((profile.userId._id || profile.userId).toString()))
+      .filter((profile) => {
+        const p = profile && profile.userId;
+        return (
+          p &&
+          p._id &&
+          p.isEnable !== false &&
+          p.isbloacked !== true &&
+          !blockedIds.has((p._id || p).toString())
+        );
+      })
       .map((profile) => {
         const photoRequestStatus = getPhotoReqStatus(profile.userId?._id);
         const photos = profile.userId?.filesId?.photos || [];
@@ -3692,7 +3758,7 @@ exports.viewDetails = async (req, res) => {
       userResponse.familyInfo = familyInfoDoc.familyInfo;
     }
 
-    if (isReqSent) {
+    if (isReqSent || isOwnProfile || isAdminUser) {
       const [paternaldetails, familyDetails] = await Promise.all([
         ExtendedFamily.findOne({ userId: profileId }),
         User.findById(profileId)
@@ -4567,7 +4633,7 @@ exports.getUserContactRequests = async (req, res) => {
   try {
     const blockedIds = await getBlockedIdsSet(userId);
     const userPopulateSelect =
-      "dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId gender mobile email firstName lastName";
+      "dateOfBirth HoroscopicId filesId profdetailsId address familydetailsId martrId gender mobile email firstName lastName isEnable isbloacked";
     const userPopulateOptions = [
       { path: "HoroscopicId", select: "clan" },
       { path: "filesId", select: "photos isPrivate" },
@@ -4585,7 +4651,16 @@ exports.getUserContactRequests = async (req, res) => {
     ]);
 
     const contactReqSent = sentDocs
-      .filter((doc) => doc && doc.receiverId && !blockedIds.has((doc.receiverId._id || doc.receiverId).toString()))
+      .filter((doc) => {
+        const p = doc && doc.receiverId;
+        return (
+          p &&
+          p._id &&
+          p.isEnable !== false &&
+          p.isbloacked !== true &&
+          !blockedIds.has((p._id || p).toString())
+        );
+      })
       .map((doc) => {
         let userObj = { ...doc.receiverId };
         if (doc.status !== "accepted") {
@@ -4601,7 +4676,16 @@ exports.getUserContactRequests = async (req, res) => {
       });
 
     const contactReqReceived = receivedDocs
-      .filter((doc) => doc && doc.senderId && !blockedIds.has((doc.senderId._id || doc.senderId).toString()))
+      .filter((doc) => {
+        const p = doc && doc.senderId;
+        return (
+          p &&
+          p._id &&
+          p.isEnable !== false &&
+          p.isbloacked !== true &&
+          !blockedIds.has((p._id || p).toString())
+        );
+      })
       .map((doc) => {
         let userObj = { ...doc.senderId };
         if (doc.status !== "accepted") {

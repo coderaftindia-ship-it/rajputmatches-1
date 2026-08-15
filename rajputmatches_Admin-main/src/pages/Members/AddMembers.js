@@ -53,7 +53,7 @@ function AddMembers() {
       city: /^[a-zA-Z ]{0,20}$/,
     };
 
-    if (regexRules[name] && regexRules[name].test(newValue)) {
+    if (name === "email" || (regexRules[name] && regexRules[name].test(newValue))) {
       setFormData({ ...formData, [name]: newValue });
     }
   };
