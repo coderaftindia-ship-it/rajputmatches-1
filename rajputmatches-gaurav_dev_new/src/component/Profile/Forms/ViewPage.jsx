@@ -636,14 +636,21 @@ const ViewPage = () => {
   const hasCareer = Data.profdetailsId &&
     Object.keys(Data.profdetailsId).some((k) => !["_id", "__v", "userId"].includes(k));
 
-  const hasFamily = isaccepted && Data.familyDetails &&
-    Object.keys(Data.familyDetails).some((k) => !["_id", "__v", "userId"].includes(k));
+  const familyObj = Data.familyDetails || Data.familydetailsId;
 
-  const hasPaternal = isaccepted && paternaldetails &&
-    Object.keys(paternaldetails).some((k) => !["_id", "__v", "userId", "updatedAt", "createdAt"].includes(k));
+  const hasFamily = familyObj &&
+    Object.entries(familyObj).some(([k, v]) => !["_id", "__v", "userId"].includes(k) && !Array.isArray(v) && typeof v !== "object" && v && String(v).trim());
+
+  const hasSiblings = (familyObj?.elderBrother?.some(b => b.name) ||
+    familyObj?.elderSister?.some(s => s.name) ||
+    familyObj?.youngerBrother?.some(b => b.name) ||
+    familyObj?.youngerSister?.some(s => s.name));
+
+  const hasPaternal = paternaldetails &&
+    Object.entries(paternaldetails).some(([k, v]) => !["_id", "__v", "userId", "updatedAt", "createdAt"].includes(k) && !Array.isArray(v) && v && String(v).trim());
 
   const hasRelatives = ["badePapa","bhuasa","kakosa","mamosa","masisa"]
-    .some((k) => Array.isArray(paternaldetails[k]) && paternaldetails[k].length > 0);
+    .some((k) => Array.isArray(paternaldetails?.[k]) && paternaldetails[k].length > 0 && paternaldetails[k].some(p => p.name || p.thikana));
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
@@ -905,8 +912,19 @@ const ViewPage = () => {
                       >
                         {isaccepted ? (
                           <div>
+                            {!hasFamily && !hasSiblings && !hasPaternal && !hasRelatives && (
+                              <div style={{ textAlign: "center", padding: "40px 20px", background: "rgba(255,255,255,0.7)", borderRadius: "16px", border: "1px dashed var(--royal-gold)", margin: "20px 0" }}>
+                                <h5 style={{ fontFamily: "serif", color: "var(--royal-maroon, #59123b)", fontWeight: "700", marginBottom: "8px" }}>
+                                  Family &amp; Ancestry Information
+                                </h5>
+                                <p style={{ color: "#666", fontSize: "0.95rem", margin: 0 }}>
+                                  This member has not provided detailed family or ancestral information yet.
+                                </p>
+                              </div>
+                            )}
+
                             {/* Family Details */}
-                            {hasFamily && (
+                            {hasFamily && familyObj && (
                               <div style={{ marginBottom: "32px" }}>
                                 <SectionRibbon>Family Information</SectionRibbon>
                                 <motion.div
@@ -915,8 +933,8 @@ const ViewPage = () => {
                                   animate="visible"
                                   className={styles.detailsList}
                                 >
-                                  {Object.entries(Data.familyDetails)
-                                    .filter(([k, v]) => !["_id", "__v", "userId"].includes(k) && !Array.isArray(v))
+                                  {Object.entries(familyObj)
+                                    .filter(([k, v]) => !["_id", "__v", "userId"].includes(k) && !Array.isArray(v) && v && String(v).trim())
                                     .map(([key, val]) => (
                                       <motion.div key={key} variants={itemVariants}>
                                         <DetailRow
@@ -931,10 +949,7 @@ const ViewPage = () => {
                             )}
 
                             {/* Siblings Details */}
-                            {(Data.familyDetails?.elderBrother?.some(b => b.name) ||
-                              Data.familyDetails?.elderSister?.some(s => s.name) ||
-                              Data.familyDetails?.youngerBrother?.some(b => b.name) ||
-                              Data.familyDetails?.youngerSister?.some(s => s.name)) && (
+                            {hasSiblings && familyObj && (
                               <div style={{ marginBottom: "32px" }}>
                                 <SectionRibbon>Siblings Information</SectionRibbon>
                                 <motion.div
@@ -949,7 +964,7 @@ const ViewPage = () => {
                                     { key: "youngerBrother", title: "Younger Brother" },
                                     { key: "youngerSister", title: "Younger Sister" },
                                   ].map(({ key, title }) =>
-                                    Data.familyDetails[key]?.map((person, idx) => {
+                                    familyObj[key]?.map((person, idx) => {
                                       if (!person.name) return null;
                                       return (
                                         <motion.div className={styles.relCard} key={`sib-${key}-${idx}`} variants={itemVariants}>

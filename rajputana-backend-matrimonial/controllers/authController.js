@@ -3758,17 +3758,15 @@ exports.viewDetails = async (req, res) => {
       userResponse.familyInfo = familyInfoDoc.familyInfo;
     }
 
-    if (isReqSent || isOwnProfile || isAdminUser) {
-      const [paternaldetails, familyDetails] = await Promise.all([
-        ExtendedFamily.findOne({ userId: profileId }),
-        User.findById(profileId)
-          .populate("familydetailsId")
-          .then((user) => user?.familydetailsId),
-      ]);
+    const [paternaldetails, familyDetails] = await Promise.all([
+      ExtendedFamily.findOne({ userId: profileId }),
+      User.findById(profileId)
+        .populate("familydetailsId")
+        .then((user) => user?.familydetailsId),
+    ]);
 
-      userResponse.paternaldetails = paternaldetails;
-      userResponse.familyDetails = familyDetails;
-    }
+    userResponse.paternaldetails = paternaldetails;
+    userResponse.familyDetails = familyDetails;
 
     console.log(userResponse);
 
