@@ -189,44 +189,7 @@ function DocumentRequest() {
 
     if (activeButton === "requestReceived") {
       if (status === "pending") {
-        return renderPlaceholderWithActions(
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "85%", margin: "0 auto" }}>
-            <button
-              className="btn btn-success btn-sm w-100"
-              style={{ 
-                backgroundColor: "rgba(26, 122, 69, 0.95)", 
-                borderColor: "rgba(26, 122, 69, 0.95)",
-                color: "white", 
-                fontSize: "11px", 
-                fontWeight: "700",
-                padding: "6px 10px",
-                borderRadius: "6px",
-                letterSpacing: "0.3px",
-                textTransform: "uppercase"
-              }}
-              onClick={() => handleAction("accept", profile._id)}
-            >
-              Accept
-            </button>
-            <button
-              className="btn btn-danger btn-sm w-100"
-              style={{ 
-                backgroundColor: "rgba(153, 28, 28, 0.95)", 
-                borderColor: "rgba(153, 28, 28, 0.95)",
-                color: "white", 
-                fontSize: "11px", 
-                fontWeight: "700",
-                padding: "6px 10px",
-                borderRadius: "6px",
-                letterSpacing: "0.3px",
-                textTransform: "uppercase"
-              }}
-              onClick={() => handleAction("reject", profile._id)}
-            >
-              Decline
-            </button>
-          </div>
-        );
+        return renderPlaceholderWithActions(null);
       } else if (status === "rejected") {
         return renderPlaceholderWithActions(
           <p className="m-0 text-dark fw-bold" style={{ fontSize: "13px" }}>
@@ -366,6 +329,7 @@ function DocumentRequest() {
                 key={entry._id}
                 profile={entry?.userId}
                 status={entry?.status}
+                requestType="document"
                 ProfileImagerender={DocumentImageContainer}
                 activeTab={activeTab}
                 fetchData={fetchData}

@@ -27,6 +27,7 @@ const RequestCard = ({
   activeTab,
   ProfileImagerender,
   fetchData,
+  requestType = "photo",
 }) => {
   const navigate = useNavigate();
   if (!profile || !profile._id) return null;
@@ -109,6 +110,7 @@ const RequestCard = ({
           fetchData={fetchData}
           activeTab={activeTab}
           handlecheck={handlecheck}
+          requestType={requestType}
         />
       </div>
     </div>
@@ -120,6 +122,7 @@ RequestCard.propTypes = {
   handlecheck: PropTypes.func,
   fetchData: PropTypes.func.isRequired,
   ProfileImagerender: PropTypes.func.isRequired,
+  requestType: PropTypes.string,
 };
 
 const ActionButtons = ({
@@ -129,6 +132,7 @@ const ActionButtons = ({
   fetchData,
   activeTab,
   handlecheck,
+  requestType = "photo",
 }) => {
   const { updateData } = useAuth();
   const navigate = useNavigate();
@@ -136,6 +140,19 @@ const ActionButtons = ({
   const handleAction = async (action, profileId) => {
     try {
       let route = `profile/${action}`;
+      if (requestType === "document") {
+        if (action === "accept") route = "profile/document/accept";
+        else if (action === "reject") route = "profile/document/reject";
+        else if (action === "delete/delete" || action === "withdrawal") route = "profile/document/withdrawal";
+      } else if (requestType === "contact") {
+        if (action === "accept") route = "profile/contact/accept";
+        else if (action === "reject") route = "profile/contact/reject";
+        else if (action === "delete/delete" || action === "withdrawal") route = "profile/contact/withdrawal";
+      } else if (requestType === "interest") {
+        if (action === "accept") route = "profile/reqsent/accept";
+        else if (action === "reject") route = "profile/reqsent/reject";
+        else if (action === "delete/delete" || action === "withdrawal") route = "profile/reqsent/withdrawal";
+      }
       await updateData(route, profileId, true);
       if (fetchData) fetchData();
     } catch (error) {

@@ -516,6 +516,7 @@ function PhotoRequest() {
               key={profile._id}
               profile={profile?.userId}
               status={profile?.status}
+              requestType="photo"
               ProfileImagerender={RequestImageContainer}
               activeTab={activeTab}
               fetchData={fetchData}
