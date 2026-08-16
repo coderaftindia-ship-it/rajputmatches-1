@@ -561,7 +561,7 @@ function Mydetails() {
       ) {
         await updateData("update-religiondetails", {
           clan: activeClan,
-          subclan: basicFormData.subclan || activeClan,
+          subclan: (basicFormData.subclan && basicFormData.subclan.trim() !== activeClan?.trim()) ? basicFormData.subclan : "",
           gotra: basicFormData.gotra,
           maglik: basicFormData.manglik,
           manglik: basicFormData.manglik,
@@ -706,7 +706,14 @@ function Mydetails() {
               <DetailRow icon={<FaMapMarkerAlt />} label="Place of Birth" value={horoscope?.birthplace || "N/A"} />
               <DetailRow icon={<FaClock />} label="Time of Birth" value={birthTime} />
               <DetailRow icon={<FaStar />} label="Gotra" value={horoscope?.gotra || "N/A"} />
-              <DetailRow icon={<FaUsers />} label="Clan / Subclan" value={horoscope?.clan ? `${horoscope.clan} ${horoscope.subclan ? `(${horoscope.subclan})` : ""}` : "N/A"} />
+              <DetailRow icon={<FaUsers />} label="Clan / Subclan" value={(() => {
+                const c = horoscope?.clan?.trim() || "";
+                const s = horoscope?.subclan?.trim() || "";
+                if (!c && !s) return "N/A";
+                if (!c) return s;
+                if (!s || s.toLowerCase() === c.toLowerCase() || c.toLowerCase().includes(`(${s.toLowerCase()})`)) return c;
+                return `${c} (${s})`;
+              })()} />
               <DetailRow icon={<FaRulerVertical />} label="Height" value={heightDisplay} />
               <DetailRow icon={<FaWeight />} label="Weight" value={user?.weight ? `${user.weight} kg` : "N/A"} />
               <DetailRow icon={<FaMoon />} label="Zodiac (Rashi)" value={horoscope?.rashi || horoscope?.zodiac || "N/A"} />

@@ -283,7 +283,7 @@ const getCareerAndEducationItems = (profDetails) => {
         });
       }
       if ((o?.company || o?.salary) && ((o?.company && o.company !== "N/A") || (o?.salary && o.salary !== "N/A"))) {
-        const valParts = [o.company, o.salary].filter(v => v && v.trim() && v !== "N/A");
+        const valParts = Array.from(new Set([o.company, o.salary].filter(v => v && v.trim() && v !== "N/A")));
         if (valParts.length > 0) {
           items.push({
             key: `comp-${idx}`,
@@ -304,7 +304,7 @@ const getCareerAndEducationItems = (profDetails) => {
       });
     }
     if ((profDetails.company || profDetails.annualIncome) && ((profDetails.company && profDetails.company !== "N/A") || (profDetails.annualIncome && profDetails.annualIncome !== "N/A"))) {
-      const valParts = [profDetails.company, profDetails.annualIncome].filter(v => v && v.trim() && v !== "N/A");
+      const valParts = Array.from(new Set([profDetails.company, profDetails.annualIncome].filter(v => v && v.trim() && v !== "N/A")));
       if (valParts.length > 0) {
         items.push({
           key: "comp-single",
@@ -515,12 +515,15 @@ const ViewPage = () => {
         setPaternaldetails(profileData?.paternaldetails);
       }
 
+      const nativePlaceVal = profileData.nativePlace || profileData.familydetailsId?.fatherNativePlace || profileData.familydetailsId?.nativePlace || profileData.HoroscopicId?.birthplace || null;
+
       setFormData({
         matrimonialid:  profileData.martrId || "N/A",
         lastName:       `${profileData.lastName || ""}`.trim(),
         dateOfBirth:    formattedDateOfBirth,
         mobile:         profileData.mobile || "N/A",
         email:          profileData.email || "N/A",
+        nativePlace:    nativePlaceVal || "N/A",
         height:         formattedHeight,
         weight:         profileData.weight || "N/A",
         maritalStatus:  profileData.maritalStatus || "N/A",
@@ -614,6 +617,7 @@ const ViewPage = () => {
     dateOfBirth:   { label: "Date of Birth",         icon: <FaCalendarAlt /> },
     mobile:        { label: "Mobile Number",          icon: <FaPhoneAlt /> },
     email:         { label: "Email Address",          icon: <FaEnvelope /> },
+    nativePlace:   { label: "Native Place",           icon: <FaHome /> },
     height:        { label: "Height",                 icon: <FaRulerVertical /> },
     weight:        { label: "Weight",                 icon: <FaWeight /> },
     maritalStatus: { label: "Marital Status",         icon: <FaHeart /> },

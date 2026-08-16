@@ -1022,7 +1022,9 @@ const SearchPage = () => {
         <FilterLabel>Class / Family Class</FilterLabel>
         <FilterSelect name="class" value={formData.class||""} onChange={handleChange}>
           <option value="">Any Class</option>
-          <option value="Royalty">Royalty</option>
+          <option value="Erstwhile Royals (Princely States)">Erstwhile Royals (Princely States)</option>
+          <option value="Erstwhile Nobles (Thikana)">Erstwhile Nobles (Thikana)</option>
+          <option value="Defence">Defence</option>
           <option value="Business">Business</option>
           <option value="Service">Service</option>
           <option value="Political">Political</option>

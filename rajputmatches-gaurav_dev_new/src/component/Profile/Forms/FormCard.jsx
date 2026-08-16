@@ -64,7 +64,9 @@ function FormCard({
   ];
 
   const classOptions = [
-    "Royalty",
+    "Erstwhile Royals (Princely States)",
+    "Erstwhile Nobles (Thikana)",
+    "Defence",
     "Business",
     "Service",
     "Political",
