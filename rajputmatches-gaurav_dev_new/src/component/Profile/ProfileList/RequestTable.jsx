@@ -113,8 +113,8 @@ const RequestTable = ({ profiles, status, activeTab, fetchData, handlecheck, isS
 
               {/* Professional */}
               <td className="py-3 px-4">
-                <div className="fw-bold text-dark text-truncate" style={{ maxWidth: "150px" }}>{profile?.familydetailsId?.occupation || "Occ. N/A"}</div>
-                <div className="text-secondary small text-truncate" style={{ maxWidth: "150px" }}>{profile?.profdetailsId?.qualifications || "Edu. N/A"}</div>
+                <div className="fw-bold text-dark text-truncate" style={{ maxWidth: "150px" }}>{(profile?.profdetailsId?.occupationsList?.length > 0 ? profile.profdetailsId.occupationsList[0].occupation : null) || profile?.profdetailsId?.professional || profile?.familydetailsId?.occupation || "Occ. N/A"}</div>
+                <div className="text-secondary small text-truncate" style={{ maxWidth: "150px" }}>{(profile?.profdetailsId?.qualificationsList?.length > 0 ? profile.profdetailsId.qualificationsList[0].qualification : null) || profile?.profdetailsId?.qualifications || "Edu. N/A"}</div>
               </td>
 
               {/* Actions */}

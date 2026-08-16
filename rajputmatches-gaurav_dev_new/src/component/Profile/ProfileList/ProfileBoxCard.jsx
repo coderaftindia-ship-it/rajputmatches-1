@@ -106,9 +106,9 @@ const ProfileBoxCard = ({ profile, handleCheck, ProfileImagerender, fetchData })
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                       }}
-                      title={profile.profdetailsId?.qualifications || "N/A"}
+                      title={(profile.profdetailsId?.qualificationsList?.length > 0 ? profile.profdetailsId.qualificationsList[0].qualification : null) || profile.profdetailsId?.qualifications || "N/A"}
                     >
-                      {profile.profdetailsId?.qualifications || "N/A"}
+                      {(profile.profdetailsId?.qualificationsList?.length > 0 ? profile.profdetailsId.qualificationsList[0].qualification : null) || profile.profdetailsId?.qualifications || "N/A"}
                     </span>
                   </p>
 
@@ -122,9 +122,9 @@ const ProfileBoxCard = ({ profile, handleCheck, ProfileImagerender, fetchData })
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                       }}
-                      title={profile.familydetailsId?.occupation || "N/A"}
+                      title={(profile.profdetailsId?.occupationsList?.length > 0 ? profile.profdetailsId.occupationsList[0].occupation : null) || profile.profdetailsId?.professional || profile.familydetailsId?.occupation || "N/A"}
                     >
-                      {profile.familydetailsId?.occupation || "N/A"}
+                      {(profile.profdetailsId?.occupationsList?.length > 0 ? profile.profdetailsId.occupationsList[0].occupation : null) || profile.profdetailsId?.professional || profile.familydetailsId?.occupation || "N/A"}
                     </span>
                   </p>
                 </div>

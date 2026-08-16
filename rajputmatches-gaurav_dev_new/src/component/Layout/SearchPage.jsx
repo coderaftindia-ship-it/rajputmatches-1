@@ -214,8 +214,8 @@ const SearchProfileCard = ({ profile, fetchData, isViewDisabled, onBlock }) => {
     { label:"Clan",            icon:<GiSwordClash />,      value: profile?.HoroscopicId?.clan || profile?.clan || null },
     { label:"Age",             icon:<FaCalendarAlt />,     value: age ? `${age} yrs old` : null },
     { label:"Location",        icon:<FaMapMarkerAlt />,    value: profile?.address?.city && profile?.address?.state ? `${profile.address.city}, ${profile.address.state}` : (profile?.address?.city || profile?.address?.state || null) },
-    { label:"High. Education", icon:<FaGraduationCap />,   value: profile?.profdetailsId?.qualifications },
-    { label:"Occupation",      icon:<FaBriefcase />,       value: profile?.familydetailsId?.occupation || profile?.profdetailsId?.occupation },
+    { label:"Qualification",   icon:<FaGraduationCap />,   value: (profile?.profdetailsId?.qualificationsList?.length > 0 ? profile.profdetailsId.qualificationsList[0].qualification : null) || profile?.profdetailsId?.qualifications || null },
+    { label:"Current Role",    icon:<FaBriefcase />,       value: (profile?.profdetailsId?.occupationsList?.length > 0 ? profile.profdetailsId.occupationsList[0].occupation : null) || profile?.profdetailsId?.professional || profile?.familydetailsId?.occupation || null },
     { label:"Class",           icon:<FaUserTie />,         value: profileClassValue },
   ];
 

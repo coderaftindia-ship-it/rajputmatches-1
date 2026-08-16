@@ -189,12 +189,12 @@ function RecentAddedPage() {
     const isPrivate   = profile.filesId?.isPrivate;
 
     const details = [
-      { label: "Clan",            icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 13l2 2"/><path d="M9.5 6.5L21 18v3h-3L6.5 9.5"/><path d="M11 5L5 11"/><path d="M8 8L4 4"/><path d="M5 11L3 9"/></svg>, value: profile?.HoroscopicId?.clan },
-      { label: "Age",             icon: <FaCalendarAlt />,   value: profile?.dateOfBirth ? `${calculateAge(profile.dateOfBirth)} yrs old` : null },
-      { label: "Location",        icon: <FaMapMarkerAlt />,  value: profile?.address?.city && profile?.address?.state ? `${profile.address.city}, ${profile.address.state}` : (profile?.address?.city || profile?.address?.state || null) },
-      { label: "High. Education", icon: <FaGraduationCap />, value: profile?.profdetailsId?.qualifications },
-      { label: "Occupation",      icon: <FaBriefcase />,     value: profile?.familydetailsId?.occupation || profile?.profdetailsId?.occupation },
-      { label: "Class",           icon: <FaUserTie />,       value: profile?.profdetailsId?.class },
+      { label: "Clan",          icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 13l2 2"/><path d="M9.5 6.5L21 18v3h-3L6.5 9.5"/><path d="M11 5L5 11"/><path d="M8 8L4 4"/><path d="M5 11L3 9"/></svg>, value: profile?.HoroscopicId?.clan },
+      { label: "Age",           icon: <FaCalendarAlt />,   value: profile?.dateOfBirth ? `${calculateAge(profile.dateOfBirth)} yrs old` : null },
+      { label: "Location",      icon: <FaMapMarkerAlt />,  value: profile?.address?.city && profile?.address?.state ? `${profile.address.city}, ${profile.address.state}` : (profile?.address?.city || profile?.address?.state || null) },
+      { label: "Qualification", icon: <FaGraduationCap />, value: (profile?.profdetailsId?.qualificationsList?.length > 0 ? profile.profdetailsId.qualificationsList[0].qualification : null) || profile?.profdetailsId?.qualifications || null },
+      { label: "Current Role",  icon: <FaBriefcase />,     value: (profile?.profdetailsId?.occupationsList?.length > 0 ? profile.profdetailsId.occupationsList[0].occupation : null) || profile?.profdetailsId?.professional || profile?.familydetailsId?.occupation || null },
+      { label: "Class",         icon: <FaUserTie />,       value: profile?.profdetailsId?.class },
     ];
 
     const parts = [];

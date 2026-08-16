@@ -55,9 +55,12 @@ const MyInterestCard = ({
       },
       {
         label: "Education",
-        value: profile?.profdetailsId?.qualifications,
+        value: (profile?.profdetailsId?.qualificationsList?.length > 0 ? profile.profdetailsId.qualificationsList[0].qualification : null) || profile?.profdetailsId?.qualifications || null,
       },
-      { label: "Occupation", value: profile?.familydetailsId?.occupation },
+      {
+        label: "Occupation",
+        value: (profile?.profdetailsId?.occupationsList?.length > 0 ? profile.profdetailsId.occupationsList[0].occupation : null) || profile?.profdetailsId?.professional || profile?.familydetailsId?.occupation || null,
+      },
     ];
 
     return details.map(({ label, value }, index) => (

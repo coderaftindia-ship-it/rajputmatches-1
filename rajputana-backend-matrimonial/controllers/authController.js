@@ -425,7 +425,7 @@ exports.getshortlistedData = async (req, res) => {
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
-            { path: "profdetailsId", select: "qualifications class" },
+            { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
             { path: "familydetailsId", select: "occupation" },
           ],
         },
@@ -505,7 +505,7 @@ exports.getviewedData = async (req, res) => {
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
-            { path: "profdetailsId", select: "qualifications class" },
+            { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
             { path: "familydetailsId", select: "occupation" },
           ],
         },
@@ -595,7 +595,7 @@ exports.getvisitedData = async (req, res) => {
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
-            { path: "profdetailsId", select: "qualifications class" },
+            { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
             { path: "familydetailsId", select: "occupation" },
           ],
         },
@@ -1263,7 +1263,7 @@ exports.getphotoRequests = async (req, res) => {
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
-            { path: "profdetailsId", select: "qualifications class" },
+            { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
             { path: "familydetailsId", select: "occupation" },
           ],
         },
@@ -1274,7 +1274,7 @@ exports.getphotoRequests = async (req, res) => {
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
-            { path: "profdetailsId", select: "qualifications class" },
+            { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
             { path: "familydetailsId", select: "occupation" },
           ],
         },
@@ -1369,7 +1369,7 @@ exports.getDocumentRequests = async (req, res) => {
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate documents isDocPrivate" },
-            { path: "profdetailsId", select: "qualifications" },
+            { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
           ],
         },
         {
@@ -1378,7 +1378,7 @@ exports.getDocumentRequests = async (req, res) => {
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate documents isDocPrivate" },
-            { path: "profdetailsId", select: "qualifications" },
+            { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
           ],
         },
       ])
@@ -1538,7 +1538,7 @@ exports.getRequests = async (req, res) => {
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
-            { path: "profdetailsId", select: "qualifications class" },
+            { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
             { path: "familydetailsId", select: "occupation" },
           ],
         },
@@ -1549,7 +1549,7 @@ exports.getRequests = async (req, res) => {
           populate: [
             { path: "HoroscopicId", select: "clan" },
             { path: "filesId", select: "photos isPrivate" },
-            { path: "profdetailsId", select: "qualifications class" },
+            { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
             { path: "familydetailsId", select: "occupation" },
           ],
         },
@@ -1678,7 +1678,7 @@ exports.viewProfileById = async (req, res) => {
       .populate([
         { path: "HoroscopicId", select: "clan" },
         { path: "filesId", select: "photos isPrivate" },
-        { path: "profdetailsId", select: "qualifications class" },
+        { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
         { path: "familydetailsId", select: "occupation" },
       ]);
 
@@ -2080,7 +2080,7 @@ exports.getprofiles = async (req, res) => {
       .populate("filesId")
       .populate("HoroscopicId")
       .populate({ path: "familydetailsId", select: "occupation" })
-      .populate({ path: "profdetailsId", select: "class" })
+      .populate({ path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" })
       .lean();
 
     if (occupation) {
@@ -3785,7 +3785,7 @@ exports.viewDetails = async (req, res) => {
       userResponse.email = maskEmail(profile.email);
     }
 
-    // Always fetch familyInfo (Partner Preferences) — it's non-sensitive
+    // Always fetch familyInfo (Partner Preferences) â€” it's non-sensitive
     const familyInfoDoc = await User.findById(profileId)
       .populate({ path: "familydetailsId", select: "familyInfo" })
       .lean()
@@ -3883,7 +3883,7 @@ exports.getPublicRecentProfiles = async (req, res) => {
       .populate("filesId")
       .populate("HoroscopicId")
       .populate({ path: "familydetailsId", select: "occupation" })
-      .populate({ path: "profdetailsId", select: "class" })
+      .populate({ path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" })
       .lean();
 
     const filterProfiles = profiles.map((profile) => {
@@ -4508,7 +4508,7 @@ exports.getdocumentRequests = async (req, res) => {
   }
 };
 
-// ── GET DISTINCT CLAN / SUBCLAN VALUES ──────────────────────────────────────
+// â”€â”€ GET DISTINCT CLAN / SUBCLAN VALUES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 exports.getDistinctClans = async (req, res) => {
   try {
     const [clans, subclans, lastNames] = await Promise.all([
@@ -4672,7 +4672,7 @@ exports.getUserContactRequests = async (req, res) => {
     const userPopulateOptions = [
       { path: "HoroscopicId", select: "clan" },
       { path: "filesId", select: "photos isPrivate" },
-      { path: "profdetailsId", select: "qualifications class" },
+      { path: "profdetailsId", select: "qualifications qualificationsList occupationsList professional class" },
       { path: "familydetailsId", select: "occupation" },
     ];
 
@@ -4787,3 +4787,4 @@ exports.updateSocialLinks = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error", error });
   }
 };
+
