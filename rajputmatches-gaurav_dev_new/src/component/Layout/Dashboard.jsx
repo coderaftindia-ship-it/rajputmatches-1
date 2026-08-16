@@ -11,7 +11,7 @@ import {
   Heart, Eye, UserCheck, Camera, Phone, MessageSquare,
   Star, TrendingUp, Users, Bell, ChevronRight, Zap,
   Shield, Crown, Search, HeartHandshake, Clock, CheckCircle2,
-  XCircle, Sparkles, Gift, ArrowRight, BarChart3
+  XCircle, Sparkles, Gift, ArrowRight, BarChart3, Ban
 } from "lucide-react";
 
 /* ── helpers ── */
@@ -149,6 +149,7 @@ const Dashboard = () => {
   const [visitedList, setVisitedList] = useState([]);
   const [shortlisted, setShortlisted] = useState([]);
   const [photoReqs, setPhotoReqs]   = useState({ sent: [], received: [] });
+  const [blockedList, setBlockedList] = useState([]);
   const [mediaFiles, setMediaFiles] = useState(null);
   const [loading, setLoading]       = useState(true);
 
@@ -162,7 +163,7 @@ const Dashboard = () => {
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [user, reqs, viewed, visited, sl, photoR, mediaRes, contactR] = await Promise.allSettled([
+      const [user, reqs, viewed, visited, sl, photoR, mediaRes, contactR, blockedRes] = await Promise.allSettled([
         fetchByRoute("user"),
         fetchByRoute("profile/myrequests"),
         fetchByRoute("profile/viewed"),
@@ -171,6 +172,7 @@ const Dashboard = () => {
         fetchByRoute("profile/photorequests"),
         fetchByRoute("files"),
         fetchByRoute("profile/contactrequests"),
+        fetchByRoute("profile/show-blocked"),
       ]);
       if (user.status === "fulfilled")     setUserData(user.value);
       if (reqs.status === "fulfilled" && reqs.value) {
@@ -179,6 +181,7 @@ const Dashboard = () => {
       if (viewed.status === "fulfilled")   setViewedList(Array.isArray(viewed.value) ? viewed.value : (viewed.value?.visitedAt || viewed.value?.viewedProfiles || viewed.value?.viewed || []));
       if (visited.status === "fulfilled")  setVisitedList(Array.isArray(visited.value) ? visited.value : (visited.value?.viewedBy || visited.value?.visitedProfiles || visited.value?.visitors || visited.value?.visited || []));
       if (sl.status === "fulfilled")       setShortlisted(Array.isArray(sl.value) ? sl.value : (sl.value?.shortlisted || sl.value?.profiles || []));
+      if (blockedRes.status === "fulfilled") setBlockedList(Array.isArray(blockedRes.value) ? blockedRes.value : (blockedRes.value?.blockedUsers || blockedRes.value?.data || []));
       if (photoR.status === "fulfilled" && photoR.value) {
         setPhotoReqs({
           sent:     photoR.value?.photoReqSent     || [],
@@ -362,6 +365,13 @@ const Dashboard = () => {
               value={interestReceived.length}
               color="linear-gradient(135deg,#ec4899,#db2777)"
               onClick={() => goProfile("interest")}
+            />
+            <StatCard
+              icon={<Ban size={20} />}
+              label="Blocked Profiles"
+              value={blockedList.length}
+              color="linear-gradient(135deg,#dc2626,#991b1b)"
+              onClick={() => goProfile("blocked")}
             />
           </section>
         )}
