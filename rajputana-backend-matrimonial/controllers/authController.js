@@ -3485,6 +3485,8 @@ exports.getUserChats = async (req, res) => {
       }
     }
 
+    const blockedIds = await getBlockedIdsSet(userId);
+
     const chats = await Chat.find({
       participants: userId,
     })
@@ -3501,8 +3503,15 @@ exports.getUserChats = async (req, res) => {
       return res.status(200).json([]);
     }
 
-    // Filter messages based on `clearedBy`
-    const filteredChats = chats.map((chat) => {
+    // Filter out chats where other participant is blocked by current user or blocked current user, and filter messages based on `clearedBy`
+    const filteredChats = chats.filter((chat) => {
+      const otherParticipant = (chat.participants || []).find(
+        (p) => (p._id || p)?.toString() !== userId?.toString()
+      );
+      if (!otherParticipant) return false;
+      const otherIdStr = (otherParticipant._id || otherParticipant).toString();
+      return !blockedIds.has(otherIdStr);
+    }).map((chat) => {
       const clearedEntry = (chat.clearedBy || []).find(
         (entry) => entry.user?.toString() === userId
       );

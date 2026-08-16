@@ -319,18 +319,35 @@ const ChatApp = () => {
   };
 
   /* ── Derived State ── */
+  const blockedIdsList = Array.isArray(userData?.blocked)
+    ? userData.blocked.map((b) => (b._id || b).toString())
+    : [];
+
   const activeChatObj = chats.find((c) => c._id === activeChat);
-  const activePartner = activeChatObj?.participants?.find((p) => p?._id?.toString() !== userId?.toString());
+  const activePartner = activeChatObj?.participants?.find((p) => (p?._id || p)?.toString() !== userId?.toString());
+
+  useEffect(() => {
+    if (activeChat && activePartner) {
+      const pId = (activePartner._id || activePartner).toString();
+      if (blockedIdsList.includes(pId) || activePartner.isBlocked) {
+        setActiveChat(null);
+      }
+    }
+  }, [activeChat, activePartner, blockedIdsList]);
 
   const filteredChats = chats
     .filter((chat) => {
+      const partner = chat?.participants?.find((p) => (p?._id || p)?.toString() !== userId?.toString());
+      if (!partner) return false;
+      const partnerIdStr = (partner._id || partner).toString();
+      if (blockedIdsList.includes(partnerIdStr) || partner.isBlocked) {
+        return false;
+      }
       const q = searchQuery.toLowerCase();
       return (
-        chat?.participants?.some(
-          (p) => p?._id?.toString() !== userId?.toString() &&
-            (String(p?.martrId || "").toLowerCase().includes(q) ||
-             `${p?.firstName || ""} ${p?.lastName || ""}`.toLowerCase().includes(q))
-        ) || chat?.lastMessage?.message?.toLowerCase().includes(q)
+        String(partner?.martrId || "").toLowerCase().includes(q) ||
+        `${partner?.firstName || ""} ${partner?.lastName || ""}`.toLowerCase().includes(q) ||
+        chat?.lastMessage?.message?.toLowerCase().includes(q)
       );
     })
     .sort((a, b) => (new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)));
@@ -340,8 +357,8 @@ const ChatApp = () => {
   ════════════════════════════════════════════════════════════ */
   return (
     <>
+      <Profilenavbar />
       <div className="chat-page-wrapper">
-        <Profilenavbar />
 
         {/* Breadcrumb */}
         <div
