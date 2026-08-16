@@ -88,7 +88,9 @@ function FormCard({
         </div>
 
         {/* Form Content */}
-        <form style={{ padding: "10px 14px" }} onSubmit={(e) => e.preventDefault()}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+          <div style={{ overflowY: "auto", flex: 1, padding: "10px 14px" }}>
+            <form onSubmit={(e) => e.preventDefault()}>
           {/* ROW 1: NAME & MIDDLE NAME */}
           <div className="row g-1.5 mb-1.5">
             <div className="col-md-4 col-6">
@@ -348,8 +350,11 @@ function FormCard({
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className={style.modalFooter} style={{ padding: "6px 0 0 0", borderTop: "1px solid #f0f0f0" }}>
+            </form>
+          </div>
+
+          {/* Action Buttons — always visible */}
+          <div className={style.modalFooter}>
             <button
               type="button"
               className={style.cancelBtn}
@@ -365,8 +370,7 @@ function FormCard({
               Save Changes
             </button>
           </div>
-
-        </form>
+        </div>
       </div>
     </div>
   );

@@ -296,7 +296,9 @@ const DocumentForm = ({
           />
         </div>
 
-        <form style={{ padding: "20px 24px" }} onSubmit={(e) => e.preventDefault()}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+          <div style={{ overflowY: "auto", flex: 1, padding: "16px 18px" }}>
+            <form onSubmit={(e) => e.preventDefault()}>
           
           {/* Images Section Card */}
           <div
@@ -722,35 +724,30 @@ const DocumentForm = ({
             )}
           </div>
 
-          {/* Modal Actions */}
-          <div className="d-flex justify-content-end gap-2 pt-2 border-top">
+            </form>
+          </div>
+
+          {/* Modal Actions — always visible */}
+          <div className={style.modalFooter}>
             <button
               type="button"
-              className="btn btn-sm btn-outline-secondary"
+              className={style.cancelBtn}
               onClick={handleCancelClick}
               disabled={isSaving}
-              style={{ padding: "6px 18px", borderRadius: "8px", fontWeight: 600 }}
             >
               Cancel
             </button>
             <button
               type="button"
-              className="btn btn-sm text-white"
+              className={style.saveBtn}
               onClick={handleSaveAll}
               disabled={isSaving}
-              style={{
-                background: "linear-gradient(135deg, #59123B 0%, #3d0826 100%)",
-                padding: "6px 24px",
-                borderRadius: "8px",
-                fontWeight: 600,
-                boxShadow: "0 2px 8px rgba(89, 18, 59, 0.3)",
-                opacity: isSaving ? 0.7 : 1,
-              }}
+              style={{ opacity: isSaving ? 0.7 : 1 }}
             >
               {isSaving ? "Saving & Uploading..." : "Save & Close"}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

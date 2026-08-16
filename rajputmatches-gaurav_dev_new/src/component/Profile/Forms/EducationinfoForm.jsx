@@ -172,7 +172,9 @@ function EducationinfoForm({
           />
         </div>
 
-        <form style={{ padding: "10px 12px" }} onSubmit={onFinalSubmit}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+          <div style={{ overflowY: "auto", flex: 1, padding: "10px 12px" }}>
+            <form onSubmit={onFinalSubmit}>
 
           {/* CARD 1: QUALIFICATION */}
           <div style={{ background: "#fdfafc", border: "1px solid rgba(89,18,59,0.12)", borderRadius: "8px", padding: "10px 10px", marginBottom: "10px" }}>
@@ -208,9 +210,9 @@ function EducationinfoForm({
             {/* Table */}
             <div style={{ border: "1px solid #edf2f7", borderRadius: "6px", overflow: "hidden", background: "#ffffff" }}>
               <div className="row m-0 py-1 px-2 bg-light" style={{ borderBottom: "1px solid #edf2f7", fontSize: "0.62rem", fontWeight: "700", color: "#64748b" }}>
-                <div className="col-5">QUALIFICATION</div>
+                <div className="col-4">QUALIFICATION</div>
                 <div className="col-5">INSTITUTION</div>
-                <div className="col-2 text-end">ACTION</div>
+                <div className="col-3 text-center">ACTION</div>
               </div>
 
               {qualificationsList.length === 0 && editingQualIndex !== -1 && (
@@ -247,12 +249,12 @@ function EducationinfoForm({
                       </div>
                     </div>
                   ) : (
-                    <div className="row m-0 py-1.5 px-2 align-items-center bg-white" style={{ borderBottom: index < qualificationsList.length - 1 ? "1px solid #edf2f7" : "none" }}>
-                      <div className="col-5 fw-bold text-dark" style={{ fontSize: "0.78rem" }}>{item.qualification || "—"}</div>
+                    <div className="row m-0 py-1 px-2 align-items-center bg-white" style={{ borderBottom: index < qualificationsList.length - 1 ? "1px solid #edf2f7" : "none" }}>
+                      <div className="col-4 fw-bold text-dark" style={{ fontSize: "0.78rem" }}>{item.qualification || "—"}</div>
                       <div className="col-5 text-secondary" style={{ fontSize: "0.76rem" }}>{item.institution || "—"}</div>
-                      <div className="col-2 text-end d-flex gap-2 justify-content-end align-items-center">
-                        <FaPencilAlt size={11} style={{ color: "#59123B", cursor: "pointer" }} onClick={() => startEditQual(index)} title="Edit" />
-                        <FaTrashAlt size={11} style={{ color: "#dc2626", cursor: "pointer" }} onClick={() => deleteQual(index)} title="Delete" />
+                      <div className="col-3 text-center d-flex gap-3 justify-content-center align-items-center">
+                        <FaPencilAlt size={13} style={{ color: "#59123B", cursor: "pointer", padding: "4px", boxSizing: "content-box" }} onClick={() => startEditQual(index)} title="Edit" />
+                        <FaTrashAlt size={13} style={{ color: "#dc2626", cursor: "pointer", padding: "4px", boxSizing: "content-box" }} onClick={() => deleteQual(index)} title="Delete" />
                       </div>
                     </div>
                   )}
@@ -323,9 +325,9 @@ function EducationinfoForm({
             {/* Table */}
             <div style={{ border: "1px solid #edf2f7", borderRadius: "6px", overflow: "hidden", background: "#ffffff" }}>
               <div className="row m-0 py-1 px-2 bg-light" style={{ borderBottom: "1px solid #edf2f7", fontSize: "0.62rem", fontWeight: "700", color: "#64748b" }}>
-                <div className="col-5">OCCUPATION</div>
+                <div className="col-4">OCCUPATION</div>
                 <div className="col-5">COMPANY / EMPLOYER</div>
-                <div className="col-2 text-end">ACTION</div>
+                <div className="col-3 text-center">ACTION</div>
               </div>
 
               {occupationsList.length === 0 && editingOccIndex !== -1 && (
@@ -362,12 +364,12 @@ function EducationinfoForm({
                       </div>
                     </div>
                   ) : (
-                    <div className="row m-0 py-1.5 px-2 align-items-center bg-white" style={{ borderBottom: index < occupationsList.length - 1 ? "1px solid #edf2f7" : "none" }}>
-                      <div className="col-5 fw-bold text-dark" style={{ fontSize: "0.78rem" }}>{item.occupation || "—"}</div>
+                    <div className="row m-0 py-1 px-2 align-items-center bg-white" style={{ borderBottom: index < occupationsList.length - 1 ? "1px solid #edf2f7" : "none" }}>
+                      <div className="col-4 fw-bold text-dark" style={{ fontSize: "0.78rem" }}>{item.occupation || "—"}</div>
                       <div className="col-5 text-secondary" style={{ fontSize: "0.76rem" }}>{item.company || "—"}</div>
-                      <div className="col-2 text-end d-flex gap-2 justify-content-end align-items-center">
-                        <FaPencilAlt size={11} style={{ color: "#59123B", cursor: "pointer" }} onClick={() => startEditOcc(index)} title="Edit" />
-                        <FaTrashAlt size={11} style={{ color: "#dc2626", cursor: "pointer" }} onClick={() => deleteOcc(index)} title="Delete" />
+                      <div className="col-3 text-center d-flex gap-3 justify-content-center align-items-center">
+                        <FaPencilAlt size={13} style={{ color: "#59123B", cursor: "pointer", padding: "4px", boxSizing: "content-box" }} onClick={() => startEditOcc(index)} title="Edit" />
+                        <FaTrashAlt size={13} style={{ color: "#dc2626", cursor: "pointer", padding: "4px", boxSizing: "content-box" }} onClick={() => deleteOcc(index)} title="Delete" />
                       </div>
                     </div>
                   )}
@@ -403,8 +405,11 @@ function EducationinfoForm({
             </div>
           </div>
 
-          {/* FOOTER BUTTONS */}
-          <div className={style.modalFooter} style={{ padding: "6px 0 0 0", borderTop: "1px solid #f0f0f0" }}>
+            </form>
+          </div>
+
+          {/* FOOTER BUTTONS — always visible */}
+          <div className={style.modalFooter}>
             <button
               type="button"
               className={style.cancelBtn}
@@ -420,8 +425,7 @@ function EducationinfoForm({
               Save Changes
             </button>
           </div>
-
-        </form>
+        </div>
 
       </div>
     </div>

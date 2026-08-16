@@ -181,7 +181,9 @@ function FamilyinfoForm({
         </div>
 
         {/* Modal Form Body */}
-        <form style={{ padding: "10px 12px" }} onSubmit={(e) => e.preventDefault()}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+          <div style={{ overflowY: "auto", flex: 1, padding: "10px 12px" }}>
+            <form onSubmit={(e) => e.preventDefault()}>
           {/* Top Parent & Basic Family Details Section */}
           <div className="row g-1.5 mb-2">
             {/* Row 1: Father Name & Father Occupation */}
@@ -340,9 +342,11 @@ function FamilyinfoForm({
               isSister={true}
             />
           </div>
+            </form>
+          </div>
 
-          {/* Footer Actions */}
-          <div className={style.modalFooter} style={{ padding: "6px 0 0 0", borderTop: "1px solid #f0f0f0" }}>
+          {/* Footer Actions — always visible */}
+          <div className={style.modalFooter}>
             <button
               type="button"
               className={style.cancelBtn}
@@ -358,7 +362,7 @@ function FamilyinfoForm({
               Save Changes
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

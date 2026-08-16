@@ -2,8 +2,6 @@
    FORMS — ULTRA-COMPACT MOBILE & DESKTOP MODAL STYLES
    ============================================ */
 
-
-
 /* ---- Modal Backdrop ---- */
 .modalContainer {
   position: fixed;
@@ -14,9 +12,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 10005;
   overflow-y: auto;
-  padding: 10px 8px;
+  padding: 10px 8px 80px 8px;
 }
 
 /* ---- Modal Card ---- */
@@ -28,11 +26,12 @@
   box-shadow: 0 16px 45px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(89, 18, 59, 0.15);
   overflow: hidden;
-  max-height: 92vh;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
   animation: slideIn 0.18s ease;
   font-family: 'Plus Jakarta Sans', sans-serif;
+  margin: auto 0;
 }
 
 @keyframes slideIn {
@@ -79,11 +78,20 @@
   transform: scale(1.1);
 }
 
-/* ---- Modal Body ---- */
-.modalContent form,
-.modalContent > div:not(.modalHeader):not(.modalFooter) {
-  padding: 12px 14px;
-  overflow-y: auto;
+/* ---- Modal Body / Form Layout ---- */
+/* The flex wrapper (plain div) grows to fill available space */
+.modalContent > div:not([class]) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* form inside modalContent has no own scroll - the parent scrollable div handles it */
+.modalContent form {
+  margin: 0;
+  padding: 0;
 }
 
 /* ---- Labels ---- */
@@ -167,18 +175,20 @@
 .modalFooter {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  padding: 8px 14px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 14px;
   border-top: 1px solid #f0f0f0;
   flex-shrink: 0;
   background: #ffffff;
   position: sticky;
   bottom: 0;
-  z-index: 10;
+  z-index: 20;
+  box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.04);
 }
 
 .cancelBtn {
-  padding: 5px 14px;
+  padding: 6px 16px;
   background: #ffffff;
   border: 1px solid #d1d5db;
   border-radius: 6px;
@@ -196,7 +206,7 @@
 
 .modalFooter button,
 .saveBtn {
-  padding: 5px 18px;
+  padding: 6px 20px;
   background: linear-gradient(135deg, #59123B 0%, #3d0826 100%);
   color: #ffffff;
   border: none;
@@ -219,13 +229,13 @@
    ============================================ */
 @media (max-width: 576px) {
   .modalContainer {
-    padding: 6px 4px;
+    padding: 8px 4px calc(78px + env(safe-area-inset-bottom, 0px)) 4px;
     align-items: center;
   }
 
   .modalContent {
     width: 98vw;
-    max-height: 94vh;
+    max-height: calc(100dvh - 85px);
     border-radius: 10px;
   }
 
@@ -238,7 +248,7 @@
     letter-spacing: 0.01em;
   }
 
-  .modalContent form,
+  .modalContent form > div:not(.modalHeader):not(.modalFooter),
   .modalContent > div:not(.modalHeader):not(.modalFooter) {
     padding: 8px 10px;
   }
@@ -266,13 +276,13 @@
   }
 
   .modalFooter {
-    padding: 6px 10px;
+    padding: 8px 12px 12px;
   }
 
   .modalFooter button,
   .saveBtn,
   .cancelBtn {
-    padding: 5px 14px;
-    font-size: 0.74rem;
+    padding: 6px 16px;
+    font-size: 0.76rem;
   }
 }

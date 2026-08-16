@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
-const { generateToken } = require('../utils/utility');
+const bcrypt = require('bcrypt');
+const { generateToken, getNextMatrimonyId } = require('../utils/utility');
 const { optimizeImage } = require('../utils/imageOptimizer');
 const {
   getStories,
@@ -105,6 +106,94 @@ router.post('/login', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error.' });
   }
 });
+
+// POST /admin/signup & /admin/register (Add Member by Admin)
+const handleAdminAddMember = async (req, res) => {
+  try {
+    const {
+      firstName,
+      middleName,
+      lastName,
+      password,
+      dateOfBirth,
+      gender,
+      mobile,
+      email,
+      country,
+      state,
+      city,
+      countryCode,
+      profilefor,
+    } = req.body;
+
+    if (!firstName || !email || !mobile || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "First name, email, mobile, and password are required.",
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const safeEmailRegex = new RegExp(`^${cleanEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+
+    const existingUser = await User.findOne({
+      $or: [
+        { email: safeEmailRegex },
+        { email: cleanEmail },
+        { mobile: mobile.trim() }
+      ],
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists with this email or mobile number.",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const matrimoniId = await getNextMatrimonyId();
+
+    const user = await User.create({
+      martrId: matrimoniId,
+      firstName: firstName.trim(),
+      middleName: (middleName || "").trim(),
+      lastName: (lastName || "").trim(),
+      countryCode: countryCode || "+91",
+      mobile: mobile.trim(),
+      email: cleanEmail,
+      dateOfBirth: dateOfBirth || null,
+      gender: gender || "Male",
+      password: hashedPassword,
+      profilefor: profilefor || "Self",
+      isApproved: true,
+      isVerified: true,
+      isEnable: true,
+      isVisible: true,
+      address: {
+        country: country || "",
+        state: state || "",
+        city: city || "",
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Member added successfully!",
+      user,
+    });
+  } catch (error) {
+    console.error("Error adding member from admin:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to add member. Server error.",
+      error: error.message,
+    });
+  }
+};
+
+router.post('/signup', handleAdminAddMember);
+router.post('/register', handleAdminAddMember);
 
 // GET /admin/notifications
 router.get('/notifications', isAuth, sanitizeAdminUser, async (req, res) => {

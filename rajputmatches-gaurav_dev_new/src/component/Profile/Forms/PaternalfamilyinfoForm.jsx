@@ -169,7 +169,9 @@ function PaternalfamilyinfoForm({
         </div>
 
         {/* Modal Form Body */}
-        <form style={{ padding: "14px 18px" }} onSubmit={(e) => e.preventDefault()}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+          <div style={{ overflowY: "auto", flex: 1, padding: "14px 18px" }}>
+            <form onSubmit={(e) => e.preventDefault()}>
           
           {/* SECTION 1: PATERNAL GRANDPARENTS */}
           <div style={{ background: "#fdfafc", border: "1px solid rgba(89, 18, 59, 0.12)", borderRadius: "10px", padding: "12px 14px", marginBottom: "12px" }}>
@@ -398,9 +400,11 @@ function PaternalfamilyinfoForm({
               ⚠️ {error}
             </div>
           )}
+            </form>
+          </div>
 
-          {/* Footer Actions */}
-          <div className={style.modalFooter} style={{ padding: "8px 0 0 0", borderTop: "1px solid #f0f0f0" }}>
+          {/* Footer Actions — always visible */}
+          <div className={style.modalFooter}>
             <button
               type="button"
               className={style.cancelBtn}
@@ -417,7 +421,7 @@ function PaternalfamilyinfoForm({
             </button>
           </div>
 
-        </form>
+        </div>
       </div>
     </div>
   );

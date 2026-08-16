@@ -74,7 +74,9 @@ const ReligionForm = ({
         </div>
 
         {/* Modal Body */}
-        <form style={{ padding: "14px 18px" }} onSubmit={(e) => e.preventDefault()}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+          <div style={{ overflowY: "auto", flex: 1, padding: "14px 18px" }}>
+            <form onSubmit={(e) => e.preventDefault()}>
           <div className="row g-2 mb-2">
             {/* Birth Time */}
             <div className="col-md-6 col-12">
@@ -268,8 +270,11 @@ const ReligionForm = ({
             </div>
           </div>
 
-          {/* Footer Actions */}
-          <div className={style.modalFooter} style={{ padding: "8px 0 0 0", borderTop: "1px solid #f0f0f0" }}>
+            </form>
+          </div>
+
+          {/* Footer Actions — always visible */}
+          <div className={style.modalFooter}>
             <button
               type="button"
               className={style.cancelBtn}
@@ -285,7 +290,7 @@ const ReligionForm = ({
               Save Changes
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
