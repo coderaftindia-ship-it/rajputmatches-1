@@ -121,15 +121,20 @@ const ChatApp = () => {
   useEffect(() => { activeChatRef.current = activeChat; }, [activeChat]);
 
   /* ── Auto-scroll ── */
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     if (chatContainerRef.current) {
-      requestAnimationFrame(() => {
-        if (chatContainerRef.current) {
-          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
-      });
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, []);
+
+  useEffect(() => {
+    if (messages.length > 0 || activeChat) {
+      scrollToBottom();
+      const t1 = setTimeout(scrollToBottom, 50);
+      const t2 = setTimeout(scrollToBottom, 250);
+      return () => { clearTimeout(t1); clearTimeout(t2); };
+    }
+  }, [messages, activeChat, scrollToBottom]);
 
   /* ── Data Loaders (useCallback to prevent infinite re-render loops) ── */
   const loadMessages = useCallback(async (chatId, showLoading = false) => {
@@ -340,6 +345,7 @@ const ChatApp = () => {
 
         {/* Breadcrumb */}
         <div
+          className="chat-breadcrumbs"
           style={{
             padding: "8px 24px",
             background: "#fff",
