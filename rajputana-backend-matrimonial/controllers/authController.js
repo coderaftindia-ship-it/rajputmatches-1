@@ -79,7 +79,7 @@ exports.signup = async (req, res) => {
 
     if (existingUser) {
       return res.status(400).json({
-        message: "User already exists with this email or mobile",
+        message: "This Email ID or Mobile Number is already registered with us. Please Login instead.",
         success: false,
       });
     }
@@ -290,7 +290,23 @@ exports.sendVerification = async (req, res) => {
         .json({ message: "Email is required", success: false });
     }
 
-    let resp = await generateOTP(email);
+    const cleanEmail = email.trim().toLowerCase();
+    const safeEmailRegex = new RegExp(`^${cleanEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+
+    // Check if Email ID is already registered
+    const existingUser = await User.findOne({
+      $or: [{ email: safeEmailRegex }, { email: cleanEmail }]
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "This Email ID is already registered with us. Please Login instead.",
+        isAlreadyRegistered: true,
+        success: false,
+      });
+    }
+
+    let resp = await generateOTP(cleanEmail);
 
     if (!resp?.success) {
       return res.status(400).json({
