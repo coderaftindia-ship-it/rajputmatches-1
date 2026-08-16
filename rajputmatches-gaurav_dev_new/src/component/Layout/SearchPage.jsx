@@ -864,7 +864,7 @@ const SearchPage = () => {
   const activeFilterCount = filterKeys.filter(k => formData[k] && formData[k] !== "").length;
 
   /* ── Sidebar filter panel ── */
-  const FilterPanel = () => (
+  const renderFilterContent = () => (
     <div style={{
       background:"#FFFDF7",
       borderRadius:"18px",
@@ -1141,7 +1141,7 @@ const SearchPage = () => {
           <AnimatePresence>
             {mobileFilter && (
               <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:"auto" }} exit={{ opacity:0, height:0 }} style={{ overflow:"hidden", marginTop:"12px" }}>
-                <FilterPanel/>
+                {renderFilterContent()}
               </motion.div>
             )}
           </AnimatePresence>
@@ -1152,7 +1152,7 @@ const SearchPage = () => {
 
           {/* LEFT: Filter Sidebar (desktop) */}
           <div className="d-none d-md-block" style={{ width:"270px", flexShrink:0 }}>
-            <FilterPanel/>
+            {renderFilterContent()}
           </div>
 
           {/* RIGHT: Results */}
