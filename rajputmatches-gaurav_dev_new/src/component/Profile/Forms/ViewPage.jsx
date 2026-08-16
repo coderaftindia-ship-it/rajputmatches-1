@@ -346,29 +346,55 @@ const getHoroscopeItems = (horoObj, fallbackDob) => {
   const validDob = (fallbackDob && fallbackDob !== "N/A" && fallbackDob !== "Not Specified") ? fallbackDob : null;
 
   if (horoObj && typeof horoObj === "object") {
-    const entries = Object.entries(horoObj).filter(
-      ([k]) => !["_id", "__v", "userId"].includes(k)
-    );
+    // 1. Date of Birth
+    const rawDob = horoObj.dateOfBirth?.trim();
+    const finalDob = (rawDob && rawDob !== "N/A" && rawDob !== "Not Specified") ? rawDob : validDob;
+    if (finalDob) {
+      items.push({
+        key: "dateOfBirth",
+        label: "Date Of Birth",
+        value: finalDob,
+      });
+    }
 
-    let dobAdded = false;
+    // 2. Combine Birth Time (birthHour, birthMinute, birthTimePeriod)
+    const hour = horoObj.birthHour ? String(horoObj.birthHour).trim() : "";
+    const minute = horoObj.birthMinute ? String(horoObj.birthMinute).trim() : "";
+    const period = horoObj.birthTimePeriod ? String(horoObj.birthTimePeriod).trim() : "";
 
-    entries.forEach(([key, val]) => {
+    if (hour || minute || period) {
+      const formattedHour = hour ? hour.padStart(2, "0") : "00";
+      const formattedMin = minute ? minute.padStart(2, "0") : "00";
+      const timeStr = `${formattedHour}:${formattedMin} ${period}`.trim();
+      if (timeStr && timeStr !== "00:00") {
+        items.push({
+          key: "birthTime",
+          label: "Birth Time",
+          value: timeStr,
+        });
+      }
+    }
+
+    // 3. Process remaining keys (excluding religion, clan, subclan, rashi, zodiac, additionalInfo, time parts, dob, _id, etc.)
+    const excludedKeys = [
+      "_id", "__v", "userId", "religion",
+      "dateOfBirth", "birthHour", "birthMinute", "birthTimePeriod",
+      "clan", "subclan", "rashi", "zodiac", "additionalInfo"
+    ];
+
+    Object.entries(horoObj).forEach(([key, val]) => {
+      if (excludedKeys.includes(key)) return;
+
       let finalVal = val && typeof val === "string" ? val.trim() : val;
 
-      if (key === "dateOfBirth") {
-        if (!finalVal || finalVal === "N/A" || finalVal === "Not Specified") {
-          finalVal = validDob;
-        }
-        if (finalVal) dobAdded = true;
-      }
-
-      // Filter out empty, N/A, Not Specified
-      if (!finalVal || finalVal === "N/A" || finalVal === "Not Specified") {
+      // Filter out empty, N/A, Not Specified, "No additional info"
+      if (!finalVal || finalVal === "N/A" || finalVal === "Not Specified" || finalVal === "No additional info") {
         return;
       }
 
       let label = key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
       if (key === "maglik") label = "Manglik Status";
+      if (key === "birthplace") label = "Birthplace";
 
       items.push({
         key,
@@ -376,14 +402,6 @@ const getHoroscopeItems = (horoObj, fallbackDob) => {
         value: String(finalVal),
       });
     });
-
-    if (!dobAdded && validDob) {
-      items.unshift({
-        key: "dateOfBirth",
-        label: "Date Of Birth",
-        value: validDob,
-      });
-    }
   } else if (validDob) {
     items.push({
       key: "dateOfBirth",
