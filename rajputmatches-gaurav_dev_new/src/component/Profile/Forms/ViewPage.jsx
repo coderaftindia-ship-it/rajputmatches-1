@@ -38,6 +38,8 @@ import {
   FaCopy,
   FaInfoCircle,
   FaFileAlt,
+  FaUserTie,
+  FaSmile,
 } from "react-icons/fa";
 
 import { useAuth } from "../../Layout/AuthContext";
@@ -219,6 +221,178 @@ const formatArrayValue = (key, val) => {
   }
   // generic string array (e.g. hobbies)
   return val.join(", ") || "N/A";
+};
+
+// Helper: build clean structured items for Career & Education section
+const getCareerAndEducationItems = (profDetails) => {
+  if (!profDetails) return [];
+  const items = [];
+
+  // Qualifications List or fallback single fields
+  const hasQualList = Array.isArray(profDetails.qualificationsList) && profDetails.qualificationsList.length > 0;
+  if (hasQualList) {
+    profDetails.qualificationsList.forEach((q, idx) => {
+      const numTag = profDetails.qualificationsList.length > 1 ? ` #${idx + 1}` : "";
+      if (q?.qualification && q.qualification.trim() && q.qualification !== "N/A") {
+        items.push({
+          key: `qual-${idx}`,
+          icon: <FaGraduationCap />,
+          label: `Qualifications${numTag}`,
+          value: q.qualification.trim(),
+        });
+      }
+      if (q?.institution && q.institution.trim() && q.institution !== "N/A") {
+        items.push({
+          key: `inst-${idx}`,
+          icon: <FaBuilding />,
+          label: `Institution${numTag}`,
+          value: q.institution.trim(),
+        });
+      }
+    });
+  } else {
+    if (profDetails.qualifications && profDetails.qualifications.trim() && profDetails.qualifications !== "N/A") {
+      items.push({
+        key: "qual-single",
+        icon: <FaGraduationCap />,
+        label: "Qualifications",
+        value: profDetails.qualifications.trim(),
+      });
+    }
+    if (profDetails.institution && profDetails.institution.trim() && profDetails.institution !== "N/A") {
+      items.push({
+        key: "inst-single",
+        icon: <FaBuilding />,
+        label: "Institution",
+        value: profDetails.institution.trim(),
+      });
+    }
+  }
+
+  // Occupations List or fallback single fields
+  const hasOccList = Array.isArray(profDetails.occupationsList) && profDetails.occupationsList.length > 0;
+  if (hasOccList) {
+    profDetails.occupationsList.forEach((o, idx) => {
+      const numTag = profDetails.occupationsList.length > 1 ? ` #${idx + 1}` : "";
+      if (o?.occupation && o.occupation.trim() && o.occupation !== "N/A") {
+        items.push({
+          key: `occ-${idx}`,
+          icon: <FaBriefcase />,
+          label: `Current Role${numTag}`,
+          value: o.occupation.trim(),
+        });
+      }
+      if ((o?.company || o?.salary) && ((o?.company && o.company !== "N/A") || (o?.salary && o.salary !== "N/A"))) {
+        const valParts = [o.company, o.salary].filter(v => v && v.trim() && v !== "N/A");
+        if (valParts.length > 0) {
+          items.push({
+            key: `comp-${idx}`,
+            icon: <FaBuilding />,
+            label: `Company${numTag}`,
+            value: valParts.join(" — "),
+          });
+        }
+      }
+    });
+  } else {
+    if (profDetails.professional && profDetails.professional.trim() && profDetails.professional !== "N/A") {
+      items.push({
+        key: "occ-single",
+        icon: <FaBriefcase />,
+        label: "Current Role",
+        value: profDetails.professional.trim(),
+      });
+    }
+    if ((profDetails.company || profDetails.annualIncome) && ((profDetails.company && profDetails.company !== "N/A") || (profDetails.annualIncome && profDetails.annualIncome !== "N/A"))) {
+      const valParts = [profDetails.company, profDetails.annualIncome].filter(v => v && v.trim() && v !== "N/A");
+      if (valParts.length > 0) {
+        items.push({
+          key: "comp-single",
+          icon: <FaBuilding />,
+          label: "Company / Income",
+          value: valParts.join(" — "),
+        });
+      }
+    }
+  }
+
+  if (profDetails.class && profDetails.class.trim() && profDetails.class !== "N/A") {
+    items.push({
+      key: "class",
+      icon: <FaUserTie />,
+      label: "Class",
+      value: profDetails.class.trim(),
+    });
+  }
+
+  if (profDetails.hobbies && Array.isArray(profDetails.hobbies) && profDetails.hobbies.length > 0) {
+    const hobbiesStr = profDetails.hobbies.filter(h => h && h.trim() && h !== "N/A").join(", ");
+    if (hobbiesStr) {
+      items.push({
+        key: "hobbies",
+        icon: <FaSmile />,
+        label: "Hobbies & Interests",
+        value: hobbiesStr,
+      });
+    }
+  }
+
+  return items;
+};
+
+// Helper: build clean structured items for Zodiac & Horoscope section
+const getHoroscopeItems = (horoObj, fallbackDob) => {
+  const items = [];
+  const validDob = (fallbackDob && fallbackDob !== "N/A" && fallbackDob !== "Not Specified") ? fallbackDob : null;
+
+  if (horoObj && typeof horoObj === "object") {
+    const entries = Object.entries(horoObj).filter(
+      ([k]) => !["_id", "__v", "userId"].includes(k)
+    );
+
+    let dobAdded = false;
+
+    entries.forEach(([key, val]) => {
+      let finalVal = val && typeof val === "string" ? val.trim() : val;
+
+      if (key === "dateOfBirth") {
+        if (!finalVal || finalVal === "N/A" || finalVal === "Not Specified") {
+          finalVal = validDob;
+        }
+        if (finalVal) dobAdded = true;
+      }
+
+      // Filter out empty, N/A, Not Specified
+      if (!finalVal || finalVal === "N/A" || finalVal === "Not Specified") {
+        return;
+      }
+
+      let label = key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
+      if (key === "maglik") label = "Manglik Status";
+
+      items.push({
+        key,
+        label,
+        value: String(finalVal),
+      });
+    });
+
+    if (!dobAdded && validDob) {
+      items.unshift({
+        key: "dateOfBirth",
+        label: "Date Of Birth",
+        value: validDob,
+      });
+    }
+  } else if (validDob) {
+    items.push({
+      key: "dateOfBirth",
+      label: "Date Of Birth",
+      value: validDob,
+    });
+  }
+
+  return items;
 };
 
 // ─────────────────────────────────────────────────
@@ -798,60 +972,71 @@ const ViewPage = () => {
                           animate="visible"
                           className={styles.detailsList}
                         >
-                          {Object.keys(formData).map((key) => {
-                            // Backend already returns masked/unmasked values based on request status
-                            // So we just use formData[key] directly
-                            const val = formData[key] || "N/A";
-                      const isReqAccepted = Data?.contactRequestStatus === "accepted";
-                      const hasFullContact = isReqAccepted;
-                            
-                            const cfg = basicDetailsConfig[key] || {
-                              label: key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()),
-                              icon: <FaUser />,
-                            };
-                            
-                            return (
-                              <motion.div key={key} variants={itemVariants}>
-                                <DetailRow 
-                                  icon={cfg.icon} 
-                                  label={cfg.label} 
-                                  value={val} 
-                                  isLockedContact={!hasFullContact && (key === "mobile" || key === "email")}
-                                  contactRequestStatus={Data?.contactRequestStatus}
-                                  onRequestAccess={handleRequestDetails}
-                                />
-                              </motion.div>
-                            );
-                          })}
+                          {Object.keys(formData)
+                            .filter((key) => {
+                              const isReqAccepted = Data?.contactRequestStatus === "accepted";
+                              const hasFullContact = isReqAccepted;
+                              const isLockedContact = (!hasFullContact && (key === "mobile" || key === "email"));
+                              if (isLockedContact) return true;
+                              const val = formData[key];
+                              return val && val !== "N/A" && val !== "Not Specified" && String(val).trim() !== "";
+                            })
+                            .map((key) => {
+                              const val = formData[key];
+                              const isReqAccepted = Data?.contactRequestStatus === "accepted";
+                              const hasFullContact = isReqAccepted;
+                              
+                              const cfg = basicDetailsConfig[key] || {
+                                label: key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()),
+                                icon: <FaUser />,
+                              };
+                              
+                              return (
+                                <motion.div key={key} variants={itemVariants}>
+                                  <DetailRow 
+                                    icon={cfg.icon} 
+                                    label={cfg.label} 
+                                    value={val} 
+                                    isLockedContact={!hasFullContact && (key === "mobile" || key === "email")}
+                                    contactRequestStatus={Data?.contactRequestStatus}
+                                    onRequestAccess={handleRequestDetails}
+                                  />
+                                </motion.div>
+                              );
+                            })}
                         </motion.div>
 
                         {/* CAREER & EDUCATION */}
                         <div style={{ marginTop: "30px" }}>
                           <SectionRibbon>Career &amp; Education</SectionRibbon>
-                          {hasCareer ? (
-                            <motion.div
-                              variants={listVariants}
-                              initial="hidden"
-                              animate="visible"
-                              className={styles.detailsList}
-                            >
-                              {Object.entries(Data.profdetailsId)
-                                .filter(([k]) => !["_id", "__v", "userId"].includes(k))
-                                .map(([key, val]) => (
-                                  <motion.div key={key} variants={itemVariants}>
-                                    <DetailRow
-                                      icon={getEducationIcon(key)}
-                                      label={key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
-                                      value={Array.isArray(val) ? formatArrayValue(key, val) : val?.trim ? (val?.trim() ? val : "N/A") : (val != null ? String(val) : "N/A")}
-                                    />
-                                  </motion.div>
-                                ))}
-                            </motion.div>
-                          ) : (
-                            <p style={{ color: "var(--text-soft)", fontStyle: "italic", textAlign: "center", padding: "20px" }}>
-                              Career details have not been updated yet.
-                            </p>
-                          )}
+                          {(() => {
+                            const careerItems = getCareerAndEducationItems(Data.profdetailsId);
+                            if (careerItems.length > 0) {
+                              return (
+                                <motion.div
+                                  variants={listVariants}
+                                  initial="hidden"
+                                  animate="visible"
+                                  className={styles.detailsList}
+                                >
+                                  {careerItems.map((item) => (
+                                    <motion.div key={item.key} variants={itemVariants}>
+                                      <DetailRow
+                                        icon={item.icon}
+                                        label={item.label}
+                                        value={item.value}
+                                      />
+                                    </motion.div>
+                                  ))}
+                                </motion.div>
+                              );
+                            }
+                            return (
+                              <p style={{ color: "var(--text-soft)", fontStyle: "italic", textAlign: "center", padding: "20px" }}>
+                                Career details have not been updated yet.
+                              </p>
+                            );
+                          })()}
                         </div>
 
                         {/* ABOUT ME */}
@@ -903,30 +1088,34 @@ const ViewPage = () => {
                         transition={{ duration: 0.15 }}
                       >
                         <SectionRibbon>Zodiac &amp; Horoscope Details</SectionRibbon>
-                        {hasHoroscope ? (
-                          <motion.div
-                            variants={listVariants}
-                            initial="hidden"
-                            animate="visible"
-                            className={styles.astroGrid}
-                          >
-                            {Object.entries(Data.HoroscopicId)
-                              .filter(([k]) => !["_id", "__v", "userId"].includes(k))
-                              .map(([key, val]) => (
-                                <motion.div key={key} variants={itemVariants}>
-                                  <DetailRow
-                                    icon={getHoroscopeIcon(key)}
-                                    label={key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
-                                    value={val || "N/A"}
-                                  />
-                                </motion.div>
-                              ))}
-                          </motion.div>
-                        ) : (
-                          <p style={{ color: "var(--text-soft)", fontStyle: "italic", textAlign: "center", padding: "40px" }}>
-                            Horoscope details are not provided for this profile.
-                          </p>
-                        )}
+                        {(() => {
+                          const horoItems = getHoroscopeItems(Data.HoroscopicId, formData.dateOfBirth);
+                          if (horoItems.length > 0) {
+                            return (
+                              <motion.div
+                                variants={listVariants}
+                                initial="hidden"
+                                animate="visible"
+                                className={styles.astroGrid}
+                              >
+                                {horoItems.map((item) => (
+                                  <motion.div key={item.key} variants={itemVariants}>
+                                    <DetailRow
+                                      icon={getHoroscopeIcon(item.key)}
+                                      label={item.label}
+                                      value={item.value}
+                                    />
+                                  </motion.div>
+                                ))}
+                              </motion.div>
+                            );
+                          }
+                          return (
+                            <p style={{ color: "var(--text-soft)", fontStyle: "italic", textAlign: "center", padding: "40px" }}>
+                              Horoscope details are not provided for this profile.
+                            </p>
+                          );
+                        })()}
                       </motion.div>
                     )}
 
@@ -1584,41 +1773,45 @@ const ViewPage = () => {
                     })}
                   </div>
 
-                  {hasHoroscope && (
-                    <div style={{ marginTop: "24px" }}>
-                      <SectionRibbon>Horoscope &amp; Astrology</SectionRibbon>
-                      <div className={styles.detailsList}>
-                        {Object.entries(Data.HoroscopicId)
-                          .filter(([k]) => !["_id", "__v", "userId"].includes(k))
-                          .map(([key, val]) => (
+                  {(() => {
+                    const horoItems = getHoroscopeItems(Data.HoroscopicId, formData.dateOfBirth);
+                    if (horoItems.length === 0) return null;
+                    return (
+                      <div style={{ marginTop: "24px" }}>
+                        <SectionRibbon>Horoscope &amp; Astrology</SectionRibbon>
+                        <div className={styles.detailsList}>
+                          {horoItems.map((item) => (
                             <DetailRow
-                              key={key}
-                              icon={getHoroscopeIcon(key)}
-                              label={key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
-                              value={val || "N/A"}
+                              key={item.key}
+                              icon={getHoroscopeIcon(item.key)}
+                              label={item.label}
+                              value={item.value}
                             />
                           ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
-                  {hasCareer && (
-                    <div style={{ marginTop: "24px" }}>
-                      <SectionRibbon>Career &amp; Education</SectionRibbon>
-                      <div className={styles.detailsList}>
-                        {Object.entries(Data.profdetailsId)
-                          .filter(([k]) => !["_id", "__v", "userId"].includes(k))
-                          .map(([key, val]) => (
+                  {(() => {
+                    const careerItems = getCareerAndEducationItems(Data.profdetailsId);
+                    if (careerItems.length === 0) return null;
+                    return (
+                      <div style={{ marginTop: "24px" }}>
+                        <SectionRibbon>Career &amp; Education</SectionRibbon>
+                        <div className={styles.detailsList}>
+                          {careerItems.map((item) => (
                             <DetailRow
-                              key={key}
-                              icon={getEducationIcon(key)}
-                              label={key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
-                              value={Array.isArray(val) ? formatArrayValue(key, val) : val?.trim ? (val?.trim() ? val : "N/A") : (val != null ? String(val) : "N/A")}
+                              key={item.key}
+                              icon={item.icon}
+                              label={item.label}
+                              value={item.value}
                             />
                           ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </div>
 
                 {/* Right side portrait block */}
