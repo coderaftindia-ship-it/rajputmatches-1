@@ -373,12 +373,7 @@ function Mydetails() {
   // Change Handlers with Validation matching originals
   const handleBasicChange = (e) => {
     const { name, value } = e.target;
-    if (value.length > 25) {
-      setBasicError("Input cannot exceed 25 characters.");
-      return;
-    } else {
-      setBasicError("");
-    }
+    setBasicError("");
 
     if (name === "clan") {
       setBasicFormData((prev) => ({

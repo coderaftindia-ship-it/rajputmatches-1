@@ -147,12 +147,7 @@ function BasicInfo() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (value.length > 25) {
-      setError("Input cannot exceed 25 characters.");
-      return;
-    } else {
-      setError("");
-    }
+    setError("");
 
     if (name === "heightFeet" || name === "heightInch") {
       setFormData((prev) => ({
