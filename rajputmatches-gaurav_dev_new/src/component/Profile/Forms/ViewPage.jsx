@@ -622,7 +622,7 @@ const ViewPage = () => {
     weight:        { label: "Weight",                 icon: <FaWeight /> },
     maritalStatus: { label: "Marital Status",         icon: <FaHeart /> },
     address:       { label: "Current Address",        icon: <FaMapMarkerAlt /> },
-    profileFor:    { label: "Profile Created For",    icon: <FaUserCheck /> },
+    profileFor:    { label: "Profile Created By",    icon: <FaUserCheck /> },
   };
 
   const getHoroscopeIcon = (key) => {
