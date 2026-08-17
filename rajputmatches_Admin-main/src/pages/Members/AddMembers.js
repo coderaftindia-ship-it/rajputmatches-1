@@ -25,37 +25,7 @@ function AddMembers() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Trimmed fields list
-    const trimmedFields = [
-      "firstName",
-      "middleName",
-      "lastName",
-      "gender",
-      "city",
-      "state",
-      "country",
-    ];
-
-    let newValue = trimmedFields.includes(name) ? value.trim() : value;
-
-    const regexRules = {
-      firstName: /^[a-zA-Z ]{0,20}$/,
-      middleName: /^[a-zA-Z ]{0,20}$/,
-      lastName: /^[a-zA-Z ]{0,20}$/,
-      password: /^.{0,20}$/,
-      dateOfBirth: /^\d{4}-\d{2}-\d{2}$/,
-      gender: /^(Male|Female|Other)?$/,
-      mobile: /^[0-9]{0,15}$/,
-      email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      country: /^[a-zA-Z ]{0,20}$/,
-      state: /^[a-zA-Z ]{0,20}$/,
-      city: /^[a-zA-Z ]{0,20}$/,
-    };
-
-    if (name === "email" || (regexRules[name] && regexRules[name].test(newValue))) {
-      setFormData({ ...formData, [name]: newValue });
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   useEffect(() => {

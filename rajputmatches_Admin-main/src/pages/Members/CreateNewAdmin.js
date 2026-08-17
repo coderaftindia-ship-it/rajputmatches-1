@@ -13,7 +13,7 @@ function CreateNewAdmin() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value.trim() });
+    setFormData({ ...formData, [name]: value });
   };
 
   const togglePasswordVisibility = () => {
@@ -23,9 +23,13 @@ function CreateNewAdmin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const route = "register";
-    // console.log("Form Data Submitted:", formData);
+    const payload = {
+      ...formData,
+      email: formData.email ? formData.email.trim() : "",
+      password: formData.password ? formData.password.trim() : "",
+    };
     try {
-      await updateData(route, formData);
+      await updateData(route, payload);
     } catch (error) {
       console.error("Error during registration:", error);
     }
