@@ -8,7 +8,6 @@ import Profilenavbar from "../Profile/ProfileComp/Profilenavbar";
 import Footer from "./Footer";
 
 // Assets
-import border from "../../assets/images/Aboutusborder.js.png";
 import imageAbout from "../../assets/images/imageAbout.jpg";
 import imageAbout2 from "../../assets/images/imageAbout2.jpg";
 import royalimg from "../../assets/images/royalimg.jpg";
@@ -488,14 +487,6 @@ function About() {
             </div>
           </motion.div>
 
-          {/* Ornamental Divider */}
-          <div className="text-center my-5">
-            <img
-              src={border}
-              alt="Decorative Gold Divider"
-              style={{ width: "100%", maxWidth: "700px", opacity: 0.75 }}
-            />
-          </div>
 
           {/* Section: Why Rajput Alliance? */}
           <motion.div

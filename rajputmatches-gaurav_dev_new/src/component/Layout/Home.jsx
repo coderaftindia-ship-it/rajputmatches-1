@@ -54,7 +54,7 @@ function Home() {
       {/* Above-fold: loads immediately */}
       <Banner />
       <MatchMakingSection />
-      <FeatureSection />
+      {/* <FeatureSection /> */}
 
       {/* Below-fold: deferred until near viewport */}
       <LazySection><RecentAddedPage /></LazySection>

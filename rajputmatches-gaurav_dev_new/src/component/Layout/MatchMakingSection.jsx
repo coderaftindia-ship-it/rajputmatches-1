@@ -1,6 +1,5 @@
 import React from "react";
 import herobg from "../../assets/images/matchmakingbg.jpeg";
-import border from "../../assets/images/border.png";
 import { Link } from "react-router-dom";
 import { FaCrown, FaCheckCircle, FaStar, FaShieldAlt } from "react-icons/fa";
 import { useAuth } from "./AuthContext";
@@ -223,18 +222,6 @@ const MatchmakingSection = () => {
           </div>
         </div>
 
-        {/* Decorative Traditional Border Underneath */}
-        <div className="text-center mt-3 mt-md-5 pt-2 pt-md-4 matchmaking-border-img">
-          <img
-            width="900"
-            height="12"
-            loading="lazy"
-            decoding="async"
-            style={{ width: "100%", maxWidth: "900px", height: "auto", opacity: 0.8 }}
-            src={border}
-            alt="Decorative border"
-          />
-        </div>
       </div>
     </div>
   );
