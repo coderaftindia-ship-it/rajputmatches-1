@@ -35,6 +35,7 @@ import EditStory from "./pages/Success/EditStory";
 import AddStory from "./pages/Success/AddStory";
 import Contactus from "./pages/Contact/Contactus";
 import Reports from "./pages/Reports";
+import UserReports from "./pages/UserReports";
 import HappyFace from "./pages/HappyFace/HappyFace";
 import ManageAboutUs from "./pages/Other/ManageAboutUs";
 import ManageHomeCMS from "./pages/Other/ManageHomeCMS";
@@ -113,6 +114,7 @@ const ProtectedRoutes = () => (
 
     <Route path="Contact/Contactus" element={<Contactus />} />
     <Route path="Reports" element={<Reports />} />
+    <Route path="User-Reports" element={<UserReports />} />
     <Route path="HappyFace" element={<HappyFace />} />
     <Route path="About/ManageAboutUs" element={<ManageAboutUs />} />
     <Route path="Home/ManageHomeCMS" element={<ManageHomeCMS />} />

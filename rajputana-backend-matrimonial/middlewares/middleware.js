@@ -171,6 +171,10 @@ const isAuth = async (req, res, next) => {
       return res.status(403).json({ message: "Your account has been deleted." });
     }
 
+    if (user.role !== "admin" && user.isbloacked === true) {
+      return res.status(403).json({ message: "Your account has been blocked by Admin. Please contact support." });
+    }
+
     if (user.role !== "admin" && !user.isApproved) {
       return res.status(403).json({ message: "Khama Ghani, Hukum! Thank you for registering with Rajput Alliances. We will verify your account and email you once it is approved, so you can log in and create your profile." });
     }

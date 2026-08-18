@@ -532,6 +532,8 @@ const FreeMembers = () => {
                   <th>Approval</th>
                   <th>Status</th>
                   <th>Verified</th>
+                  <th>Created Date</th>
+                  <th>Last Login</th>
                   <th onClick={() => toggleSort("view")}>
                     Views <SortIcon field="view" />
                   </th>
@@ -647,6 +649,16 @@ const FreeMembers = () => {
                         ) : (
                           <span className="badge-unverified">❌ Unverified</span>
                         )}
+                      </td>
+
+                      {/* creation date */}
+                      <td style={{ fontSize: ".78rem", color: "#666" }}>
+                        {member.createdAt ? new Date(member.createdAt).toLocaleDateString() : "—"}
+                      </td>
+
+                      {/* last login */}
+                      <td style={{ fontSize: ".78rem", color: "#666" }}>
+                        {member.lastLoginAt ? new Date(member.lastLoginAt).toLocaleDateString() : "—"}
                       </td>
 
                       {/* views */}

@@ -178,6 +178,108 @@ function ViewMember() {
     }
   };
 
+  /* PDF Download Handler */
+  const handleDownloadPdf = () => {
+    if (!member) return;
+    const printWindow = window.open("", "_blank");
+    const avatar = getAvatarUrl(photos[imgIndex]?.url || member.avatar) || "";
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Biodata - ${member.firstName || ""} ${member.lastName || ""} (ID: ${member.martrId || ""})</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+            body { font-family: 'Inter', sans-serif; color: #3d1a2b; margin: 0; padding: 24px; background: #fff; }
+            .header { text-align: center; border-bottom: 3px double #D4AF37; padding-bottom: 15px; margin-bottom: 25px; }
+            .header h1 { font-family: 'Playfair Display', serif; color: #59123B; margin: 0 0 5px 0; font-size: 26px; text-transform: uppercase; letter-spacing: 1px; }
+            .header p { color: #888; font-size: 13px; margin: 0; font-weight: 600; }
+            .profile-box { display: flex; gap: 20px; align-items: center; background: #fdfaf7; border: 1.5px solid #f0e2d5; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
+            .profile-img { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #D4AF37; object-fit: cover; }
+            .profile-info h2 { font-family: 'Playfair Display', serif; color: #59123B; margin: 0 0 8px 0; font-size: 22px; }
+            .profile-info p { margin: 4px 0; font-size: 14px; color: #555; }
+            .section-title { font-family: 'Playfair Display', serif; color: #59123B; font-size: 16px; font-weight: 700; border-bottom: 2px solid #59123B; padding-bottom: 5px; margin: 20px 0 12px 0; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+            .grid-item { font-size: 13px; }
+            .label { font-weight: 600; color: #888; text-transform: uppercase; font-size: 11px; display: block; margin-bottom: 2px; }
+            .value { font-weight: 700; color: #3d1a2b; font-size: 14px; }
+            .footer { text-align: center; margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px; font-size: 12px; color: #999; }
+            @media print {
+              body { padding: 0; }
+              @page { margin: 1.5cm; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Rajput Alliances</h1>
+            <p>MATRIMONIAL BIODATA &bull; CONFIDENTIAL</p>
+          </div>
+
+          <div class="profile-box">
+            ${avatar ? `<img src="${avatar}" class="profile-img" />` : `<div class="profile-img" style="display:flex;align-items:center;justify-content:center;background:#59123B;color:#fff;font-size:32px;font-weight:700;">${(member.firstName?.[0] || "")}${(member.lastName?.[0] || "")}</div>`}
+            <div class="profile-info">
+              <h2>${member.firstName || ""} ${member.middleName || ""} ${member.lastName || ""}</h2>
+              <p><strong>Matrimony ID:</strong> ${member.martrId || "N/A"}</p>
+              <p><strong>Profile Created for:</strong> ${member.profilefor || "Self"}</p>
+              <p><strong>Age / Gender:</strong> ${getAge(member.dateOfBirth)} Yrs &bull; ${member.gender || "N/A"}</p>
+              <p><strong>Height:</strong> ${formatHeight(member.height)}</p>
+            </div>
+          </div>
+
+          <div class="section-title">Personal & Contact Details</div>
+          <div class="grid">
+            <div class="grid-item"><span class="label">Date of Birth</span><span class="value">${formatDate(member.dateOfBirth)}</span></div>
+            <div class="grid-item"><span class="label">Marital Status</span><span class="value">${member.maritalStatus || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Email Address</span><span class="value">${member.email || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Mobile Number</span><span class="value">${member.mobile || "N/A"}</span></div>
+            <div class="grid-item" style="grid-column: span 2;"><span class="label">Address</span><span class="value">${getFullAddress(member.address)}</span></div>
+          </div>
+
+          <div class="section-title">Career & Education</div>
+          <div class="grid">
+            <div class="grid-item"><span class="label">Highest Education</span><span class="value">${Array.isArray(profInfo.highestDegree) ? profInfo.highestDegree.join(", ") : profInfo.highestDegree || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Occupation</span><span class="value">${profInfo.occupation || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Annual Income</span><span class="value">${profInfo.annualIncome || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Organization</span><span class="value">${profInfo.organizationName || "N/A"}</span></div>
+          </div>
+
+          <div class="section-title">Family Background & Gotra Info</div>
+          <div class="grid">
+            <div class="grid-item"><span class="label">Father's Name</span><span class="value">${familyInfo.fatherName || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Father's Occupation</span><span class="value">${familyInfo.occupation || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Father's Native Place</span><span class="value">${familyInfo.fatherNativePlace || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Mother's Name</span><span class="value">${familyInfo.motherName || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Mother's Native Place</span><span class="value">${familyInfo.motherNativePlace || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Maternal (Nani) Gotra</span><span class="value">${familyInfo.maternalGotra || "N/A"}</span></div>
+          </div>
+
+          <div class="section-title">Horoscope & Astro Information</div>
+          <div class="grid">
+            <div class="grid-item"><span class="label">Birth Place</span><span class="value">${horoInfo.birthPlace || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Birth Time</span><span class="value">${horoInfo.birthTime || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Manglik Status</span><span class="value">${horoInfo.isManglik || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Rashi / Nakshatra</span><span class="value">${horoInfo.rashi || "N/A"} / ${horoInfo.nakshatra || "N/A"}</span></div>
+          </div>
+
+          <div class="footer">
+            Generated on ${new Date().toLocaleDateString()} &bull; Rajput Alliances Matrimonial Portal
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
   if (loading) {
     return (
       <div className="main-content">
@@ -448,9 +550,18 @@ function ViewMember() {
 
       {/* ── HEADER NAVIGATION & GENERAL CONTROLS ── */}
       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <Link to="/Members/Free-Members" className="btn btn-royal-outline d-inline-flex align-items-center gap-2">
-          <FaArrowLeft /> Back to Members list
-        </Link>
+        <div className="d-flex gap-2">
+          <Link to="/Members/Free-Members" className="btn btn-royal-outline d-inline-flex align-items-center gap-2">
+            <FaArrowLeft /> Back to Members list
+          </Link>
+          <button
+            onClick={handleDownloadPdf}
+            className="btn d-inline-flex align-items-center gap-2"
+            style={{ background: "#59123B", color: "#D4AF37", border: "1px solid #D4AF37", borderRadius: "10px", fontWeight: 700, padding: "10px 18px" }}
+          >
+            <FaDownload /> Download Biodata (PDF)
+          </button>
+        </div>
         <div className="action-button-panel">
           <button
             onClick={handleApproveStatus}
@@ -599,6 +710,18 @@ function ViewMember() {
                     <div className="royal-grid-item">
                       <div className="royal-item-lbl"><FaUsers /> Family Thikana</div>
                       <div className="royal-item-val">{familyInfo.familyLocation || member.address?.city || "N/A"}</div>
+                    </div>
+                  </div>
+                  <div className="col-md-6 col-lg-4 mb-3">
+                    <div className="royal-grid-item">
+                      <div className="royal-item-lbl"><FaCalendarAlt /> Account Created</div>
+                      <div className="royal-item-val">{member.createdAt ? formatDate(member.createdAt) : "N/A"}</div>
+                    </div>
+                  </div>
+                  <div className="col-md-6 col-lg-4 mb-3">
+                    <div className="royal-grid-item">
+                      <div className="royal-item-lbl"><FaHistory /> Last Login</div>
+                      <div className="royal-item-val">{member.lastLoginAt ? formatDate(member.lastLoginAt) : "N/A"}</div>
                     </div>
                   </div>
                 </div>

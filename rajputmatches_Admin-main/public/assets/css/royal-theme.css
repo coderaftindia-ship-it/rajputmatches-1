@@ -104,7 +104,26 @@ h1, h2, h3, h4, h5, h6 {
   border-right: 1px solid var(--royal-border) !important;
   box-shadow: 6px 0 25px rgba(55, 8, 37, 0.25) !important;
   width: 250px;
+  max-height: 100vh !important;
+  overflow-y: auto !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(237, 177, 57, 0.4) transparent;
+}
+
+.main-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.main-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(237, 177, 57, 0.4);
+  border-radius: 4px;
+}
+
+#sidebar-wrapper {
+  max-height: 100vh !important;
+  overflow-y: auto !important;
+  padding-bottom: 80px !important;
 }
 
 .main-sidebar .sidebar-brand {

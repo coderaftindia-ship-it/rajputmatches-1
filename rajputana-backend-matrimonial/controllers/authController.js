@@ -172,12 +172,22 @@ exports.login = async (req, res) => {
       });
     }
 
+    if (user.isbloacked === true) {
+      return res.status(403).json({
+        message: "Your account has been blocked by Admin. Please contact support.",
+        success: false,
+      });
+    }
+
     if (user.role !== "admin" && !user.isApproved) {
       return res.status(403).json({
         message: "Khama Ghani, Hukum! Thank you for registering with Rajput Alliances. We will verify your account and email you once it is approved, so you can log in and create your profile.",
         success: false
       });
     }
+
+    user.lastLoginAt = new Date();
+    await user.save();
 
     const token = generateToken(user._id);
 
@@ -3021,11 +3031,8 @@ exports.viewuser = async (req, res) => {
       return res.status(404).json({ message: "Profile not found" });
     }
 
-    profile.isEnable = !profile.isEnable;
-    await profile.save();
-
     return res.status(200).json({
-      message: "Updated successfully",
+      message: "Profile fetched successfully",
       profile,
     });
   } catch (error) {

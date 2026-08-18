@@ -190,8 +190,8 @@ const Header = () => {
       </nav>
 
       {/* ── Sidebar ────────────────────────────────────── */}
-      <div className="main-sidebar sidebar-style-2">
-        <aside id="sidebar-wrapper">
+      <div className="main-sidebar sidebar-style-2" style={{ maxHeight: "100vh", overflowY: "auto" }}>
+        <aside id="sidebar-wrapper" style={{ maxHeight: "100vh", overflowY: "auto", paddingBottom: "90px" }}>
           {/* Brand */}
           <div className="sidebar-brand">
             <Link to="/dashboard">
@@ -244,6 +244,20 @@ const Header = () => {
                   <Link className="nav-link" to="/Attributes/Social-Links">Social Links</Link>
                 </li>
               </ul>
+            </li>
+
+            <li className={isActive("/User-Reports") ? "active" : ""}>
+              <Link to="/User-Reports" className="nav-link">
+                <i className="fa fa-comments" />
+                <span>User Feedback &amp; Reports</span>
+              </Link>
+            </li>
+
+            <li className={isActive("/Reports") ? "active" : ""}>
+              <Link to="/Reports" className="nav-link">
+                <i className="fa fa-chart-line" />
+                <span>System Analytics</span>
+              </Link>
             </li>
 
             <li className={isActive("/Success/Success-Stories") ? "active" : ""}>
@@ -299,13 +313,6 @@ const Header = () => {
               <Link to="/Settings/ManageSiteSettings" className="nav-link">
                 <i className="fa fa-cog" />
                 <span>Site Branding &amp; Logo</span>
-              </Link>
-            </li>
-
-            <li className={isActive("/Reports") ? "active" : ""}>
-              <Link to="/Reports" className="nav-link">
-                <i className="fa fa-chart-line" />
-                <span>Reports</span>
               </Link>
             </li>
           </ul>

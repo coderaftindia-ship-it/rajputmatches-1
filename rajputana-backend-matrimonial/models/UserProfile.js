@@ -221,6 +221,7 @@ const UserProfileSchema = new Schema({
       ref: "UserProfile",
     },
   ],
-});
+  lastLoginAt: { type: Date, default: Date.now },
+}, { timestamps: true });
 
 module.exports = mongoose.model("UserProfile", UserProfileSchema);
