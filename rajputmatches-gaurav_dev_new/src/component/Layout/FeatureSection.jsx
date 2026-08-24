@@ -132,7 +132,7 @@ export const VVIPSection = ({ title, description, buttonText }) => {
       className="mt-5 pt-4"
     >
       <div
-        className="rounded-4 p-5 text-center position-relative overflow-hidden shadow-lg"
+        className="rounded-4 p-3.5 p-md-5 text-center position-relative overflow-hidden shadow-lg"
         style={{
           background: "linear-gradient(135deg, var(--royal-maroon-dark), var(--royal-maroon))",
           border: "2px solid var(--royal-gold)"
@@ -142,12 +142,12 @@ export const VVIPSection = ({ title, description, buttonText }) => {
         <div className="position-absolute" style={{ top: "-50%", left: "-20%", width: "100%", height: "200%", background: "radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 60%)", zIndex: 0 }}></div>
 
         <div className="position-relative" style={{ zIndex: 1 }}>
-          <h2 className="display-6 fw-bold mb-4" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-gold)" }}>{title}</h2>
-          <p className="lead mx-auto mb-4" style={{ maxWidth: "800px", color: "var(--royal-cream)", opacity: 0.9 }}>
+          <h2 className="display-6 fw-bold mb-3 mb-md-4" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-gold)" }}>{title}</h2>
+          <p className="lead mx-auto mb-3 mb-md-4" style={{ maxWidth: "800px", color: "var(--royal-cream)", opacity: 0.9, fontSize: "clamp(0.92rem, 3.5vw, 1.15rem)", lineHeight: 1.65 }}>
             {description}
           </p>
           <Link to={isAuthenticated ? "/search" : "/login"}>
-            <button className="btn mt-3 px-5 py-3 fs-5" style={{ background: "#ffffff", color: "var(--royal-maroon-dark)", fontWeight: "700", borderRadius: "30px", boxShadow: "0 10px 20px rgba(0,0,0,0.3)" }}>
+            <button className="btn mt-2 mt-md-3 px-4 px-md-5 py-2.5 py-md-3 fs-6 fs-md-5" style={{ background: "#ffffff", color: "var(--royal-maroon-dark)", fontWeight: "700", borderRadius: "30px", boxShadow: "0 10px 20px rgba(0,0,0,0.3)" }}>
               {buttonText}
             </button>
           </Link>

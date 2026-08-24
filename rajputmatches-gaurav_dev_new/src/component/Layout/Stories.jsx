@@ -217,13 +217,13 @@ function Stories() {
           >
             <p
               style={{
-                fontSize: "clamp(14px, 16px, 18px)",
+                fontSize: "clamp(12px, 1.8vw, 16px)",
                 fontWeight: 600,
                 fontFamily: "var(--font-body)",
                 color: "#e8c371", // Elegant Gold color
                 textTransform: "uppercase",
-                letterSpacing: "4px",
-                marginBottom: "1rem",
+                letterSpacing: "3px",
+                marginBottom: "0.75rem",
                 textShadow: "1px 1px 3px rgba(0,0,0,0.8)"
               }}
             >
@@ -231,19 +231,19 @@ function Stories() {
             </p>
             <h1
               style={{
-                fontSize: "clamp(32px, 44px, 52px)",
+                fontSize: "clamp(22px, 5vw, 44px)",
                 fontWeight: 600,
                 fontFamily: "var(--font-heading)",
-                lineHeight: 1.3,
+                lineHeight: 1.25,
                 color: "#ffffff",
                 textShadow: "2px 2px 10px rgba(0,0,0,0.6)",
-                marginBottom: "1.5rem"
+                marginBottom: "1.25rem"
               }}
               dangerouslySetInnerHTML={{ __html: (cmsData.heroTitle || "").replace(/True Love\./gi, "True Love").replace(/Love\./gi, "Love") }}
             />
             <p
               style={{
-                fontSize: "clamp(16px, 18px, 20px)",
+                fontSize: "clamp(14px, 2.2vw, 18px)",
                 fontFamily: "var(--font-body)",
                 color: "rgba(255, 255, 255, 0.9)",
                 lineHeight: 1.6,

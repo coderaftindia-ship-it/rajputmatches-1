@@ -50,9 +50,15 @@ const sendOtp = async (to, otp) => {
 
 const generateOTP = async (identifier) => {
   try {
+    if (!identifier) return { success: false, message: "Identifier is required." };
+    const rawIdentifier = identifier.trim();
+    const isEmail = rawIdentifier.includes("@");
+    const cleanIdentifier = isEmail ? rawIdentifier.toLowerCase() : rawIdentifier;
+    const safeRegex = new RegExp(`^${rawIdentifier.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+
     // Basic rate-limiting: max 5 sends per hour per identifier, min 30s between sends
     const now = Date.now();
-    const limit = otpRateLimit.get(identifier) || {
+    const limit = otpRateLimit.get(cleanIdentifier) || {
       count: 0,
       firstSent: now,
       lastSent: 0,
@@ -69,35 +75,34 @@ const generateOTP = async (identifier) => {
     // increment and check hourly limit
     limit.count += 1;
     limit.lastSent = now;
-    otpRateLimit.set(identifier, limit);
+    otpRateLimit.set(cleanIdentifier, limit);
     if (limit.count > 5) {
       return { success: false, message: "Exceeded maximum OTP requests. Try again later." };
     }
 
     const otpCode = crypto.randomInt(100000, 1000000).toString();
-    const isEmail = identifier.includes("@");
     const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiration
 
-    const filter = isEmail ? { email: identifier } : { mobile: identifier };
-    const update = { otp: otpCode, expiresAt: expirationTime };
+    const filter = isEmail ? { $or: [{ email: safeRegex }, { email: cleanIdentifier }] } : { mobile: cleanIdentifier };
+    const update = { otp: otpCode, expiresAt: expirationTime, email: isEmail ? cleanIdentifier : undefined, mobile: !isEmail ? cleanIdentifier : undefined };
 
     // Store or update OTP in the database
     await OTP.findOneAndUpdate(filter, update, { upsert: true, new: true });
 
     if (isEmail) {
-      const info = await sendOtp(identifier, otpCode);
+      const info = await sendOtp(cleanIdentifier, otpCode);
       if (info.success) {
-        console.log(`✅ OTP sent to email: ${identifier}`);
+        console.log(`✅ OTP sent to email: ${cleanIdentifier}`);
 
         // Dev bypass: automatically mark email as verified in dev mode
         if (process.env.DEV_BYPASS_VERIFY === "true") {
           try {
             await VerifiedEmail.updateOne(
-              { email: identifier },
-              { email: identifier, isVerified: true, verifiedAt: new Date() },
+              { $or: [{ email: safeRegex }, { email: cleanIdentifier }] },
+              { email: cleanIdentifier, isVerified: true, verifiedAt: new Date() },
               { upsert: true }
             );
-            console.log(`⚠️ DEV_BYPASS_VERIFY enabled: ${identifier} auto-verified.`);
+            console.log(`⚠️ DEV_BYPASS_VERIFY enabled: ${cleanIdentifier} auto-verified.`);
           } catch (err) {
             console.error("Error auto-verifying email in dev bypass:", err.message);
           }
@@ -109,7 +114,7 @@ const generateOTP = async (identifier) => {
         return { success: false, message: "Failed to send OTP email." };
       }
     } else {
-      console.log(`✅ OTP sent to mobile: ${identifier}`);
+      console.log(`✅ OTP sent to mobile: ${cleanIdentifier}`);
       return { success: true, message: "OTP sent to mobile." };
     }
   } catch (error) {
@@ -120,9 +125,15 @@ const generateOTP = async (identifier) => {
 
 const verifyOTP = async (identifier, enteredOTP) => {
   try {
-    const query = identifier.includes("@")
-      ? { email: identifier, otp: enteredOTP }
-      : { mobile: identifier, otp: enteredOTP };
+    if (!identifier) return { success: false, message: "Identifier is required." };
+    const rawIdentifier = identifier.trim();
+    const isEmail = rawIdentifier.includes("@");
+    const cleanIdentifier = isEmail ? rawIdentifier.toLowerCase() : rawIdentifier;
+    const safeRegex = new RegExp(`^${rawIdentifier.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+
+    const query = isEmail
+      ? { $or: [{ email: safeRegex }, { email: cleanIdentifier }], otp: enteredOTP }
+      : { mobile: cleanIdentifier, otp: enteredOTP };
 
     const otpRecord = await OTP.findOne(query);
 

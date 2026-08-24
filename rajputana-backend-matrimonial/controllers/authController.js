@@ -211,8 +211,15 @@ exports.forgotPassword = async (req, res) => {
       return res.status(400).json({ message: "Email or Mobile is required." });
     }
 
+    const cleanUsername = username.trim();
+    const safeUsernameRegex = new RegExp(`^${cleanUsername.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+
     const user = await User.findOne({
-      $or: [{ email: username }, { mobile: username }],
+      $or: [
+        { email: safeUsernameRegex },
+        { email: cleanUsername.toLowerCase() },
+        { mobile: cleanUsername }
+      ],
     }).select("name email mobile");
 
     if (!user) {
@@ -267,13 +274,21 @@ exports.verifyOtp = async (req, res) => {
 
     console.log(req.body);
 
-    let resp = await verifyOTP(username, otp);
+    const cleanUsername = username ? username.trim() : "";
+    let resp = await verifyOTP(cleanUsername, otp);
 
     if (!resp.success) {
       return res.status(400).json({ message: "Invalid or Expired Otp" });
     }
+
+    const safeUsernameRegex = new RegExp(`^${cleanUsername.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+
     const user = await User.findOne({
-      $or: [{ email: username }, { mobile: username }],
+      $or: [
+        { email: safeUsernameRegex },
+        { email: cleanUsername.toLowerCase() },
+        { mobile: cleanUsername }
+      ],
     });
     if (user && user.isEnable === false) {
       return res.status(403).json({
@@ -286,7 +301,7 @@ exports.verifyOtp = async (req, res) => {
       .status(200)
       .json({ message: "Otp Verified Successful", token: token });
   } catch (error) {
-    console.error("Error during forgot password:", error);
+    console.error("Error during verifyOtp:", error);
     res.status(500).json({ message: "Server error", error });
   }
 };

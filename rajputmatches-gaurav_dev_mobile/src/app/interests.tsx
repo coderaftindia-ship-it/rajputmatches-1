@@ -719,67 +719,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.18)',
   },
 
-  // ── SECTION LABEL ──
-  sectionLabel: {
-    fontSize: 9.5,
-    fontWeight: '900',
-    color: '#7A5C66',
-    letterSpacing: 1.2,
-  },
-
-  // ── NAV CHIPS ──
-  navScrollContent: {
-    gap: 8,
-    paddingRight: 14,
-  },
-  navChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 13,
-    paddingVertical: 9,
-    borderRadius: 22,
-    borderWidth: 1.5,
-    borderColor: '#EFE0CB',
-    shadowColor: '#59123B',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
-  },
-  navChipActive: {
-    backgroundColor: '#59123B',
-    borderColor: '#59123B',
-    shadowOpacity: 0.2,
-    elevation: 3,
-  },
-  navChipLabel: {
-    fontSize: 11.5,
-    fontWeight: '800',
-    color: '#59123B',
-  },
-  navChipLabelActive: {
-    color: '#FFFFFF',
-  },
-  countBubble: {
-    backgroundColor: '#FAF0E7',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 10,
-    minWidth: 18,
-    alignItems: 'center',
-  },
-  countBubbleActive: {
-    backgroundColor: '#CD9024',
-  },
-  countBubbleText: {
-    fontSize: 9.5,
-    fontWeight: '900',
-    color: '#59123B',
-  },
-  countBubbleTextActive: {
-    color: '#FFFFFF',
+  scrollContent: {
+    paddingHorizontal: 14,
+    paddingBottom: 24,
+    gap: 14,
   },
 
   // ── LOADING / EMPTY ──

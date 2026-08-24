@@ -87,12 +87,47 @@ a {
 }
 
 /* ── Bootstrap display class overrides (mobile-friendly) ── */
-.display-1 { font-size: clamp(2rem, 6vw, 3.5rem) !important; }
-.display-2 { font-size: clamp(1.8rem, 5vw, 3rem) !important; }
-.display-3 { font-size: clamp(1.6rem, 4.5vw, 2.6rem) !important; }
-.display-4 { font-size: clamp(1.4rem, 4vw, 2.2rem) !important; }
-.display-5 { font-size: clamp(1.25rem, 3.5vw, 1.8rem) !important; }
-.display-6 { font-size: clamp(1.1rem, 3vw, 1.5rem) !important; }
+.display-1 { font-size: clamp(1.8rem, 5.5vw, 3.2rem) !important; }
+.display-2 { font-size: clamp(1.6rem, 4.8vw, 2.8rem) !important; }
+.display-3 { font-size: clamp(1.45rem, 4.2vw, 2.4rem) !important; }
+.display-4 { font-size: clamp(1.3rem, 3.8vw, 2rem) !important; }
+.display-5 { font-size: clamp(1.15rem, 3.4vw, 1.6rem) !important; }
+.display-6 { font-size: clamp(1.05rem, 3vw, 1.35rem) !important; }
+
+/* ── Mobile Typography & Scale Overrides ── */
+@media (max-width: 768px) {
+  .display-1 { font-size: clamp(1.5rem, 5vw, 2.2rem) !important; }
+  .display-2 { font-size: clamp(1.4rem, 4.5vw, 2rem) !important; }
+  .display-3 { font-size: clamp(1.3rem, 4vw, 1.8rem) !important; }
+  .display-4 { font-size: clamp(1.2rem, 3.8vw, 1.65rem) !important; }
+  .display-5 { font-size: clamp(1.1rem, 3.5vw, 1.4rem) !important; }
+  .display-6 { font-size: clamp(1rem, 3.2vw, 1.2rem) !important; }
+
+  .lead {
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Responsive button padding & font size scaling on mobile */
+  button.fs-5, .btn.fs-5 {
+    font-size: 0.95rem !important;
+    padding-top: 0.55rem !important;
+    padding-bottom: 0.55rem !important;
+    padding-left: 1.1rem !important;
+    padding-right: 1.1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .display-4 { font-size: 1.2rem !important; }
+  .display-5 { font-size: 1.1rem !important; }
+  .display-6 { font-size: 1.02rem !important; }
+
+  .lead {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+  }
+}
 
 /* ── Input, select, button font fix ── */
 input, select, textarea, button {

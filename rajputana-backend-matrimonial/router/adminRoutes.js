@@ -126,10 +126,10 @@ const handleAdminAddMember = async (req, res) => {
       profilefor,
     } = req.body;
 
-    if (!firstName || !email || !mobile || !password) {
+    if (!firstName || !email || !mobile || !password || !gender) {
       return res.status(400).json({
         success: false,
-        message: "First name, email, mobile, and password are required.",
+        message: "First name, email, mobile, gender, and password are required.",
       });
     }
 
@@ -154,6 +154,8 @@ const handleAdminAddMember = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const matrimoniId = await getNextMatrimonyId();
 
+    const formattedGender = gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
+
     const user = await User.create({
       martrId: matrimoniId,
       firstName: firstName.trim(),
@@ -163,7 +165,7 @@ const handleAdminAddMember = async (req, res) => {
       mobile: mobile.trim(),
       email: cleanEmail,
       dateOfBirth: dateOfBirth || null,
-      gender: gender || "Male",
+      gender: formattedGender,
       password: hashedPassword,
       profilefor: profilefor || "Self",
       isApproved: true,

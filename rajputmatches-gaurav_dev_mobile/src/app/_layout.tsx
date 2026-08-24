@@ -97,14 +97,10 @@ export default function TabLayout() {
             ),
           }}
         />
-        {/* Hide welcome from tab bar */}
+
         <Tabs.Screen
           name="welcome"
-          options={{
-            href: null,
-            tabBarStyle: { display: 'none' },
-            headerShown: false,
-          }}
+          options={{ href: null }}
         />
         <Tabs.Screen
           name="view-profile"

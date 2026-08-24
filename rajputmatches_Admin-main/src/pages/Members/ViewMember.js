@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { useAuth } from "../AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -8,8 +7,8 @@ import {
   FaUser, FaCalendarAlt, FaEnvelope, FaPhone, FaMapMarkerAlt,
   FaRulerVertical, FaWeight, FaRing, FaBriefcase, FaGraduationCap,
   FaFileAlt, FaDownload, FaCompass, FaRegIdCard, FaHistory,
-  FaChevronRight, FaChevronLeft, FaInfoCircle, FaHeart, FaUsers,
-  FaCrown, FaCheckCircle, FaUsersCog
+  FaInfoCircle, FaHeart, FaUsers,
+  FaCrown, FaCheckCircle, FaUsersCog, FaCamera, FaEye, FaExpand
 } from "react-icons/fa";
 
 const BASE_URL = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
@@ -28,11 +27,14 @@ const getFullAddress = (addr) => {
   return parts.length > 0 ? parts.join(", ") : "N/A";
 };
 
-const getAvatarUrl = (avatar) => {
-  if (!avatar) return null;
-  if (avatar.startsWith("http")) return avatar;
+const getFileUrl = (url) => {
+  if (!url) return "";
+  if (typeof url !== "string") return "";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) return url;
+  const cleanPath = url.replace(/\\/g, "/");
+  const formattedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
   const domain = BASE_URL.replace(/\/admin$/, "");
-  return `${domain}/${avatar}`;
+  return `${domain}${formattedPath}`;
 };
 
 const formatDate = (dateStr) => {
@@ -75,7 +77,6 @@ const getAge = (dob) => {
 function ViewMember() {
   const { profileId } = useParams();
   const navigate = useNavigate();
-  const { updateData } = useAuth();
 
   /* State */
   const [member, setMember] = useState(null);
@@ -83,8 +84,11 @@ function ViewMember() {
   const [actionLoading, setActionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
-  /* Document Modal/Carousel */
+  /* Photo selection state & Lightbox */
   const [imgIndex, setImgIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState("");
+  const [lightboxTitle, setLightboxTitle] = useState("");
 
   /* Fetch Data */
   const fetchMemberDetails = async () => {
@@ -101,7 +105,7 @@ function ViewMember() {
       if (response) {
         setMember(response);
       } else {
-        toast.error("Member profile data nahi mila.");
+        toast.error("Member profile data not found.");
       }
     } catch (error) {
       console.error("Error fetching member profile:", error);
@@ -117,6 +121,24 @@ function ViewMember() {
     }
   }, [profileId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* Extract Photo & Document Lists safely */
+  const photos = Array.isArray(member?.filesId?.photos)
+    ? member.filesId.photos
+    : Array.isArray(member?.photos)
+    ? member.photos
+    : [];
+
+  const docs = Array.isArray(member?.filesId?.documents)
+    ? member.filesId.documents
+    : Array.isArray(member?.documents)
+    ? member.documents
+    : [];
+
+  const familyInfo = member?.familydetailsId || member?.familyDetails || {};
+  const horoInfo = member?.HoroscopicId || {};
+  const profInfo = member?.profdetailsId || {};
+  const extFamily = member?.paternaldetails || {};
+
   /* Actions */
   const handleApproveStatus = async () => {
     if (actionLoading) return;
@@ -128,7 +150,7 @@ function ViewMember() {
         { data: profileId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success(res.data?.message || "Status updated successfully!");
+      toast.success(res.data?.message || "Approval status updated successfully!");
       await fetchMemberDetails();
     } catch (err) {
       console.error(err);
@@ -178,11 +200,17 @@ function ViewMember() {
     }
   };
 
+  const openLightbox = (src, title) => {
+    setLightboxSrc(src);
+    setLightboxTitle(title || "Preview");
+    setLightboxOpen(true);
+  };
+
   /* PDF Download Handler */
   const handleDownloadPdf = () => {
     if (!member) return;
     const printWindow = window.open("", "_blank");
-    const avatar = getAvatarUrl(photos[imgIndex]?.url || member.avatar) || "";
+    const avatarUrl = getFileUrl(photos[imgIndex]?.url || member.avatar) || "";
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -191,19 +219,22 @@ function ViewMember() {
           <title>Biodata - ${member.firstName || ""} ${member.lastName || ""} (ID: ${member.martrId || ""})</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
-            body { font-family: 'Inter', sans-serif; color: #3d1a2b; margin: 0; padding: 24px; background: #fff; }
+            body { font-family: 'Inter', sans-serif; color: #3d1a2b; margin: 0; padding: 24px; background: #fff; line-height: 1.5; }
             .header { text-align: center; border-bottom: 3px double #D4AF37; padding-bottom: 15px; margin-bottom: 25px; }
             .header h1 { font-family: 'Playfair Display', serif; color: #59123B; margin: 0 0 5px 0; font-size: 26px; text-transform: uppercase; letter-spacing: 1px; }
             .header p { color: #888; font-size: 13px; margin: 0; font-weight: 600; }
             .profile-box { display: flex; gap: 20px; align-items: center; background: #fdfaf7; border: 1.5px solid #f0e2d5; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
-            .profile-img { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #D4AF37; object-fit: cover; }
+            .profile-img { width: 130px; height: 130px; border-radius: 50%; border: 3px solid #D4AF37; object-fit: cover; }
             .profile-info h2 { font-family: 'Playfair Display', serif; color: #59123B; margin: 0 0 8px 0; font-size: 22px; }
             .profile-info p { margin: 4px 0; font-size: 14px; color: #555; }
-            .section-title { font-family: 'Playfair Display', serif; color: #59123B; font-size: 16px; font-weight: 700; border-bottom: 2px solid #59123B; padding-bottom: 5px; margin: 20px 0 12px 0; }
+            .section-title { font-family: 'Playfair Display', serif; color: #59123B; font-size: 16px; font-weight: 700; border-bottom: 2px solid #59123B; padding-bottom: 5px; margin: 22px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px; }
             .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
             .grid-item { font-size: 13px; }
             .label { font-weight: 600; color: #888; text-transform: uppercase; font-size: 11px; display: block; margin-bottom: 2px; }
             .value { font-weight: 700; color: #3d1a2b; font-size: 14px; }
+            .relatives-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+            .relatives-table th { background: #59123B; color: white; padding: 8px; text-align: left; font-size: 11px; text-transform: uppercase; }
+            .relatives-table td { padding: 8px; border-bottom: 1px solid #eee; }
             .footer { text-align: center; margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px; font-size: 12px; color: #999; }
             @media print {
               body { padding: 0; }
@@ -214,45 +245,48 @@ function ViewMember() {
         <body>
           <div class="header">
             <h1>Rajput Alliances</h1>
-            <p>MATRIMONIAL BIODATA &bull; CONFIDENTIAL</p>
+            <p>CONFIDENTIAL MATRIMONIAL BIODATA</p>
           </div>
 
           <div class="profile-box">
-            ${avatar ? `<img src="${avatar}" class="profile-img" />` : `<div class="profile-img" style="display:flex;align-items:center;justify-content:center;background:#59123B;color:#fff;font-size:32px;font-weight:700;">${(member.firstName?.[0] || "")}${(member.lastName?.[0] || "")}</div>`}
+            ${avatarUrl ? `<img src="${avatarUrl}" class="profile-img" />` : `<div class="profile-img" style="display:flex;align-items:center;justify-content:center;background:#59123B;color:#fff;font-size:36px;font-weight:700;">${(member.firstName?.[0] || "")}${(member.lastName?.[0] || "")}</div>`}
             <div class="profile-info">
               <h2>${member.firstName || ""} ${member.middleName || ""} ${member.lastName || ""}</h2>
               <p><strong>Matrimony ID:</strong> ${member.martrId || "N/A"}</p>
               <p><strong>Profile Created for:</strong> ${member.profilefor || "Self"}</p>
               <p><strong>Age / Gender:</strong> ${getAge(member.dateOfBirth)} Yrs &bull; ${member.gender || "N/A"}</p>
-              <p><strong>Height:</strong> ${formatHeight(member.height)}</p>
+              <p><strong>Height:</strong> ${formatHeight(member.height)} &bull; <strong>Marital Status:</strong> ${member.maritalStatus || "Unmarried"}</p>
             </div>
           </div>
 
           <div class="section-title">Personal & Contact Details</div>
           <div class="grid">
             <div class="grid-item"><span class="label">Date of Birth</span><span class="value">${formatDate(member.dateOfBirth)}</span></div>
-            <div class="grid-item"><span class="label">Marital Status</span><span class="value">${member.maritalStatus || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Weight</span><span class="value">${member.weight ? `${member.weight} kg` : "N/A"}</span></div>
             <div class="grid-item"><span class="label">Email Address</span><span class="value">${member.email || "N/A"}</span></div>
-            <div class="grid-item"><span class="label">Mobile Number</span><span class="value">${member.mobile || "N/A"}</span></div>
-            <div class="grid-item" style="grid-column: span 2;"><span class="label">Address</span><span class="value">${getFullAddress(member.address)}</span></div>
+            <div class="grid-item"><span class="label">Mobile Phone</span><span class="value">${member.mobile || "N/A"}</span></div>
+            <div class="grid-item" style="grid-column: span 2;"><span class="label">Full Address</span><span class="value">${getFullAddress(member.address)}</span></div>
           </div>
 
-          <div class="section-title">Career & Education</div>
+          <div class="section-title">Career & Educational Details</div>
           <div class="grid">
             <div class="grid-item"><span class="label">Highest Education</span><span class="value">${Array.isArray(profInfo.highestDegree) ? profInfo.highestDegree.join(", ") : profInfo.highestDegree || "N/A"}</span></div>
-            <div class="grid-item"><span class="label">Occupation</span><span class="value">${profInfo.occupation || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Specialization Degree</span><span class="value">${Array.isArray(profInfo.degree) ? profInfo.degree.join(", ") : profInfo.degree || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Current Occupation</span><span class="value">${profInfo.occupation || "N/A"}</span></div>
             <div class="grid-item"><span class="label">Annual Income</span><span class="value">${profInfo.annualIncome || "N/A"}</span></div>
-            <div class="grid-item"><span class="label">Organization</span><span class="value">${profInfo.organizationName || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Organization Name</span><span class="value">${profInfo.organizationName || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Work Location</span><span class="value">${profInfo.employmentLocation || "N/A"}</span></div>
           </div>
 
-          <div class="section-title">Family Background & Gotra Info</div>
+          <div class="section-title">Family Heritage & Gotra Information</div>
           <div class="grid">
             <div class="grid-item"><span class="label">Father's Name</span><span class="value">${familyInfo.fatherName || "N/A"}</span></div>
             <div class="grid-item"><span class="label">Father's Occupation</span><span class="value">${familyInfo.occupation || "N/A"}</span></div>
-            <div class="grid-item"><span class="label">Father's Native Place</span><span class="value">${familyInfo.fatherNativePlace || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Father's Native Thikana</span><span class="value">${familyInfo.fatherNativePlace || "N/A"}</span></div>
             <div class="grid-item"><span class="label">Mother's Name</span><span class="value">${familyInfo.motherName || "N/A"}</span></div>
-            <div class="grid-item"><span class="label">Mother's Native Place</span><span class="value">${familyInfo.motherNativePlace || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Mother's Native Thikana</span><span class="value">${familyInfo.motherNativePlace || "N/A"}</span></div>
             <div class="grid-item"><span class="label">Maternal (Nani) Gotra</span><span class="value">${familyInfo.maternalGotra || "N/A"}</span></div>
+            <div class="grid-item" style="grid-column: span 2;"><span class="label">Siblings Information</span><span class="value">${familyInfo.siblings || "N/A"}</span></div>
           </div>
 
           <div class="section-title">Horoscope & Astro Information</div>
@@ -261,10 +295,24 @@ function ViewMember() {
             <div class="grid-item"><span class="label">Birth Time</span><span class="value">${horoInfo.birthTime || "N/A"}</span></div>
             <div class="grid-item"><span class="label">Manglik Status</span><span class="value">${horoInfo.isManglik || "N/A"}</span></div>
             <div class="grid-item"><span class="label">Rashi / Nakshatra</span><span class="value">${horoInfo.rashi || "N/A"} / ${horoInfo.nakshatra || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Nadi / Gan / Charan</span><span class="value">${horoInfo.nadi || "N/A"} &bull; ${horoInfo.gan || "N/A"} &bull; ${horoInfo.charan || "N/A"}</span></div>
           </div>
 
+          <div class="section-title">Grandparents Lineage</div>
+          <div class="grid">
+            <div class="grid-item"><span class="label">Paternal Grandfather (Dada Ji)</span><span class="value">${extFamily.grandFatherName || "N/A"} (${extFamily.grandFatherthikana || "Thikana N/A"})</span></div>
+            <div class="grid-item"><span class="label">Paternal Grandmother (Dadi Ji)</span><span class="value">${extFamily.grandMotherName || "N/A"} (${extFamily.grandmotherthikana || "Thikana N/A"})</span></div>
+            <div class="grid-item"><span class="label">Maternal Grandfather (Nana Ji)</span><span class="value">${extFamily.maternalGrandFatherName || "N/A"} (${extFamily.maternalGrandFatherthikana || "Thikana N/A"})</span></div>
+            <div class="grid-item"><span class="label">Maternal Grandmother (Nani Ji)</span><span class="value">${extFamily.maternalGrandMotherName || "N/A"} (${extFamily.maternalGrandMotherthikana || "Thikana N/A"})</span></div>
+          </div>
+
+          ${member.additionalInfo ? `
+            <div class="section-title">Additional Remarks / Bio</div>
+            <p style="font-size: 13px; color: #444;">${member.additionalInfo}</p>
+          ` : ""}
+
           <div class="footer">
-            Generated on ${new Date().toLocaleDateString()} &bull; Rajput Alliances Matrimonial Portal
+            Generated on ${new Date().toLocaleDateString()} &bull; Rajput Alliances Matrimonial Portal &bull; Confidential Document
           </div>
 
           <script>
@@ -304,14 +352,6 @@ function ViewMember() {
     );
   }
 
-  /* Extract Photo & Doc Lists */
-  const photos = member?.filesId?.photos || [];
-  const docs = member?.filesId?.documents || [];
-  const familyInfo = member?.familydetailsId || member?.familyDetails || {};
-  const horoInfo = member?.HoroscopicId || {};
-  const profInfo = member?.profdetailsId || {};
-  const extFamily = member?.paternaldetails || {};
-
   /* Render Tabs Navigation */
   const tabs = [
     { id: "overview", label: "Overview", icon: <FaInfoCircle /> },
@@ -320,10 +360,10 @@ function ViewMember() {
     { id: "family", label: "Family Details", icon: <FaUsers /> },
     { id: "horoscope", label: "Horoscope", icon: <FaCompass /> },
     { id: "paternal", label: "Relatives & Lineage", icon: <FaUsersCog /> },
+    { id: "photos", label: `Photos (${photos.length})`, icon: <FaCamera /> },
     { id: "documents", label: `Documents (${docs.length})`, icon: <FaFileAlt /> }
   ];
 
-  /* UI Renders based on active tab */
   return (
     <div className="main-content">
       {/* Redesigned Stylesheet */}
@@ -352,6 +392,7 @@ function ViewMember() {
           font-size: 3rem;
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
           flex-shrink: 0;
+          position: relative;
         }
         .royal-profile-img {
           width: 100%;
@@ -505,6 +546,15 @@ function ViewMember() {
           overflow: hidden;
           background: #faf7f8;
           padding: 12px;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          transition: all 0.25s ease;
+        }
+        .photo-gallery-card:hover {
+          box-shadow: 0 8px 25px rgba(89, 18, 59, 0.12);
+          border-color: #D4AF37;
         }
         .action-button-panel {
           display: flex;
@@ -536,21 +586,74 @@ function ViewMember() {
         .btn-panel-delete:hover { background: #dc2626; color: white; }
         .doc-preview-card {
           background: #faf7f8;
-          border: 1px dashed #D4AF37;
+          border: 1.5px dashed #D4AF37;
           border-radius: 12px;
           padding: 20px;
           text-align: center;
           transition: all 0.2s;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
         }
         .doc-preview-card:hover {
           background: #fdfafb;
-          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
+        }
+        /* Custom Lightbox Modal */
+        .royal-lightbox-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.85);
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          backdrop-filter: blur(5px);
+        }
+        .royal-lightbox-content {
+          max-width: 90vw;
+          max-height: 90vh;
+          position: relative;
+          background: #111;
+          border: 2px solid #D4AF37;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+        .royal-lightbox-img {
+          max-width: 100%;
+          max-height: 80vh;
+          object-fit: contain;
+          display: block;
+          margin: 0 auto;
+        }
+        .royal-lightbox-close {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: #59123B;
+          color: #D4AF37;
+          border: 1px solid #D4AF37;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          font-size: 1.2rem;
+          z-index: 10;
         }
       `}</style>
 
       {/* ── HEADER NAVIGATION & GENERAL CONTROLS ── */}
       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <div className="d-flex gap-2">
+        <div className="d-flex gap-2 flex-wrap">
           <Link to="/Members/Free-Members" className="btn btn-royal-outline d-inline-flex align-items-center gap-2">
             <FaArrowLeft /> Back to Members list
           </Link>
@@ -594,9 +697,17 @@ function ViewMember() {
       {/* ── PROFILE MAIN BANNER ── */}
       <div className="royal-member-header">
         <div className="d-flex align-items-center flex-wrap gap-4">
-          <div className="royal-profile-img-wrap">
-            {photos.length > 0 ? (
-              <img src={getAvatarUrl(photos[imgIndex]?.url || member.avatar)} alt="Avatar" className="royal-profile-img" />
+          <div
+            className="royal-profile-img-wrap"
+            onClick={() => {
+              const currentImg = getFileUrl(photos[imgIndex]?.url || member.avatar);
+              if (currentImg) openLightbox(currentImg, `${member.firstName} ${member.lastName}`);
+            }}
+            style={{ cursor: "pointer" }}
+            title="Click to view full photo"
+          >
+            {photos.length > 0 || member.avatar ? (
+              <img src={getFileUrl(photos[imgIndex]?.url || member.avatar)} alt="Avatar" className="royal-profile-img" />
             ) : (
               `${member.firstName?.[0] || ""}${member.lastName?.[0] || ""}`.toUpperCase()
             )}
@@ -695,7 +806,7 @@ function ViewMember() {
                   <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
                       <div className="royal-item-lbl"><FaHeart /> Request Sent</div>
-                      <div className="royal-item-val">{member.reqSentCount || 0} profiles</div>
+                      <div className="royal-item-val">{member.reqSentCount || (Array.isArray(member.reqSent) ? member.reqSent.length : 0)} profiles</div>
                     </div>
                   </div>
                   <div className="col-md-6 col-lg-4 mb-3">
@@ -709,7 +820,7 @@ function ViewMember() {
                   <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
                       <div className="royal-item-lbl"><FaUsers /> Family Thikana</div>
-                      <div className="royal-item-val">{familyInfo.familyLocation || member.address?.city || "N/A"}</div>
+                      <div className="royal-item-val">{familyInfo.fatherNativePlace || familyInfo.familyLocation || member.address?.city || "N/A"}</div>
                     </div>
                   </div>
                   <div className="col-md-6 col-lg-4 mb-3">
@@ -728,7 +839,7 @@ function ViewMember() {
 
                 {/* Additional Info Box */}
                 <div className="p-4 rounded" style={{ background: "#faf7f8", border: "1.5px dashed #f2e6eb" }}>
-                  <h5 style={{ color: "#59123B", fontWeight: 700, fontSize: "0.95rem" }} className="mb-2">Additional Remarks:</h5>
+                  <h5 style={{ color: "#59123B", fontWeight: 700, fontSize: "0.95rem" }} className="mb-2">Additional Remarks / Bio:</h5>
                   <p style={{ color: "#5c3d4a", margin: 0, fontSize: "0.9rem", lineHeight: "1.6" }}>
                     {member.additionalInfo || "No additional comments or bio details provided by the user."}
                   </p>
@@ -1070,64 +1181,138 @@ function ViewMember() {
               </div>
             )}
 
-            {/* 7️⃣ TAB: DOCUMENTS & PHOTO ATTACHMENTS */}
-            {activeTab === "documents" && (
+            {/* 7️⃣ TAB: PHOTOS ALBUM */}
+            {activeTab === "photos" && (
               <div>
-                <h4 className="royal-card-title"><FaFileAlt /> Uploaded Documents & ID Verifications</h4>
-                
-                {/* Verification Documents Grid */}
-                {docs.length > 0 ? (
-                  <div className="row mb-4">
-                    {docs.map((doc, idx) => (
-                      <div className="col-md-6 col-lg-4 mb-3" key={idx}>
-                        <div className="doc-preview-card">
-                          <FaRegIdCard size={48} style={{ color: "#59123B" }} className="mb-3" />
-                          <div style={{ fontWeight: 700, fontSize: "0.9rem", color: "#3d1a2b" }} className="mb-1">
-                            Document #{idx + 1}
+                <h4 className="royal-card-title"><FaCamera /> Photo Album ({photos.length})</h4>
+                {photos.length > 0 ? (
+                  <div className="row g-4">
+                    {photos.map((ph, idx) => {
+                      const photoUrl = getFileUrl(ph.url);
+                      return (
+                        <div className="col-sm-6 col-md-4 col-lg-3" key={idx}>
+                          <div className="photo-gallery-card">
+                            <div style={{ position: "relative", overflow: "hidden", borderRadius: "8px" }}>
+                              <img
+                                src={photoUrl}
+                                alt={`Profile attachment ${idx + 1}`}
+                                className="img-fluid"
+                                style={{ height: "180px", width: "100%", objectFit: "cover", cursor: "pointer" }}
+                                onClick={() => openLightbox(photoUrl, `Photo #${idx + 1}`)}
+                              />
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: "8px",
+                                  right: "8px",
+                                  background: "rgba(0,0,0,0.6)",
+                                  color: "#D4AF37",
+                                  padding: "4px 8px",
+                                  borderRadius: "4px",
+                                  fontSize: "0.75rem",
+                                  cursor: "pointer"
+                                }}
+                                onClick={() => openLightbox(photoUrl, `Photo #${idx + 1}`)}
+                              >
+                                <FaExpand />
+                              </div>
+                            </div>
+                            <div className="text-center mt-3 d-flex flex-column gap-2">
+                              <button
+                                onClick={() => setImgIndex(idx)}
+                                className={`btn btn-sm ${imgIndex === idx ? "btn-royal" : "btn-outline-secondary"}`}
+                                style={{ fontSize: "0.78rem", borderRadius: "20px" }}
+                              >
+                                {imgIndex === idx ? "Default Avatar" : "Set as Default Avatar"}
+                              </button>
+                              <a
+                                href={photoUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                download
+                                className="btn btn-sm btn-light d-inline-flex align-items-center justify-content-center gap-1"
+                                style={{ fontSize: "0.75rem", color: "#59123B", fontWeight: 600 }}
+                              >
+                                <FaDownload /> Download Image
+                              </a>
+                            </div>
                           </div>
-                          <p className="text-muted small mb-3">System file upload id: {doc._id || "N/A"}</p>
-                          <a href={doc.url} target="_blank" rel="noreferrer" className="btn btn-sm btn-royal-outline w-100 d-flex align-items-center justify-content-center gap-2">
-                            <FaDownload /> Download / View File
-                          </a>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="alert alert-info text-center p-4">
-                    No identification proofs or documents uploaded by this member.
+                    No extra photos uploaded for this profile.
                   </div>
                 )}
+              </div>
+            )}
 
-                {/* Additional Photos Section */}
-                <h5 style={{ color: "#59123B", fontWeight: 700 }} className="mb-3">Complete Photo Album ({photos.length})</h5>
-                {photos.length > 0 ? (
-                  <div className="row">
-                    {photos.map((ph, idx) => (
-                      <div className="col-sm-6 col-md-4 col-lg-3 mb-3" key={idx}>
-                        <div className="photo-gallery-card">
-                          <img
-                            src={getAvatarUrl(ph.url)}
-                            alt={`Profile attachment ${idx + 1}`}
-                            className="img-fluid rounded"
-                            style={{ height: "160px", width: "100%", objectFit: "cover", cursor: "pointer" }}
-                            onClick={() => setImgIndex(idx)}
-                          />
-                          <div className="text-center mt-2">
-                            <button
-                              onClick={() => setImgIndex(idx)}
-                              className={`btn btn-sm ${imgIndex === idx ? "btn-royal" : "btn-light"}`}
-                              style={{ fontSize: "0.75rem" }}
-                            >
-                              {imgIndex === idx ? "Default Avatar" : "Select as Avatar"}
-                            </button>
+            {/* 8️⃣ TAB: DOCUMENTS & VERIFICATION */}
+            {activeTab === "documents" && (
+              <div>
+                <h4 className="royal-card-title"><FaFileAlt /> Verification & Uploaded Documents ({docs.length})</h4>
+                
+                {docs.length > 0 ? (
+                  <div className="row g-4 mb-4">
+                    {docs.map((doc, idx) => {
+                      const docUrl = getFileUrl(doc.url);
+                      const isImage = doc.url && (doc.url.endsWith(".jpg") || doc.url.endsWith(".jpeg") || doc.url.endsWith(".png") || doc.url.endsWith(".webp"));
+
+                      return (
+                        <div className="col-md-6 col-lg-4" key={idx}>
+                          <div className="doc-preview-card">
+                            {isImage ? (
+                              <div style={{ height: "140px", overflow: "hidden", borderRadius: "8px", marginBottom: "12px", background: "#eee" }}>
+                                <img
+                                  src={docUrl}
+                                  alt={`Doc ${idx + 1}`}
+                                  style={{ width: "100%", height: "100%", objectFit: "cover", cursor: "pointer" }}
+                                  onClick={() => openLightbox(docUrl, `Document #${idx + 1}`)}
+                                />
+                              </div>
+                            ) : (
+                              <FaRegIdCard size={54} style={{ color: "#59123B" }} className="my-3 mx-auto" />
+                            )}
+
+                            <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "#3d1a2b" }} className="mb-1">
+                              Verification Document #{idx + 1}
+                            </div>
+                            <p className="text-muted small mb-3">
+                              File ID: {doc._id || idx + 1}
+                            </p>
+
+                            <div className="d-flex gap-2">
+                              {isImage && (
+                                <button
+                                  onClick={() => openLightbox(docUrl, `Document #${idx + 1}`)}
+                                  className="btn btn-sm btn-royal-outline flex-fill d-flex align-items-center justify-content-center gap-1"
+                                  style={{ fontSize: "0.78rem" }}
+                                >
+                                  <FaEye /> Preview
+                                </button>
+                              )}
+                              <a
+                                href={docUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                download
+                                className="btn btn-sm btn-royal flex-fill d-flex align-items-center justify-content-center gap-1"
+                                style={{ fontSize: "0.78rem", background: "#59123B", color: "#D4AF37", border: "1px solid #D4AF37" }}
+                              >
+                                <FaDownload /> Download File
+                              </a>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
-                  <p className="text-muted text-center p-3 bg-light rounded">No extra images uploaded.</p>
+                  <div className="alert alert-info text-center p-4">
+                    No identification proofs or verification documents uploaded by this member.
+                  </div>
                 )}
               </div>
             )}
@@ -1135,6 +1320,34 @@ function ViewMember() {
           </div>
         </div>
       </div>
+
+      {/* ── LIGHTBOX MODAL FOR IMAGES / DOCUMENTS ── */}
+      {lightboxOpen && (
+        <div className="royal-lightbox-backdrop" onClick={() => setLightboxOpen(false)}>
+          <div className="royal-lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <button className="royal-lightbox-close" onClick={() => setLightboxOpen(false)}>
+              <FaTimes />
+            </button>
+            <div className="p-3 text-center style={{ color: '#D4AF37' }}">
+              <h5 style={{ color: "#D4AF37", margin: "0 0 10px 0", fontFamily: "Playfair Display, serif" }}>{lightboxTitle}</h5>
+            </div>
+            <img src={lightboxSrc} alt={lightboxTitle} className="royal-lightbox-img" />
+            <div className="p-3 text-center">
+              <a
+                href={lightboxSrc}
+                target="_blank"
+                rel="noreferrer"
+                download
+                className="btn btn-sm"
+                style={{ background: "#D4AF37", color: "#3B0000", fontWeight: 700, borderRadius: "20px" }}
+              >
+                <FaDownload /> Download High-Res File
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
