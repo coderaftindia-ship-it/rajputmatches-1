@@ -2881,7 +2881,7 @@ exports.getusersData = async (req, res) => {
       isEnable: { $ne: false },
       isbloacked: { $ne: true }
     }).select(
-      "gender firstName middleName lastName dateOfBirth martrId view isVisible isbloacked isApproved isVerified avatar isEnable mobile email isSubscribed"
+      "gender firstName middleName lastName dateOfBirth martrId view isVisible isbloacked isApproved isVerified avatar isEnable mobile email isSubscribed createdAt lastLoginAt"
     );
     // console.log(user);
     res.status(200).json({
@@ -2896,7 +2896,7 @@ exports.getusersData = async (req, res) => {
 exports.getBlockedProfiles = async (req, res) => {
   try {
     const user = await User.find({ isbloacked: true }).select(
-      "gender firstName middleName lastName dateOfBirth martrId view isVisible isbloacked isApproved isVerified avatar isEnable mobile email isSubscribed"
+      "gender firstName middleName lastName dateOfBirth martrId view isVisible isbloacked isApproved isVerified avatar isEnable mobile email isSubscribed createdAt lastLoginAt"
     );
 
     res.status(200).json({
@@ -2912,7 +2912,7 @@ exports.getBlockedProfiles = async (req, res) => {
 exports.getDeletedprofiles = async (req, res) => {
   try {
     const user = await User.find({ isEnable: false }).select(
-      "gender firstName middleName lastName dateOfBirth martrId view isVisible isbloacked isApproved isVerified avatar isEnable mobile email isSubscribed"
+      "gender firstName middleName lastName dateOfBirth martrId view isVisible isbloacked isApproved isVerified avatar isEnable mobile email isSubscribed createdAt lastLoginAt"
     );
 
     res.status(200).json({

@@ -8,7 +8,9 @@ import {
   FaRulerVertical, FaWeight, FaRing, FaBriefcase, FaGraduationCap,
   FaFileAlt, FaDownload, FaCompass, FaRegIdCard, FaHistory,
   FaInfoCircle, FaHeart, FaUsers,
-  FaCrown, FaCheckCircle, FaUsersCog, FaCamera, FaEye, FaExpand
+  FaCrown, FaCheckCircle, FaUsersCog, FaCamera, FaEye, FaExpand,
+  FaShieldAlt, FaLandmark, FaBookmark, FaHome, FaFemale, FaMapPin,
+  FaBuilding, FaMoneyBillWave
 } from "react-icons/fa";
 
 const BASE_URL = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
@@ -50,6 +52,25 @@ const formatDate = (dateStr) => {
   } catch (e) {
     return dateStr;
   }
+};
+
+const getCreatedDate = (member) => {
+  if (member?.createdAt) return member.createdAt;
+  if (member?._id && typeof member._id === "string" && member._id.length === 24) {
+    const timestamp = parseInt(member._id.substring(0, 8), 16) * 1000;
+    if (!isNaN(timestamp)) return new Date(timestamp);
+  }
+  return null;
+};
+
+const getBirthTime = (h) => {
+  if (!h) return "N/A";
+  if (h.birthTime) return h.birthTime;
+  if (h.birthHour || h.birthMinute) {
+    const period = h.birthTimePeriod || "";
+    return `${h.birthHour || "00"}:${h.birthMinute || "00"} ${period}`.trim();
+  }
+  return "N/A";
 };
 
 const formatHeight = (h) => {
@@ -295,10 +316,10 @@ function ViewMember() {
             <div class="grid-item"><span class="label">Birth Time</span><span class="value">${horoInfo.birthTime || "N/A"}</span></div>
             <div class="grid-item"><span class="label">Manglik Status</span><span class="value">${horoInfo.isManglik || "N/A"}</span></div>
             <div class="grid-item"><span class="label">Rashi / Nakshatra</span><span class="value">${horoInfo.rashi || "N/A"} / ${horoInfo.nakshatra || "N/A"}</span></div>
-            <div class="grid-item"><span class="label">Nadi / Gan / Charan</span><span class="value">${horoInfo.nadi || "N/A"} &bull; ${horoInfo.gan || "N/A"} &bull; ${horoInfo.charan || "N/A"}</span></div>
+            <div class="grid-item"><span class="label">Nadi / Charan</span><span class="value">${horoInfo.nadi || "N/A"} &bull; ${horoInfo.charan || "N/A"}</span></div>
           </div>
 
-          <div class="section-title">Grandparents Lineage</div>
+          <div class="section-title">Grandparents & Ancestry Details</div>
           <div class="grid">
             <div class="grid-item"><span class="label">Paternal Grandfather (Dada Ji)</span><span class="value">${extFamily.grandFatherName || "N/A"} (${extFamily.grandFatherthikana || "Thikana N/A"})</span></div>
             <div class="grid-item"><span class="label">Paternal Grandmother (Dadi Ji)</span><span class="value">${extFamily.grandMotherName || "N/A"} (${extFamily.grandmotherthikana || "Thikana N/A"})</span></div>
@@ -359,7 +380,6 @@ function ViewMember() {
     { id: "professional", label: "Career & Education", icon: <FaBriefcase /> },
     { id: "family", label: "Family Details", icon: <FaUsers /> },
     { id: "horoscope", label: "Horoscope", icon: <FaCompass /> },
-    { id: "paternal", label: "Relatives & Lineage", icon: <FaUsersCog /> },
     { id: "photos", label: `Photos (${photos.length})`, icon: <FaCamera /> },
     { id: "documents", label: `Documents (${docs.length})`, icon: <FaFileAlt /> }
   ];
@@ -476,33 +496,59 @@ function ViewMember() {
         .rm-badge-free     { background: #f3f4f6; color: #4b5563; }
 
         .royal-grid-item {
-          background: #faf7f8;
+          background: #ffffff;
           border-radius: 12px;
-          padding: 16px 20px;
-          border: 1px solid #f2e6eb;
+          padding: 16px 18px;
+          border: 1px solid #f0e4ea;
+          box-shadow: 0 2px 8px rgba(89, 18, 59, 0.04);
           height: 100%;
-          transition: transform 0.2s, border-color 0.2s;
+          transition: all 0.2s ease-in-out;
         }
         .royal-grid-item:hover {
-          transform: translateY(-1px);
-          border-color: rgba(212, 175, 55, 0.3);
+          transform: translateY(-2px);
+          border-color: #D4AF37;
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.18);
         }
         .royal-item-lbl {
-          font-size: 0.75rem;
-          color: #9A7888;
-          font-weight: 600;
+          font-size: 0.72rem;
+          color: #8c6b79;
+          font-weight: 700;
           text-transform: uppercase;
           margin-bottom: 6px;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.6px;
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
         }
-        .royal-item-lbl svg { color: #D4AF37; }
-        .royal-item-val {
-          font-size: 1rem;
-          color: #3d1a2b;
-          font-weight: 700;
+        .royal-item-lbl svg { color: #D4AF37; font-size: 0.95rem; flex-shrink: 0; }
+        .royal-icon-card {
+          background: #ffffff;
+          border-radius: 12px;
+          padding: 14px 16px;
+          border: 1px solid #f0e4ea;
+          box-shadow: 0 2px 8px rgba(89, 18, 59, 0.04);
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          height: 100%;
+          transition: all 0.2s ease-in-out;
+        }
+        .royal-icon-card:hover {
+          transform: translateY(-2px);
+          border-color: #D4AF37;
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.18);
+        }
+        .royal-icon-box {
+          width: 42px;
+          height: 42px;
+          border-radius: 10px;
+          background: #f7eff3;
+          color: #59123B;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.05rem;
+          flex-shrink: 0;
         }
         .royal-quick-bar {
           display: flex;
@@ -826,13 +872,13 @@ function ViewMember() {
                   <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
                       <div className="royal-item-lbl"><FaCalendarAlt /> Account Created</div>
-                      <div className="royal-item-val">{member.createdAt ? formatDate(member.createdAt) : "N/A"}</div>
+                      <div className="royal-item-val">{formatDate(getCreatedDate(member))}</div>
                     </div>
                   </div>
                   <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
                       <div className="royal-item-lbl"><FaHistory /> Last Login</div>
-                      <div className="royal-item-val">{member.lastLoginAt ? formatDate(member.lastLoginAt) : "N/A"}</div>
+                      <div className="royal-item-val">{formatDate(member.lastLoginAt || getCreatedDate(member))}</div>
                     </div>
                   </div>
                 </div>
@@ -908,51 +954,143 @@ function ViewMember() {
             {activeTab === "professional" && (
               <div>
                 <h4 className="royal-card-title"><FaBriefcase /> Career & Educational Qualifications</h4>
-                <div className="row">
+                <div className="row g-3">
+                  {/* Qualifications List */}
+                  {Array.isArray(profInfo.qualificationsList) && profInfo.qualificationsList.length > 0 ? (
+                    profInfo.qualificationsList.map((q, idx) => (
+                      <React.Fragment key={`qual-${idx}`}>
+                        <div className="col-md-6 mb-3">
+                          <div className="royal-icon-card">
+                            <div className="royal-icon-box"><FaGraduationCap /></div>
+                            <div>
+                              <div className="royal-item-lbl">QUALIFICATIONS #{idx + 1}</div>
+                              <div className="royal-item-val">{q.qualification || "N/A"}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-6 mb-3">
+                          <div className="royal-icon-card">
+                            <div className="royal-icon-box"><FaBuilding /></div>
+                            <div>
+                              <div className="royal-item-lbl">INSTITUTION #{idx + 1}</div>
+                              <div className="royal-item-val">{q.institution || "N/A"}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </React.Fragment>
+                    ))
+                  ) : (
+                    <>
+                      <div className="col-md-6 mb-3">
+                        <div className="royal-icon-card">
+                          <div className="royal-icon-box"><FaGraduationCap /></div>
+                          <div>
+                            <div className="royal-item-lbl">HIGHEST EDUCATION</div>
+                            <div className="royal-item-val">
+                              {profInfo.qualifications ||
+                                (Array.isArray(profInfo.highestDegree) ? profInfo.highestDegree.join(", ") : profInfo.highestDegree) ||
+                                profInfo.education ||
+                                "N/A"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-6 mb-3">
+                        <div className="royal-icon-card">
+                          <div className="royal-icon-box"><FaBuilding /></div>
+                          <div>
+                            <div className="royal-item-lbl">INSTITUTION / COLLEGE</div>
+                            <div className="royal-item-val">
+                              {profInfo.institution ||
+                                profInfo.college ||
+                                (Array.isArray(profInfo.degree) ? profInfo.degree.join(", ") : profInfo.degree) ||
+                                "N/A"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Occupations List */}
+                  {Array.isArray(profInfo.occupationsList) && profInfo.occupationsList.length > 0 ? (
+                    profInfo.occupationsList.map((occ, idx) => (
+                      <React.Fragment key={`occ-${idx}`}>
+                        <div className="col-md-6 mb-3">
+                          <div className="royal-icon-card">
+                            <div className="royal-icon-box"><FaBriefcase /></div>
+                            <div>
+                              <div className="royal-item-lbl">CURRENT ROLE #{idx + 1}</div>
+                              <div className="royal-item-val">{occ.occupation || "N/A"}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-6 mb-3">
+                          <div className="royal-icon-card">
+                            <div className="royal-icon-box"><FaBuilding /></div>
+                            <div>
+                              <div className="royal-item-lbl">COMPANY #{idx + 1}</div>
+                              <div className="royal-item-val">{occ.company || occ.salary || "N/A"}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </React.Fragment>
+                    ))
+                  ) : (
+                    <>
+                      <div className="col-md-6 mb-3">
+                        <div className="royal-icon-card">
+                          <div className="royal-icon-box"><FaBriefcase /></div>
+                          <div>
+                            <div className="royal-item-lbl">CURRENT OCCUPATION</div>
+                            <div className="royal-item-val">{profInfo.professional || profInfo.occupation || "N/A"}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-6 mb-3">
+                        <div className="royal-icon-card">
+                          <div className="royal-icon-box"><FaBuilding /></div>
+                          <div>
+                            <div className="royal-item-lbl">ORGANIZATION / COMPANY</div>
+                            <div className="royal-item-val">{profInfo.company || profInfo.organizationName || "N/A"}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Additional Professional Details */}
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl"><FaGraduationCap /> Highest Education</div>
-                      <div className="royal-item-val">
-                        {Array.isArray(profInfo.highestDegree) 
-                          ? profInfo.highestDegree.join(", ") 
-                          : profInfo.highestDegree || "N/A"}
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaMoneyBillWave /></div>
+                      <div>
+                        <div className="royal-item-lbl">ANNUAL INCOME / EARNINGS</div>
+                        <div className="royal-item-val">{profInfo.annualIncome || profInfo.income || "N/A"}</div>
                       </div>
                     </div>
                   </div>
+
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Specialization Degree</div>
-                      <div className="royal-item-val">
-                        {Array.isArray(profInfo.degree) 
-                          ? profInfo.degree.join(", ") 
-                          : profInfo.degree || "N/A"}
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaMapMarkerAlt /></div>
+                      <div>
+                        <div className="royal-item-lbl">EMPLOYMENT LOCATION</div>
+                        <div className="royal-item-val">{profInfo.employmentLocation || profInfo.workLocation || "N/A"}</div>
                       </div>
                     </div>
                   </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl"><FaBriefcase /> Current Occupation</div>
-                      <div className="royal-item-val">{profInfo.occupation || "N/A"}</div>
+
+                  {profInfo.class && (
+                    <div className="col-md-6 mb-3">
+                      <div className="royal-icon-card">
+                        <div className="royal-icon-box"><FaCrown /></div>
+                        <div>
+                          <div className="royal-item-lbl">CLASS</div>
+                          <div className="royal-item-val">{profInfo.class}</div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Annual Income / Earnings</div>
-                      <div className="royal-item-val">{profInfo.annualIncome || "N/A"}</div>
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Organization / Office Name</div>
-                      <div className="royal-item-val">{profInfo.organizationName || "N/A"}</div>
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl"><FaMapMarkerAlt /> Employment Location</div>
-                      <div className="royal-item-val">{profInfo.employmentLocation || "N/A"}</div>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}
@@ -962,57 +1100,131 @@ function ViewMember() {
               <div>
                 <h4 className="royal-card-title"><FaUsers /> Family Heritage & Gotra Info</h4>
                 <div className="row">
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Father's Name</div>
-                      <div className="royal-item-val">{familyInfo.fatherName || "N/A"}</div>
+                      <div className="royal-item-lbl"><FaShieldAlt /> Paternal Clan (Vansh)</div>
+                      <div className="royal-item-val">{horoInfo.clan || member.clan || "N/A"}</div>
                     </div>
                   </div>
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Father's Occupation</div>
-                      <div className="royal-item-val">{familyInfo.occupation || "N/A"}</div>
+                      <div className="royal-item-lbl"><FaLandmark /> Paternal Gotra</div>
+                      <div className="royal-item-val">{horoInfo.gotra || member.gotra || "N/A"}</div>
                     </div>
                   </div>
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Father's Native Thikana</div>
-                      <div className="royal-item-val">{familyInfo.fatherNativePlace || "N/A"}</div>
+                      <div className="royal-item-lbl"><FaBookmark /> Sub-Clan / Khamp</div>
+                      <div className="royal-item-val">{horoInfo.subclan || "N/A"}</div>
                     </div>
                   </div>
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Mother's Name</div>
-                      <div className="royal-item-val">{familyInfo.motherName || "N/A"}</div>
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Mother's Native Thikana</div>
-                      <div className="royal-item-val">{familyInfo.motherNativePlace || "N/A"}</div>
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Maternal (Nani) Gotra</div>
+                      <div className="royal-item-lbl"><FaBookmark /> Maternal (Nani) Gotra</div>
                       <div className="royal-item-val">{familyInfo.maternalGotra || "N/A"}</div>
                     </div>
                   </div>
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Siblings Details</div>
+                      <div className="royal-item-lbl"><FaUser /> Father's Name</div>
+                      <div className="royal-item-val">{familyInfo.fatherName || "N/A"}</div>
+                    </div>
+                  </div>
+                  <div className="col-md-6 col-lg-4 mb-3">
+                    <div className="royal-grid-item">
+                      <div className="royal-item-lbl"><FaBriefcase /> Father's Occupation</div>
+                      <div className="royal-item-val">{familyInfo.occupation || "N/A"}</div>
+                    </div>
+                  </div>
+                  <div className="col-md-6 col-lg-4 mb-3">
+                    <div className="royal-grid-item">
+                      <div className="royal-item-lbl"><FaHome /> Father's Native Thikana</div>
+                      <div className="royal-item-val">{familyInfo.fatherNativePlace || "N/A"}</div>
+                    </div>
+                  </div>
+                  <div className="col-md-6 col-lg-4 mb-3">
+                    <div className="royal-grid-item">
+                      <div className="royal-item-lbl"><FaFemale /> Mother's Name</div>
+                      <div className="royal-item-val">{familyInfo.motherName || "N/A"}</div>
+                    </div>
+                  </div>
+                  <div className="col-md-6 col-lg-4 mb-3">
+                    <div className="royal-grid-item">
+                      <div className="royal-item-lbl"><FaBriefcase /> Mother's Occupation</div>
+                      <div className="royal-item-val">{familyInfo.motherOccupation || "N/A"}</div>
+                    </div>
+                  </div>
+                  <div className="col-md-6 col-lg-4 mb-3">
+                    <div className="royal-grid-item">
+                      <div className="royal-item-lbl"><FaMapMarkerAlt /> Mother's Native Thikana</div>
+                      <div className="royal-item-val">{familyInfo.motherNativePlace || "N/A"}</div>
+                    </div>
+                  </div>
+                  <div className="col-md-6 col-lg-4 mb-3">
+                    <div className="royal-grid-item">
+                      <div className="royal-item-lbl"><FaMapPin /> Family Thikana / Location</div>
+                      <div className="royal-item-val">{familyInfo.familyLocation || member.address?.city || "N/A"}</div>
+                    </div>
+                  </div>
+                  <div className="col-md-6 col-lg-4 mb-3">
+                    <div className="royal-grid-item">
+                      <div className="royal-item-lbl"><FaUsers /> Siblings Summary</div>
                       <div className="royal-item-val">{familyInfo.siblings || "N/A"}</div>
                     </div>
                   </div>
-                  <div className="col-md-6 mb-3">
+                  <div className="col-md-6 col-lg-4 mb-3">
                     <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Additional Maternal Info</div>
+                      <div className="royal-item-lbl"><FaInfoCircle /> Additional Maternal Info</div>
                       <div className="royal-item-val">{familyInfo.additionalMaternal || "N/A"}</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-3 p-4 rounded" style={{ background: "#faf7f8", border: "1.5px dashed #f2e6eb" }}>
+                {/* Brothers & Sisters Lineage Details (if available) */}
+                {["elderBrother", "elderSister", "youngerBrother", "youngerSister"].some(
+                  (k) => Array.isArray(familyInfo[k]) && familyInfo[k].length > 0
+                ) && (
+                  <div className="mt-4">
+                    <h5 style={{ color: "#59123B", fontWeight: 700, fontSize: "1rem" }} className="mb-3">
+                      <FaUsers style={{ color: "#D4AF37", marginRight: 8 }} /> Brothers & Sisters Details
+                    </h5>
+                    <div className="table-responsive">
+                      <table className="table table-striped relative-table border rounded">
+                        <thead>
+                          <tr>
+                            <th>Relation</th>
+                            <th>Name</th>
+                            <th>Married To</th>
+                            <th>Son / Daughter Of</th>
+                            <th>Thikana</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            { key: "elderBrother", label: "Elder Brother" },
+                            { key: "elderSister", label: "Elder Sister" },
+                            { key: "youngerBrother", label: "Younger Brother" },
+                            { key: "youngerSister", label: "Younger Sister" },
+                          ].map(({ key, label }) =>
+                            Array.isArray(familyInfo[key]) &&
+                            familyInfo[key].map((item, idx) => (
+                              <tr key={`${key}-${idx}`}>
+                                <td style={{ color: "#59123B", fontWeight: 700 }}>{label}</td>
+                                <td>{item.name || "N/A"}</td>
+                                <td>{item.marriedto || item.marriedTo || "N/A"}</td>
+                                <td>{item.sonof || item.daughterof || item.daughterOf || "N/A"}</td>
+                                <td>{item.thikana || "N/A"}</td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Brief Family Intro Box */}
+                <div className="mt-4 p-4 rounded" style={{ background: "#ffffff", border: "1.5px dashed #D4AF37", boxShadow: "0 2px 8px rgba(89, 18, 59, 0.04)" }}>
                   <h5 style={{ color: "#59123B", fontWeight: 700, fontSize: "0.95rem" }} className="mb-2">Brief Family Intro:</h5>
                   <p style={{ color: "#5c3d4a", margin: 0, fontSize: "0.9rem", lineHeight: "1.6" }}>
                     {familyInfo.familyInfo || "No details provided."}
@@ -1024,160 +1236,108 @@ function ViewMember() {
             {/* 5️⃣ TAB: HOROSCOPE */}
             {activeTab === "horoscope" && (
               <div>
-                <h4 className="royal-card-title"><FaCompass /> Horoscopic / Astro Details</h4>
-                <div className="row">
+                <h4 className="royal-card-title"><FaCompass /> Zodiac & Horoscope Details</h4>
+                <div className="row g-3">
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Birth Place (Shehar)</div>
-                      <div className="royal-item-val">{horoInfo.birthPlace || "N/A"}</div>
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaCalendarAlt /></div>
+                      <div>
+                        <div className="royal-item-lbl">DATE OF BIRTH</div>
+                        <div className="royal-item-val">{formatDate(member.dateOfBirth)}</div>
+                      </div>
                     </div>
                   </div>
+
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Birth Time (Samay)</div>
-                      <div className="royal-item-val">{horoInfo.birthTime || "N/A"}</div>
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaHistory /></div>
+                      <div>
+                        <div className="royal-item-lbl">BIRTH TIME</div>
+                        <div className="royal-item-val">{getBirthTime(horoInfo)}</div>
+                      </div>
                     </div>
                   </div>
+
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Manglik status</div>
-                      <div className="royal-item-val">{horoInfo.isManglik || "N/A"}</div>
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaMapMarkerAlt /></div>
+                      <div>
+                        <div className="royal-item-lbl">BIRTHPLACE</div>
+                        <div className="royal-item-val">{horoInfo.birthplace || horoInfo.birthCity || horoInfo.birthPlace || "N/A"}</div>
+                      </div>
                     </div>
                   </div>
+
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Rashi</div>
-                      <div className="royal-item-val">{horoInfo.rashi || "N/A"}</div>
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaLandmark /></div>
+                      <div>
+                        <div className="royal-item-lbl">GOTRA</div>
+                        <div className="royal-item-val">{horoInfo.gotra || member.gotra || "N/A"}</div>
+                      </div>
                     </div>
                   </div>
+
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Nakshatra</div>
-                      <div className="royal-item-val">{horoInfo.nakshatra || "N/A"}</div>
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaCompass /></div>
+                      <div>
+                        <div className="royal-item-lbl">MANGLIK STATUS</div>
+                        <div className="royal-item-val">{horoInfo.maglik || horoInfo.isManglik || horoInfo.manglik || "N/A"}</div>
+                      </div>
                     </div>
                   </div>
+
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Nadi</div>
-                      <div className="royal-item-val">{horoInfo.nadi || "N/A"}</div>
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaCompass /></div>
+                      <div>
+                        <div className="royal-item-lbl">RASHI</div>
+                        <div className="royal-item-val">{horoInfo.rashi || horoInfo.zodiac || "N/A"}</div>
+                      </div>
                     </div>
                   </div>
+
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Devak / Gan</div>
-                      <div className="royal-item-val">{horoInfo.gan || "N/A"}</div>
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaCompass /></div>
+                      <div>
+                        <div className="royal-item-lbl">NAKSHATRA</div>
+                        <div className="royal-item-val">{horoInfo.nakshatra || "N/A"}</div>
+                      </div>
                     </div>
                   </div>
+
                   <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Charan</div>
-                      <div className="royal-item-val">{horoInfo.charan || "N/A"}</div>
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaCompass /></div>
+                      <div>
+                        <div className="royal-item-lbl">RELIGION</div>
+                        <div className="royal-item-val">{horoInfo.religion || "Hindu"}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-md-6 mb-3">
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaCompass /></div>
+                      <div>
+                        <div className="royal-item-lbl">NADI</div>
+                        <div className="royal-item-val">{horoInfo.nadi || "N/A"}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-md-6 mb-3">
+                    <div className="royal-icon-card">
+                      <div className="royal-icon-box"><FaCompass /></div>
+                      <div>
+                        <div className="royal-item-lbl">CHARAN</div>
+                        <div className="royal-item-val">{horoInfo.charan || "N/A"}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* 6️⃣ TAB: PATERNAL & RELATIVES */}
-            {activeTab === "paternal" && (
-              <div>
-                <h4 className="royal-card-title"><FaUsersCog /> Grandparents & Extended Lineage</h4>
-                
-                {/* Grandparents Block */}
-                <h5 style={{ color: "#59123B", fontWeight: 700 }} className="mb-3">Paternal & Maternal Grandparents</h5>
-                <div className="row mb-4">
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Dada Ji (Grandfather)</div>
-                      <div className="royal-item-val">{extFamily.grandFatherName || "N/A"}</div>
-                      {extFamily.grandFathersonOf && <div style={{ fontSize: "0.82rem", color: "#9A7888" }} className="mt-1">Son of: {extFamily.grandFathersonOf}</div>}
-                      {extFamily.grandFatheroccupation && <div style={{ fontSize: "0.82rem", color: "#9A7888" }}>Occupation: {extFamily.grandFatheroccupation}</div>}
-                      {extFamily.grandFatherthikana && <div style={{ fontSize: "0.82rem", color: "#9A7888" }}>Thikana: {extFamily.grandFatherthikana}</div>}
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Dadi Ji (Grandmother)</div>
-                      <div className="royal-item-val">{extFamily.grandMotherName || "N/A"}</div>
-                      {extFamily.grandMotherdaughterOf && <div style={{ fontSize: "0.82rem", color: "#9A7888" }} className="mt-1">Daughter of: {extFamily.grandMotherdaughterOf}</div>}
-                      {extFamily.grandmotherthikana && <div style={{ fontSize: "0.82rem", color: "#9A7888" }}>Thikana: {extFamily.grandmotherthikana}</div>}
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Nana Ji (Maternal Grandfather)</div>
-                      <div className="royal-item-val">{extFamily.maternalGrandFatherName || "N/A"}</div>
-                      {extFamily.maternalGrandFathersonOf && <div style={{ fontSize: "0.82rem", color: "#9A7888" }} className="mt-1">Son of: {extFamily.maternalGrandFathersonOf}</div>}
-                      {extFamily.maternalGrandFatheroccupation && <div style={{ fontSize: "0.82rem", color: "#9A7888" }}>Occupation: {extFamily.maternalGrandFatheroccupation}</div>}
-                      {extFamily.maternalGrandFatherthikana && <div style={{ fontSize: "0.82rem", color: "#9A7888" }}>Thikana: {extFamily.maternalGrandFatherthikana}</div>}
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="royal-grid-item">
-                      <div className="royal-item-lbl">Nani Ji (Maternal Grandmother)</div>
-                      <div className="royal-item-val">{extFamily.maternalGrandMotherName || "N/A"}</div>
-                      {extFamily.maternalGrandMotherdaughterOf && <div style={{ fontSize: "0.82rem", color: "#9A7888" }} className="mt-1">Daughter of: {extFamily.maternalGrandMotherdaughterOf}</div>}
-                      {extFamily.maternalGrandMotherthikana && <div style={{ fontSize: "0.82rem", color: "#9A7888" }}>Thikana: {extFamily.maternalGrandMotherthikana}</div>}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Relatives Arrays Block */}
-                <h5 style={{ color: "#59123B", fontWeight: 700 }} className="mb-3">Aunts, Uncles & Relatives Directory</h5>
-                
-                {/* Check if any relatives arrays have items */}
-                {["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"].some(key => Array.isArray(extFamily[key]) && extFamily[key].length > 0) ? (
-                  <>
-                    {/* Desktop Table View */}
-                    <div className="table-responsive d-none d-lg-block">
-                      <table className="table table-striped relative-table border">
-                        <thead>
-                          <tr>
-                            <th>Relation</th>
-                            <th>Relative's Name</th>
-                            <th>Married To</th>
-                            <th>Son / Daughter of</th>
-                            <th>Thikana (Address)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"].map((relKey) => 
-                            Array.isArray(extFamily[relKey]) && extFamily[relKey].map((person, idx) => (
-                              <tr key={`${relKey}-${idx}`}>
-                                <td style={{ color: "#59123B", fontWeight: 700 }}>
-                                  {relKey.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-                                </td>
-                                <td>{person.name || "N/A"}</td>
-                                <td>{person.marriedto || person.marriedTo || "N/A"}</td>
-                                <td>{person.sonof || person.daughterof || person.daughterOf || "N/A"}</td>
-                                <td>{person.thikana || "N/A"}</td>
-                              </tr>
-                            ))
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Mobile Card Layout */}
-                    <div className="d-lg-none">
-                      {["badePapa", "kakosa", "bhuasa", "mamosa", "masisa"].map((relKey) => 
-                        Array.isArray(extFamily[relKey]) && extFamily[relKey].map((person, idx) => (
-                          <div className="relative-card-mobile" key={`${relKey}-${idx}`}>
-                            <div style={{ color: "#59123B", fontWeight: 700, borderBottom: "1px solid #f2e6eb", paddingBottom: 6 }} className="mb-2">
-                              {relKey.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-                            </div>
-                            <div className="mb-1"><strong>Name:</strong> {person.name || "N/A"}</div>
-                            <div className="mb-1"><strong>Married to:</strong> {person.marriedto || person.marriedTo || "N/A"}</div>
-                            <div className="mb-1"><strong>Son/Daughter Of:</strong> {person.sonof || person.daughterof || person.daughterOf || "N/A"}</div>
-                            <div className="mb-1"><strong>Thikana:</strong> {person.thikana || "N/A"}</div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-muted p-3 bg-light rounded text-center">No uncles, aunts or maternal family listings declared.</p>
-                )}
               </div>
             )}
 

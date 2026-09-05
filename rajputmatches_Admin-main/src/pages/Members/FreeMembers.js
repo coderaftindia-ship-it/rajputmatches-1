@@ -14,6 +14,26 @@ const BASE_URL = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin
 /* ─────────────────────────── helpers ─────────────────────────── */
 const getToken = () => localStorage.getItem("adminAuthToken");
 
+const getCreatedDate = (member) => {
+  if (member?.createdAt) return member.createdAt;
+  if (member?._id && typeof member._id === "string" && member._id.length === 24) {
+    const timestamp = parseInt(member._id.substring(0, 8), 16) * 1000;
+    if (!isNaN(timestamp)) return new Date(timestamp);
+  }
+  return null;
+};
+
+const formatDate = (dateValue) => {
+  if (!dateValue) return "—";
+  const d = new Date(dateValue);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
 const getAvatar = (member) => {
   if (!member?.avatar) return null;
   const av = member.avatar;
@@ -192,6 +212,16 @@ const FreeMembers = () => {
         va = a.martrId || 0; vb = b.martrId || 0;
       } else if (sortField === "view") {
         va = a.view || 0; vb = b.view || 0;
+      } else if (sortField === "createdAt") {
+        const da = getCreatedDate(a);
+        const db = getCreatedDate(b);
+        va = da ? new Date(da).getTime() : 0;
+        vb = db ? new Date(db).getTime() : 0;
+      } else if (sortField === "lastLoginAt") {
+        const da = a.lastLoginAt || getCreatedDate(a);
+        const db = b.lastLoginAt || getCreatedDate(b);
+        va = da ? new Date(da).getTime() : 0;
+        vb = db ? new Date(db).getTime() : 0;
       } else {
         va = a._id; vb = b._id;
       }
@@ -532,8 +562,12 @@ const FreeMembers = () => {
                   <th>Approval</th>
                   <th>Status</th>
                   <th>Verified</th>
-                  <th>Created Date</th>
-                  <th>Last Login</th>
+                  <th onClick={() => toggleSort("createdAt")} style={{ minWidth: 120, cursor: "pointer" }}>
+                    Created Date <SortIcon field="createdAt" />
+                  </th>
+                  <th onClick={() => toggleSort("lastLoginAt")} style={{ minWidth: 120, cursor: "pointer" }}>
+                    Last Login <SortIcon field="lastLoginAt" />
+                  </th>
                   <th onClick={() => toggleSort("view")}>
                     Views <SortIcon field="view" />
                   </th>
@@ -652,13 +686,13 @@ const FreeMembers = () => {
                       </td>
 
                       {/* creation date */}
-                      <td style={{ fontSize: ".78rem", color: "#666" }}>
-                        {member.createdAt ? new Date(member.createdAt).toLocaleDateString() : "—"}
+                      <td style={{ fontSize: ".78rem", color: "#666", whiteSpace: "nowrap" }}>
+                        {formatDate(getCreatedDate(member))}
                       </td>
 
                       {/* last login */}
-                      <td style={{ fontSize: ".78rem", color: "#666" }}>
-                        {member.lastLoginAt ? new Date(member.lastLoginAt).toLocaleDateString() : "—"}
+                      <td style={{ fontSize: ".78rem", color: "#666", whiteSpace: "nowrap" }}>
+                        {formatDate(member.lastLoginAt || getCreatedDate(member))}
                       </td>
 
                       {/* views */}

@@ -883,6 +883,11 @@ const ViewPage = () => {
   const hasPaternal = paternaldetails &&
     Object.entries(paternaldetails).some(([k, v]) => !["_id", "__v", "userId", "updatedAt", "createdAt"].includes(k) && !Array.isArray(v) && v && String(v).trim());
 
+  const hasRelatives = paternaldetails &&
+    ["badePapa", "bhuasa", "kakosa", "mamosa", "masisa"].some(
+      (rk) => Array.isArray(paternaldetails[rk]) && paternaldetails[rk].some((person) => person && person.name && String(person.name).trim())
+    );
+
   const profileFullName = [Data.firstName, Data.middleName, Data.lastName]
     .filter(Boolean)
     .join(" ") || Data.name || "N/A";

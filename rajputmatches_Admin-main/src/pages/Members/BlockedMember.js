@@ -14,6 +14,26 @@ const BASE_URL = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin
 /* ─────────────────────────── HELPERS ─────────────────────────── */
 const getToken = () => localStorage.getItem("adminAuthToken");
 
+const getCreatedDate = (member) => {
+  if (member?.createdAt) return member.createdAt;
+  if (member?._id && typeof member._id === "string" && member._id.length === 24) {
+    const timestamp = parseInt(member._id.substring(0, 8), 16) * 1000;
+    if (!isNaN(timestamp)) return new Date(timestamp);
+  }
+  return null;
+};
+
+const formatDate = (dateValue) => {
+  if (!dateValue) return "—";
+  const d = new Date(dateValue);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
 const getAvatar = (member) => {
   if (!member?.avatar) return null;
   const av = member.avatar;
@@ -500,6 +520,8 @@ const BlockedMember = () => {
                     <th>Approval</th>
                     <th>Subscription</th>
                     <th>Account Status</th>
+                    <th>Created Date</th>
+                    <th>Last Login</th>
                     <th onClick={() => toggleSort("view")}>
                       Views <SortIcon field="view" />
                     </th>
@@ -606,6 +628,16 @@ const BlockedMember = () => {
                         {/* Status (Blocked) */}
                         <td>
                           <span className="badge-blocked"><FaBan /> Blocked</span>
+                        </td>
+
+                        {/* Created Date */}
+                        <td style={{ fontSize: ".78rem", color: "#666", whiteSpace: "nowrap" }}>
+                          {formatDate(getCreatedDate(member))}
+                        </td>
+
+                        {/* Last Login */}
+                        <td style={{ fontSize: ".78rem", color: "#666", whiteSpace: "nowrap" }}>
+                          {formatDate(member.lastLoginAt || getCreatedDate(member))}
                         </td>
 
                         {/* Views */}
