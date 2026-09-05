@@ -1,510 +1,504 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap');
-
 /* ==========================================================================
-   Exact Rajput Alliances Pixel-Perfect UI Reference Theme
+   Royal Auth Theme Styles
    ========================================================================== */
 
-/* Outer Canvas Backdrop */
-.ref-outer-container {
+.royal-auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
   width: 100%;
-  background: #FAF7F2;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px 15px;
-  box-sizing: border-box;
-  overflow: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/* Upper Dark Purple Background Backdrop */
-.ref-outer-bg-gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 65%;
-  background: linear-gradient(180deg, #2B021E 0%, #3B0629 55%, #4B0934 80%, rgba(75, 9, 52, 0) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Background Soft Organic Smoke Glow Effect Left and Right */
-.ref-outer-smoke-left {
-  position: absolute;
-  top: 8%;
-  left: -8%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(74, 10, 52, 0.75) 0%, rgba(43, 2, 30, 0) 70%);
-  filter: blur(60px);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.ref-outer-smoke-right {
-  position: absolute;
-  top: 12%;
-  right: -8%;
-  width: 650px;
-  height: 650px;
-  background: radial-gradient(circle, rgba(90, 14, 64, 0.7) 0%, rgba(43, 2, 30, 0) 70%);
-  filter: blur(70px);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Smartphone Container Frame */
-.ref-phone-device {
-  width: 395px;
   max-width: 100%;
-  height: 812px;
-  background: #3B0629;
-  border-radius: 46px;
-  border: 4px solid #571C44;
-  box-shadow: 
-    0 0 0 1px #1E0114,
-    0 25px 65px rgba(0, 0, 0, 0.65),
-    0 10px 30px rgba(61, 6, 42, 0.5);
-  position: relative;
-  z-index: 10;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  user-select: none;
-}
-
-/* Status Bar & Notch */
-.ref-phone-topbar {
-  height: 50px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 30;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-}
-
-.ref-skip-button {
-  background: none;
-  border: none;
-  color: #FFFFFF;
-  font-family: 'Inter', sans-serif;
-  font-size: 13.5px;
-  font-weight: 500;
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
-  z-index: 35;
-  outline: none;
-  transition: opacity 0.2s ease;
-}
-
-.ref-skip-button:hover {
-  opacity: 0.8;
-}
-
-.ref-notch-pill {
-  width: 100px;
-  height: 26px;
-  background: #000000;
-  border-radius: 18px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 10px;
-  z-index: 35;
-}
-
-.ref-status-right-icons {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: #FFFFFF;
-  z-index: 35;
-}
-
-/* Upper Section inside Phone */
-.ref-phone-upper-content {
-  height: 485px;
-  background: linear-gradient(180deg, #350524 0%, #460832 60%, #520B3B 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-top: 45px;
+  background-image: url("../assets/images/matchmakingbg.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
   position: relative;
   box-sizing: border-box;
+  padding: 3rem 1.5rem;
 }
 
-/* Smoke Vignette Texture Overlay */
-.ref-upper-vignette {
+.royal-auth-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url("../assets/images/smoke_vignette.png");
-  background-size: cover;
-  background-position: center;
-  opacity: 0.45;
+  background-color: rgba(63, 12, 42, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
 }
 
-/* Lotus Logo Image */
-.ref-lotus-logo-image {
-  width: 215px;
-  height: 215px;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
+.royal-auth-card {
+  background: var(--royal-cream, #FCF5EA);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(63, 12, 42, 0.45);
+  border: 2px solid var(--royal-gold);
+  width: 100%;
+  max-width: 480px;
   position: relative;
-  z-index: 10;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  z-index: 5;
+  opacity: 1 !important;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  animation: cardSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
 }
 
-/* Brand Title */
-.ref-brand-title-text {
-  font-family: 'Cinzel', serif;
-  font-size: 21px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin: 0 0 4px 0;
-  color: #E2C278;
-  background: linear-gradient(180deg, #FFF6D2 0%, #E2C278 50%, #B88E33 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
-  position: relative;
-  z-index: 10;
+/* Wider card variant for registration */
+.royal-auth-card.wide {
+  max-width: 720px;
 }
 
-/* Subtitle */
-.ref-brand-subtitle-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 14.5px;
-  font-weight: 500;
-  color: #DAB978;
-  margin: 0;
-  letter-spacing: 0.3px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+.royal-auth-header {
+  background: linear-gradient(135deg, var(--royal-maroon) 0%, var(--royal-maroon-dark) 100%);
+  padding: 2.5rem 2rem 2rem 2rem;
+  text-align: center;
   position: relative;
-  z-index: 10;
-}
-
-/* Lower Cream Card Section */
-.ref-phone-lower-card {
-  flex: 1;
-  background: #FAF6F0;
-  border-radius: 36px 36px 0 0;
-  margin-top: -35px;
-  position: relative;
-  z-index: 20;
-  padding: 22px 24px 18px 24px;
+  border-bottom: 3px solid var(--royal-gold);
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-sizing: border-box;
-  box-shadow: 0 -12px 30px rgba(45, 4, 32, 0.35);
 }
 
-/* Soft top filigree glow inside cream card */
-.ref-phone-lower-card::before {
-  content: '';
+.royal-close-btn {
   position: absolute;
-  top: -20px;
-  left: 0;
-  right: 0;
-  height: 40px;
-  background: radial-gradient(ellipse at top, rgba(74, 9, 53, 0.22) 0%, rgba(250, 246, 240, 0) 70%);
-  pointer-events: none;
-}
-
-/* Action Controls */
-.ref-btn-create-account {
-  width: 100%;
-  height: 46px;
-  border-radius: 9999px;
-  background: transparent;
-  border: 1.5px solid #3B0626;
-  color: #3B0626;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-  outline: none;
-}
-
-.ref-btn-create-account:hover {
-  background: rgba(59, 6, 38, 0.04);
-}
-
-.ref-btn-login-main {
-  width: 100%;
-  height: 46px;
-  border-radius: 9999px;
-  background: #470831;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: none;
   border: none;
-  color: #FFFFFF;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.5rem;
   cursor: pointer;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 14px rgba(71, 8, 49, 0.3);
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-  outline: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }
 
-.ref-btn-login-main:hover {
-  background: #570B3D;
-  box-shadow: 0 6px 18px rgba(71, 8, 49, 0.4);
+.royal-close-btn:hover {
+  color: var(--royal-gold);
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
 }
 
-.ref-forgot-password-link {
-  font-family: 'Inter', sans-serif;
-  font-size: 12.5px;
-  color: #4A3E46;
-  text-decoration: none;
-  font-weight: 500;
-  margin-bottom: 8px;
-  transition: color 0.2s ease;
+.royal-crown-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--royal-gold);
+  background: linear-gradient(135deg, var(--royal-maroon-dark), var(--royal-maroon));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(237, 177, 57, 0.4);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  position: relative;
 }
 
-.ref-forgot-password-link:hover {
-  color: #3B0626;
-  text-decoration: underline;
-}
-
-.ref-terms-policy-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  color: #5C4E58;
-  text-align: center;
-  margin: 0 0 14px 0;
-  line-height: 1.4;
-}
-
-.ref-terms-policy-anchor {
-  color: #5C4E58;
-  text-decoration: underline;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.ref-terms-policy-anchor:hover {
-  color: #3B0626;
-}
-
-/* Divider Line with Text */
-.ref-or-divider-container {
+.royal-crown-badge img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.royal-crown-icon {
+  color: var(--royal-gold);
+  font-size: 2.2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.royal-auth-title {
+  font-family: var(--font-heading);
+  color: var(--royal-gold-light);
+  font-size: 1.95rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem 0;
+  letter-spacing: 0.5px;
+}
+
+.royal-auth-subtitle {
+  font-family: var(--font-heading);
+  font-style: italic;
+  color: var(--royal-cream);
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.95;
+  font-weight: 300;
+}
+
+/* Elegant filigree separator */
+.royal-divider {
   display: flex;
   align-items: center;
-  margin-bottom: 14px;
+  justify-content: center;
+  width: 60%;
+  margin: 1.25rem 0 0 0;
+  position: relative;
 }
 
-.ref-or-divider-line {
+.royal-divider::before,
+.royal-divider::after {
+  content: "";
   flex: 1;
   height: 1px;
-  background: #E2D8CC;
+  background: linear-gradient(90deg, transparent, var(--royal-gold), transparent);
 }
 
-.ref-or-divider-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  color: #7C6E78;
-  padding: 0 10px;
+.royal-divider-ornament {
+  color: var(--royal-gold);
+  font-size: 1rem;
+  margin: 0 8px;
+  opacity: 0.85;
+}
+
+.royal-auth-body {
+  padding: 2.25rem 2.25rem 2.5rem 2.25rem;
+  box-sizing: border-box;
+}
+
+/* Tab Selector */
+.royal-tab-toggle {
+  display: flex;
+  background: rgba(89, 18, 59, 0.06);
+  padding: 4px;
+  border-radius: 30px;
+  margin-bottom: 2rem;
+  border: 1.5px solid rgba(237, 177, 57, 0.25);
+}
+
+.royal-tab-btn {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--royal-text-light);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  text-decoration: none;
+}
+
+.royal-tab-btn:hover {
+  color: var(--royal-maroon);
+}
+
+.royal-tab-btn.active {
+  background: linear-gradient(135deg, var(--royal-maroon), var(--royal-maroon-dark));
+  color: var(--royal-gold-light);
+  box-shadow: 0 4px 12px rgba(89, 18, 59, 0.2);
+}
+
+/* Form groups */
+.royal-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.royal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.royal-form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.royal-input-label {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--royal-maroon);
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.royal-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.royal-input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--royal-gold-dark);
+  font-size: 1.05rem;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.royal-input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.65rem;
+  border: 1.5px solid rgba(237, 177, 57, 0.35);
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  background: #ffffff;
+  color: var(--royal-text);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* Input text adjustments for fields without left icons */
+.royal-input.no-icon {
+  padding-left: 1rem;
+}
+
+.royal-input:focus {
+  border-color: var(--royal-gold);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(237, 177, 57, 0.15);
+}
+
+.royal-input:disabled {
+  background-color: #f5eedf;
+  color: var(--royal-text-light);
+  border-color: rgba(237, 177, 57, 0.2);
+  cursor: not-allowed;
+}
+
+.royal-password-toggle {
+  position: absolute;
+  right: 1rem;
+  color: var(--royal-text-light);
+  cursor: pointer;
+  transition: color 0.2s;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+}
+
+.royal-password-toggle:hover {
+  color: var(--royal-maroon);
+}
+
+.royal-forgot-link {
+  display: block;
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--royal-maroon);
+  font-weight: 600;
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s;
+  text-decoration: none;
+}
+
+.royal-forgot-link:hover {
+  color: var(--royal-maroon-light);
+  text-decoration: underline;
+}
+
+/* Submit button */
+.royal-submit-btn {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--royal-maroon), var(--royal-maroon-dark));
+  color: white;
+  border: 1.5px solid var(--royal-gold);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(89, 18, 59, 0.22);
+  box-sizing: border-box;
   white-space: nowrap;
 }
 
-/* Social Buttons Row */
-.ref-social-icons-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-}
-
-.ref-social-button-circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  border: 1px solid #EAE0D4;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none;
-  padding: 0;
-}
-
-.ref-social-button-circle:hover {
+.royal-submit-btn:hover {
+  background: linear-gradient(135deg, var(--royal-maroon-dark), var(--royal-maroon));
+  border-color: var(--royal-gold-light);
+  color: var(--royal-gold-light);
   transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-  border-color: #DCD0C2;
+  box-shadow: 0 8px 20px rgba(89, 18, 59, 0.35);
 }
 
-/* Credentials Form Modal */
-.ref-credentials-modal-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(35, 3, 25, 0.8);
-  backdrop-filter: blur(6px);
-  z-index: 100;
-  display: flex;
-  align-items: flex-end;
-  animation: modalFadeIn 0.3s ease;
+.royal-submit-btn:active {
+  transform: translateY(0);
 }
 
-.ref-credentials-modal-box {
-  width: 100%;
-  background: #FAF6F0;
-  border-radius: 32px 32px 0 0;
-  padding: 24px 24px 32px 24px;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.35);
-  animation: modalSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  box-sizing: border-box;
+.royal-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-.ref-modal-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #EAE0D4;
+.royal-submit-btn-icon {
+  font-size: 1.1rem;
 }
 
-.ref-modal-heading {
-  font-family: 'Cinzel', serif;
-  font-size: 17px;
+/* Footer & other elements */
+.royal-footer-text {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--royal-text-light);
+  margin-top: 1.75rem;
+  font-weight: 500;
+}
+
+.royal-footer-link {
+  color: var(--royal-maroon);
   font-weight: 700;
-  color: #3B0626;
-  margin: 0;
+  text-decoration: none;
+  transition: color 0.2s;
+  margin-left: 4px;
 }
 
-.ref-modal-x-btn {
-  background: #EDE2D4;
-  border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  font-size: 16px;
-  color: #3B0626;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.royal-footer-link:hover {
+  color: var(--royal-maroon-light);
+  text-decoration: underline;
 }
 
-.ref-form-field {
-  margin-bottom: 14px;
-  text-align: left;
+.royal-demo-creds {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--royal-text-light);
+  margin-top: 2rem;
+  padding: 8px 12px;
+  background: rgba(237, 177, 57, 0.1);
+  border: 1px dashed rgba(237, 177, 57, 0.4);
+  border-radius: 8px;
+  line-height: 1.4;
 }
 
-.ref-form-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #3B0626;
-  margin-bottom: 5px;
+.royal-error-text {
+  color: #c92a2a;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  font-family: var(--font-body);
+  font-weight: 500;
   display: block;
 }
 
-.ref-form-input-wrapper {
-  position: relative;
+.royal-info-text {
+  color: var(--royal-maroon);
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* OTP Inline Fields styling */
+.royal-otp-wrapper {
   display: flex;
+  gap: 10px;
   align-items: center;
+  margin-top: 0.5rem;
 }
 
-.ref-form-input-icon {
-  position: absolute;
-  left: 12px;
-  color: #3B0626;
-  font-size: 13px;
-}
-
-.ref-form-input-element {
-  width: 100%;
-  height: 44px;
-  border-radius: 10px;
-  border: 1.5px solid #E0D4C4;
-  background: #FFFFFF;
-  padding: 0 12px 0 36px;
-  font-family: 'Inter', sans-serif;
-  font-size: 13.5px;
-  color: #333333;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease;
-}
-
-.ref-form-input-element:focus {
-  border-color: #3B0626;
-}
-
-.ref-form-error {
-  color: #D32F2F;
-  font-size: 11px;
-  margin-top: 4px;
-  display: block;
-}
-
-@keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes modalSlideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-/* Mobile Screen Adaptation */
-@media (max-width: 440px) {
-  .ref-outer-container {
-    padding: 0;
-    background: #350524;
+/* Responsive grid for registration on mobile */
+@media (max-width: 768px) {
+  .royal-form-grid,
+  .royal-form-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
-  .ref-phone-device {
-    max-width: 100%;
-    height: 100vh;
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .royal-form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
-  .ref-notch-pill {
-    display: none;
+  .royal-auth-container {
+    padding: 1rem 0.75rem;
+  }
+  .royal-auth-body {
+    padding: 1.25rem 1.1rem 1.5rem;
+  }
+  .royal-auth-header {
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+  .royal-auth-title {
+    font-size: 1.35rem;
+  }
+  .royal-auth-subtitle {
+    font-size: 0.9rem;
+  }
+  .royal-crown-badge {
+    width: 54px;
+    height: 54px;
+    margin-bottom: 0.6rem;
+  }
+  .royal-crown-icon {
+    font-size: 1.6rem;
+  }
+  /* Smaller submit button on mobile */
+  .royal-submit-btn {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 9px;
+    gap: 6px;
+  }
+  .royal-submit-btn-icon {
+    font-size: 0.95rem;
+  }
+  /* Smaller tab buttons */
+  .royal-tab-btn {
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+  /* Smaller labels and inputs */
+  .royal-input-label {
+    font-size: 0.82rem;
+    margin-bottom: 0.35rem;
+  }
+  .royal-input,
+  select.royal-input {
+    padding: 0.65rem 0.85rem 0.65rem 2.2rem;
+    font-size: 16px !important; /* iOS Safari auto-zoom prevention */
+    border-radius: 9px;
+  }
+  .royal-input.no-icon,
+  select.royal-input.no-icon {
+    padding-left: 0.85rem !important;
+  }
+  .royal-form-group {
+    margin-bottom: 0.85rem;
+  }
+  .royal-forgot-link {
+    font-size: 0.78rem;
+    margin-bottom: 1rem;
+  }
+  .royal-footer-text {
+    font-size: 0.82rem;
+    margin-top: 1.25rem;
+  }
+  .royal-demo-creds {
+    font-size: 0.72rem;
+    margin-top: 1.25rem;
+    padding: 6px 10px;
+  }
+  .royal-otp-wrapper {
+    gap: 6px;
   }
 }

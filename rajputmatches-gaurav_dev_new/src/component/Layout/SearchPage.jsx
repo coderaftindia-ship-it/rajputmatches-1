@@ -710,10 +710,46 @@ const SearchPage = () => {
   const [clanOptions, setClanOptions] = useState({ clans: [], subclans: [], combined: [] });
   const [clanLoading, setClanLoading] = useState(false);
 
-  const profilesPerPage = 6;
+  const [itemsPerPage, setItemsPerPage] = useState(15);
+  const profilesPerPage = itemsPerPage === "all" ? (profiles?.length || 15) : Number(itemsPerPage);
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.max(1, Math.ceil((profiles?.length||0) / profilesPerPage));
-  const getPage    = () => profiles?.slice((currentPage-1)*profilesPerPage, currentPage*profilesPerPage) || [];
+  const totalPages = Math.max(1, Math.ceil((profiles?.length || 0) / profilesPerPage));
+
+  const getPage = () => {
+    if (itemsPerPage === "all") return profiles || [];
+    const start = (currentPage - 1) * profilesPerPage;
+    return profiles?.slice(start, start + profilesPerPage) || [];
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    const val = e.target.value === "all" ? "all" : parseInt(e.target.value, 10);
+    setItemsPerPage(val);
+    setCurrentPage(1);
+  };
+
+  const resultsRef = useRef(null);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      if (resultsRef.current) {
+        resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
+
+  const getPaginationRange = () => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, "...", totalPages];
+    }
+    if (currentPage >= totalPages - 3) {
+      return [1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    }
+    return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
+  };
 
   // ── Ref to always have latest formData (prevents stale-closure in callbacks) ──
   const formDataRef = useRef(formData);
@@ -1157,38 +1193,81 @@ const SearchPage = () => {
 
           {/* RIGHT: Results */}
           <div style={{ flex:1, minWidth:0 }}>
-            {/* Top bar: count + view toggle */}
-            <div className="d-flex justify-content-between align-items-center mb-4"
+            {/* Top bar: count + select per page + view toggle */}
+            <div
+              ref={resultsRef}
+              className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3"
               style={{ background:"#ffffff", borderRadius:"14px", padding:"14px 20px", boxShadow:"0 2px 12px rgba(89,18,59,0.06)", border:"1px solid rgba(212,175,55,0.15)" }}>
-              <h5 className="fw-bold mb-0" style={{ fontFamily:"var(--font-heading)", color:"var(--royal-maroon-dark)", fontSize:"1.05rem" }}>
-                Search Results
-                <span style={{ fontSize:"0.82rem", fontWeight:400, color:"var(--royal-text-light)", marginLeft:"8px" }}>({profiles.length} Found)</span>
-              </h5>
-              <div className="d-flex gap-2">
-                <button
-                  title="Grid View"
-                  onClick={() => setViewMode("grid")}
-                  style={{
-                    width:"38px", height:"38px", borderRadius:"10px",
-                    border: viewMode==="grid" ? "2px solid var(--royal-maroon)" : "1.5px solid rgba(212,175,55,0.3)",
-                    color: viewMode==="grid" ? "var(--royal-maroon)" : "var(--royal-text-light)",
-                    background: viewMode==="grid" ? "#fff5f0" : "#fff",
-                    display:"flex", alignItems:"center", justifyContent:"center",
-                    cursor:"pointer", transition:"all .2s",
-                  }}
-                ><BsGridFill size={16}/></button>
-                <button
-                  title="Table View"
-                  onClick={() => setViewMode("table")}
-                  style={{
-                    width:"38px", height:"38px", borderRadius:"10px",
-                    border: viewMode==="table" ? "2px solid var(--royal-maroon)" : "1.5px solid rgba(212,175,55,0.3)",
-                    color: viewMode==="table" ? "var(--royal-maroon)" : "var(--royal-text-light)",
-                    background: viewMode==="table" ? "#fff5f0" : "#fff",
-                    display:"flex", alignItems:"center", justifyContent:"center",
-                    cursor:"pointer", transition:"all .2s",
-                  }}
-                ><BsListUl size={18}/></button>
+              <div>
+                <h5 className="fw-bold mb-0" style={{ fontFamily:"var(--font-heading)", color:"var(--royal-maroon-dark)", fontSize:"1.05rem" }}>
+                  Search Results
+                  <span style={{ fontSize:"0.82rem", fontWeight:400, color:"var(--royal-text-light)", marginLeft:"8px" }}>({profiles.length} Found)</span>
+                </h5>
+                {profiles.length > 0 && (
+                  <div style={{ fontSize: "0.78rem", color: "var(--royal-text-light)", marginTop: "2px" }}>
+                    Showing {itemsPerPage === "all" ? 1 : (currentPage - 1) * profilesPerPage + 1}–{itemsPerPage === "all" ? profiles.length : Math.min(currentPage * profilesPerPage, profiles.length)} of {profiles.length} profiles
+                  </div>
+                )}
+              </div>
+
+              <div className="d-flex align-items-center gap-3 flex-wrap">
+                {/* Select Option for profiles per page */}
+                <div className="d-flex align-items-center gap-2">
+                  <label htmlFor="profilesPerPageSelect" style={{ fontSize: "0.83rem", fontWeight: 600, color: "var(--royal-maroon-dark)", margin: 0, whiteSpace: "nowrap" }}>
+                    Show per page:
+                  </label>
+                  <select
+                    id="profilesPerPageSelect"
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPageChange}
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: "8px",
+                      border: "1.5px solid rgba(212,175,55,0.4)",
+                      background: "#fff",
+                      color: "var(--royal-maroon-dark)",
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      outline: "none",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    <option value={15}>15 Profiles</option>
+                    <option value={30}>30 Profiles</option>
+                    <option value={45}>45 Profiles</option>
+                    <option value={60}>60 Profiles</option>
+                    <option value="all">All Profiles</option>
+                  </select>
+                </div>
+
+                <div className="d-flex gap-2">
+                  <button
+                    title="Grid View"
+                    onClick={() => setViewMode("grid")}
+                    style={{
+                      width:"38px", height:"38px", borderRadius:"10px",
+                      border: viewMode==="grid" ? "2px solid var(--royal-maroon)" : "1.5px solid rgba(212,175,55,0.3)",
+                      color: viewMode==="grid" ? "var(--royal-maroon)" : "var(--royal-text-light)",
+                      background: viewMode==="grid" ? "#fff5f0" : "#fff",
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      cursor:"pointer", transition:"all .2s",
+                    }}
+                  ><BsGridFill size={16}/></button>
+                  <button
+                    title="Table View"
+                    onClick={() => setViewMode("table")}
+                    style={{
+                      width:"38px", height:"38px", borderRadius:"10px",
+                      border: viewMode==="table" ? "2px solid var(--royal-maroon)" : "1.5px solid rgba(212,175,55,0.3)",
+                      color: viewMode==="table" ? "var(--royal-maroon)" : "var(--royal-text-light)",
+                      background: viewMode==="table" ? "#fff5f0" : "#fff",
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      cursor:"pointer", transition:"all .2s",
+                    }}
+                  ><BsListUl size={18}/></button>
+                </div>
               </div>
             </div>
 
@@ -1237,41 +1316,74 @@ const SearchPage = () => {
 
             {/* Pagination */}
             {totalPages > 1 && !loading && (
-              <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:"8px", marginTop:"40px" }}>
-                <button onClick={()=>setCurrentPage(p=>Math.max(1,p-1))} disabled={currentPage===1}
-                  style={{
-                    width:"40px", height:"40px", borderRadius:"50%",
-                    border:"1.5px solid rgba(212,175,55,0.4)", color:"var(--royal-maroon)",
-                    background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
-                    opacity: currentPage===1 ? 0.4 : 1, transition:"all .2s",
-                    boxShadow:"0 2px 8px rgba(0,0,0,0.06)",
-                  }}>
-                  <FaChevronLeft size={13}/>
-                </button>
-                {Array.from({ length:totalPages }).map((_,i)=>(
-                  <button key={i} onClick={()=>setCurrentPage(i+1)}
+              <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 mt-4 pt-3"
+                style={{ borderTop: "1px dashed rgba(212,175,55,0.3)" }}>
+                <div style={{ fontSize: "0.85rem", color: "var(--royal-text-light)" }}>
+                  Showing <strong style={{ color: "var(--royal-maroon-dark)" }}>
+                    {(currentPage - 1) * profilesPerPage + 1}–{Math.min(currentPage * profilesPerPage, profiles.length)}
+                  </strong> of <strong style={{ color: "var(--royal-maroon-dark)" }}>{profiles.length}</strong> profiles
+                </div>
+
+                <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
                     style={{
-                      width:"40px", height:"40px", borderRadius:"50%",
-                      background: currentPage===i+1 ? "linear-gradient(135deg, var(--royal-maroon), #3a0a25)" : "#fff",
-                      color: currentPage===i+1 ? "#fff" : "var(--royal-maroon)",
-                      border: currentPage===i+1 ? "none" : "1.5px solid rgba(212,175,55,0.4)",
-                      fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
-                      boxShadow: currentPage===i+1 ? "0 4px 12px rgba(89,18,59,0.3)" : "0 2px 6px rgba(0,0,0,0.04)",
-                      transition:"all .2s",
-                    }}>
-                    {i+1}
+                      padding: "0 14px", height: "38px", borderRadius: "20px",
+                      border: "1.5px solid rgba(212,175,55,0.4)", color: "var(--royal-maroon)",
+                      background: "#fff", cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                      display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", fontWeight: 600,
+                      opacity: currentPage === 1 ? 0.4 : 1, transition: "all .2s",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                    }}
+                  >
+                    <FaChevronLeft size={11} /> Prev
                   </button>
-                ))}
-                <button onClick={()=>setCurrentPage(p=>Math.min(totalPages,p+1))} disabled={currentPage===totalPages}
-                  style={{
-                    width:"40px", height:"40px", borderRadius:"50%",
-                    border:"1.5px solid rgba(212,175,55,0.4)", color:"var(--royal-maroon)",
-                    background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
-                    opacity: currentPage===totalPages ? 0.4 : 1, transition:"all .2s",
-                    boxShadow:"0 2px 8px rgba(0,0,0,0.06)",
-                  }}>
-                  <FaChevronRight size={13}/>
-                </button>
+
+                  {getPaginationRange().map((item, idx) => {
+                    if (item === "...") {
+                      return (
+                        <span key={`dots-${idx}`} style={{ padding: "0 6px", color: "var(--royal-text-light)", fontWeight: 600 }}>
+                          ...
+                        </span>
+                      );
+                    }
+                    const isSelected = currentPage === item;
+                    return (
+                      <button
+                        key={item}
+                        onClick={() => handlePageChange(item)}
+                        style={{
+                          width: "38px", height: "38px", borderRadius: "50%",
+                          background: isSelected ? "linear-gradient(135deg, var(--royal-maroon), #3a0a25)" : "#fff",
+                          color: isSelected ? "#fff" : "var(--royal-maroon)",
+                          border: isSelected ? "none" : "1.5px solid rgba(212,175,55,0.4)",
+                          fontWeight: 700, fontSize: "0.85rem", cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          boxShadow: isSelected ? "0 4px 12px rgba(89,18,59,0.3)" : "0 2px 6px rgba(0,0,0,0.04)",
+                          transition: "all .2s",
+                        }}
+                      >
+                        {item}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    style={{
+                      padding: "0 14px", height: "38px", borderRadius: "20px",
+                      border: "1.5px solid rgba(212,175,55,0.4)", color: "var(--royal-maroon)",
+                      background: "#fff", cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                      display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", fontWeight: 600,
+                      opacity: currentPage === totalPages ? 0.4 : 1, transition: "all .2s",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                    }}
+                  >
+                    Next <FaChevronRight size={11} />
+                  </button>
+                </div>
               </div>
             )}
           </div>{/* /RIGHT */}

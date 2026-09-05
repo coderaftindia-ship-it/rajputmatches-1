@@ -1460,137 +1460,55 @@
    PRINT LAYOUT STYLES - METICULOUS REDESIGN
    ──────────────────────────────────────────── */
 @media print {
-  /* Force colors and backgrounds */
+  /* Force exact print colors */
   * {
     -webkit-print-color-adjust: exact !important;
     color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  body {
-    background: #FFFDF5 !important;
-    color: #1E0A0A !important;
-    font-family: var(--font-body) !important;
-  }
-
-  /* Hide navbar, screen containers, tabs, and action buttons */
-  .navbar-profile,
+  /* Hide all global website wrappers */
+  :global(header),
+  :global(nav),
+  :global(footer),
+  :global(.navbar),
+  :global(.bottom-nav),
+  :global(.report-widget),
+  :global(.report-widget-container),
+  :global(#report-widget),
+  :global(iframe),
   .screenOnly,
-  .headerRow,
   .floatingActions,
+  .navbar-profile,
+  .headerRow,
   .dotsPagination,
   .navBtn,
   .thumbStrip {
     display: none !important;
   }
 
+  :global(html),
+  :global(body),
+  :global(#root) {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .pageWrapper,
+  .pageContainer {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
   /* Display the dedicated print view */
   .printOnly {
     display: block !important;
-  }
-
-  .pageWrapper {
-    padding: 0 !important;
-    background: transparent !important;
-  }
-
-  .pageContainer {
-    max-width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  /* Premium physical card styling for print */
-  .biodataCard {
-    background: #FFFDF5 !important;
-    border: 3px double #C8973A !important;
-    outline: 2px solid #7B1A1A !important;
-    outline-offset: 6px !important;
-    box-shadow: none !important;
-    padding: 30px !important;
-    margin: 10px !important;
-    page-break-after: avoid;
-    page-break-inside: auto;
-  }
-
-  /* Double border frame ornament */
-  .biodataCard::before {
-    border: 1px solid rgba(200,151,58,0.3) !important;
-  }
-
-  .biodataHeader {
-    border-bottom: 1px solid rgba(200,151,58,0.3) !important;
-    margin-bottom: 24px !important;
-    padding-bottom: 18px !important;
-  }
-
-  .biodataSlogan {
-    color: #8B6040 !important;
-    font-size: 1.1rem !important;
-  }
-
-  .sectionRibbon {
-    background: linear-gradient(90deg, #4E0D0D, #7B1A1A, #4E0D0D) !important;
-    color: #EFD38C !important;
-    border: 1px solid #C8973A !important;
-    font-size: 0.8rem !important;
-    padding: 8px 16px !important;
-    margin-top: 20px !important;
-    margin-bottom: 16px !important;
-    page-break-after: avoid;
-    page-break-inside: avoid;
-  }
-
-  .printGrid {
-    display: grid;
-    grid-template-columns: 1fr 240px;
-    gap: 30px;
-    align-items: start;
-    page-break-inside: avoid;
-  }
-
-  .detailsList {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-  }
-
-  .detailRow {
-    background: #fff !important;
-    border: 1px solid rgba(200,151,58,0.2) !important;
-    padding: 8px 12px !important;
-    page-break-inside: avoid;
-  }
-
-  .detailIconCircle {
-    background: linear-gradient(135deg, #7B1A1A, #4E0D0D) !important;
-    color: #EFD38C !important;
-    width: 30px !important;
-    height: 30px !important;
-    font-size: 0.8rem !important;
-  }
-
-  .detailLabel {
-    color: #8B6040 !important;
-    font-size: 0.65rem !important;
-  }
-
-  .detailValue {
-    color: #1E0A0A !important;
-    font-size: 0.85rem !important;
-  }
-
-  /* Photo Frame layout for print */
-  .photoFrame {
-    width: 220px !important;
-    aspect-ratio: 3/4 !important;
-    border: 2px solid #C8973A !important;
-    box-shadow: none !important;
-    margin: 0 auto 16px !important;
-    page-break-inside: avoid;
-  }
-
-  .profileName {
-    font-size: 1.8rem !important;
     color: #7B1A1A !important;
   }
 

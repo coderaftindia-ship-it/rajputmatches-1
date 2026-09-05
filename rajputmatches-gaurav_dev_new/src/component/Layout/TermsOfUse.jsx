@@ -293,8 +293,8 @@ export default function TermsOfUse() {
                   </h3>
                   <p style={{ color: "var(--royal-text)", lineHeight: "1.8" }}>
                     If there is any dispute about or involving the Site and/or the Service, by using the Site, you unconditionally agree that 
-                    all such disputes and/or differences will be governed by the laws of India and shall be subject to the exclusive jurisdiction 
-                    of the Competent Courts in Udaipur, India only.
+                    all such disputes and/or differences will be governed by the laws of Canada  and shall be subject to the exclusive jurisdiction 
+                    of the Competent Courts in Toronto, Ontario, Canada  only.
                   </p>
                 </section>
 

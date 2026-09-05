@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
 import styles from "./ViewPage.module.css";
 import Profilenavbar from "../ProfileComp/Profilenavbar";
+import { calculateAge } from "../ProfileComp/ProfileInfoHeader";
 
 import {
   FaArrowLeft,
@@ -451,6 +452,15 @@ const DetailRow = ({ icon, label, value, isLockedContact, contactRequestStatus, 
   </div>
 );
 
+const getAvatarInitials = (nameStr) => {
+  if (!nameStr || nameStr === "N/A") return "RA";
+  const parts = nameStr.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return nameStr.slice(0, 2).toUpperCase();
+};
+
 // ─────────────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────────────
@@ -873,8 +883,48 @@ const ViewPage = () => {
   const hasPaternal = paternaldetails &&
     Object.entries(paternaldetails).some(([k, v]) => !["_id", "__v", "userId", "updatedAt", "createdAt"].includes(k) && !Array.isArray(v) && v && String(v).trim());
 
-  const hasRelatives = ["badePapa","bhuasa","kakosa","mamosa","masisa"]
-    .some((k) => Array.isArray(paternaldetails?.[k]) && paternaldetails[k].length > 0 && paternaldetails[k].some(p => p.name || p.thikana));
+  const profileFullName = [Data.firstName, Data.middleName, Data.lastName]
+    .filter(Boolean)
+    .join(" ") || Data.name || "N/A";
+
+  const matrimonyId = Data.martrId || Data._id || "N/A";
+  const profileCreatedFor = Data.profilefor || Data.profileCreatedFor || "Self";
+  const profileAge = calculateAge(Data.dateOfBirth) || Data.age || "N/A";
+  const profileGender = Data.gender || "N/A";
+  const profileHeight = Data.height?.feet != null 
+    ? `${Data.height.feet}' ${Data.height.inches || 0}"` 
+    : (Data.basicdetailsId?.height?.feet ? `${Data.basicdetailsId.height.feet}' ${Data.basicdetailsId.height.inches || 0}"` : "5' 0\"");
+
+  const dobVal = Data.dateOfBirth 
+    ? new Date(Data.dateOfBirth).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) 
+    : (formData.dateOfBirth && formData.dateOfBirth !== "N/A" ? formData.dateOfBirth : "N/A");
+
+  const maritalStatusVal = Data.maritalStatus || "N/A";
+  const emailVal = Data.email || formData.email || "N/A";
+  const mobileVal = Data.mobile || formData.mobile || "N/A";
+
+  const addressVal = Data.address 
+    ? [Data.address.city, Data.address.state, Data.address.country].filter(Boolean).join(", ") 
+    : (formData.address && formData.address !== "N/A" ? formData.address : "N/A");
+
+  const educationVal = Data.profdetailsId?.education || Data.education || Data.basicdetailsId?.education || "N/A";
+  const occupationVal = Data.profdetailsId?.occupation || Data.occupation || Data.basicdetailsId?.occupation || "N/A";
+  const incomeVal = Data.profdetailsId?.annualIncome || Data.profdetailsId?.income || Data.income || "N/A";
+  const organizationVal = Data.profdetailsId?.organization || Data.profdetailsId?.company || Data.organization || "N/A";
+
+  const fatherNameVal = Data.familydetailsId?.fatherName || Data.familyDetails?.fatherName || Data.fatherName || "N/A";
+  const fatherOccVal = Data.familydetailsId?.fatherOccupation || Data.familyDetails?.fatherOccupation || Data.fatherOccupation || "N/A";
+  const fatherNativeVal = Data.familydetailsId?.fatherNativePlace || Data.familydetailsId?.nativePlace || Data.nativePlace || "N/A";
+  const motherNameVal = Data.familydetailsId?.motherName || Data.familyDetails?.motherName || Data.motherName || "N/A";
+  const motherNativeVal = Data.familydetailsId?.motherNativePlace || "N/A";
+  const maternalGotraVal = Data.familydetailsId?.maternalGotra || Data.familydetailsId?.naniGotra || Data.basicdetailsId?.clan || Data.subclan || "N/A";
+
+  const birthplaceVal = Data.HoroscopicId?.birthplace || Data.birthPlace || "N/A";
+  const birthtimeVal = Data.HoroscopicId?.birthtime || Data.birthTime || "N/A";
+  const manglikVal = Data.HoroscopicId?.manglik || Data.manglik || "N/A";
+  const rashiNakshatraVal = (Data.HoroscopicId?.rashi || Data.HoroscopicId?.nakshatra)
+    ? `${Data.HoroscopicId?.rashi || "N/A"} / ${Data.HoroscopicId?.nakshatra || "N/A"}`
+    : "N/A / N/A";
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
@@ -1751,206 +1801,149 @@ const ViewPage = () => {
           {/* ──────────────────────────────────────────────────────── */}
           {/* DEDICATED PRINT VIEW (Flat, multi-page booklet style)    */}
           {/* ──────────────────────────────────────────────────────── */}
+          {/* ──────────────────────────────────────────────────────── */}
+          {/* DEDICATED PRINT VIEW (Matching Image 1 Biodata Layout)   */}
+          {/* ──────────────────────────────────────────────────────── */}
           <div className={styles.printOnly}>
-            <div className={styles.biodataCard}>
-              {/* Printed Biodata Header */}
-              <div className={styles.biodataHeader}>
-                <h1 style={{ fontFamily: "Cinzel, serif", fontSize: "2rem", color: "#7B1A1A", marginBottom: "4px" }}>
-                  RAJPUTANA MATRIMONIALS
-                </h1>
-                <p className={styles.biodataSlogan}>Trusted Connections. Happy Futures.</p>
-                <div className={styles.goldFlourish}>
-                  <span>❧ ✦ ❧</span>
+            <div className={styles.biodataPrintDocument}>
+              {/* Header */}
+              <div className={styles.printHeader}>
+                <h1 className={styles.printMainTitle}>RAJPUT ALLIANCES</h1>
+                <p className={styles.printSubTitle}>MATRIMONIAL BIODATA • CONFIDENTIAL</p>
+                <div className={styles.printGoldDivider}></div>
+              </div>
+
+              {/* Profile Meta Card */}
+              <div className={styles.printProfileCard}>
+                <div className={styles.printAvatarCircle}>
+                  {images.length > 0 ? (
+                    <img src={images[0].url} alt="Profile" className={styles.printAvatarImg} />
+                  ) : (Data?.imageUrl && !Data.imageUrl.includes("profile.png") && !Data.imageUrl.includes("user-icon-flat-isolated") && !Data.imageUrl.includes("istockphoto.com")) ? (
+                    <img src={Data.imageUrl} alt="Profile" className={styles.printAvatarImg} />
+                  ) : (
+                    <span className={styles.printAvatarInitials}>{getAvatarInitials(profileFullName)}</span>
+                  )}
+                </div>
+                <div className={styles.printProfileMeta}>
+                  <h2 className={styles.printProfileName}>{profileFullName}</h2>
+                  <p className={styles.printMetaLine}><strong>Matrimony ID:</strong> {matrimonyId}</p>
+                  <p className={styles.printMetaLine}><strong>Profile Created for:</strong> {profileCreatedFor}</p>
+                  <p className={styles.printMetaLine}><strong>Age / Gender:</strong> {profileAge} Yrs • {profileGender}</p>
+                  <p className={styles.printMetaLine}><strong>Height:</strong> {profileHeight}</p>
                 </div>
               </div>
 
-              {/* Print Grid: Left columns, Right photo block */}
-              <div className={styles.printGrid}>
-                {/* Left side details */}
-                <div>
-                  <SectionRibbon>Personal Information</SectionRibbon>
-                  <div className={styles.detailsList}>
-                    {Object.keys(formData).map((key) => {
-                      // Backend already returns masked/unmasked values based on request status
-                      const val = formData[key] || "N/A";
-                      const isReqAccepted = Data?.contactRequestStatus === "accepted";
-                      const hasFullContact = isReqAccepted;
-                      
-                      const cfg = basicDetailsConfig[key] || {
-                        label: key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()),
-                        icon: <FaUser />,
-                      };
-                      
-                      return (
-                        <DetailRow 
-                          key={key} 
-                          icon={cfg.icon} 
-                          label={cfg.label} 
-                          value={val} 
-                          isLockedContact={!hasFullContact && (key === "mobile" || key === "email")}
-                          contactRequestStatus={Data?.contactRequestStatus}
-                          onRequestAccess={handleRequestDetails}
-                        />
-                      );
-                    })}
-                  </div>
-
-                  {(() => {
-                    const horoItems = getHoroscopeItems(Data.HoroscopicId, formData.dateOfBirth);
-                    if (horoItems.length === 0) return null;
-                    return (
-                      <div style={{ marginTop: "24px" }}>
-                        <SectionRibbon>Horoscope &amp; Astrology</SectionRibbon>
-                        <div className={styles.detailsList}>
-                          {horoItems.map((item) => (
-                            <DetailRow
-                              key={item.key}
-                              icon={getHoroscopeIcon(item.key)}
-                              label={item.label}
-                              value={item.value}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {(() => {
-                    const careerItems = getCareerAndEducationItems(Data.profdetailsId);
-                    if (careerItems.length === 0) return null;
-                    return (
-                      <div style={{ marginTop: "24px" }}>
-                        <SectionRibbon>Career &amp; Education</SectionRibbon>
-                        <div className={styles.detailsList}>
-                          {careerItems.map((item) => (
-                            <DetailRow
-                              key={item.key}
-                              icon={item.icon}
-                              label={item.label}
-                              value={item.value}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                {/* Right side portrait block */}
-                <div style={{ textAlign: "center" }}>
-                  <div className={styles.photoFrame}>
-                    <img
-                      src={images.length > 0 ? images[0].url : ((Data?.imageUrl && !Data.imageUrl.includes("profile.png") && !Data.imageUrl.includes("user-icon-flat-isolated") && !Data.imageUrl.includes("istockphoto.com")) ? Data.imageUrl : (Data?.gender === "Female" ? femaleDefault : maleDefault))}
-                      alt="Printed Profile"
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
-                
-                  <div className={styles.profileId}>ID: {Data.martrId || "N/A"}</div>
-                  <div className={styles.quickPills} style={{ justifyContent: "center" }}>
-                    {Data.maritalStatus && <span className={styles.pill}>{Data.maritalStatus}</span>}
-                    {Data.height && <span className={styles.pill}>{Data.height.feet}′{Data.height.inches}″</span>}
-                    {(Data.address?.city || Data.address?.state) && <span className={styles.pill}>{Data.address?.city || Data.address?.state}</span>}
-                  </div>
-                </div>
-              </div>
-
-              {/* Family & Relatives continuous print layouts */}
-              <div className={styles.fullWidthSection}>
-                <SectionRibbon>Family &amp; Relatives Information</SectionRibbon>
-                {isaccepted ? (
+              {/* Personal & Contact Details */}
+              <div className={styles.printSection}>
+                <h3 className={styles.printSectionTitle}>Personal &amp; Contact Details</h3>
+                <div className={styles.printSectionLine}></div>
+                <div className={styles.printGrid2Col}>
                   <div>
-                    {hasFamily && (
-                      <div className={styles.detailsList} style={{ marginBottom: "20px" }}>
-                        {Object.entries(Data.familyDetails)
-                          .filter(([k, v]) => !["_id", "__v", "userId"].includes(k) && !Array.isArray(v))
-                          .map(([key, val]) => (
-                            <DetailRow
-                              key={key}
-                              icon={getFamilyIcon(key)}
-                              label={key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
-                              value={typeof val === "string" && val?.trim() ? val : (val != null ? String(val) : "N/A")}
-                            />
-                          ))}
-                      </div>
-                    )}
-
-                    {hasPaternal && (
-                      <div className={styles.ancestryGrid} style={{ marginBottom: "20px" }}>
-                        <div className={styles.ancestryCard}>
-                          <h5 className={styles.ancestryHeader}>Paternal Grandparents Details</h5>
-                          {Object.entries(paternaldetails)
-                            .filter(([k, v]) => !Array.isArray(v) && !["_id", "__v", "userId", "updatedAt", "createdAt"].includes(k) && k.startsWith("grand"))
-                            .map(([key, val]) => (
-                              <div key={key} style={{ marginBottom: "8px" }}>
-                                <span style={{ fontSize: "0.7rem", fontWeight: "700", color: "#8B6040", textTransform: "uppercase" }}>
-                                  {keyNameMapping[key] || key.replace(/([A-Z])/g, " $1")}
-                                </span>
-                                <p style={{ fontSize: "0.85rem", margin: "2px 0 0", color: "#1E0A0A", fontWeight: "600" }}>{val || "N/A"}</p>
-                              </div>
-                            ))}
-                        </div>
-
-                        <div className={styles.ancestryCard}>
-                          <h5 className={styles.ancestryHeader}>Maternal Grandparents Details</h5>
-                          {Object.entries(paternaldetails)
-                            .filter(([k, v]) => !Array.isArray(v) && !["_id", "__v", "userId", "updatedAt", "createdAt"].includes(k) && k.startsWith("maternal"))
-                            .map(([key, val]) => (
-                              <div key={key} style={{ marginBottom: "8px" }}>
-                                <span style={{ fontSize: "0.7rem", fontWeight: "700", color: "#8B6040", textTransform: "uppercase" }}>
-                                  {keyNameMapping[key] || key.replace(/([A-Z])/g, " $1")}
-                                </span>
-                                <p style={{ fontSize: "0.85rem", margin: "2px 0 0", color: "#1E0A0A", fontWeight: "600" }}>{val || "N/A"}</p>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {hasRelatives && (
-                      <div className={styles.relGrid}>
-                        {["badePapa", "bhuasa", "kakosa", "mamosa", "masisa"].map((rk) =>
-                          paternaldetails[rk]?.length > 0
-                            ? paternaldetails[rk].map((person, idx) => (
-                                <div className={styles.relCard} key={`${rk}-${idx}`}>
-                                  <span className={styles.relRelation}>{rk.replace(/([A-Z])/g, " $1")}</span>
-                                  <div className={styles.relInfoItem}>
-                                    <span className={styles.relInfoLabel}>Name:</span>
-                                    <span className={styles.relInfoVal}>{person.name || "N/A"}</span>
-                                  </div>
-                                  <div className={styles.relInfoItem}>
-                                    <span className={styles.relInfoLabel}>Married To:</span>
-                                    <span className={styles.relInfoVal}>{person.marriedto || "N/A"}</span>
-                                  </div>
-                                  <div className={styles.relInfoItem}>
-                                    <span className={styles.relInfoLabel}>Thikana:</span>
-                                    <span className={styles.relInfoVal}>{person.thikana || "N/A"}</span>
-                                  </div>
-                                </div>
-                              ))
-                            : null
-                        )}
-                      </div>
-                    )}
+                    <span className={styles.printLabel}>DATE OF BIRTH</span>
+                    <p className={styles.printVal}>{dobVal}</p>
                   </div>
-                ) : (
-                  <div className={styles.lockContainer} style={{ minHeight: "140px" }}>
-                    <div className={styles.lockOverlay}>
-                      <h4 className={styles.lockTitle} style={{ fontSize: "1.1rem" }}>Family Details Restricted</h4>
-                      <p className={styles.lockDesc} style={{ fontSize: "0.8rem", margin: "0" }}>
-                        Family and paternal grand ancestry details are locked. Connect with this member to request details access.
-                      </p>
-                    </div>
+                  <div>
+                    <span className={styles.printLabel}>MARITAL STATUS</span>
+                    <p className={styles.printVal}>{maritalStatusVal}</p>
                   </div>
-                )}
+                  <div>
+                    <span className={styles.printLabel}>EMAIL ADDRESS</span>
+                    <p className={styles.printVal}>{emailVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>MOBILE NUMBER</span>
+                    <p className={styles.printVal}>{mobileVal}</p>
+                  </div>
+                  <div style={{ gridColumn: "span 2" }}>
+                    <span className={styles.printLabel}>ADDRESS</span>
+                    <p className={styles.printVal}>{addressVal}</p>
+                  </div>
+                </div>
               </div>
 
-              {/* Print Footer badges */}
-              <div className={styles.biodataFooter}>
-                {Data?.isVerified && (
-                  <span className={styles.footerBadge}>Profile Verification: Verified Member</span>
-                )}
-                <span className={styles.footerBadge}>Rajput Alliances platform</span>
+              {/* Career & Education */}
+              <div className={styles.printSection}>
+                <h3 className={styles.printSectionTitle}>Career &amp; Education</h3>
+                <div className={styles.printSectionLine}></div>
+                <div className={styles.printGrid2Col}>
+                  <div>
+                    <span className={styles.printLabel}>HIGHEST EDUCATION</span>
+                    <p className={styles.printVal}>{educationVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>OCCUPATION</span>
+                    <p className={styles.printVal}>{occupationVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>ANNUAL INCOME</span>
+                    <p className={styles.printVal}>{incomeVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>ORGANIZATION</span>
+                    <p className={styles.printVal}>{organizationVal}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Family Background & Gotra Info */}
+              <div className={styles.printSection}>
+                <h3 className={styles.printSectionTitle}>Family Background &amp; Gotra Info</h3>
+                <div className={styles.printSectionLine}></div>
+                <div className={styles.printGrid2Col}>
+                  <div>
+                    <span className={styles.printLabel}>FATHER'S NAME</span>
+                    <p className={styles.printVal}>{fatherNameVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>FATHER'S OCCUPATION</span>
+                    <p className={styles.printVal}>{fatherOccVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>FATHER'S NATIVE PLACE</span>
+                    <p className={styles.printVal}>{fatherNativeVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>MOTHER'S NAME</span>
+                    <p className={styles.printVal}>{motherNameVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>MOTHER'S NATIVE PLACE</span>
+                    <p className={styles.printVal}>{motherNativeVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>MATERNAL (NANI) GOTRA</span>
+                    <p className={styles.printVal}>{maternalGotraVal}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Horoscope & Astro Information */}
+              <div className={styles.printSection}>
+                <h3 className={styles.printSectionTitle}>Horoscope &amp; Astro Information</h3>
+                <div className={styles.printSectionLine}></div>
+                <div className={styles.printGrid2Col}>
+                  <div>
+                    <span className={styles.printLabel}>BIRTH PLACE</span>
+                    <p className={styles.printVal}>{birthplaceVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>BIRTH TIME</span>
+                    <p className={styles.printVal}>{birthtimeVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>MANGLIK STATUS</span>
+                    <p className={styles.printVal}>{manglikVal}</p>
+                  </div>
+                  <div>
+                    <span className={styles.printLabel}>RASHI / NAKSHATRA</span>
+                    <p className={styles.printVal}>{rashiNakshatraVal}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className={styles.printFooter}>
+                Generated on {new Date().toLocaleDateString('en-US')} • Rajput Alliances Matrimonial Portal
               </div>
             </div>
           </div>

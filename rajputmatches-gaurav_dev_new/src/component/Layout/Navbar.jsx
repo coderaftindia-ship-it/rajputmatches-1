@@ -105,7 +105,7 @@ const Navbar = ({ forceSolid = false }) => {
               width="68"
               height="68"
               loading="eager"
-              fetchPriority="high"
+              fetchpriority="high"
               decoding="sync"
               onError={(e) => { e.target.onerror = null; e.target.src = Logo; }}
               style={{

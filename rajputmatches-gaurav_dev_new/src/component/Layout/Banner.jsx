@@ -98,7 +98,7 @@ function Banner() {
             src={bannerBg}
             alt=""
             aria-hidden="true"
-            fetchPriority="high"
+            fetchpriority="high"
             loading="eager"
             decoding="async"
             width="1920"
