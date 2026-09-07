@@ -382,6 +382,53 @@ const Dashboard = () => {
           {/* LEFT COL */}
           <div className={styles.leftCol}>
 
+            {/* Quick Actions */}
+            <div className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardTitle}>
+                  <Zap size={18} />
+                  <span>Quick Actions</span>
+                </div>
+              </div>
+              <div className={styles.cardBody} style={{ gap: 8, display: "flex", flexDirection: "column" }}>
+                <QuickAction
+                  icon={<Search size={18} />}
+                  label="Find Matches"
+                  desc="Browse profiles near you"
+                  accent="#59123B"
+                  onClick={() => navigate("/search")}
+                />
+                <QuickAction
+                  icon={<Heart size={18} />}
+                  label="My Shortlist"
+                  desc="View saved profiles"
+                  accent="#f43f5e"
+                  onClick={() => goProfile("shortlisted")}
+                />
+                <QuickAction
+                  icon={<Phone size={18} />}
+                  label="Contact Requests"
+                  desc={`${contactPending} pending action${contactPending !== 1 ? "s" : ""}`}
+                  accent="#f59e0b"
+                  onClick={() => goProfile("interest")}
+                />
+                <QuickAction
+                  icon={<Camera size={18} />}
+                  label="Photo Requests"
+                  desc={`${photoReqPending} pending approval${photoReqPending !== 1 ? "s" : ""}`}
+                  accent="#10b981"
+                  onClick={() => goProfile("request")}
+                />
+                <QuickAction
+                  icon={<MessageSquare size={18} />}
+                  label="Messages"
+                  desc="Chat with matches"
+                  accent="#8b5cf6"
+                  onClick={() => navigate("/message")}
+                />
+              </div>
+            </div>
+
             {/* Recent Visitors */}
             <div className={styles.card}>
               <div className={styles.cardHeader}>
@@ -457,53 +504,6 @@ const Dashboard = () => {
 
           {/* RIGHT COL */}
           <div className={styles.rightCol}>
-
-            {/* Quick Actions */}
-            <div className={styles.card}>
-              <div className={styles.cardHeader}>
-                <div className={styles.cardTitle}>
-                  <Zap size={18} />
-                  <span>Quick Actions</span>
-                </div>
-              </div>
-              <div className={styles.cardBody} style={{ gap: 8, display: "flex", flexDirection: "column" }}>
-                <QuickAction
-                  icon={<Search size={18} />}
-                  label="Find Matches"
-                  desc="Browse profiles near you"
-                  accent="#59123B"
-                  onClick={() => navigate("/search")}
-                />
-                <QuickAction
-                  icon={<Heart size={18} />}
-                  label="My Shortlist"
-                  desc="View saved profiles"
-                  accent="#f43f5e"
-                  onClick={() => goProfile("shortlisted")}
-                />
-                <QuickAction
-                  icon={<Phone size={18} />}
-                  label="Contact Requests"
-                  desc={`${contactPending} pending action${contactPending !== 1 ? "s" : ""}`}
-                  accent="#f59e0b"
-                  onClick={() => goProfile("interest")}
-                />
-                <QuickAction
-                  icon={<Camera size={18} />}
-                  label="Photo Requests"
-                  desc={`${photoReqPending} pending approval${photoReqPending !== 1 ? "s" : ""}`}
-                  accent="#10b981"
-                  onClick={() => goProfile("request")}
-                />
-                <QuickAction
-                  icon={<MessageSquare size={18} />}
-                  label="Messages"
-                  desc="Chat with matches"
-                  accent="#8b5cf6"
-                  onClick={() => navigate("/message")}
-                />
-              </div>
-            </div>
 
             {/* Profile Completion Checklist */}
             <div className={styles.card}>
@@ -601,36 +601,42 @@ const Dashboard = () => {
                 )}
               </div>
             </div>
+
+            {/* Shortlisted Profiles */}
+            <div className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardTitle}>
+                  <Star size={18} />
+                  <span>Shortlisted Profiles</span>
+                </div>
+                <button className={styles.seeAll} onClick={() => goProfile("shortlisted")}>
+                  See all <ChevronRight size={13} />
+                </button>
+              </div>
+              <div className={styles.cardBody}>
+                {shortlisted.length === 0 ? (
+                  <div className={styles.empty}>
+                    <Star size={32} />
+                    <p>No shortlisted profiles yet</p>
+                  </div>
+                ) : (
+                  shortlisted.slice(0, 3).map((item, i) => {
+                    const p = item?.profile || item?.userId || item;
+                    return (
+                      <ProfileMiniCard
+                        key={p?._id || i}
+                        profile={p}
+                        onView={(id) => navigate(`/search/view/${id}`)}
+                        isAccepted={acceptedSet.has(p?._id)}
+                      />
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
           </div>
         </div>
-
-        {/* ── Recently Shortlisted ── */}
-        {shortlisted.length > 0 && (
-          <section className={styles.card} style={{ marginBottom: 0 }}>
-            <div className={styles.cardHeader}>
-              <div className={styles.cardTitle}>
-                <Star size={18} />
-                <span>Shortlisted Profiles</span>
-              </div>
-              <button className={styles.seeAll} onClick={() => goProfile("shortlisted")}>
-                See all <ChevronRight size={13} />
-              </button>
-            </div>
-            <div className={styles.shortlistGrid}>
-              {shortlisted.slice(0, 6).map((item, i) => {
-                const p = item?.profile || item?.userId || item;
-                return (
-                  <ProfileMiniCard
-                    key={p?._id || i}
-                    profile={p}
-                    onView={(id) => navigate(`/search/view/${id}`)}
-                    isAccepted={acceptedSet.has(p?._id)}
-                  />
-                );
-              })}
-            </div>
-          </section>
-        )}
 
       </main>
 
