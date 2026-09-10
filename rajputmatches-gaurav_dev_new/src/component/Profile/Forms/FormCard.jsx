@@ -214,7 +214,7 @@ function FormCard({
               <label>HEIGHT</label>
               <select
                 name="height"
-                value={formData.height || "5 ft 10 in"}
+                value={formData.height || ""}
                 onChange={handleInputChange}
               >
                 <option value="">Select Height</option>
@@ -232,7 +232,7 @@ function FormCard({
                 value={
                   typeof formData.weight === "number"
                     ? `${formData.weight} kg`
-                    : formData.weight || "70 kg"
+                    : (formData.weight || "")
                 }
                 onChange={handleInputChange}
               >
@@ -316,29 +316,7 @@ function FormCard({
             </div>
           </div>
 
-          {/* ROW 8: CONTACT DETAILS (MOBILE & EMAIL) */}
-          <div className="row g-1.5 mb-2">
-            <div className="col-6">
-              <label>MOBILE NUMBER</label>
-              <input
-                type="text"
-                name="mobile"
-                placeholder="Mobile Number"
-                value={formData.mobile || ""}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="col-6">
-              <label>EMAIL ADDRESS</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email || ""}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
+
 
           {error && (
             <div

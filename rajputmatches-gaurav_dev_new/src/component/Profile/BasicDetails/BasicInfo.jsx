@@ -180,7 +180,34 @@ function BasicInfo() {
 
   const handleEditClick = () => {
     setIsEditing(true);
-    setFormData(details);
+    if (user) {
+      const formattedDateOfBirth = user.dateOfBirth
+        ? (user.dateOfBirth.includes("T") ? user.dateOfBirth.split("T")[0] : user.dateOfBirth)
+        : "";
+
+      let heightFormatted = "";
+      if (user.height) {
+        if (typeof user.height === "object" && user.height !== null) {
+          heightFormatted = `${user.height.feet ?? 5} ft ${user.height.inches ?? 0} in`;
+        } else {
+          heightFormatted = String(user.height);
+        }
+      }
+
+      setFormData({
+        firstName: user.firstName || "",
+        middleName: user.middleName || "",
+        lastName: user.lastName || "",
+        dateOfBirth: formattedDateOfBirth,
+        mobile: user.mobile || "",
+        email: user.email || "",
+        height: heightFormatted,
+        weight: user.weight || "",
+        maritalStatus: (user.maritalStatus === "Single") ? "Never Married" : (user.maritalStatus || ""),
+        additionalInfo: user.additionalInfo || "",
+        countryCode: user.countryCode || "",
+      });
+    }
   };
 
   // Cancel edit mode

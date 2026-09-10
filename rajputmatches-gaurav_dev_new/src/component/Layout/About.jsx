@@ -226,7 +226,7 @@ function About() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="d-inline-flex align-items-center gap-2 px-3.5 py-1.5 rounded-pill mb-3"
+              className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3"
               style={{
                 background: "rgba(212, 175, 55, 0.2)",
                 border: "1.5px solid rgba(212, 175, 55, 0.6)",
@@ -584,10 +584,11 @@ function About() {
             {/* Our Vision Card */}
             <motion.div variants={itemVariants} className="col-12 col-md-6">
               <div
-                className="p-3.5 p-md-5 rounded-4 h-100 text-white position-relative overflow-hidden shadow-lg"
+                className="p-4 p-md-5 rounded-4 h-100 text-white position-relative shadow-lg d-flex flex-column justify-content-start"
                 style={{
                   background: "linear-gradient(135deg, var(--royal-maroon-dark, #59123B) 0%, #3f0c2a 100%)",
-                  border: "2px solid #D4AF37"
+                  border: "2px solid #D4AF37",
+                  boxSizing: "border-box"
                 }}
               >
                 <div
@@ -597,7 +598,8 @@ function About() {
                     height: "52px",
                     background: "rgba(212, 175, 55, 0.18)",
                     border: "1px solid #D4AF37",
-                    color: "#E8C371"
+                    color: "#E8C371",
+                    flexShrink: 0
                   }}
                 >
                   <Eye size={26} />
@@ -608,7 +610,7 @@ function About() {
                 >
                   Our Vision
                 </h3>
-                <p className="lead mb-0" style={{ color: "rgba(255, 255, 255, 0.92)", lineHeight: 1.65, fontSize: "clamp(0.92rem, 3vw, 1.1rem)" }}>
+                <p className="lead mb-0" style={{ color: "rgba(255, 255, 255, 0.92)", lineHeight: 1.65, fontSize: "clamp(0.88rem, 3.2vw, 1.05rem)" }}>
                   To become the most trusted Rajput matrimonial platform by creating genuine connections that strengthen families, preserve cultural heritage, and inspire lifelong relationships.
                 </p>
               </div>
@@ -617,10 +619,11 @@ function About() {
             {/* Our Mission Card */}
             <motion.div variants={itemVariants} className="col-12 col-md-6">
               <div
-                className="p-3.5 p-md-5 rounded-4 h-100 text-white position-relative overflow-hidden shadow-lg"
+                className="p-4 p-md-5 rounded-4 h-100 text-white position-relative shadow-lg d-flex flex-column justify-content-start"
                 style={{
                   background: "linear-gradient(135deg, var(--royal-maroon-dark, #59123B) 0%, #3f0c2a 100%)",
-                  border: "2px solid #D4AF37"
+                  border: "2px solid #D4AF37",
+                  boxSizing: "border-box"
                 }}
               >
                 <div
@@ -630,7 +633,8 @@ function About() {
                     height: "52px",
                     background: "rgba(212, 175, 55, 0.18)",
                     border: "1px solid #D4AF37",
-                    color: "#E8C371"
+                    color: "#E8C371",
+                    flexShrink: 0
                   }}
                 >
                   <Target size={26} />
@@ -641,7 +645,7 @@ function About() {
                 >
                   Our Mission
                 </h3>
-                <p className="lead mb-0" style={{ color: "rgba(255, 255, 255, 0.92)", lineHeight: 1.65, fontSize: "clamp(0.92rem, 3vw, 1.1rem)" }}>
+                <p className="lead mb-0" style={{ color: "rgba(255, 255, 255, 0.92)", lineHeight: 1.65, fontSize: "clamp(0.88rem, 3.2vw, 1.05rem)" }}>
                   To provide a secure, transparent, and premium matrimonial experience where every Rajput family can confidently find meaningful and compatible matches.
                 </p>
               </div>
@@ -725,10 +729,11 @@ function About() {
             className="my-5 pt-3"
           >
             <div
-              className="rounded-4 p-3.5 p-md-5 text-center position-relative overflow-hidden shadow-lg"
+              className="rounded-4 p-4 p-md-5 text-center position-relative overflow-hidden shadow-lg"
               style={{
                 background: "linear-gradient(135deg, var(--royal-maroon-dark, #59123B) 0%, #3f0c2a 100%)",
-                border: "2px solid #D4AF37"
+                border: "2px solid #D4AF37",
+                boxSizing: "border-box"
               }}
             >
               {/* Decorative Glow */}
@@ -767,22 +772,22 @@ function About() {
 
                 <p
                   className="lead mx-auto mb-3"
-                  style={{ color: "rgba(255, 255, 255, 0.95)", fontSize: "clamp(0.92rem, 3.2vw, 1.12rem)", lineHeight: 1.65 }}
+                  style={{ color: "rgba(255, 255, 255, 0.95)", fontSize: "clamp(0.88rem, 3.2vw, 1.12rem)", lineHeight: 1.65 }}
                 >
                   Whether you are beginning your search or helping a loved one find the right partner, Rajput Alliance is here to support every step of the journey.
                 </p>
 
                 <p
                   className="fw-semibold mb-4"
-                  style={{ color: "#E8C371", fontSize: "clamp(0.88rem, 2.8vw, 1.05rem)", fontStyle: "italic" }}
+                  style={{ color: "#E8C371", fontSize: "clamp(0.85rem, 2.8vw, 1.05rem)", fontStyle: "italic" }}
                 >
                   Join a community where tradition meets trust, families come together, and lifelong relationships begin.
                 </p>
 
-                <div className="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
-                  <Link to={isAuthenticated ? "/search" : "/login"}>
+                <div className="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-3 mt-4">
+                  <Link to={isAuthenticated ? "/search" : "/login"} className="w-100 w-sm-auto">
                     <button
-                      className="btn px-3.5 px-md-4 py-2.5 py-md-3 fs-6 fs-md-5 fw-bold d-inline-flex align-items-center justify-content-center gap-2"
+                      className="btn px-4 py-2 px-md-4 py-md-3 fs-6 fs-md-5 fw-bold d-inline-flex align-items-center justify-content-center gap-2 w-100"
                       style={{
                         background: "linear-gradient(135deg, #E8C371 0%, #D4AF37 100%)",
                         color: "#3B0000",
@@ -805,9 +810,9 @@ function About() {
                     </button>
                   </Link>
 
-                  <Link to="/contact">
+                  <Link to="/contact" className="w-100 w-sm-auto">
                     <button
-                      className="btn px-3.5 px-md-4 py-2.5 py-md-3 fs-6 fs-md-5 fw-bold text-white d-inline-flex align-items-center justify-content-center gap-2"
+                      className="btn px-4 py-2 px-md-4 py-md-3 fs-6 fs-md-5 fw-bold text-white d-inline-flex align-items-center justify-content-center gap-2 w-100"
                       style={{
                         background: "transparent",
                         borderRadius: "30px",

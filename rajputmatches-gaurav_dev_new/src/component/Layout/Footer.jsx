@@ -65,7 +65,7 @@ function Footer() {
         <div className="row g-3">
           {/* About Section */}
           <div className="col-12 col-lg-6">
-            <Link to="/" className="d-inline-flex align-items-center gap-2.5 mb-2 text-decoration-none">
+            <Link to="/" className="d-inline-flex align-items-center gap-2 mb-2 text-decoration-none">
               <img
                 src={siteSettings.logo || Logo}
                 alt={siteSettings.companyName || "Logo"}
@@ -107,7 +107,7 @@ function Footer() {
               </div>
             </Link>
 
-            <p className="mb-2.5" style={{ color: "rgba(255, 255, 255, 0.75)", fontSize: "0.82rem", lineHeight: "1.45", maxWidth: "520px" }}>
+            <p className="mb-3" style={{ color: "rgba(255, 255, 255, 0.75)", fontSize: "0.82rem", lineHeight: "1.45", maxWidth: "520px" }}>
              Global matrimonial platform created to help Rajput families connect, discover meaningful relationships, and find compatible life partners while honoring the traditions, values, and heritage that unite the Rajput community.
             </p>
 
@@ -133,7 +133,7 @@ function Footer() {
             <h6 className="fw-bold mb-2" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-gold, #EDB139)", fontSize: "0.9rem", letterSpacing: "0.5px" }}>
               Quick Links
             </h6>
-            <ul className="list-unstyled d-flex flex-column gap-1.5 mb-0" style={{ fontSize: "0.82rem" }}>
+            <ul className="list-unstyled d-flex flex-column gap-2 mb-0" style={{ fontSize: "0.82rem" }}>
               <li>
                 <Link to="/about" className="text-decoration-none" style={{ color: "rgba(255, 255, 255, 0.75)" }}>About Us</Link>
               </li>
@@ -154,7 +154,7 @@ function Footer() {
             <h6 className="fw-bold mb-2" style={{ fontFamily: "var(--font-heading)", color: "var(--royal-gold, #EDB139)", fontSize: "0.9rem", letterSpacing: "0.5px" }}>
               Legal
             </h6>
-            <ul className="list-unstyled d-flex flex-column gap-1.5 mb-0" style={{ fontSize: "0.82rem" }}>
+            <ul className="list-unstyled d-flex flex-column gap-2 mb-0" style={{ fontSize: "0.82rem" }}>
               <li>
                 <Link to="/terms-of-use" className="text-decoration-none" style={{ color: "rgba(255, 255, 255, 0.75)" }}>Terms of Use</Link>
               </li>
@@ -165,7 +165,7 @@ function Footer() {
           </div>
         </div>
 
-        <hr className="my-2.5" style={{ borderColor: "rgba(255,255,255,0.12)" }} />
+        <hr className="my-3" style={{ borderColor: "rgba(255,255,255,0.12)" }} />
 
         <div className="text-center">
           <p className="mb-0" style={{ color: "rgba(255, 255, 255, 0.55)", fontSize: "0.78rem" }}>

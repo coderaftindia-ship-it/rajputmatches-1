@@ -1,10 +1,9 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Rajput Matches Theme & Typography System
+ * Premium colors and cross-platform font family declarations for iOS, Android, and Web.
  */
 
 import '../global.css';
-
 import { Platform } from 'react-native';
 
 export const Colors = {
@@ -14,12 +13,12 @@ export const Colors = {
     backgroundElement: '#F0E5D3', // Royal cream-dark for elements
     backgroundSelected: '#EDB139', // Royal gold for selected state
     textSecondary: '#7A5C66', // Royal text light
-    primary: '#59123B', // Royal maroon
-    primaryDark: '#3f0c2a',
-    primaryLight: '#821A56',
-    gold: '#EDB139',
+    primary: '#4A1235', // Deep Royal Maroon
+    primaryDark: '#350B25',
+    primaryLight: '#6B1B4D',
+    gold: '#D4AF37', // Royal Gold
     goldDark: '#CD9024',
-    goldLight: '#F5C870',
+    goldLight: '#F4E4BC',
     white: '#FFFFFF',
     border: 'rgba(212, 175, 55, 0.35)',
   },
@@ -27,14 +26,14 @@ export const Colors = {
     text: '#FCF5EA', // Cream text on dark
     background: '#1A1A1A', // Dark background
     backgroundElement: '#2b2226', // Deep maroon dark
-    backgroundSelected: '#EDB139', // Gold for selection
+    backgroundSelected: '#D4AF37', // Gold for selection
     textSecondary: '#BFAFB5', // Light grey maroon
-    primary: '#EDB139', // Gold
+    primary: '#D4AF37', // Gold
     primaryDark: '#CD9024',
-    primaryLight: '#F5C870',
-    gold: '#EDB139',
+    primaryLight: '#F4E4BC',
+    gold: '#D4AF37',
     goldDark: '#CD9024',
-    goldLight: '#F5C870',
+    goldLight: '#F4E4BC',
     white: '#FFFFFF',
     border: 'rgba(212, 175, 55, 0.2)',
   },
@@ -44,28 +43,40 @@ export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
+    sans: 'System',
+    serif: 'Georgia',
+    heading: 'Georgia',
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
-  default: {
-    sans: 'normal',
+  android: {
+    sans: 'sans-serif-medium',
     serif: 'serif',
-    rounded: 'normal',
+    heading: 'serif',
+    rounded: 'sans-serif',
+    mono: 'monospace',
+  },
+  default: {
+    sans: 'sans-serif-medium',
+    serif: 'serif',
+    heading: 'serif',
+    rounded: 'sans-serif',
     mono: 'monospace',
   },
   web: {
-    sans: 'var(--font-display)',
-    serif: 'var(--font-serif)',
-    rounded: 'var(--font-rounded)',
-    mono: 'var(--font-mono)',
+    sans: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    serif: "'Cinzel', 'Playfair Display', 'Georgia', 'Garamond', 'Times New Roman', serif",
+    heading: "'Cinzel', 'Playfair Display', 'Georgia', serif",
+    rounded: "'Plus Jakarta Sans', 'Outfit', sans-serif",
+    mono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
   },
-});
+}) as {
+  sans: string;
+  serif: string;
+  heading: string;
+  rounded: string;
+  mono: string;
+};
 
 export const Spacing = {
   half: 2,

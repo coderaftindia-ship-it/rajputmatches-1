@@ -106,13 +106,6 @@ const MOCK_HOME_PROFILES = [
   },
 ];
 
-// Spotlight Stories - Verified Rajput Members Only
-const SPOTLIGHT_STORIES = [
-  { id: 'st-v1', label: 'Verified', iconName: 'shield-checkmark', color: '#10B981', avatar: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=80' },
-  { id: 'st-v2', label: 'Verified', iconName: 'shield-checkmark', color: '#10B981', avatar: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=300&q=80' },
-  { id: 'st-v3', label: 'Verified', iconName: 'shield-checkmark', color: '#10B981', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80' },
-  { id: 'st-v4', label: 'Verified', iconName: 'shield-checkmark', color: '#10B981', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80' },
-];
 
 const formatHeight = (height: any): string => {
   if (!height) return "5'5\"";
@@ -140,25 +133,6 @@ export default function HomeScreen() {
   const [homeViewMode, setHomeViewMode] = useState<'single' | 'grid'>('single');
   const [selectedProfileIndex, setSelectedProfileIndex] = useState<number>(0);
 
-  // ─── CONTINUOUS PULSATING SCALE ANIMATION ──────────────────────────────
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.06,
-          duration: 1200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1200,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [pulseAnim]);
 
   // ─── PHYSICS ANIMATED SWIPE SYSTEM ──────────────────────────────────────
   const position = useRef(new Animated.ValueXY()).current;
@@ -343,65 +317,6 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4A1235']} />}
       >
-        {/* ─── NEW ANIMATED ROYAL SPOTLIGHT & STORY STRIP (NO EMOJIS) ── */}
-        <View style={styles.animatedSpotlightSection}>
-          {/* Animated Marquee Ribbon */}
-          <LinearGradient colors={['#4A1235', '#6B1B4D', '#3A0B28']} style={styles.marqueeRibbon}>
-            <Animated.View style={{ transform: [{ scale: pulseAnim }], flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name="sparkles" size={13} color="#D4AF37" />
-              <Text style={styles.marqueeText}>ROYAL SPOTLIGHT & DAILY 36 GUNA MATCHES</Text>
-              <Ionicons name="ribbon" size={13} color="#D4AF37" />
-            </Animated.View>
-          </LinearGradient>
-
-          {/* Horizontal Scroll Story Rings with Vector Icons */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.storiesScrollContent}>
-            {SPOTLIGHT_STORIES.map((story) => (
-              <TouchableOpacity
-                key={story.id}
-                style={styles.storyItemBox}
-                onPress={() => router.push('/explore')}
-                activeOpacity={0.8}
-              >
-                <Animated.View style={[styles.storyAnimatedRing, { transform: [{ scale: pulseAnim }] }]}>
-                  <LinearGradient colors={['#D4AF37', '#CD9024', '#F4E4BC']} style={styles.storyGradientRing}>
-                    <View style={styles.storyAvatarWrap}>
-                      <Image source={{ uri: story.avatar }} style={styles.storyAvatarImg} />
-                    </View>
-                  </LinearGradient>
-                  <View style={[styles.storyBadgeIconBox, { borderColor: '#10B981' }]}>
-                    <Ionicons name={story.iconName as any} size={10} color="#10B981" />
-                  </View>
-                </Animated.View>
-                <Text style={styles.storyLabelText} numberOfLines={1}>{story.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          {/* Interactive Filter Pills */}
-          <View style={styles.quickFilterPillsRow}>
-            <TouchableOpacity
-              style={[styles.filterPill, activeFilter === 'all' && styles.filterPillActive]}
-              onPress={() => { setActiveFilter('all'); setSelectedProfileIndex(0); }}
-            >
-              <Text style={[styles.filterPillText, activeFilter === 'all' && styles.filterPillTextActive]}>All Profiles</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.filterPill, activeFilter === 'brides' && styles.filterPillActive]}
-              onPress={() => { setActiveFilter('brides'); setSelectedProfileIndex(0); }}
-            >
-              <Text style={[styles.filterPillText, activeFilter === 'brides' && styles.filterPillTextActive]}>Brides</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.filterPill, activeFilter === 'grooms' && styles.filterPillActive]}
-              onPress={() => { setActiveFilter('grooms'); setSelectedProfileIndex(0); }}
-            >
-              <Text style={[styles.filterPillText, activeFilter === 'grooms' && styles.filterPillTextActive]}>Grooms</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
 
         {/* ─── ELEGANT VIEW MODE SWITCHER SECTION ─────────────────────────── */}
         <View style={styles.viewModeSection}>
@@ -420,7 +335,7 @@ export default function HomeScreen() {
               <View style={styles.iconWithNumRow}>
                 <Ionicons
                   name="person"
-                  size={16}
+                  size={14}
                   color={homeViewMode === 'single' ? '#4A1235' : '#8C687D'}
                 />
                 <View style={[styles.numBadge, homeViewMode === 'single' && styles.numBadgeActive]}>
@@ -436,17 +351,11 @@ export default function HomeScreen() {
             >
               <Ionicons
                 name="grid"
-                size={18}
+                size={15}
                 color={homeViewMode === 'grid' ? '#FFFFFF' : '#8C687D'}
               />
             </TouchableOpacity>
           </View>
-
-          <Text style={styles.viewModeSubtext}>
-            {homeViewMode === 'single'
-              ? 'Currently Viewing: One Profile.\nTap to switch to Grid View.'
-              : 'Currently Viewing: Multiple Profiles.\nTap to switch to Single View.'}
-          </Text>
         </View>
 
         {loading ? (
@@ -692,228 +601,9 @@ export default function HomeScreen() {
           </>
         )}
 
-        {/* ─── MORE RECOMMENDED RAJPUT MATCHES CARD FEED (DYNAMIC ACCORDING TO VIEW MODE) ─── */}
-        <View style={{ marginTop: 14 }}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitleText}>More Recommended Matches</Text>
-            <TouchableOpacity onPress={() => router.push('/explore')}>
-              <Text style={styles.seeAllText}>Explore All ›</Text>
-            </TouchableOpacity>
-          </View>
 
-          {homeViewMode === 'grid' ? (
-            /* 2-GRID LAYOUT WHEN 2x2 GRID ICON IS CLICKED */
-            <View style={styles.grid2ColContainer}>
-              {recommendations.map((item, idx) => {
-                const isFav = favorites.has(item.id);
-                const isConn = sentInterests.has(item.id);
 
-                return (
-                  <View key={`grid-more-${item.id}-${idx}`} style={styles.gridCardItem}>
-                    <TouchableOpacity
-                      onPress={() => handleViewProfile(item)}
-                      activeOpacity={0.9}
-                    >
-                      <View style={styles.gridPhotoBox}>
-                        <Image source={{ uri: item.avatar }} style={styles.gridImage} resizeMode="cover" />
 
-                        <LinearGradient
-                          colors={['rgba(74,18,53,0.3)', 'transparent', 'rgba(74,18,53,0.85)']}
-                          style={styles.gridGradient}
-                        />
-
-                        <View style={styles.gridBrideBadge}>
-                          <Text style={styles.gridBrideBadgeText}>
-                            {item.gender?.toLowerCase() === 'male' ? 'GROOM' : 'BRIDE'}
-                          </Text>
-                        </View>
-
-                        <TouchableOpacity
-                          style={styles.gridHeartCircle}
-                          onPress={() => handleToggleFavorite(item.id, item.name)}
-                        >
-                          <Ionicons
-                            name="heart"
-                            size={14}
-                            color={isFav ? '#E11D48' : '#D4AF37'}
-                          />
-                        </TouchableOpacity>
-                      </View>
-
-                      <View style={styles.gridFooterBanner}>
-                        <Text style={styles.gridMatriText} numberOfLines={1}>
-                          Matri ID: {item.matriId}
-                        </Text>
-                        <Text style={styles.gridSubInfoText} numberOfLines={1}>
-                          {item.age} Yrs | {item.height} | {item.city}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-
-                    <View style={styles.miniGridCardToolbar}>
-                      <TouchableOpacity
-                        style={styles.miniGridTbIconBtn}
-                        onPress={() => handleViewProfile(item)}
-                      >
-                        <Ionicons name="eye-outline" size={14} color="#4A1235" />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={styles.miniGridTbIconBtn}
-                        onPress={() => handleToggleFavorite(item.id, item.name)}
-                      >
-                        <Ionicons
-                          name={isFav ? 'heart' : 'heart-outline'}
-                          size={14}
-                          color={isFav ? '#E11D48' : '#4A1235'}
-                        />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={styles.miniGridTbIconBtn}
-                        onPress={() => handleSendInterest(item.id, item.name)}
-                      >
-                        <Ionicons
-                          name={isConn ? 'checkmark' : 'person-add-outline'}
-                          size={14}
-                          color={isConn ? '#10B981' : '#4A1235'}
-                        />
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={styles.miniGridTbIconBtn}
-                        onPress={() => Alert.alert('Shortlist', `${item.name} short-listed.`)}
-                      >
-                        <Ionicons name="ban-outline" size={13} color="#4A1235" />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
-          ) : (
-            /* SINGLE FULL-WIDTH CARDS WHEN 1 ICON IS CLICKED */
-            <View style={{ gap: 18, marginTop: 10 }}>
-              {recommendations.slice(1).map((item, idx) => {
-                const isFav = favorites.has(item.id);
-                const isConn = sentInterests.has(item.id);
-
-                return (
-                  <View key={`more-single-${item.id}-${idx}`} style={styles.singleCardContainer}>
-                    {/* Photo Container */}
-                    <View style={styles.singlePhotoBox}>
-                      <Image source={{ uri: item.avatar }} style={styles.singleImage} resizeMode="cover" />
-
-                      <LinearGradient
-                        colors={['rgba(74,18,53,0.35)', 'transparent', 'rgba(74,18,53,0.85)']}
-                        style={styles.photoGradient}
-                      />
-
-                      <View style={styles.brideBadge}>
-                        <Text style={styles.brideBadgeText}>
-                          {item.gender?.toLowerCase() === 'male' ? 'GROOM' : 'BRIDE'}
-                        </Text>
-                      </View>
-
-                      <View style={styles.gunaScoreBadge}>
-                        <Ionicons name="star" size={11} color="#D4AF37" />
-                        <Text style={styles.gunaScoreText}>Guna: {item.gunaScore || '34/36'}</Text>
-                      </View>
-
-                      <View style={styles.locationPinCircle}>
-                        <Ionicons name="location" size={16} color="#D4AF37" />
-                      </View>
-                    </View>
-
-                    {/* Card Footer Banner */}
-                    <View style={styles.cardFooterBanner}>
-                      <Text style={styles.cardFooterBannerText}>
-                        Matri ID: <Text style={styles.matriIdBold}>{item.matriId}</Text> | {item.age} Yrs | {item.height} | {item.city}
-                      </Text>
-                    </View>
-
-                    {/* ─── DEDICATED INDIVIDUAL CARD TOOLBAR ─── */}
-                    <View style={styles.individualCardToolbarWrap}>
-                      <View style={styles.individualCardToolbar}>
-                        <TouchableOpacity
-                          style={styles.cardTbIconBtn}
-                          onPress={() => handleViewProfile(item)}
-                        >
-                          <Ionicons name="eye-outline" size={18} color="#4A1235" />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={styles.cardTbIconBtn}
-                          onPress={() => handleToggleFavorite(item.id, item.name)}
-                        >
-                          <Ionicons
-                            name={isFav ? 'heart' : 'heart-outline'}
-                            size={18}
-                            color={isFav ? '#E11D48' : '#4A1235'}
-                          />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={styles.cardTbIconBtn}
-                          onPress={() => router.push('/explore')}
-                        >
-                          <Ionicons name="images-outline" size={18} color="#4A1235" />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={styles.cardTbIconBtn}
-                          onPress={() => handleSendInterest(item.id, item.name)}
-                        >
-                          <Ionicons
-                            name={isConn ? 'checkmark' : 'person-add-outline'}
-                            size={18}
-                            color={isConn ? '#10B981' : '#4A1235'}
-                          />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={styles.cardTbIconBtn}
-                          onPress={() => Alert.alert('Shortlist', `${item.name} short-listed.`)}
-                        >
-                          <Ionicons name="ban-outline" size={18} color="#4A1235" />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
-          )}
-        </View>
-
-        {/* ─── NEWLY JOINED MEMBERS STRIP ───────────────────────────────────── */}
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitleText}>Newly Joined Members</Text>
-          <TouchableOpacity onPress={() => router.push('/explore')}>
-            <Text style={styles.seeAllText}>See All ›</Text>
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.newlyScroll}>
-          {recommendations.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.newlyMemberCard}
-              onPress={() => handleViewProfile(item)}
-              activeOpacity={0.8}
-            >
-              <View style={styles.newlyAvatarRing}>
-                <Image source={{ uri: item.avatar }} style={styles.newlyAvatarImg} />
-              </View>
-              <Text style={styles.newlyNameText} numberOfLines={1}>
-                {item.name.split(' ')[0]}
-              </Text>
-              <Text style={styles.newlySubText} numberOfLines={1}>
-                {item.city}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
@@ -1088,65 +778,65 @@ const styles = StyleSheet.create({
   // ─── VIEW MODE SECTION ───────────────────────────────────────────────────
   viewModeSection: {
     alignItems: 'center',
-    marginVertical: 12,
+    marginVertical: 4,
   },
   modeTitleHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 10,
+    gap: 8,
+    marginBottom: 6,
   },
   titleLineDeco: {
-    width: 44,
-    height: 1.2,
+    width: 28,
+    height: 1,
     backgroundColor: '#D4AF37',
   },
   viewModeTitle: {
-    fontSize: 16,
+    fontSize: 11.5,
     fontWeight: '900',
     color: '#4A1235',
     fontFamily: 'serif',
-    letterSpacing: 1.8,
+    letterSpacing: 1.2,
   },
   switcherPillContainer: {
     flexDirection: 'row',
     backgroundColor: '#EDE5DC',
-    width: 220,
-    height: 48,
-    borderRadius: 24,
-    padding: 4,
+    width: 140,
+    height: 36,
+    borderRadius: 18,
+    padding: 3,
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: '#E2CFC2',
     shadowColor: '#4A1235',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
     elevation: 2,
   },
   switcherBtn: {
     flex: 1,
     height: '100%',
-    borderRadius: 20,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
   switcherBtnActive: {
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   switcherBtnGridActive: {
     backgroundColor: '#4A1235',
     shadowColor: '#4A1235',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
   iconWithNumRow: {
     flexDirection: 'row',
@@ -1154,9 +844,9 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   numBadge: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     backgroundColor: '#8C687D',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1166,17 +856,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#4A1235',
   },
   numBadgeText: {
-    fontSize: 9.5,
+    fontSize: 8.5,
     fontWeight: '900',
     color: '#FFFFFF',
-  },
-  viewModeSubtext: {
-    fontSize: 12.5,
-    color: '#4A1235',
-    textAlign: 'center',
-    marginTop: 10,
-    lineHeight: 19,
-    fontWeight: '700',
   },
 
   singleCardWrapper: {

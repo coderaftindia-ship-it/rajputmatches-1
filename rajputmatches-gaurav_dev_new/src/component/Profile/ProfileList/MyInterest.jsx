@@ -408,7 +408,7 @@ function MyInterest() {
             <button
               key={statusTab.id}
               onClick={() => handleStatusTabChange(statusTab.id)}
-              className="btn d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill shadow-sm"
+              className="btn d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm"
               style={{
                 backgroundColor: isActive ? (statusTab.color || "#991c1c") : "#ffffff",
                 color: isActive ? "#ffffff" : "#444444",

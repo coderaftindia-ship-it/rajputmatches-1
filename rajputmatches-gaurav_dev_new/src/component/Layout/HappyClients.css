@@ -346,6 +346,14 @@
   .hc-slider-wrap {
     padding: 0;
   }
+  .hc-card {
+    padding: 22px 16px 18px !important;
+    gap: 10px !important;
+  }
+  .hc-card-text {
+    font-size: 0.88rem !important;
+    line-height: 1.6 !important;
+  }
   .hc-card--active {
     flex: 0 0 100%;
     max-width: 100%;

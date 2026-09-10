@@ -23,7 +23,7 @@ import { profileApi } from '../services/profile.api';
 import { connectionApi } from '../services/connection.api';
 import { FilterDrawerModal } from '../components/filter-drawer-modal';
 
-// Fallback high quality Rajput sample profiles matching screenshots
+// High-quality Rajput fallback sample profiles
 const MOCK_PROFILES = [
   {
     id: 'p-1011',
@@ -220,7 +220,7 @@ export default function ExploreScreen() {
 
   // Dynamic Filtering & Search State
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeChipFilter, setActiveChipFilter] = useState<'all' | 'brides' | 'grooms' | 'jaipur' | 'jodhpur' | 'verified'>('all');
+  const [activeChipFilter, setActiveChipFilter] = useState<'all' | 'brides' | 'grooms' | 'verified' | 'jaipur' | 'jodhpur'>('all');
 
   // View Mode: 'single' or 'grid'
   const [viewMode, setViewMode] = useState<'single' | 'grid'>('single');
@@ -409,11 +409,13 @@ export default function ExploreScreen() {
     });
   };
 
+  const hasActiveFilters = searchQuery.trim().length > 0 || activeChipFilter !== 'all';
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#4A1235" />
 
-      {/* Top Royal App Bar Header with Prominent Lotus RA Logo */}
+      {/* ─── ROYAL TOP HEADER ─── */}
       <View style={styles.topHeader}>
         <View style={styles.headerTitleWrap}>
           <Image
@@ -422,44 +424,48 @@ export default function ExploreScreen() {
             resizeMode="contain"
           />
           <View style={styles.headerTextCol}>
-            <Text style={styles.brandTitle}>Rajput Alliances</Text>
-            <Text style={styles.taglineText}>Connecting Rajputs Worldwide</Text>
+            <Text style={styles.brandTitle}>Explore Rajput Matches</Text>
+            <Text style={styles.taglineText}>Search & Connect Worldwide</Text>
           </View>
         </View>
 
         <TouchableOpacity style={styles.filterBtn} onPress={() => setIsFilterDrawerOpen(true)}>
-          <Ionicons name="options-outline" size={16} color="#FFFFFF" />
-          <Text style={styles.filterBtnText}>Filter</Text>
+          <Ionicons name="options-outline" size={15} color="#FFFFFF" />
+          <Text style={styles.filterBtnText}>Filters</Text>
+          {hasActiveFilters && <View style={styles.activeFilterBadgeDot} />}
         </TouchableOpacity>
       </View>
 
-      {/* Dynamic Search Bar */}
-      <View style={styles.searchBarContainer}>
-        <Ionicons name="search-outline" size={18} color="#8C687D" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search Matri ID, Name, City, or Clan..."
-          placeholderTextColor="#A0849A"
-          value={searchQuery}
-          onChangeText={(text) => {
-            setSearchQuery(text);
-            setSelectedProfileIndex(0);
-          }}
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <Ionicons name="close-circle" size={18} color="#8C687D" />
-          </TouchableOpacity>
-        )}
+      {/* ─── DYNAMIC LUXURY SEARCH BAR ─── */}
+      <View style={styles.searchBarWrapper}>
+        <View style={styles.searchBarContainer}>
+          <Ionicons name="search" size={18} color="#4A1235" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by Matri ID, Name, City, Gotra, Clan..."
+            placeholderTextColor="#9A7B90"
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              setSelectedProfileIndex(0);
+            }}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+              <Ionicons name="close-circle" size={18} color="#4A1235" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
-      {/* Quick Filter Chips */}
+      {/* ─── QUICK FILTER CHIPS CAROUSEL WITH ICONS ─── */}
       <View style={styles.chipsRowContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsScrollContent}>
           <TouchableOpacity
             style={[styles.chipItem, activeChipFilter === 'all' && styles.chipItemActive]}
             onPress={() => { setActiveChipFilter('all'); setSelectedProfileIndex(0); }}
           >
+            <Ionicons name="sparkles" size={12} color={activeChipFilter === 'all' ? '#FFFFFF' : '#4A1235'} />
             <Text style={[styles.chipText, activeChipFilter === 'all' && styles.chipTextActive]}>
               All ({matches.length - blockedSet.size})
             </Text>
@@ -469,6 +475,7 @@ export default function ExploreScreen() {
             style={[styles.chipItem, activeChipFilter === 'brides' && styles.chipItemActive]}
             onPress={() => { setActiveChipFilter('brides'); setSelectedProfileIndex(0); }}
           >
+            <Ionicons name="female" size={12} color={activeChipFilter === 'brides' ? '#FFFFFF' : '#4A1235'} />
             <Text style={[styles.chipText, activeChipFilter === 'brides' && styles.chipTextActive]}>Brides</Text>
           </TouchableOpacity>
 
@@ -476,13 +483,23 @@ export default function ExploreScreen() {
             style={[styles.chipItem, activeChipFilter === 'grooms' && styles.chipItemActive]}
             onPress={() => { setActiveChipFilter('grooms'); setSelectedProfileIndex(0); }}
           >
+            <Ionicons name="male" size={12} color={activeChipFilter === 'grooms' ? '#FFFFFF' : '#4A1235'} />
             <Text style={[styles.chipText, activeChipFilter === 'grooms' && styles.chipTextActive]}>Grooms</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.chipItem, activeChipFilter === 'verified' && styles.chipItemActive]}
+            onPress={() => { setActiveChipFilter('verified'); setSelectedProfileIndex(0); }}
+          >
+            <Ionicons name="shield-checkmark" size={12} color={activeChipFilter === 'verified' ? '#FFFFFF' : '#10B981'} />
+            <Text style={[styles.chipText, activeChipFilter === 'verified' && styles.chipTextActive]}>Verified</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.chipItem, activeChipFilter === 'jaipur' && styles.chipItemActive]}
             onPress={() => { setActiveChipFilter('jaipur'); setSelectedProfileIndex(0); }}
           >
+            <Ionicons name="location" size={12} color={activeChipFilter === 'jaipur' ? '#FFFFFF' : '#4A1235'} />
             <Text style={[styles.chipText, activeChipFilter === 'jaipur' && styles.chipTextActive]}>Jaipur</Text>
           </TouchableOpacity>
 
@@ -490,16 +507,29 @@ export default function ExploreScreen() {
             style={[styles.chipItem, activeChipFilter === 'jodhpur' && styles.chipItemActive]}
             onPress={() => { setActiveChipFilter('jodhpur'); setSelectedProfileIndex(0); }}
           >
+            <Ionicons name="location" size={12} color={activeChipFilter === 'jodhpur' ? '#FFFFFF' : '#4A1235'} />
             <Text style={[styles.chipText, activeChipFilter === 'jodhpur' && styles.chipTextActive]}>Jodhpur</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.chipItem, activeChipFilter === 'verified' && styles.chipItemActive]}
-            onPress={() => { setActiveChipFilter('verified'); setSelectedProfileIndex(0); }}
-          >
-            <Text style={[styles.chipText, activeChipFilter === 'verified' && styles.chipTextActive]}>Verified</Text>
-          </TouchableOpacity>
         </ScrollView>
+      </View>
+
+      {/* ─── LIVE RESULTS COUNT & ACTIVE FILTER PILL BAR ─── */}
+      <View style={styles.resultsInfoBar}>
+        <Text style={styles.resultsCountText}>
+          Found <Text style={styles.resultsCountBold}>{filteredProfiles.length}</Text> Rajput Profiles
+        </Text>
+        {hasActiveFilters && (
+          <TouchableOpacity
+            style={styles.clearFiltersBtn}
+            onPress={() => {
+              setSearchQuery('');
+              setActiveChipFilter('all');
+            }}
+          >
+            <Text style={styles.clearFiltersBtnText}>Clear Search</Text>
+            <Ionicons name="close" size={12} color="#9A7228" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView
@@ -507,24 +537,28 @@ export default function ExploreScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4A1235']} />}
         showsVerticalScrollIndicator={false}
       >
-        {/* ─── VIEW MODE SWITCHER HEADER CARD ─────────────────────────────── */}
+        {/* ─── SLEEK COMPACT VIEW MODE SWITCHER ─── */}
         <View style={styles.viewModeSection}>
-          <Text style={styles.viewModeTitle}>View Mode</Text>
+          <View style={styles.modeTitleHeaderRow}>
+            <View style={styles.titleLineDeco} />
+            <Text style={styles.viewModeTitle}>VIEW MODE</Text>
+            <View style={styles.titleLineDeco} />
+          </View>
 
           <View style={styles.switcherPillContainer}>
             <TouchableOpacity
               style={[styles.switcherBtn, viewMode === 'single' && styles.switcherBtnActive]}
               onPress={() => setViewMode('single')}
-              activeOpacity={0.8}
+              activeOpacity={0.85}
             >
               <View style={styles.iconWithNumRow}>
                 <Ionicons
                   name="person"
-                  size={18}
+                  size={14}
                   color={viewMode === 'single' ? '#4A1235' : '#8C687D'}
                 />
                 <View style={[styles.numBadge, viewMode === 'single' && styles.numBadgeActive]}>
-                  <Text style={[styles.numBadgeText, viewMode === 'single' && styles.numBadgeTextActive]}>1</Text>
+                  <Text style={styles.numBadgeText}>1</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -532,37 +566,40 @@ export default function ExploreScreen() {
             <TouchableOpacity
               style={[styles.switcherBtn, viewMode === 'grid' && styles.switcherBtnGridActive]}
               onPress={() => setViewMode('grid')}
-              activeOpacity={0.8}
+              activeOpacity={0.85}
             >
               <Ionicons
                 name="grid"
-                size={20}
+                size={15}
                 color={viewMode === 'grid' ? '#FFFFFF' : '#8C687D'}
               />
             </TouchableOpacity>
           </View>
-
-          <Text style={styles.viewModeSubtext}>
-            {viewMode === 'single'
-              ? 'Currently Viewing: One Profile.\nTap to switch to Grid View.'
-              : 'Currently Viewing: Multiple Profiles.\nTap to switch to Single View.'}
-          </Text>
         </View>
 
         {loading ? (
           <View style={styles.loaderCenter}>
             <ActivityIndicator size="large" color="#4A1235" />
-            <Text style={styles.loaderText}>Finding Rajput Profiles...</Text>
+            <Text style={styles.loaderText}>Searching Rajput Profiles...</Text>
           </View>
         ) : filteredProfiles.length === 0 ? (
           <View style={styles.loaderCenter}>
             <Ionicons name="search-outline" size={48} color="#8C687D" />
-            <Text style={styles.noResultsTitle}>No Profiles Match Search</Text>
-            <Text style={styles.noResultsSub}>Try adjusting your search query or quick filters.</Text>
+            <Text style={styles.noResultsTitle}>No Matching Profiles</Text>
+            <Text style={styles.noResultsSub}>Try adjusting your search criteria or quick filters.</Text>
+            <TouchableOpacity
+              style={styles.resetFiltersBtn}
+              onPress={() => {
+                setSearchQuery('');
+                setActiveChipFilter('all');
+              }}
+            >
+              <Text style={styles.resetFiltersBtnText}>Reset All Filters</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <>
-            {/* ─── SINGLE PROFILE VIEW MODE ───────────────────────────────── */}
+            {/* ─── SINGLE PROFILE VIEW MODE ─── */}
             {viewMode === 'single' && activeProfile && (
               <View style={styles.singleCardWrapper}>
                 {nextProfile && (
@@ -679,7 +716,7 @@ export default function ExploreScreen() {
                 </Animated.View>
 
                 <View style={styles.swipeHintRow}>
-                  <Text style={styles.swipeHintText}>‹ Drag card left/right or tap arrows to navigate ›</Text>
+                  <Text style={styles.swipeHintText}>‹ Swipe left/right or tap arrows below to explore ›</Text>
                 </View>
 
                 {filteredProfiles.length > 1 && (
@@ -708,7 +745,7 @@ export default function ExploreScreen() {
               </View>
             )}
 
-            {/* ─── GRID PROFILE VIEW MODE ─────────────────────────────────── */}
+            {/* ─── 2-COLUMN GRID VIEW MODE ─── */}
             {viewMode === 'grid' && (
               <View style={styles.grid2ColContainer}>
                 {filteredProfiles.map((item, idx) => {
@@ -859,8 +896,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerLogoImage: {
-    width: 52,
-    height: 52,
+    width: 50,
+    height: 50,
     marginRight: 8,
   },
   headerTextCol: {
@@ -868,9 +905,9 @@ const styles = StyleSheet.create({
   },
   brandTitle: {
     color: '#FFFDF9',
-    fontSize: 16.5,
+    fontSize: 16,
     fontWeight: '900',
-    letterSpacing: 0.8,
+    letterSpacing: 0.6,
     fontFamily: 'serif',
   },
   taglineText: {
@@ -888,25 +925,42 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
+    borderColor: 'rgba(212,175,55,0.4)',
+    position: 'relative',
   },
   filterBtnText: {
     color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '700',
   },
+  activeFilterBadgeDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: '#D4AF37',
+    position: 'absolute',
+    top: 4,
+    right: 4,
+  },
 
+  searchBarWrapper: {
+    paddingHorizontal: 14,
+    paddingTop: 10,
+  },
   searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 14,
-    marginTop: 10,
-    paddingHorizontal: 12,
-    height: 42,
-    borderRadius: 21,
-    borderWidth: 1,
+    paddingHorizontal: 14,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1.5,
     borderColor: '#E7D8C9',
+    shadowColor: '#4A1235',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 3,
   },
   searchIcon: {
     marginRight: 8,
@@ -915,11 +969,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     color: '#4A1235',
-    fontWeight: '600',
+    fontWeight: '700',
   },
 
   chipsRowContainer: {
-    marginTop: 8,
+    marginTop: 10,
     marginBottom: 4,
   },
   chipsScrollContent: {
@@ -927,7 +981,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chipItem: {
-    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 13,
     paddingVertical: 6,
     borderRadius: 16,
     backgroundColor: '#EDE5DC',
@@ -937,70 +994,121 @@ const styles = StyleSheet.create({
   chipItemActive: {
     backgroundColor: '#4A1235',
     borderColor: '#4A1235',
+    shadowColor: '#4A1235',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   chipText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#4A1235',
   },
   chipTextActive: {
     color: '#FFFFFF',
   },
 
+  resultsInfoBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginTop: 6,
+    marginBottom: 2,
+  },
+  resultsCountText: {
+    fontSize: 11.5,
+    color: '#8C687D',
+    fontWeight: '700',
+  },
+  resultsCountBold: {
+    color: '#4A1235',
+    fontWeight: '900',
+  },
+  clearFiltersBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#EDE5DC',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  clearFiltersBtnText: {
+    fontSize: 10.5,
+    color: '#9A7228',
+    fontWeight: '800',
+  },
+
   scrollContent: {
     paddingHorizontal: 14,
-    paddingTop: 10,
+    paddingTop: 6,
     paddingBottom: 180,
   },
 
+  // ─── COMPACT VIEW MODE SWITCHER ───
   viewModeSection: {
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 4,
+  },
+  modeTitleHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
+  titleLineDeco: {
+    width: 28,
+    height: 1,
+    backgroundColor: '#D4AF37',
   },
   viewModeTitle: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 11.5,
+    fontWeight: '900',
     color: '#4A1235',
-    marginBottom: 10,
     fontFamily: 'serif',
+    letterSpacing: 1.2,
   },
   switcherPillContainer: {
     flexDirection: 'row',
     backgroundColor: '#EDE5DC',
-    width: 220,
-    height: 48,
-    borderRadius: 24,
-    padding: 4,
+    width: 140,
+    height: 36,
+    borderRadius: 18,
+    padding: 3,
     alignItems: 'center',
     justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#E2CFC2',
     shadowColor: '#4A1235',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
     elevation: 2,
   },
   switcherBtn: {
     flex: 1,
     height: '100%',
-    borderRadius: 20,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
   switcherBtnActive: {
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   switcherBtnGridActive: {
     backgroundColor: '#4A1235',
     shadowColor: '#4A1235',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
   iconWithNumRow: {
     flexDirection: 'row',
@@ -1008,9 +1116,9 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   numBadge: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     backgroundColor: '#8C687D',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1020,24 +1128,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#4A1235',
   },
   numBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
+    fontSize: 8.5,
+    fontWeight: '900',
     color: '#FFFFFF',
-  },
-  numBadgeTextActive: {
-    color: '#FFFFFF',
-  },
-  viewModeSubtext: {
-    fontSize: 12,
-    color: '#4A1235',
-    textAlign: 'center',
-    marginTop: 10,
-    lineHeight: 18,
-    fontWeight: '600',
   },
 
   singleCardWrapper: {
-    marginTop: 12,
+    marginTop: 8,
     alignItems: 'center',
     position: 'relative',
   },
@@ -1124,36 +1221,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 1.2,
   },
-  matchScoreBadge: {
-    position: 'absolute',
-    top: 14,
-    right: 60,
-    backgroundColor: 'rgba(212, 175, 55, 0.95)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  matchScoreText: {
-    color: '#4A1235',
-    fontSize: 10,
-    fontWeight: '900',
-  },
-  singleHeartCircle: {
-    position: 'absolute',
-    top: 14,
-    right: 14,
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(74, 18, 53, 0.65)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.6)',
-  },
   gunaScoreBadge: {
     position: 'absolute',
     bottom: 14,
@@ -1226,21 +1293,6 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
-  cardTbViewBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#4A1235',
-    paddingHorizontal: 18,
-    paddingVertical: 9,
-    borderRadius: 20,
-    gap: 6,
-  },
-  cardTbViewBtnText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
-  },
   cardTbIconBtn: {
     width: 38,
     height: 38,
@@ -1288,7 +1340,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 12,
+    marginTop: 8,
   },
   gridCardItem: {
     width: '48.5%',
@@ -1375,22 +1427,6 @@ const styles = StyleSheet.create({
     paddingTop: 6,
     gap: 3,
   },
-  miniGridTbViewBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#4A1235',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 12,
-    gap: 3,
-    flex: 1,
-  },
-  miniGridTbViewText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '700',
-  },
   miniGridTbIconBtn: {
     width: 28,
     height: 28,
@@ -1422,6 +1458,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8C687D',
     textAlign: 'center',
+  },
+  resetFiltersBtn: {
+    marginTop: 14,
+    backgroundColor: '#4A1235',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  resetFiltersBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '800',
   },
 
   galleryModalBackdrop: {

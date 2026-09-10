@@ -143,7 +143,7 @@ const MatchmakingSection = () => {
             {/* Heritage Badge */}
             <div className="mb-2 mb-md-4">
               <span
-                className="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill"
+                className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill"
                 style={{
                   color: "var(--royal-gold-dark)",
                   background: "rgba(237, 177, 57, 0.08)",
@@ -204,7 +204,7 @@ const MatchmakingSection = () => {
             {/* Call to Action Button */}
             <Link to={isAuthenticated ? "/search" : "/login"}>
               <button
-                className="royal-button px-4 px-md-5 py-2.5 py-md-3 shadow-lg border-0 d-inline-flex align-items-center justify-content-center"
+                className="royal-button px-4 px-md-5 py-2 py-md-3 shadow-lg border-0 d-inline-flex align-items-center justify-content-center"
                 style={{
                   letterSpacing: "1px",
                   transition: "all 0.35s ease",

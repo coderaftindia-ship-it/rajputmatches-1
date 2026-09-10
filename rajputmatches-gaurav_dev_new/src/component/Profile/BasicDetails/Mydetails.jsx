@@ -5,6 +5,7 @@ import { useProfileDetails } from "../../../context/ProfileDetailsContext";
 
 // Import original edit forms
 import FormCard from "../Forms/FormCard";
+import ContactForm from "../Forms/ContactForm";
 import ReligionForm from "../Forms/ReligionForm";
 import EducationinfoForm from "../Forms/EducationinfoForm";
 import FamilyinfoForm from "../Forms/FamilyinfoForm";
@@ -212,19 +213,69 @@ function Mydetails() {
   const [mediaDocs, setMediaDocs] = useState([]);
   const [mediaPrivate, setMediaPrivate] = useState(false);
 
+  const [contactFormData, setContactFormData] = useState({});
+  const [contactError, setContactError] = useState("");
+
+  const openContactEdit = () => {
+    setContactError("");
+    setContactFormData({
+      mobile: user?.mobile || "",
+      email: user?.email || "",
+    });
+    setActiveModal("contact");
+  };
+
+  const handleContactChange = (e) => {
+    const { name, value } = e.target;
+    setContactError("");
+    setContactFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleContactSave = async () => {
+    try {
+      setContactError("");
+      await updateData("update-profile", {
+        mobile: contactFormData.mobile,
+        email: contactFormData.email,
+      }, true);
+      setActiveModal(null);
+      await refreshSection("user");
+    } catch (err) {
+      console.error(err);
+      setContactError("Failed to update contact info. Please try again.");
+    }
+  };
+
   // Initialize and Open Forms
   const openBasicEdit = () => {
     setBasicError("");
-    const formattedDob = user?.dateOfBirth ? user.dateOfBirth.split("T")[0] : "";
+    const formattedDob = user?.dateOfBirth ? (user.dateOfBirth.includes("T") ? user.dateOfBirth.split("T")[0] : user.dateOfBirth) : "";
+    
+    // Parse height cleanly
+    let heightFormatted = "";
+    if (user?.height) {
+      if (typeof user.height === "object" && user.height !== null) {
+        heightFormatted = `${user.height.feet ?? 5} ft ${user.height.inches ?? 0} in`;
+      } else if (typeof user.height === "string") {
+        heightFormatted = user.height;
+      }
+    }
+
+    // Parse weight cleanly
+    let weightFormatted = "";
+    if (user?.weight !== undefined && user?.weight !== null && user?.weight !== "") {
+      weightFormatted = typeof user.weight === "number" ? `${user.weight} kg` : String(user.weight);
+    }
+
     setBasicFormData({
       firstName: user?.firstName || "",
       middleName: user?.middleName || "",
-      lastName: user?.lastName || "",
+      lastName: user?.lastName || horoscope?.clan || user?.subclan || "",
       dateOfBirth: formattedDob,
       mobile: user?.mobile || "",
       email: user?.email || "",
-      height: user?.height ? `${user.height.feet || 5} ft ${user.height.inches || 0} in` : "",
-      weight: user?.weight ? `${user.weight} kg` : "",
+      height: heightFormatted,
+      weight: weightFormatted,
       maritalStatus: (user?.maritalStatus === "Single") ? "Never Married" : (user?.maritalStatus || ""),
       clan: horoscope?.clan || user?.lastName || user?.subclan || "",
       subclan: horoscope?.subclan || user?.lastName || "",
@@ -232,9 +283,9 @@ function Mydetails() {
       state: user?.state || user?.address?.state || "",
       nativePlace: user?.nativePlace || horoscope?.birthplace || "",
       birthplace: horoscope?.birthplace || "",
-      birthTime: horoscope?.birthHour && horoscope?.birthMinute
-        ? `${horoscope.birthHour}:${horoscope.birthMinute} ${horoscope.birthTimePeriod || ""}`
-        : "",
+      birthTime: (horoscope?.birthHour && horoscope?.birthMinute)
+        ? `${horoscope.birthHour}:${horoscope.birthMinute} ${horoscope.birthTimePeriod || "AM"}`
+        : (horoscope?.birthTime || ""),
       gotra: horoscope?.gotra || "",
       rashi: horoscope?.rashi || horoscope?.zodiac || "",
       manglik: horoscope?.maglik || horoscope?.manglik || "",
@@ -247,14 +298,14 @@ function Mydetails() {
     setReligionFormData({
       birthHour: horoscope?.birthHour || "",
       birthMinute: horoscope?.birthMinute || "",
-      birthTimePeriod: horoscope?.birthTimePeriod || "",
+      birthTimePeriod: horoscope?.birthTimePeriod || "AM",
       birthplace: horoscope?.birthplace || "",
-      birthCity: horoscope?.birthCity || "",
+      birthCity: horoscope?.birthCity || horoscope?.birthplace || "",
       birthState: horoscope?.birthState || "",
-      birthCountry: horoscope?.birthCountry || "",
-      maglik: horoscope?.maglik || "",
-      clan: horoscope?.clan || "",
-      subclan: horoscope?.subclan || "",
+      birthCountry: horoscope?.birthCountry || "India",
+      maglik: horoscope?.maglik || horoscope?.manglik || "",
+      clan: horoscope?.clan || user?.lastName || "",
+      subclan: horoscope?.subclan || user?.subclan || "",
       gotra: horoscope?.gotra || "",
       additionalInfo: horoscope?.additionalInfo || "",
     });
@@ -718,7 +769,7 @@ function Mydetails() {
             </div>
 
             {/* CONTACT INFORMATION SECTION */}
-            <SectionRibbon onEditClick={openBasicEdit} editTitle="Edit Contact Information">
+            <SectionRibbon onEditClick={openContactEdit} editTitle="Edit Contact Information">
               Contact Information
             </SectionRibbon>
 
@@ -1044,6 +1095,16 @@ function Mydetails() {
       </div>
 
       {/* ── Active Modal Rendering for Editing Details ── */}
+      {activeModal === "contact" && (
+        <ContactForm
+          handleCancelClick={() => setActiveModal(null)}
+          formData={contactFormData}
+          handleInputChange={handleContactChange}
+          handleSaveClick={handleContactSave}
+          error={contactError}
+        />
+      )}
+
       {activeModal === "basic" && (
         <FormCard
           handleCancelClick={() => setActiveModal(null)}

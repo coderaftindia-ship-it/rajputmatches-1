@@ -11,6 +11,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
+  Image,
 } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -193,9 +194,11 @@ export default function InterestsScreen() {
       {/* ── ROYAL TOP HEADER (matches Profile page style) ── */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={styles.headerLogoRing}>
-            <FontAwesome5 name="crown" size={14} color="#D4AF37" />
-          </View>
+          <Image
+            source={require('../../assets/images/lotus_ra_logo.png')}
+            style={styles.headerLogoImage}
+            resizeMode="contain"
+          />
           <View>
             <Text style={styles.headerKicker}>MATRIMONIAL DASHBOARD</Text>
             <Text style={styles.headerTitle}>Activity & Requests 👑</Text>
@@ -452,15 +455,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
-  headerLogoRing: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#4A1235',
-    borderWidth: 1.5,
-    borderColor: '#D4AF37',
-    alignItems: 'center',
-    justifyContent: 'center',
+  headerLogoImage: {
+    width: 44,
+    height: 44,
+    marginRight: 2,
   },
   headerKicker: {
     fontSize: 9,

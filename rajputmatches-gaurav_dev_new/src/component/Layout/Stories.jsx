@@ -309,8 +309,8 @@ function Stories() {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0) 100%)",
-                            padding: "40px 20px 20px 20px",
+                            background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,0) 100%)",
+                            padding: "32px 16px 16px 16px",
                             color: "white"
                         }}>
                             <motion.h5 
@@ -318,9 +318,9 @@ function Stories() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 style={{ 
                                     fontFamily: "var(--font-heading)", 
-                                    fontSize: "26px", 
-                                    marginBottom: "10px",
-                                    fontWeight: "500",
+                                    fontSize: "clamp(1.1rem, 4vw, 1.45rem)", 
+                                    marginBottom: "8px",
+                                    fontWeight: "600",
                                     color: "#ffffff",
                                     textShadow: "1px 1px 3px rgba(0,0,0,0.8)"
                                 }}
@@ -329,14 +329,14 @@ function Stories() {
                             </motion.h5>
                             <p style={{
                                 fontFamily: "var(--font-body)",
-                                fontSize: "15px",
-                                opacity: 0.9,
+                                fontSize: "clamp(0.85rem, 3vw, 0.95rem)",
+                                opacity: 0.92,
                                 display: "-webkit-box",
                                 WebkitBoxOrient: "vertical",
-                                WebkitLineClamp: 2,
+                                WebkitLineClamp: 3,
                                 overflow: "hidden",
                                 margin: 0,
-                                lineHeight: "1.5",
+                                lineHeight: "1.45",
                                 color: "#f0f0f0",
                                 textShadow: "1px 1px 2px rgba(0,0,0,0.8)"
                             }}>

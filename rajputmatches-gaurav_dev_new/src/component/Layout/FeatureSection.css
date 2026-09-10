@@ -172,66 +172,68 @@
 
 @media (max-width: 768px) {
   .box {
-    padding-inline: 5px;
-
+    padding-inline: 12px;
     border: 2px solid rgba(255, 210, 64, 1);
   }
   .vip-section {
-    padding: 15px;
+    padding: 24px 16px;
     flex-direction: column;
     min-height: fit-content;
     text-align: center;
-    bottom: 5px;
+    bottom: 0;
   }
   .vip-section h2 {
     text-align: center;
-    font-size: 3vw;
-    margin-bottom: 8px;
-    padding: auto;
+    font-size: 1.35rem;
+    margin-bottom: 12px;
+    padding: 0;
+    min-width: unset;
   }
 
   .vip-section p {
-    padding-inline: 5vw;
-    font-size: 1.75vw;
-    margin-bottom: 8px;
+    padding-inline: 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin-bottom: 14px;
+    text-align: center;
   }
   .vip-section div {
     text-align: center;
   }
 
   .vip-section button {
-    padding: 0.5rem 1rem;
-    font-size: 1.3vw;
+    padding: 0.6rem 1.4rem;
+    font-size: 0.9rem;
+    border-radius: 30px;
   }
 }
 
 @media (max-width: 440px) {
   .box {
-    padding-inline: 4px;
+    padding-inline: 10px;
     border: 2px solid rgba(255, 210, 64, 1);
   }
   .vip-section {
-    padding: 10px;
+    padding: 20px 12px;
     text-align: center;
-    bottom: 4px;
-    min-height: 180px;
-    bottom: 5px;
+    min-height: fit-content;
   }
   .vip-section h2 {
     text-align: center;
-    font-size: 4.5vw;
-    margin-bottom: 8px;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
   }
 
   .vip-section p {
-    padding-inline: 5vw;
-    font-size: 2.5vw;
-    margin-bottom: 8px;
+    padding-inline: 0;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    margin-bottom: 12px;
   }
 
   .vip-section button {
-    padding: 0.6rem 1.2rem;
-    font-size: 2vw;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.85rem;
   }
 }
 
