@@ -129,7 +129,7 @@ export const VVIPSection = ({ title, description, buttonText }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8 }}
-      className="mt-5 pt-4"
+      className="mt-4 mt-md-5 mb-4 mb-md-5 pt-2 pt-md-4 pb-2 pb-md-3"
     >
       <div
         className="rounded-4 p-4 p-md-5 text-center position-relative overflow-hidden shadow-lg"
