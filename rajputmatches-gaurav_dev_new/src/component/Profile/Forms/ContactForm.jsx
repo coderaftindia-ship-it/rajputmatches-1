@@ -2,6 +2,38 @@ import React from "react";
 import style from "./Form.module.css";
 import { X } from "lucide-react";
 
+const COUNTRY_CODES = [
+  { code: "+91", label: "India (+91)" },
+  { code: "+1", label: "USA/Canada (+1)" },
+  { code: "+971", label: "UAE (+971)" },
+  { code: "+44", label: "UK (+44)" },
+  { code: "+61", label: "Australia (+61)" },
+  { code: "+966", label: "Saudi Arabia (+966)" },
+  { code: "+65", label: "Singapore (+65)" },
+  { code: "+965", label: "Kuwait (+965)" },
+  { code: "+974", label: "Qatar (+974)" },
+  { code: "+968", label: "Oman (+968)" },
+  { code: "+49", label: "Germany (+49)" },
+  { code: "+33", label: "France (+33)" },
+  { code: "+39", label: "Italy (+39)" },
+  { code: "+34", label: "Spain (+34)" },
+  { code: "+81", label: "Japan (+81)" },
+  { code: "+92", label: "Pakistan (+92)" },
+  { code: "+977", label: "Nepal (+977)" },
+  { code: "+94", label: "Sri Lanka (+94)" },
+  { code: "+880", label: "Bangladesh (+880)" },
+  { code: "+60", label: "Malaysia (+60)" },
+  { code: "+64", label: "New Zealand (+64)" },
+  { code: "+27", label: "South Africa (+27)" },
+  { code: "+31", label: "Netherlands (+31)" },
+  { code: "+46", label: "Sweden (+46)" },
+  { code: "+41", label: "Switzerland (+41)" },
+  { code: "+47", label: "Norway (+47)" },
+  { code: "+45", label: "Denmark (+45)" },
+  { code: "+353", label: "Ireland (+353)" },
+  { code: "+973", label: "Bahrain (+973)" },
+];
+
 function ContactForm({
   handleCancelClick,
   formData,
@@ -36,21 +68,47 @@ function ContactForm({
                 <label style={{ fontSize: "0.75rem", fontWeight: "700", color: "#59123B", letterSpacing: "0.05em", marginBottom: "4px", display: "block" }}>
                   MOBILE NUMBER
                 </label>
-                <input
-                  type="text"
-                  name="mobile"
-                  placeholder="Enter Mobile Number"
-                  value={formData.mobile || ""}
-                  onChange={handleInputChange}
-                  style={{
-                    width: "100%",
-                    padding: "8px 12px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                    fontSize: "0.9rem",
-                    outline: "none"
-                  }}
-                />
+                <div className="d-flex gap-2">
+                  <select
+                    name="countryCode"
+                    value={formData.countryCode || "+91"}
+                    onChange={handleInputChange}
+                    style={{
+                      width: "140px",
+                      flexShrink: 0,
+                      padding: "8px 10px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "0.88rem",
+                      outline: "none",
+                      backgroundColor: "#fff",
+                      fontWeight: "600",
+                      color: "#334155"
+                    }}
+                  >
+                    {COUNTRY_CODES.map((item) => (
+                      <option key={item.code} value={item.code}>
+                        {item.code} ({item.label.split("(")[0].trim()})
+                      </option>
+                    ))}
+                  </select>
+
+                  <input
+                    type="text"
+                    name="mobile"
+                    placeholder="Enter Mobile Number"
+                    value={formData.mobile || ""}
+                    onChange={handleInputChange}
+                    style={{
+                      flexGrow: 1,
+                      padding: "8px 12px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "0.9rem",
+                      outline: "none"
+                    }}
+                  />
+                </div>
               </div>
 
               <div className="mb-3">

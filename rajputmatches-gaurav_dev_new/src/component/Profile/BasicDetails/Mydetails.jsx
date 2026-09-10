@@ -219,6 +219,7 @@ function Mydetails() {
   const openContactEdit = () => {
     setContactError("");
     setContactFormData({
+      countryCode: user?.countryCode || "+91",
       mobile: user?.mobile || "",
       email: user?.email || "",
     });
@@ -235,6 +236,7 @@ function Mydetails() {
     try {
       setContactError("");
       await updateData("update-profile", {
+        countryCode: contactFormData.countryCode || "+91",
         mobile: contactFormData.mobile,
         email: contactFormData.email,
       }, true);
