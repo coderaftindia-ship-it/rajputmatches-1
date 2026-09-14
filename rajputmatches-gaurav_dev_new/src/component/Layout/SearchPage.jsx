@@ -851,7 +851,7 @@ const SearchPage = () => {
           (heightFrom === null || feet >= heightFrom) &&
           (heightTo   === null || feet <= heightTo));
 
-      return !isSelf && !isAdmin && matchesGender && matchesId && matchesName && matchesClass && matchesHeight;
+      return matchesGender && matchesId && matchesName && matchesClass && matchesHeight;
     });
   };
 

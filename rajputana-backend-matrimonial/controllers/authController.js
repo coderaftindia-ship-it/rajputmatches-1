@@ -2023,13 +2023,11 @@ exports.getprofiles = async (req, res) => {
     const usersWhoBlockedMe = await User.find({ blocked: userObjectId }).select("_id").lean();
     const blockedByMe = Array.isArray(user.blocked) ? user.blocked : [];
     const blockedByOthers = Array.isArray(usersWhoBlockedMe) ? usersWhoBlockedMe.map((u) => u._id) : [];
-    const excludedIds = [userObjectId, ...blockedByMe, ...blockedByOthers];
+    const excludedIds = [...blockedByMe, ...blockedByOthers];
 
     const query = {
       isbloacked: false,
       isApproved: true,
-      isEnable: true,
-      role: { $ne: "admin" },
       _id: { $nin: excludedIds },
     };
 
