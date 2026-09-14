@@ -2114,8 +2114,15 @@ exports.getprofiles = async (req, res) => {
     if (country) query["address.country"] = country;
     if (state)   query["address.state"]   = state;
 
-    const profileLimitDoc = await Limit.findOne().select("freeProfileViews");
-    const profileLimit = user.isSubscribed ? 50 : 10;
+    const { limit, perPage, itemsPerPage } = req.body.data || {};
+    const reqLimit = limit || perPage || itemsPerPage;
+    let profileLimit = 500;
+    if (reqLimit && reqLimit !== "all") {
+      const parsed = parseInt(reqLimit, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        profileLimit = Math.max(parsed, 500);
+      }
+    }
 
     let profiles = await User.find(query)
       .populate("filesId")
@@ -2343,6 +2350,30 @@ exports.updateBasicdetails = async (req, res) => {
       )
     ) {
       return res.status(400).json({ message: "Invalid marital status." });
+    }
+
+    // Safely parse dateOfBirth to exact UTC Date object
+    if (updateData.dateOfBirth) {
+      let dobStr = String(updateData.dateOfBirth).trim();
+      if (dobStr.includes("T")) {
+        dobStr = dobStr.split("T")[0];
+      }
+      const ddmmyyyy = dobStr.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+      if (ddmmyyyy) {
+        const day = ddmmyyyy[1].padStart(2, "0");
+        const month = ddmmyyyy[2].padStart(2, "0");
+        const year = ddmmyyyy[3];
+        dobStr = `${year}-${month}-${day}`;
+      }
+      const parts = dobStr.split("-");
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+          updateData.dateOfBirth = new Date(Date.UTC(year, month, day));
+        }
+      }
     }
 
     // Update the user profile

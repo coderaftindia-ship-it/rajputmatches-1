@@ -49,20 +49,49 @@ import {
   FaTree
 } from "react-icons/fa";
 
+const parseDobToIsoString = (dobString) => {
+  if (!dobString || dobString === "N/A") return "";
+  const str = String(dobString).trim();
+  if (str.includes("T")) {
+    return str.split("T")[0];
+  }
+  const ddmmyyyy = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+  if (ddmmyyyy) {
+    const day = ddmmyyyy[1].padStart(2, "0");
+    const month = ddmmyyyy[2].padStart(2, "0");
+    const year = ddmmyyyy[3];
+    return `${year}-${month}-${day}`;
+  }
+  const yyyymmdd = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  if (yyyymmdd) {
+    const year = yyyymmdd[1];
+    const month = yyyymmdd[2].padStart(2, "0");
+    const day = yyyymmdd[3].padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+  return str;
+};
+
 // Date formatting helper
 const formatDob = (dobString) => {
   if (!dobString || dobString === "N/A") return "N/A";
-  try {
-    const date = new Date(dobString);
-    if (isNaN(date.getTime())) return dobString;
-    return date.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    });
-  } catch (e) {
-    return dobString;
+  const isoStr = parseDobToIsoString(dobString);
+  if (!isoStr) return "N/A";
+  const parts = isoStr.split("-");
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    const date = new Date(year, month, day);
+    if (!isNaN(date.getTime())) {
+      return date.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+    }
   }
+  return dobString;
 };
 
 // Slowly Spinning Mandala SVG Watermark
@@ -251,7 +280,7 @@ function Mydetails() {
   // Initialize and Open Forms
   const openBasicEdit = () => {
     setBasicError("");
-    const formattedDob = user?.dateOfBirth ? (user.dateOfBirth.includes("T") ? user.dateOfBirth.split("T")[0] : user.dateOfBirth) : "";
+    const formattedDob = parseDobToIsoString(user?.dateOfBirth);
     
     // Parse height cleanly
     let heightFormatted = "";
@@ -556,6 +585,7 @@ function Mydetails() {
 
       const profilePayload = {
         ...basicFormData,
+        dateOfBirth: parseDobToIsoString(basicFormData.dateOfBirth),
         lastName: basicFormData.clan || basicFormData.lastName || basicFormData.subclan,
         maritalStatus: mappedMaritalStatus,
         height: heightObj,

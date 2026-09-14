@@ -5,6 +5,29 @@ import { FaRegEdit } from "react-icons/fa";
 import { useAuth } from "../../Layout/AuthContext";
 import { useProfileDetails } from "../../../context/ProfileDetailsContext";
 
+const parseDobToIsoString = (dobString) => {
+  if (!dobString || dobString === "N/A") return "";
+  const str = String(dobString).trim();
+  if (str.includes("T")) {
+    return str.split("T")[0];
+  }
+  const ddmmyyyy = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+  if (ddmmyyyy) {
+    const day = ddmmyyyy[1].padStart(2, "0");
+    const month = ddmmyyyy[2].padStart(2, "0");
+    const year = ddmmyyyy[3];
+    return `${year}-${month}-${day}`;
+  }
+  const yyyymmdd = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  if (yyyymmdd) {
+    const year = yyyymmdd[1];
+    const month = yyyymmdd[2].padStart(2, "0");
+    const day = yyyymmdd[3].padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+  return str;
+};
+
 function BasicInfo() {
   const { updateData } = useAuth();
   const { user, refreshSection } = useProfileDetails();
@@ -35,9 +58,7 @@ function BasicInfo() {
       ? `${userData.height.feet}'${userData.height.inches}"`
       : "N/A";
 
-    const formattedDateOfBirth = userData.dateOfBirth
-      ? userData.dateOfBirth.split("T")[0]
-      : "N/A";
+    const formattedDateOfBirth = parseDobToIsoString(userData.dateOfBirth) || "N/A";
 
     setDetails({
       firstName: userData.firstName || "N/A",
@@ -170,7 +191,11 @@ function BasicInfo() {
     if (!isValid) return;
     try {
       const route = "update-profile";
-      await updateData(route, formData, true);
+      const payload = {
+        ...formData,
+        dateOfBirth: parseDobToIsoString(formData.dateOfBirth),
+      };
+      await updateData(route, payload, true);
       setIsEditing(false);
       await refreshSection("user");
     } catch (error) {
@@ -181,9 +206,7 @@ function BasicInfo() {
   const handleEditClick = () => {
     setIsEditing(true);
     if (user) {
-      const formattedDateOfBirth = user.dateOfBirth
-        ? (user.dateOfBirth.includes("T") ? user.dateOfBirth.split("T")[0] : user.dateOfBirth)
-        : "";
+      const formattedDateOfBirth = parseDobToIsoString(user.dateOfBirth);
 
       let heightFormatted = "";
       if (user.height) {

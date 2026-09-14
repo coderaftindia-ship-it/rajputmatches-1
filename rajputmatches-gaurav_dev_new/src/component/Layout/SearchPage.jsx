@@ -710,20 +710,32 @@ const SearchPage = () => {
   const [clanOptions, setClanOptions] = useState({ clans: [], subclans: [], combined: [] });
   const [clanLoading, setClanLoading] = useState(false);
 
-  const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [itemsPerPage, setItemsPerPage] = useState(() => {
+    const saved = localStorage.getItem("search_items_per_page");
+    return saved ? (saved === "all" ? "all" : parseInt(saved, 10)) : 15;
+  });
   const profilesPerPage = itemsPerPage === "all" ? (profiles?.length || 15) : Number(itemsPerPage);
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil((profiles?.length || 0) / profilesPerPage));
 
+  // Auto-clamp currentPage when profiles length or totalPages changes
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
   const getPage = () => {
     if (itemsPerPage === "all") return profiles || [];
-    const start = (currentPage - 1) * profilesPerPage;
+    const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+    const start = (validCurrentPage - 1) * profilesPerPage;
     return profiles?.slice(start, start + profilesPerPage) || [];
   };
 
   const handleItemsPerPageChange = (e) => {
     const val = e.target.value === "all" ? "all" : parseInt(e.target.value, 10);
     setItemsPerPage(val);
+    localStorage.setItem("search_items_per_page", val);
     setCurrentPage(1);
   };
 
@@ -739,16 +751,17 @@ const SearchPage = () => {
   };
 
   const getPaginationRange = () => {
+    const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
     if (totalPages <= 7) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
-    if (currentPage <= 4) {
+    if (safeCurrentPage <= 4) {
       return [1, 2, 3, 4, 5, "...", totalPages];
     }
-    if (currentPage >= totalPages - 3) {
+    if (safeCurrentPage >= totalPages - 3) {
       return [1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
     }
-    return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
+    return [1, "...", safeCurrentPage - 1, safeCurrentPage, safeCurrentPage + 1, "...", totalPages];
   };
 
   // ── Ref to always have latest formData (prevents stale-closure in callbacks) ──
@@ -847,7 +860,7 @@ const SearchPage = () => {
     try {
       setLoading(true);
       const targetGender = getEnforcedTargetGender();
-      const payload = { ...(formDataRef.current || {}), gender: targetGender };
+      const payload = { ...(formDataRef.current || {}), gender: targetGender, limit: itemsPerPage, itemsPerPage: itemsPerPage };
       const res = await updateData("getprofiles", payload, showToast);
       const rawList = res?.data || [];
       setProfiles(applyClientFilters(rawList, targetGender));
@@ -860,13 +873,13 @@ const SearchPage = () => {
   const refreshData = useCallback(async () => {
     try {
       const targetGender = userData?.gender === "Male" ? "Female" : (userData?.gender === "Female" ? "Male" : (formDataRef.current?.gender || ""));
-      const payload = { ...(formDataRef.current || {}), gender: targetGender };
+      const payload = { ...(formDataRef.current || {}), gender: targetGender, limit: itemsPerPage, itemsPerPage: itemsPerPage };
       const res = await updateData("getprofiles", payload, false);
       const rawList = res?.data || [];
       setProfiles(applyClientFilters(rawList, targetGender));
       // currentPage intentionally NOT reset — stay on same page
     } catch(e){ console.error(e); }
-  }, [updateData, userData]);
+  }, [updateData, userData, itemsPerPage]);
 
   const handleReset = () => {
     let defaultGender = "";
@@ -1205,7 +1218,7 @@ const SearchPage = () => {
                 </h5>
                 {profiles.length > 0 && (
                   <div style={{ fontSize: "0.78rem", color: "var(--royal-text-light)", marginTop: "2px" }}>
-                    Showing {itemsPerPage === "all" ? 1 : (currentPage - 1) * profilesPerPage + 1}–{itemsPerPage === "all" ? profiles.length : Math.min(currentPage * profilesPerPage, profiles.length)} of {profiles.length} profiles
+                    Showing {profiles.length === 0 ? 0 : (itemsPerPage === "all" ? 1 : (currentPage - 1) * profilesPerPage + 1)}–{itemsPerPage === "all" ? profiles.length : Math.min(currentPage * profilesPerPage, profiles.length)} of {profiles.length} profiles
                   </div>
                 )}
               </div>
@@ -1234,10 +1247,12 @@ const SearchPage = () => {
                       transition: "all 0.2s"
                     }}
                   >
+                    <option value={10}>10 Profiles</option>
                     <option value={15}>15 Profiles</option>
                     <option value={30}>30 Profiles</option>
                     <option value={45}>45 Profiles</option>
                     <option value={60}>60 Profiles</option>
+                    <option value={100}>100 Profiles</option>
                     <option value="all">All Profiles</option>
                   </select>
                 </div>
@@ -1320,7 +1335,7 @@ const SearchPage = () => {
                 style={{ borderTop: "1px dashed rgba(212,175,55,0.3)" }}>
                 <div style={{ fontSize: "0.85rem", color: "var(--royal-text-light)" }}>
                   Showing <strong style={{ color: "var(--royal-maroon-dark)" }}>
-                    {(currentPage - 1) * profilesPerPage + 1}–{Math.min(currentPage * profilesPerPage, profiles.length)}
+                    {profiles.length === 0 ? 0 : (itemsPerPage === "all" ? 1 : (currentPage - 1) * profilesPerPage + 1)}–{itemsPerPage === "all" ? profiles.length : Math.min(currentPage * profilesPerPage, profiles.length)}
                   </strong> of <strong style={{ color: "var(--royal-maroon-dark)" }}>{profiles.length}</strong> profiles
                 </div>
 
