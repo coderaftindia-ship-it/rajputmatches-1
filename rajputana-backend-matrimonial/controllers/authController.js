@@ -2028,6 +2028,7 @@ exports.getprofiles = async (req, res) => {
     const query = {
       isbloacked: false,
       isApproved: true,
+      isEnable: { $ne: false },
       _id: { $nin: excludedIds },
     };
 

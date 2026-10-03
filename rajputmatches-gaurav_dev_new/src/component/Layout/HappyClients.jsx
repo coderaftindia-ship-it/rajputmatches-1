@@ -192,7 +192,7 @@ const HappyClients = () => {
 
   useEffect(() => {
     if (total === 0) return;
-    const timer = setInterval(next, 4500);
+    const timer = setInterval(next, 30000); // 30 seconds auto-scroll
     return () => clearInterval(timer);
   }, [total]);
 

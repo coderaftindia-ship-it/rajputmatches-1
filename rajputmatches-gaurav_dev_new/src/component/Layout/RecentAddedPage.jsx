@@ -57,8 +57,10 @@ function RecentAddedPage() {
         else if (Array.isArray(res?.data))        fetchedList = res.data;
         else if (Array.isArray(res))              fetchedList = res;
 
-        // Display ONLY admin approved profiles & max top 9 recent profiles
-        const approvedOnly = fetchedList.filter(p => p && p.isApproved !== false);
+        // Display ONLY active, enabled, admin approved profiles & max top 9 recent profiles
+        const approvedOnly = fetchedList.filter(
+          (p) => p && p.isApproved !== false && p.isEnable !== false && !p.isbloacked && !p.isBlocked
+        );
         if (isMounted) {
           setProfiles(approvedOnly.slice(0, 9));
         }
@@ -79,12 +81,28 @@ function RecentAddedPage() {
   const handleNext = useCallback(() => setCurrentIndex(prev => prev >= maxIndex ? 0 : prev + 1), [maxIndex]);
   const handlePrev = useCallback(() => setCurrentIndex(prev => prev <= 0 ? maxIndex : prev - 1), [maxIndex]);
 
-  // Auto-slide (desktop only)
+  // Auto-slide / auto-scroll every 30 seconds (30000 ms) for mobile & desktop
   useEffect(() => {
-    if (!useSlider || isPaused || isMobile) return;
-    const interval = setInterval(handleNext, 3500);
+    if (isPaused || profiles.length === 0) return;
+    const interval = setInterval(() => {
+      if (isMobile) {
+        if (scrollRef.current && profiles.length > 0) {
+          const nextIdx = (currentIndex + 1) % profiles.length;
+          scrollRef.current.scrollTo({
+            left: nextIdx * scrollRef.current.offsetWidth,
+            behavior: "smooth"
+          });
+          setCurrentIndex(nextIdx);
+        }
+      } else {
+        if (useSlider) {
+          handleNext();
+        }
+      }
+    }, 30000); // 30 seconds interval
+
     return () => clearInterval(interval);
-  }, [useSlider, isPaused, maxIndex, isMobile, handleNext]);
+  }, [useSlider, isPaused, maxIndex, isMobile, handleNext, currentIndex, profiles.length]);
 
   useEffect(() => {
     if (currentIndex > maxIndex) setCurrentIndex(maxIndex);

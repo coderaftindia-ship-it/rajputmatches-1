@@ -819,6 +819,18 @@ const SearchPage = () => {
     const searchName = (fd.searchName || fd.name || "").trim().toLowerCase();
 
     return rawList.filter(p => {
+      // Exclude deleted, disabled, inactive, unapproved, or blocked profiles
+      if (
+        p.isEnable === false ||
+        p.isApproved === false ||
+        p.isbloacked === true ||
+        p.isBlocked === true ||
+        String(p.accountStatus || "").toLowerCase().includes("deleted") ||
+        String(p.accountStatus || "").toLowerCase().includes("inactive")
+      ) {
+        return false;
+      }
+
       const isSelf     = p._id === userData?._id || p.userId === userData?._id;
       const isAdmin    = p.role === "admin";
       const matchesGender = !targetGender || p.gender === targetGender;
