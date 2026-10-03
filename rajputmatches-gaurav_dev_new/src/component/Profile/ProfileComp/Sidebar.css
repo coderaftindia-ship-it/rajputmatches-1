@@ -1,20 +1,193 @@
 /* ============================================
    SIDEBAR — DUAL MODE
    Desktop: Hidden (rendered via Profile.module.css verticalSidebar)
-   Mobile/Tablet: Horizontal scrolling pill tabs
+   Mobile/Tablet: Section Dropdown Switcher + Horizontal scrolling pill tabs
    ============================================ */
 
-/* ---- Mobile pill tab bar (default, shown below 1024px) ---- */
+/* ---- Mobile container (shown below 1024px) ---- */
 .sidebar-nav-container {
   display: block;
   background: white;
   border-radius: 12px;
   border: 1px solid rgba(212, 175, 55, 0.15);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  padding: 8px 6px;
-  margin-bottom: 12px;
+  padding: 10px;
+  margin-bottom: 14px;
 }
 
+/* ---- Mobile Section Switcher Dropdown ---- */
+.mobile-section-switcher {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.mobile-dropdown-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #59123B 0%, #7d1752 100%);
+  color: #ffffff;
+  border: 1.5px solid var(--royal-gold, #CD9024);
+  border-radius: 10px;
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(89, 18, 59, 0.18);
+  transition: all 0.25s ease;
+}
+
+.mobile-dropdown-btn:active {
+  transform: scale(0.99);
+}
+
+.mobile-dropdown-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-active-icon {
+  display: flex;
+  align-items: center;
+  color: var(--royal-gold, #CD9024);
+}
+
+.mobile-active-label {
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+.mobile-active-badge {
+  background: var(--royal-gold, #CD9024);
+  color: #59123B;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 12px;
+}
+
+.mobile-dropdown-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--royal-gold, #CD9024);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.mobile-menu-text {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+}
+
+/* Dropdown Grid Container */
+.mobile-dropdown-grid {
+  margin-top: 8px;
+  background: #ffffff;
+  border: 1.5px solid rgba(205, 144, 36, 0.3);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-dropdown-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #888888;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.mobile-grid-items {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 520px) {
+  .mobile-grid-items {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mobile-grid-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #fbf9f6;
+  border: 1px solid rgba(89, 18, 59, 0.12);
+  border-radius: 8px;
+  color: #333333;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.mobile-grid-item:hover, .mobile-grid-item:focus {
+  background: rgba(89, 18, 59, 0.06);
+  border-color: var(--royal-gold, #CD9024);
+}
+
+.mobile-grid-item.active {
+  background: var(--royal-maroon, #59123B);
+  color: #ffffff;
+  border-color: var(--royal-gold, #CD9024);
+  font-weight: 700;
+}
+
+.grid-item-icon {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+  color: var(--royal-gold, #CD9024);
+}
+
+.mobile-grid-item.active .grid-item-icon {
+  color: var(--royal-gold, #CD9024);
+}
+
+.grid-item-label {
+  flex: 1;
+}
+
+.grid-item-badge {
+  background: var(--royal-maroon, #59123B);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.grid-item-badge.active {
+  background: var(--royal-gold, #CD9024);
+  color: #59123B;
+}
+
+/* ---- Horizontal Pill Menu ---- */
 .sidebar-menu {
   display: flex;
   flex-direction: row;

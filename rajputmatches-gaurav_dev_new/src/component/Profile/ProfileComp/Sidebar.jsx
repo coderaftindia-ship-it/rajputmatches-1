@@ -11,6 +11,8 @@ import {
   MessageSquare,
   Phone,
   FileText,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { fetchByRoute } from "../../../api/routeAdapter";
 import { chatApi } from "../../../api";
@@ -202,22 +204,79 @@ export const VerticalSidebar = ({ activeContent = "myDetails", setActiveContent 
 };
 
 /* ------------------------------------------------------------------ */
-/* Horizontal pill sidebar — rendered for mobile/tablet               */
+/* Horizontal pill sidebar with Section Selector for mobile/tablet    */
 /* ------------------------------------------------------------------ */
 const Sidebar = ({ activeContent = "myDetails", setActiveContent }) => {
   const navigate = useNavigate();
   const counts = useSidebarCounts();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleItemClick = (item) => {
-    if (item === "chat") {
+  const activeItem = menuItems.find((item) => item.value === activeContent) || menuItems[0];
+
+  const handleItemClick = (itemValue) => {
+    if (itemValue === "chat") {
       navigate("/message");
       return;
     }
-    setActiveContent(item);
+    setActiveContent(itemValue);
+    setIsOpen(false);
   };
 
   return (
     <aside className="sidebar-nav-container">
+      {/* Mobile Top Active Tab Dropdown Switcher */}
+      <div className="mobile-section-switcher">
+        <button
+          type="button"
+          className="mobile-dropdown-btn"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className="mobile-dropdown-left">
+            <span className="mobile-active-icon">{activeItem.icon}</span>
+            <span className="mobile-active-label">{activeItem.label}</span>
+            {activeItem.value !== "myDetails" && counts[activeItem.value] !== undefined && (
+              <span className="mobile-active-badge">
+                {counts[activeItem.value]}
+              </span>
+            )}
+          </div>
+          <div className="mobile-dropdown-right">
+            <span className="mobile-menu-text">{isOpen ? "Close" : "All Sections"}</span>
+            {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          </div>
+        </button>
+
+        {/* Dropdown Menu Grid */}
+        {isOpen && (
+          <div className="mobile-dropdown-grid">
+            <div className="mobile-dropdown-header">Select Section</div>
+            <div className="mobile-grid-items">
+              {menuItems.map((item) => {
+                const isActive = activeContent === item.value;
+                const count = counts[item.value];
+                return (
+                  <button
+                    key={item.value}
+                    type="button"
+                    className={`mobile-grid-item ${isActive ? "active" : ""}`}
+                    onClick={() => handleItemClick(item.value)}
+                  >
+                    <span className="grid-item-icon">{item.icon}</span>
+                    <span className="grid-item-label">{item.label}</span>
+                    {item.value !== "myDetails" && count !== undefined && (
+                      <span className={`grid-item-badge ${isActive ? "active" : ""}`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Horizontal Pills Bar */}
       <ul className="sidebar-menu">
         {menuItems.map((item) => (
           <li

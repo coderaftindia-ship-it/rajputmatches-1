@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaHome, FaSearch, FaCommentDots, FaUser } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
 import { useAuth } from "./AuthContext";
 
 const BottomNav = () => {
@@ -13,15 +14,16 @@ const BottomNav = () => {
   }
 
   const allNavItems = [
-    { name: "Home",     path: "/home",    icon: <FaHome size={20} /> },
-    { name: "Search",   path: "/search",  icon: <FaSearch size={20} /> },
+    { name: "Home", path: "/home", icon: <FaHome size={20} /> },
+    { name: "Dashboard", path: "/dashboard", icon: <MdDashboard size={20} /> },
+    { name: "Search", path: "/search", icon: <FaSearch size={20} /> },
     { name: "Messages", path: "/message", icon: <FaCommentDots size={20} /> },
-    { name: "Profile",  path: "/profile", icon: <FaUser size={20} /> },
+    { name: "Profile", path: "/profile", icon: <FaUser size={20} /> },
   ];
 
-  // Messages sirf login ke baad dikhe
+  // Messages aur Dashboard sirf login ke baad dikhe
   const navItems = allNavItems.filter(
-    (item) => item.name !== "Messages" || isAuthenticated
+    (item) => (item.name !== "Messages" && item.name !== "Dashboard") || isAuthenticated
   );
 
   const isActive = (path) => {
