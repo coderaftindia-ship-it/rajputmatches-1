@@ -166,7 +166,7 @@ const PremiumMembers = () => {
                                           borderRadius: "4px",
                                           fontSize: "0.75rem",
                                           display: "inline-flex",
-                                          align-items: "center",
+                                          alignItems: "center",
                                           gap: 3,
                                           transition: "all 0.2s"
                                         }}
