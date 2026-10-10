@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { FaCopy } from "react-icons/fa";
 
 const PremiumMembers = () => {
   const [members, setMembers] = useState([]);
@@ -145,7 +147,43 @@ const PremiumMembers = () => {
                                   {member.firstName} {member.lastName}
                                 </td>
                                 <td>{member.gender}</td>
-                                <td>{member.email}</td>
+                                <td>
+                                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                                    <span style={{ userSelect: "all" }}>{member.email || "—"}</span>
+                                    {member.email && (
+                                      <button
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(member.email);
+                                          toast.success("Email copied!");
+                                        }}
+                                        title="Copy email"
+                                        style={{
+                                          border: "none",
+                                          background: "#f0e8ec",
+                                          color: "#59123B",
+                                          cursor: "pointer",
+                                          padding: "3px 6px",
+                                          borderRadius: "4px",
+                                          fontSize: "0.75rem",
+                                          display: "inline-flex",
+                                          align-items: "center",
+                                          gap: 3,
+                                          transition: "all 0.2s"
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.background = "#59123B";
+                                          e.currentTarget.style.color = "#fff";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.background = "#f0e8ec";
+                                          e.currentTarget.style.color = "#59123B";
+                                        }}
+                                      >
+                                        <FaCopy style={{ fontSize: 11 }} />
+                                      </button>
+                                    )}
+                                  </div>
+                                </td>
 
                                 <td>
                                   <div

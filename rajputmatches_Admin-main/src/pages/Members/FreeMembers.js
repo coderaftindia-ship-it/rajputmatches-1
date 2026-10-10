@@ -6,7 +6,7 @@ import {
   FaUser, FaEye, FaBan, FaTrash, FaCheck, FaSearch,
   FaFilter, FaRedo, FaMale, FaFemale, FaTimes, FaChevronLeft,
   FaChevronRight, FaSort, FaSortUp, FaSortDown, FaDownload,
-  FaUserPlus, FaUsers, FaClock, FaCheckCircle, FaShieldAlt
+  FaUserPlus, FaUsers, FaClock, FaCheckCircle, FaShieldAlt, FaCopy
 } from "react-icons/fa";
 
 const BASE_URL = (process.env.REACT_APP_BASE_URL || "http://localhost:5000/admin").replace(/\/$/, "");
@@ -556,7 +556,7 @@ const FreeMembers = () => {
                   <th onClick={() => toggleSort("martrId")}>
                     Matri ID <SortIcon field="martrId" />
                   </th>
-                  <th style={{ minWidth: 190 }}>Email</th>
+                  <th style={{ minWidth: 200 }}>Email</th>
                   <th>Gender</th>
                   <th>Mobile</th>
                   <th>Approval</th>
@@ -638,8 +638,42 @@ const FreeMembers = () => {
                       </td>
 
                       {/* email */}
-                      <td style={{ maxWidth: 190, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        <span title={member.email}>{member.email}</span>
+                      <td style={{ minWidth: 200, wordBreak: "break-all" }}>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                          <span style={{ userSelect: "all" }} title={member.email}>{member.email || "—"}</span>
+                          {member.email && (
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(member.email);
+                                toast.success("Email copied!");
+                              }}
+                              title="Copy email"
+                              style={{
+                                border: "none",
+                                background: "#f0e8ec",
+                                color: "#59123B",
+                                cursor: "pointer",
+                                padding: "3px 6px",
+                                borderRadius: "4px",
+                                fontSize: "0.75rem",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 3,
+                                transition: "all 0.2s"
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = "#59123B";
+                                e.currentTarget.style.color = "#fff";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = "#f0e8ec";
+                                e.currentTarget.style.color = "#59123B";
+                              }}
+                            >
+                              <FaCopy style={{ fontSize: 11 }} />
+                            </button>
+                          )}
+                        </div>
                       </td>
 
                       {/* gender */}
